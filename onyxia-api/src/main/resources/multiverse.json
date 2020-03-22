@@ -1,0 +1,12 @@
+{
+  "universes": [
+    {
+      "id": "sample",
+      "name": "Sample lab",
+      "description": "A sample Universe",
+      "maintainer": "sample@example.com",
+      "url": "http://localhost/repo",
+      "status": "PROD"
+    }
+  ]
+}
