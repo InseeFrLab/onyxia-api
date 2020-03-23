@@ -1,0 +1,18 @@
+language: java
+services:
+  - docker
+jdk:
+  - openjdk11
+before_install:
+  - mvn -B versions:set -DnewVersion=$TRAVIS_BRANCH
+script:
+  - mvn -B package
+  - docker build -t inseefrlab/onyxia-api onyxia-api
+deploy:
+  skip_cleanup: true
+  provider: script
+  script:
+    echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    && docker push inseefrlab/onyxia-api
+  on:
+    branch: master
