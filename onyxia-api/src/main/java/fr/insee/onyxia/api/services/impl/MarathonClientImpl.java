@@ -24,6 +24,9 @@ public class MarathonClientImpl {
 
     @Bean
     public Marathon marathonClient() {
+        if (MARATHON_URL == null || MARATHON_URL.isBlank()) {
+            return null;
+        }
         if (MARATHON_AUTH_TOKEN != null && !MARATHON_AUTH_TOKEN.isBlank()) {
             return MarathonClient.getInstanceWithTokenAuth(MARATHON_URL,MARATHON_AUTH_TOKEN);
         }

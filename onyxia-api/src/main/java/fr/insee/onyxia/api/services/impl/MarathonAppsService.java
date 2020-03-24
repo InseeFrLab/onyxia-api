@@ -18,7 +18,7 @@ import mesosphere.marathon.client.model.v2.VersionedApp;
 public class MarathonAppsService implements AppsService {
 
 
-   @Autowired
+   @Autowired(required = false)
    Marathon marathon;
    
    @Override

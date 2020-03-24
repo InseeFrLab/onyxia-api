@@ -66,7 +66,7 @@ public class MyLabController {
     @Autowired
     private List<AdmissionController> admissionControllers;
 
-    @Autowired
+    @Autowired(required = false)
     private Marathon marathon;
     
     @GetMapping("/group")
