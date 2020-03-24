@@ -1,0 +1,155 @@
+{
+    "packages": [
+        {
+            "packagingVersion": "3.0",
+            "name": "wordpress",
+            "version": "1.0.0-4.5.3-apache",
+            "minDcosReleaseVersion": "1.8",
+            "scm": "https://github.com/docker-library/wordpress.git",
+            "maintainer": "https://dcos.io/community/",
+            "website": "https://wordpress.com/",
+            "framework": true,
+            "description": "WordPress is a free and open source blogging tool and a content management system (CMS) based on PHP and MySQL.",
+            "tags": [
+                "blog",
+                "cms",
+                "website"
+            ],
+            "preInstallNotes": "This DC/OS Service is currently in preview.",
+            "postInstallNotes": "WordPress has been installed.",
+            "postUninstallNotes": "WordPress has been uninstalled.",
+            "licenses": [
+                {
+                    "name": "GPLv2",
+                    "url": "https://wordpress.org/about/license/"
+                }
+            ],
+            "selected": false,
+            "lastUpdated": 1491426142,
+            "releaseVersion": 1,
+            "resource": {
+                "images": {
+                    "icon-small": "https://downloads.mesosphere.com/assets/universe/000/wordpress-icon-small.png",
+                    "icon-medium": "https://downloads.mesosphere.com/assets/universe/000/wordpress-icon-medium.png",
+                    "icon-large": "https://downloads.mesosphere.com/assets/universe/000/wordpress-icon-large.png"
+                },
+                "assets": {
+                    "container": {
+                        "docker": {
+                            "wordpress-100-453apache": "wordpress:4.5.3-apache"
+                        }
+                    }
+                }
+            },
+            "marathon": {
+                "v2AppMustacheTemplate": "ewogICJpZCI6ICJ7e3NlcnZpY2UubmFtZX19IiwKICAiY3B1cyI6IHt7c2VydmljZS5jcHVzfX0sCiAgIm1lbSI6IHt7c2VydmljZS5tZW19fSwKICAiaW5zdGFuY2VzIjogMSwKICAiZW52IjogewogICAgICAiV09SRFBSRVNTX0RCX0hPU1QiOiAie3tkYXRhYmFzZS5ob3N0fX0iLAogICAgICAiV09SRFBSRVNTX0RCX05BTUUiOiAie3tkYXRhYmFzZS5uYW1lfX0iLAogICAgICAiV09SRFBSRVNTX0RCX1VTRVIiOiAie3tkYXRhYmFzZS51c2VyfX0iLAogICAgICAiV09SRFBSRVNTX0RCX1BBU1NXT1JEIjogInt7ZGF0YWJhc2UucGFzc3dvcmR9fSIKICAgICAge3sjZGF0YWJhc2UudGFibGUtcHJlZml4fX0sCiAgICAgICJXT1JEUFJFU1NfVEFCTEVfUFJFRklYIjogInt7ZGF0YWJhc2UudGFibGUtcHJlZml4fX0iCiAgICAgIHt7L2RhdGFiYXNlLnRhYmxlLXByZWZpeH19CiAgfSwKICAiY29udGFpbmVyIjogewogICAgICAgInR5cGUiOiAiRE9DS0VSIiwKICAgICAgICJkb2NrZXIiOiB7CiAgICAgICAgICAgImltYWdlIjogInt7cmVzb3VyY2UuYXNzZXRzLmNvbnRhaW5lci5kb2NrZXIud29yZHByZXNzLTEwMC00NTNhcGFjaGV9fSIsCiAgICAgICAgICAgIm5ldHdvcmsiOiAiQlJJREdFIiwKICAgICAgICAgICAicG9ydE1hcHBpbmdzIjogWwogICAgICAgICAgICAgIHsgImNvbnRhaW5lclBvcnQiOiA4MCwgImhvc3RQb3J0IjogMCB9CiAgICAgICAgICBdCiAgICAgICB9LAogICAgICAgInZvbHVtZXMiOiBbCiAgICAgICAgICAgewogICAgICAgICAgICAgICAiY29udGFpbmVyUGF0aCI6ICIvdmFyL3d3dy9odG1sIiwKICAgICAgICAgICAgICAgImhvc3RQYXRoIjogInt7c3RvcmFnZS5ob3N0LXZvbHVtZX19L3t7c2VydmljZS5uYW1lfX0iLAogICAgICAgICAgICAgICAibW9kZSI6ICJSVyIKICAgICAgICAgICB9CiAgICAgICBdCiAgIH0sCiAgICJoZWFsdGhDaGVja3MiOiBbCiAgICB7CiAgICAgICJwYXRoIjogIi8iLAogICAgICAicG9ydEluZGV4IjogMCwKICAgICAgInByb3RvY29sIjogIkhUVFAiLAogICAgICAiZ3JhY2VQZXJpb2RTZWNvbmRzIjogMzAsCiAgICAgICJpbnRlcnZhbFNlY29uZHMiOiA2MCwKICAgICAgInRpbWVvdXRTZWNvbmRzIjogMjAsCiAgICAgICJtYXhDb25zZWN1dGl2ZUZhaWx1cmVzIjogMwogICAgfQogIF0sCiAgImxhYmVscyI6IHsKICAgIHt7I25ldHdvcmtpbmcudmlydHVhbC1ob3N0fX0KICAgICJIQVBST1hZX0dST1VQIjoiZXh0ZXJuYWwiLAogICAgIkhBUFJPWFlfMF9WSE9TVCI6Int7bmV0d29ya2luZy52aXJ0dWFsLWhvc3R9fSIsCiAgICAiSEFQUk9YWV8wX1JFRElSRUNUX1RPX0hUVFBTIjogInt7bmV0d29ya2luZy5odHRwcy1yZWRpcmVjdH19IiwKICAgIHt7L25ldHdvcmtpbmcudmlydHVhbC1ob3N0fX0KICAgICJNQVJBVEhPTl9TSU5HTEVfSU5TVEFOQ0VfQVBQIjogInRydWUiLAogICAgIkRDT1NfU0VSVklDRV9OQU1FIiA6ICJ7e3NlcnZpY2UubmFtZX19IiwKICAgICJEQ09TX1NFUlZJQ0VfUE9SVF9JTkRFWCIgIDogIjAiLAogICAgIkRDT1NfU0VSVklDRV9TQ0hFTUUiOiAiaHR0cCIKICB9LAogICJ1cGdyYWRlU3RyYXRlZ3kiOnsKICAgICJtaW5pbXVtSGVhbHRoQ2FwYWNpdHkiOiAwLAogICAgIm1heGltdW1PdmVyQ2FwYWNpdHkiOiAwCiAgfXt7I3N0b3JhZ2UucGlubmVkLWhvc3RuYW1lfX0sCiAgImNvbnN0cmFpbnRzIjogW1siaG9zdG5hbWUiLCAiQ0xVU1RFUiIsICJ7e3N0b3JhZ2UucGlubmVkLWhvc3RuYW1lfX0iXV0KICB7ey9zdG9yYWdlLnBpbm5lZC1ob3N0bmFtZX19Cn0K"
+            },
+            "config": {
+                "type": "object",
+                "properties": {
+                    "service": {
+                        "description": "Configuration properties for the Wordpress service for DC/OS.",
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "description": "The name of the service to display in the DC/OS dashboard.",
+                                "type": "string",
+                                "default": "wordpress"
+                            },
+                            "cpus": {
+                                "description": "CPU shares to allocate to this WordPress instance.",
+                                "type": "number",
+                                "default": 0.5,
+                                "minimum": 0.1
+                            },
+                            "mem": {
+                                "description": "Memory (in MB) to allocate to this WordPress instance.",
+                                "type": "number",
+                                "default": 512.0,
+                                "minimum": 256.0
+                            }
+                        },
+                        "required": [
+                            "name",
+                            "cpus",
+                            "mem"
+                        ]
+                    },
+                    "database": {
+                        "description": "MySQL database properties.",
+                        "type": "object",
+                        "properties": {
+                            "host": {
+                                "description": "Database host name and port (e.g. 1.2.3.4:3306).",
+                                "type": "string",
+                                "default": "mysql.marathon.mesos:3306"
+                            },
+                            "name": {
+                                "description": "Database name.",
+                                "type": "string",
+                                "default": "wordpress"
+                            },
+                            "user": {
+                                "description": "Database username.",
+                                "type": "string",
+                                "default": "wordpress"
+                            },
+                            "password": {
+                                "description": "Database password.",
+                                "type": "string",
+                                "default": "wordpress"
+                            },
+                            "table-prefix": {
+                                "description": "Database table prefix (only set this when you need to override the default table prefix in wp-config.php).",
+                                "type": "string",
+                                "default": ""
+                            }
+                        },
+                        "required": [
+                            "host",
+                            "name",
+                            "user",
+                            "password"
+                        ]
+                    },
+                    "networking": {
+                        "description": "Networking-related configuration properties for WordPress on DC/OS.",
+                        "type": "object",
+                        "properties": {
+                            "virtual-host": {
+                                "description": "The virtual host address to configure for integration with Marathon-lb.",
+                                "type": "string"
+                            },
+                            "https-redirect": {
+                                "description": "Whether Marathon-lb should redirect HTTP traffic to HTTPS. This requires 'virtual-host' to be set. By default, this is false.",
+                                "type": "boolean",
+                                "default": false
+                            }
+                        }
+                    },
+                    "storage": {
+                        "description": "Storage-related configuration properties for WordPress on DC/OS.",
+                        "type": "object",
+                        "properties": {
+                            "host-volume": {
+                                "description": "The location of a volume on the host to be used for persisting WordPress files. The final location will be derived from this value plus the name set in `name` (e.g. `/mnt/host_volume/wordpress`). Note that this path must be the same on all DC/OS agents unless you are using a pinned-hostname (below).",
+                                "type": "string",
+                                "default": "/tmp"
+                            },
+                            "pinned-hostname": {
+                                "description": "An optional DC/OS agent hostname to run this WordPress instance on (e.g. 10.0.0.1).",
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "required": [
+                    "service",
+                    "database",
+                    "networking",
+                    "storage"
+                ]
+            }
+        }
+    ]
+}

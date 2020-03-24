@@ -17,9 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
-import static fr.insee.onyxia.model.deprecated.HttpUtils.CLIENT;
-
-@Tag(name = "My lab",description = "My services")
+@Tag(name = "My lab", description = "My services")
 @RequestMapping("/my-lab/task")
 @RestController
 public class TaskController {
@@ -40,39 +38,37 @@ public class TaskController {
     private String MINIO_REGION;
 
     @GetMapping("/{taskId}")
-    public MesosTask getTask(
-            @PathVariable("taskId") String taskId)  {
+    public MesosTask getTask(@PathVariable("taskId") String taskId) {
         User user = userProvider.getUser();
         MesosTask task = taskService.getTaskFromMesos(taskId);
         return task;
     }
 
     @GetMapping("/{taskId}/browse")
-    public ServiceFile[] browse(@PathVariable("taskId") String taskId, @RequestParam("path") String path) throws IOException  {
+    public ServiceFile[] browse(@PathVariable("taskId") String taskId, @RequestParam("path") String path)
+            throws IOException {
         return taskService.browseFiles(taskId, path);
     }
 
     @GetMapping("/{taskId}/transfer")
-    public ResponseEntity transferFile(
-            @PathVariable("taskId") String taskId,
-            @RequestParam("path") String path,
+    public ResponseEntity transferFile(@PathVariable("taskId") String taskId, @RequestParam("path") String path,
             @RequestHeader(value = "S3_ACCESS_TOKEN") String accessToken,
-            @RequestHeader(value ="S3_ACCESS_KEY") String accessKey,
-            @RequestHeader(value ="S3_SECRET_KEY") String secretKey) throws IOException {
+            @RequestHeader(value = "S3_ACCESS_KEY") String accessKey,
+            @RequestHeader(value = "S3_SECRET_KEY") String secretKey) throws IOException {
         TaskService.SandboxFile file = taskService.downloadFile(taskId, path);
 
         User user = userProvider.getUser();
-        //final okhttp3.Response resp = CLIENT.newCall(fileRequest).execute();
+        // final okhttp3.Response resp = CLIENT.newCall(fileRequest).execute();
 
-        s3client.uploadObject(MINIO_REGION, MINIO_URL, accessKey, secretKey, accessToken, user.getIdep(), taskId + "/" + path, file.getData(), file.getContentLength());
+        s3client.uploadObject(MINIO_REGION, MINIO_URL, accessKey, secretKey, accessToken, user.getIdep(),
+                taskId + "/" + path, file.getData(), file.getContentLength());
         return new ResponseEntity(HttpStatus.OK);
     }
 
     @GetMapping("/{taskId}/download")
-    public ResponseEntity downloadFile(
-            @PathVariable("taskId") String taskId,
-            @RequestParam("path") String path) throws IOException {
-        TaskService.SandboxFile file = taskService.downloadFile(taskId,path);
+    public ResponseEntity downloadFile(@PathVariable("taskId") String taskId, @RequestParam("path") String path)
+            throws IOException {
+        TaskService.SandboxFile file = taskService.downloadFile(taskId, path);
         InputStreamResource inputStreamResource = new InputStreamResource(file.getData());
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setContentLength(file.getContentLength());
