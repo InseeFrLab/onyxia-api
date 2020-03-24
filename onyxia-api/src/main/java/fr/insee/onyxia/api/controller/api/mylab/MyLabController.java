@@ -65,6 +65,9 @@ public class MyLabController {
 
     @Autowired
     private List<AdmissionController> admissionControllers;
+
+    @Autowired
+    private Marathon marathon;
     
     @GetMapping("/group")
     public Group getGroup(
@@ -138,7 +141,6 @@ public class MyLabController {
                     "/users/" + userProvider.getUser().getIdep())) {
             throw new RuntimeException("hack!");
         }
-        Marathon marathon = MarathonClient.getInstance(MARATHON_URL);
         Result result = marathon.deleteApp(id);
         return result;
     }
@@ -158,7 +160,6 @@ public class MyLabController {
                     "/users/" + userProvider.getUser().getIdep())) {
             throw new RuntimeException("hack!");
         }
-        Marathon marathon = MarathonClient.getInstance(MARATHON_URL);
         Result result = marathon.deleteGroup(id, true);
         return result;
     }
@@ -175,7 +176,6 @@ public class MyLabController {
                     "/users/" + userProvider.getUser().getIdep())) {
             throw new RuntimeException("hack!");
         }
-        Marathon marathon = MarathonClient.getInstance(MARATHON_URL);
         App app = marathon.getApp(id).getApp();
         if (serviceId.getCpus() != null && serviceId.getCpus() > 0) {
             app.setCpus(serviceId.getCpus());
@@ -260,7 +260,6 @@ public class MyLabController {
             return app;
         }
         else {
-            Marathon marathon = MarathonClient.getInstance(MARATHON_URL);
             VersionedApp versionedApp = marathon.createApp(app);
             metrics.plusUn();
             return versionedApp;
@@ -328,7 +327,6 @@ public class MyLabController {
                         .get("icon-small"));
 
             if (!requestDTO.isDryRun()) {
-                Marathon marathon = MarathonClient.getInstance(MARATHON_URL);
                 VersionedApp versionedApp = marathon.createApp(app);
                 versionedApps.add(versionedApp);
             }
