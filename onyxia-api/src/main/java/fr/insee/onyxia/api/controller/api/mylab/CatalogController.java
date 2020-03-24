@@ -6,12 +6,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import fr.insee.onyxia.api.configuration.Multiverse;
 import fr.insee.onyxia.api.configuration.NotFoundException;
-import fr.insee.onyxia.api.configuration.metrics.CustomMetrics;
+import fr.insee.onyxia.api.configuration.UniverseWrapper;
 import fr.insee.onyxia.api.services.CatalogService;
-import fr.insee.onyxia.model.catalog.Multiverse;
 import fr.insee.onyxia.model.catalog.UniversePackage;
-import fr.insee.onyxia.model.catalog.UniverseWrapper;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(name = "Catalog",description = "Catalog")

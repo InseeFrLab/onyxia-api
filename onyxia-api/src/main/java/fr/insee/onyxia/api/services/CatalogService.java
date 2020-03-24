@@ -1,8 +1,8 @@
 package fr.insee.onyxia.api.services;
 
-import fr.insee.onyxia.model.catalog.Multiverse;
+import fr.insee.onyxia.api.configuration.Multiverse;
+import fr.insee.onyxia.api.configuration.UniverseWrapper;
 import fr.insee.onyxia.model.catalog.UniversePackage;
-import fr.insee.onyxia.model.catalog.UniverseWrapper;
 
 public interface CatalogService {
 

@@ -5,7 +5,7 @@
       "name": "Sample lab",
       "description": "A sample Universe",
       "maintainer": "sample@example.com",
-      "url": "http://localhost/repo",
+      "location": "classpath:universe.json",
       "status": "PROD"
     }
   ]
