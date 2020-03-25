@@ -1,28 +1,9 @@
 package fr.insee.onyxia.api.configuration;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.insee.onyxia.model.catalog.Universe;
-import fr.insee.onyxia.model.catalog.UniversePackage;
-import fr.insee.onyxia.model.catalog.UniversePackage.Config.Category;
-import fr.insee.onyxia.model.catalog.UniversePackage.Config.Category.Property;
 import fr.insee.onyxia.model.catalog.UniverseStatus;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UniverseWrapper {
