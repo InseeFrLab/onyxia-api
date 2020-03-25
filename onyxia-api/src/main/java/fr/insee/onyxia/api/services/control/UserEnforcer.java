@@ -42,6 +42,6 @@ public class UserEnforcer implements AdmissionController {
         userValues.put("\\[\\$GIT\\]", git);
         userValues.put("\\[\\$DNS\\]", dns);
         userValues.put("\\[\\$UUID\\]", instanceID);
-        return pkg.getProperties().enforceUser(userValues, object);
+        return pkg.getConfig().enforceUser(userValues, object);
     }
 }

@@ -5,10 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import fr.insee.onyxia.model.catalog.Config.Config;
@@ -34,7 +31,7 @@ public class UniversePackage {
 	int releaseVersion;
 	Map<String, Object> resource = new HashMap<>();
 	MarathonMustache marathon;
-	Config properties;
+	Config config;
 	String jsonMustache;
 
 	String status;
@@ -249,12 +246,12 @@ public class UniversePackage {
 		this.resource = resource;
 	}
 
-	public Config getProperties() {
-		return properties;
+	public Config getConfig() {
+		return config;
 	}
 
 	public void setConfig(Config properties) {
-		this.properties = properties;
+		this.config = properties;
 	}
 
 	public static class Images {
