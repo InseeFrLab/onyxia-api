@@ -1,4 +1,4 @@
-package fr.insee.onyxia.api.controller.api.mylab;
+package fr.insee.onyxia.api.controller.pub;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +14,7 @@ import fr.insee.onyxia.model.catalog.UniversePackage;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(name = "Catalog",description = "Catalog")
-@RequestMapping("/catalog")
+@RequestMapping("/public/catalog")
 @RestController
 public class CatalogController {
    

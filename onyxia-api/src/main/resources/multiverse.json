@@ -5,7 +5,7 @@
       "name": "Sample lab",
       "description": "A sample Universe",
       "maintainer": "sample@example.com",
-      "location": "classpath:universe.json",
+      "location": "https://levitt.fr/universe.json",
       "status": "PROD"
     }
   ]
