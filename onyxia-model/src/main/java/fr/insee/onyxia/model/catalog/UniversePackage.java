@@ -42,7 +42,7 @@ public class UniversePackage {
 	public String getJsonMustache() {
 		if (jsonMustache == null && marathon != null && marathon.getV2AppMustacheTemplate() != null) {
 			try {
-				Base64.getDecoder().decode(marathon.getV2AppMustacheTemplate());
+				jsonMustache = new String(Base64.getDecoder().decode(marathon.getV2AppMustacheTemplate()));
 			} catch (IllegalArgumentException e) {
 				// donothing
 			}

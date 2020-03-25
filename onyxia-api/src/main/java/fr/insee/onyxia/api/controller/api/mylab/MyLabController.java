@@ -221,10 +221,14 @@ public class MyLabController {
         String toMarathon = Mustacheur.mustache(pkg.getJsonMustache(), fusion);
 
         App app = mapper.readValue(toMarathon, App.class);
+        Map<String,String> onyxiaOptions = ((Map<String, String>) ((Map<String, Object>) requestDTO.getOptions()).get("onyxia"));
         app.addLabel("ONYXIA_NAME", pkg.getName());
-        app.addLabel("ONYXIA_TITLE",
-                ((Map<String, String>) ((Map<String, Object>) requestDTO.getOptions()).get("onyxia"))
-                        .get("friendly_name"));
+        if (onyxiaOptions != null) {
+            app.addLabel("ONYXIA_TITLE",
+                    onyxiaOptions
+                            .get("friendly_name"));
+        }
+
         app.addLabel("ONYXIA_SUBTITLE", pkg.getName());
         app.addLabel("ONYXIA_SCM", pkg.getScm());
         app.addLabel("ONYXIA_DESCRIPTION", pkg.getDescription());
@@ -238,7 +242,7 @@ public class MyLabController {
             }
         }
         app.addLabel("ONYXIA_LOGO",
-                (String) ((Map<String, Object>) ((Map<String, Object>) resource.get("resource")).get("images"))
+                (String) ((Map<String, Object>) resource.get("images"))
                         .get("icon-small"));
 
         if (requestDTO.isDryRun()) {
