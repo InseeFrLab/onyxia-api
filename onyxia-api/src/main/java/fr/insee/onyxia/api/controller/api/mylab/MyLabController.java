@@ -216,7 +216,7 @@ public class MyLabController {
             throw new AccessDeniedException("Validation failed");
         }
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
-        fusion.putAll(resource);
+        fusion.putAll(Map.of("resource",resource));
 
         String toMarathon = Mustacheur.mustache(pkg.getJsonMustache(), fusion);
 
