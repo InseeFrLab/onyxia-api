@@ -1,13 +1,27 @@
 package fr.insee.onyxia.api.configuration;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.node.IntNode;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonSerializationContext;
+import io.minio.messages.Item;
+import mesosphere.marathon.client.model.v2.ExternalVolume;
+import mesosphere.marathon.client.model.v2.LocalVolume;
+import mesosphere.marathon.client.model.v2.PersistentLocalVolume;
+import mesosphere.marathon.client.model.v2.Volume;
+import org.apache.tomcat.jni.Local;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+
+import java.io.IOException;
 
 @Configuration
 public class CustomObjectMapper {
@@ -19,6 +33,37 @@ public class CustomObjectMapper {
        mapper.setSerializationInclusion(Include.NON_NULL);
        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
        mapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
+       SimpleModule module = new SimpleModule();
+       module.addDeserializer(Volume.class, new ItemDeserializer(mapper));
+       mapper.registerModule(module);
+
        return mapper;
    }
+
+    public class ItemDeserializer extends StdDeserializer<Volume> {
+
+       ObjectMapper mapper;
+
+        public ItemDeserializer(ObjectMapper mapper) {
+            this(mapper,null);
+        }
+
+        public ItemDeserializer(ObjectMapper mapper, Class<?> vc) {
+            super(vc);
+            this.mapper = mapper;
+        }
+
+        @Override
+        public Volume deserialize(JsonParser jp, DeserializationContext ctxt)
+                throws IOException, JsonProcessingException {
+            JsonNode node = jp.getCodec().readTree(jp);
+            if (node != null && node.has("external")) {
+                return mapper.treeToValue(node, ExternalVolume.class);
+            }
+            if (node != null && node.has("persistent")) {
+                return mapper.treeToValue(node, PersistentLocalVolume.class);
+            }
+            return mapper.treeToValue(node, LocalVolume.class);
+        }
+    }
 }
