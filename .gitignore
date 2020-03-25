@@ -6,3 +6,4 @@ node_modules
 /onyxia-api/bin
 .idea
 *.iml
+.vscode

@@ -25,23 +25,23 @@ public class UserEnforcer implements AdmissionController {
 
     @Override
     public boolean validateContract(User user, UniversePackage pkg, Object data) {
-        return enforceUser(user,pkg,data);
+        return enforceUser(user, pkg, data);
     }
 
     public boolean enforceUser(User user, UniversePackage pkg, Object object) {
         UUID uuid = UUID.randomUUID();
         String instanceID = Long.toString(-uuid.getLeastSignificantBits());
-        Map<String,String> userValues = new HashMap<String,String>();
-        userValues.put("\\[\\$IDEP\\]",user.getIdep());
-        userValues.put("\\[\\$USERMAIL\\]",user.getEmail());
-        userValues.put("\\[\\$USERNAME\\]",user.getNomComplet());
-        userValues.put("\\[\\$USERPASSWORD\\]",user.getPassword());
-        //	userValues.put("\\[\\$USERKEY\\]",user.getSshKeyUrl());
-        userValues.put("\\[\\$USERKEY\\]",keyLocation+user.getIdep()+"_rsa.gpg");
+        Map<String, String> userValues = new HashMap<String, String>();
+        userValues.put("\\[\\$IDEP\\]", user.getIdep());
+        userValues.put("\\[\\$USERMAIL\\]", user.getEmail());
+        userValues.put("\\[\\$USERNAME\\]", user.getNomComplet());
+        userValues.put("\\[\\$USERPASSWORD\\]", user.getPassword());
+        // userValues.put("\\[\\$USERKEY\\]",user.getSshKeyUrl());
+        userValues.put("\\[\\$USERKEY\\]", keyLocation + user.getIdep() + "_rsa.gpg");
         userValues.put("\\[\\$STATUS\\]", pkg.getStatus());
-        userValues.put("\\[\\$GIT\\]",git);
-        userValues.put("\\[\\$DNS\\]",dns);
-        userValues.put("\\[\\$UUID\\]",instanceID);
-        return pkg.getProperties().enforceUser(userValues,object);
+        userValues.put("\\[\\$GIT\\]", git);
+        userValues.put("\\[\\$DNS\\]", dns);
+        userValues.put("\\[\\$UUID\\]", instanceID);
+        return pkg.getProperties().enforceUser(userValues, object);
     }
 }
