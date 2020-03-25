@@ -47,15 +47,15 @@ public class Config {
     }
 
     public boolean enforceUser(Map<String, String> userValues, Object object) {
-        // Map<String, Object> map;
-        // if (!(object instanceof Map)) {
-        // return false;
-        // } else {
-        // map = (Map<String, Object>) object;
-        // }
-        // for (Map.Entry<String, Property> entry : properties.entrySet()) {
-        // entry.getValue().enforceUser(userValues, map, entry.getKey());
-        // }
+         Map<String, Object> map;
+         if (!(object instanceof Map)) {
+         return false;
+         } else {
+         map = (Map<String, Object>) object;
+         }
+         for (Map.Entry<String, Property> entry : properties.getProperties().entrySet()) {
+         entry.getValue().enforceUser(userValues, map, entry.getKey());
+         }
         return true;
     }
 
