@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.websocket.server.PathParam;
 
@@ -84,6 +85,9 @@ public class MyLabController {
 
     @Autowired
     private OkHttpClient httpClient;
+
+    @Value("${marathon.group:/users}")
+    private String MARATHON_GROUP;
 
     @GetMapping("/group")
     public Group getGroup(@RequestParam(value = "groupId", required = false) String id)
@@ -216,17 +220,18 @@ public class MyLabController {
             throw new AccessDeniedException("Validation failed");
         }
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
-        fusion.putAll(Map.of("resource",resource));
+        fusion.putAll(Map.of("resource", resource));
 
         String toMarathon = Mustacheur.mustache(pkg.getJsonMustache(), fusion);
-
         App app = mapper.readValue(toMarathon, App.class);
-        Map<String,String> onyxiaOptions = ((Map<String, String>) ((Map<String, Object>) requestDTO.getOptions()).get("onyxia"));
+        UUID uuid = UUID.randomUUID();
+        String instanceID = Long.toString(-uuid.getLeastSignificantBits());
+        app.setId(MARATHON_GROUP + "/" + user.getIdep() + "/" + pkg.getName() + "-" + instanceID);
+        Map<String, String> onyxiaOptions = ((Map<String, String>) ((Map<String, Object>) requestDTO.getOptions())
+                .get("onyxia"));
         app.addLabel("ONYXIA_NAME", pkg.getName());
         if (onyxiaOptions != null) {
-            app.addLabel("ONYXIA_TITLE",
-                    onyxiaOptions
-                            .get("friendly_name"));
+            app.addLabel("ONYXIA_TITLE", onyxiaOptions.get("friendly_name"));
         }
 
         app.addLabel("ONYXIA_SUBTITLE", pkg.getName());
@@ -241,9 +246,7 @@ public class MyLabController {
                 app.addLabel("ONYXIA_URL", "https://" + app.getLabels().get("HAPROXY_0_VHOST"));
             }
         }
-        app.addLabel("ONYXIA_LOGO",
-                (String) ((Map<String, Object>) resource.get("images"))
-                        .get("icon-small"));
+        app.addLabel("ONYXIA_LOGO", (String) ((Map<String, Object>) resource.get("images")).get("icon-small"));
 
         if (requestDTO.isDryRun()) {
             return app;
