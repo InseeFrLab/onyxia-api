@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -56,8 +57,16 @@ import okhttp3.Response;
 @RestController
 public class MyLabController {
 
+    /**
+     * @deprecated : should be moved to the marathon http client
+     */
+    @Deprecated
     @Value("${marathon.url}")
-    private String MARATHON_URL;
+    String MARATHON_URL;
+
+    @Autowired
+    @Qualifier("marathon")
+    private OkHttpClient marathonClient;
 
     @Autowired
     private CustomMetrics metrics;
@@ -83,9 +92,6 @@ public class MyLabController {
     @Autowired(required = false)
     private Marathon marathon;
 
-    @Autowired
-    private OkHttpClient httpClient;
-
     @Value("${marathon.group.name}")
     private String MARATHON_GROUP_NAME;
 
@@ -101,7 +107,7 @@ public class MyLabController {
                 + "embed=group.apps.tasks" + "&" + "embed=group.apps.counts" + "&" + "embed=group.apps.deployments"
                 + "&" + "embed=group.apps.readiness" + "&" + "embed=group.apps.lastTaskFailure" + "&"
                 + "embed=group.pods" + "&" + "embed=group.apps.taskStats").build();
-        Response response = httpClient.newCall(requete).execute();
+        Response response = marathonClient.newCall(requete).execute();
         Group groupResponse = mapper.readValue(response.body().byteStream(), Group.class);
         return groupResponse;
 
@@ -132,7 +138,7 @@ public class MyLabController {
                 + "embed=app.readiness" + "&" + "embed=app.lastTaskFailure" + "&" + "embed=app.taskStats";
 
         Request requete = new Request.Builder().url(url).build();
-        Response response = httpClient.newCall(requete).execute();
+        Response response = marathonClient.newCall(requete).execute();
 
         return response.body().string();
 
