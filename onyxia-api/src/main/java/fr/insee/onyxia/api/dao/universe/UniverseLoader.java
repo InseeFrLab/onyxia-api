@@ -1,17 +1,15 @@
 package fr.insee.onyxia.api.dao.universe;
 
-import java.io.InputStreamReader;
-import java.io.Reader;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import fr.insee.onyxia.api.configuration.UniverseWrapper;
+import fr.insee.onyxia.model.catalog.Universe;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
-import fr.insee.onyxia.api.configuration.UniverseWrapper;
-import fr.insee.onyxia.model.catalog.Universe;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
 @Service
 public class UniverseLoader {
