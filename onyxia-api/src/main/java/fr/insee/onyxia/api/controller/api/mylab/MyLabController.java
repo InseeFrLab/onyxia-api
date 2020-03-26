@@ -86,8 +86,8 @@ public class MyLabController {
     @Autowired
     private OkHttpClient httpClient;
 
-    @Value("${marathon.group:/users}")
-    private String MARATHON_GROUP;
+    @Value("${marathon.group.name}")
+    private String MARATHON_GROUP_NAME;
 
     @GetMapping("/group")
     public Group getGroup(@RequestParam(value = "groupId", required = false) String id)
@@ -226,7 +226,7 @@ public class MyLabController {
         App app = mapper.readValue(toMarathon, App.class);
         UUID uuid = UUID.randomUUID();
         String instanceID = Long.toString(-uuid.getLeastSignificantBits());
-        app.setId(MARATHON_GROUP + "/" + user.getIdep() + "/" + pkg.getName() + "-" + instanceID);
+        app.setId(MARATHON_GROUP_NAME + "/" + user.getIdep() + "/" + pkg.getName() + "-" + instanceID);
         Map<String, String> onyxiaOptions = ((Map<String, String>) ((Map<String, Object>) requestDTO.getOptions())
                 .get("onyxia"));
         app.addLabel("ONYXIA_NAME", pkg.getName());
