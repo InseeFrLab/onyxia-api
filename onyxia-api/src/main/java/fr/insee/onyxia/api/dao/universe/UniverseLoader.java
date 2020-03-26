@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.configuration.UniverseWrapper;
 import fr.insee.onyxia.model.catalog.Universe;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +13,6 @@ import java.io.Reader;
 @Service
 public class UniverseLoader {
 
-    @Value("${universe.cache.ttl}")
-    private long refreshTime;
-
     @Autowired
     private ResourceLoader resourceLoader;
 
@@ -24,9 +20,6 @@ public class UniverseLoader {
     private ObjectMapper mapper;
 
     public void updateUniverse(UniverseWrapper uw) {
-        if (System.currentTimeMillis() < uw.getLastUpdateTime() + refreshTime) {
-            return;
-        }
         try {
             Reader reader = new InputStreamReader(resourceLoader.getResource(uw.getLocation()).getInputStream(),
                     "UTF-8");
