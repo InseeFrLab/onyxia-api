@@ -113,7 +113,7 @@ public class SpringKeycloakSecurityConfiguration {
          // manage routes securisation here
          .authorizeRequests().antMatchers(HttpMethod.OPTIONS).permitAll()
          // configuration pour Swagger
-         .antMatchers("/","/swagger-ui**","/swagger-ui/**", "/v2/api-docs","/v3/api-docs","/csrf",  "/webjars/**", "/swagger-resources/**", "/actuator/**", "/actuator").permitAll()
+         .antMatchers("/","/swagger-ui**","/swagger-ui/**", "/v2/api-docs","/v3/api-docs","/v3/api-docs/*","/csrf",  "/webjars/**", "/swagger-resources/**", "/actuator/**", "/actuator").permitAll()
          // configuration pour public
          .antMatchers("/public/**").permitAll()
          .anyRequest().authenticated()
