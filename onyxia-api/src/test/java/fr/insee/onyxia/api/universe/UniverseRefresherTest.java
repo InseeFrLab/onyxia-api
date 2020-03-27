@@ -8,14 +8,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.TestPropertySource;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @SpringBootTest
 @TestPropertySource(properties = {"universe.refresh.ms=3000","multiverse.configuration=classpath:multiverse.json","dummy-multiverse.configuration=classpath:dummy-multiverse.json"})
@@ -27,27 +23,24 @@ public class UniverseRefresherTest  {
     @Autowired
     private UniverseRefresher universeRefresher;
 
-    @Autowired
-    private ResourceLoader resourceLoader;
-
     @Value("${universe.refresh.ms}")
     private long refreshTime;
 
-    @Value("${multiverse.configuration}")
-    private String multiverseConf;
-
-    @Value("${dummy-multiverse.configuration}")
-    private String dummyMultiverseConf;
 
     @Test
-    public void timeSchedulerCorrectlyInitializedTest() throws IOException, InterruptedException {
-        Path dummyMultiverseConfPath = resourceLoader.getResource(dummyMultiverseConf).getFile().toPath();
-        Path multiVersePath = resourceLoader.getResource(multiverseConf).getFile().toPath();
-        Files.copy(dummyMultiverseConfPath,multiVersePath, StandardCopyOption.REPLACE_EXISTING);
-        List<UniverseWrapper> multiverseWrappers = multiverse.getUniverses();
+    public void timeSchedulerCorrectlyInitializedTest() throws InterruptedException {
+        List<Long> timesBeforeUpdateList =genererListeTemps(multiverse);
         Thread.sleep(refreshTime);
-        Assertions.assertNotEquals(multiverseWrappers.toString(),multiverse.getUniverses().toString());
+        List<Long> timesAfterUpdateList = genererListeTemps(multiverse);
+        Assertions.assertNotEquals(timesBeforeUpdateList,timesAfterUpdateList);
         } ;
+
+    private List<Long> genererListeTemps(Multiverse multiverse){
+        return multiverse.getUniverses()
+                .stream()
+                .map(UniverseWrapper::getLastUpdateTime)
+                .collect(Collectors.toList());
+    }
 
 
 }
