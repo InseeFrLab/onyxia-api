@@ -25,13 +25,13 @@ public class UniverseRefresherTest  {
 
     @Test
     public void timeSchedulerCorrectlyInitializedTest() throws InterruptedException {
-        List<Long> timesBeforeUpdateList =genererListeTemps(multiverse);
-        Thread.sleep(refreshTime);
-        List<Long> timesAfterUpdateList = genererListeTemps(multiverse);
-        Assertions.assertNotEquals(timesBeforeUpdateList,timesAfterUpdateList);
+        List<Long> timesBeforeListUpdate =generateTimeLists(multiverse);
+        Thread.sleep(refreshTime*2);
+        List<Long> timesAfterListUpdate = generateTimeLists(multiverse);
+        Assertions.assertNotEquals(timesBeforeListUpdate,timesAfterListUpdate);
         } ;
 
-    private List<Long> genererListeTemps(Multiverse multiverse){
+    private List<Long> generateTimeLists(Multiverse multiverse){
         return multiverse.getUniverses()
                 .stream()
                 .map(UniverseWrapper::getLastUpdateTime)
