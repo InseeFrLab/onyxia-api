@@ -5,6 +5,8 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import javax.print.attribute.standard.Media;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Property {
     String type;
@@ -18,48 +20,15 @@ public class Property {
     Object enumeration;
     Map<String, Property> properties;
 
-    @JsonProperty("api-defined")
-    Boolean apiDefined = null;
+    @JsonProperty("x-form")
+    private XForm xform;
 
-    @JsonProperty("api-default")
-    String apiDefault;
-
-    @JsonProperty("js-control")
-    String jsControl;
-
-    @JsonProperty("api-control")
-    String apiControl;
-
-    public Boolean getApiDefined() {
-        return apiDefined;
+    public XForm getXform() {
+        return xform;
     }
 
-    public void setApiDefined(Boolean apiDefined) {
-        this.apiDefined = apiDefined;
-    }
-
-    public String getJsControl() {
-        return jsControl;
-    }
-
-    public void setJsControl(String jsControl) {
-        this.jsControl = jsControl;
-    }
-
-    public String getApiDefault() {
-        return apiDefault;
-    }
-
-    public void setApiDefault(String apiDefault) {
-        this.apiDefault = apiDefault;
-    }
-
-    public String getApiControl() {
-        return apiControl;
-    }
-
-    public void setApiControl(String apiControl) {
-        this.apiControl = apiControl;
+    public void setXform(XForm xform) {
+        this.xform = xform;
     }
 
     public Map<String, Property> getProperties() {
@@ -126,55 +95,6 @@ public class Property {
         this.minimum = minimum;
     }
 
-    public boolean enforceUser(Map<String, String> userValues, Map<String, Object> map, String key) {
-        switch (type) {
-            case "string":
-                if (apiDefined != null && apiControl != null && apiDefined) {
-                    switch (apiControl) {
-                        case "strict":
-                            String force = apiDefault;
-                            for (Map.Entry<String, String> entry : userValues.entrySet()) {
-                                if (entry.getValue() != null) {
-                                    force = force.replaceAll(entry.getKey(), entry.getValue());
-                                }
-                            }
-                            map.put(key, force);
-                            break;
-
-                    }
-                }
-                break;
-            case "boolean":
-                break;
-            case "number":
-                break;
-            case "object":
-                if (!(map.get(key) instanceof Map)) {
-                    return false;
-                }
-                for (Map.Entry<String, Property> entry : properties.entrySet()) {
-                    entry.getValue().enforceUser(userValues, (Map<String, Object>) map.get(key), entry.getKey());
-                }
-
-                break;
-            default:
-                return false;
-
-        }
-        return true;
-    }
-    // public void initUser(User user) {
-    // if (properties!=null){
-    // for (Property property : properties.values()){
-    // property.initUser(user);
-    // }
-    // }
-    // else{
-    // defaut = apiDefault;
-    // }
-
-    // }
-
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Media {
         String type;
@@ -185,6 +105,38 @@ public class Property {
 
         public void setType(String type) {
             this.type = type;
+        }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class XForm {
+
+        boolean visible;
+        boolean readonly;
+        String value;
+
+        public boolean isVisible() {
+            return visible;
+        }
+
+        public void setVisible(boolean visible) {
+            this.visible = visible;
+        }
+
+        public boolean isReadonly() {
+            return readonly;
+        }
+
+        public void setReadonly(boolean readonly) {
+            this.readonly = readonly;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
         }
     }
 

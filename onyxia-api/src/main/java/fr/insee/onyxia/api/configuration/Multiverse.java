@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Multiverse {
-  private List<UniverseWrapper> universes;
+  private List<UniverseWrapper> universes = new ArrayList<>();
 
 
   public Multiverse() {
