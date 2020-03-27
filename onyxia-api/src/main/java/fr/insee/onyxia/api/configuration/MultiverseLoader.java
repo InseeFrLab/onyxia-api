@@ -26,10 +26,14 @@ public class MultiverseLoader {
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
-    public Multiverse multiverse() throws IOException {
+    public Multiverse multiverse() {
             try(InputStream inputStream = resourceLoader.getResource(multiverseConf).getInputStream()){
                 return mapper.readValue(inputStream, Multiverse.class);
             }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
     }
+
 
 }
