@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import javax.annotation.PostConstruct;
 import javax.websocket.server.PathParam;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -91,6 +92,13 @@ public class MyLabController {
 
     @Value("${marathon.group.name}")
     private String MARATHON_GROUP_NAME;
+
+    @PostConstruct
+    public void postConstruct() {
+        Collections.sort(admissionControllers, (admissionController, admissionController2) ->  {
+            return admissionController2.getPriority().compareTo(admissionController.getPriority());
+        });
+    }
 
     @GetMapping("/group")
     public Group getGroup(@RequestParam(value = "groupId", required = false) String id)

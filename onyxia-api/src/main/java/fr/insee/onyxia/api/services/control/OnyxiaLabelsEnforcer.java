@@ -36,4 +36,9 @@ public class OnyxiaLabelsEnforcer implements AdmissionController {
 
         return true;
     }
+
+    @Override
+    public Integer getPriority() {
+        return -1000;
+    }
 }

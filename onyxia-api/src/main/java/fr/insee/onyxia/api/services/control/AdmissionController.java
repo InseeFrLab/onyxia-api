@@ -18,4 +18,12 @@ public interface AdmissionController {
      * @return whether the contract is ok to deploy
      */
     public boolean validateContract(App app, User user, UniversePackage pkg, Map<String,Object> configData, PublishContext context);
+
+    /**
+     * Returns the priority. Higher priority will be applied first. Default is 0, can be negative.
+     * @return
+     */
+    public default Integer getPriority() {
+        return 0;
+    }
 }
