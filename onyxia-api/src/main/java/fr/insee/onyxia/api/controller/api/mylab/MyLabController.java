@@ -1,12 +1,8 @@
 package fr.insee.onyxia.api.controller.api.mylab;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.websocket.server.PathParam;
 
@@ -186,9 +182,21 @@ public class MyLabController {
         return result;
     }
 
+
+
     @PutMapping("/app")
     public App publishService(@RequestBody CreateServiceDTO requestDTO)
             throws JsonProcessingException, IOException, MarathonException, Exception {
+        return publishApps(requestDTO,false).stream().findFirst().get();
+    }
+
+    @PutMapping("/group")
+    public Collection<App> publishGroup(@RequestBody CreateServiceDTO requestDTO)
+            throws JsonProcessingException, IOException, MarathonException, Exception {
+        return publishApps(requestDTO, true);
+    }
+
+    private Collection<App> publishApps(CreateServiceDTO requestDTO, boolean isGroup) throws JsonProcessingException, IOException, MarathonException, Exception {
         String catalogId = "inno";
         if (requestDTO.getCatalogId() != null && requestDTO.getCatalogId().length() > 0) {
             catalogId = requestDTO.getCatalogId();
@@ -204,89 +212,35 @@ public class MyLabController {
         fusion.putAll(Map.of("resource", resource));
 
         String toMarathon = Mustacheur.mustache(pkg.getJsonMustache(), fusion);
-        App app = mapper.readValue(toMarathon, App.class);
-
-        PublishContext context = new PublishContext();
-
-        // Apply every admission controller
-        long nbInvalidations = admissionControllers.stream()
-                .map(admissionController -> admissionController.validateContract(app, user, pkg, (Map<String, Object>) requestDTO.getOptions(), context))
-                .filter(b -> !b).count();
-        if (nbInvalidations > 0) {
-            throw new AccessDeniedException("Validation failed");
+        Collection<App> apps;
+        if (isGroup) {
+            Group group = mapper.readValue(toMarathon, Group.class);
+            apps = group.getApps();
         }
+        else {
+            apps = new ArrayList<>();
+            apps.add(mapper.readValue(toMarathon, App.class));
+        }
+
+        for (App app : apps) {
+            PublishContext context = new PublishContext();
+
+            // Apply every admission controller
+            long nbInvalidations = admissionControllers.stream()
+                    .map(admissionController -> admissionController.validateContract(app, user, pkg, (Map<String, Object>) requestDTO.getOptions(), context))
+                    .filter(b -> !b).count();
+            if (nbInvalidations > 0) {
+                throw new AccessDeniedException("Validation failed");
+            }
+        }
+
+
 
         if (requestDTO.isDryRun()) {
-            return app;
+            return apps;
         } else {
-            VersionedApp versionedApp = marathon.createApp(app);
-            metrics.plusUn();
-            return versionedApp;
+            return apps.stream().map(app -> marathon.createApp(app)).collect(Collectors.toList());
         }
-    }
-
-    @PutMapping("/group")
-    public Collection<App> publishGroup(@RequestBody CreateServiceDTO requestDTO)
-            throws JsonProcessingException, IOException, MarathonException, Exception {
-        System.out.println("Stub publishing group");
-        /*String catalogId = "inno";
-        if (requestDTO.getCatalogId() != null && requestDTO.getCatalogId().length() > 0) {
-            catalogId = requestDTO.getCatalogId();
-        }
-        UniversePackage pkg = catalogService.getPackage(catalogId, requestDTO.getPackageName());
-        Map<String, Object> resource = pkg.getResource();
-        Map<String, Object> fusion = new HashMap<>();
-        User user = userProvider.getUser();
-        userDataService.fetchUserData(user);
-
-        // Apply every admission controller
-        long nbInvalidations = admissionControllers.stream()
-                .map(admissionController -> admissionController.validateContract(user, pkg, requestDTO.getOptions()))
-                .filter(b -> !b).count();
-        if (nbInvalidations > 0) {
-            throw new AccessDeniedException("Validation failed");
-        }
-
-        fusion.putAll((Map<String, Object>) requestDTO.getOptions());
-        fusion.putAll(resource);
-
-        String toMarathon = Mustacheur.mustache(pkg.getJsonMustache(), fusion);
-        Group group = mapper.readValue(toMarathon, Group.class);
-        Collection<App> apps = group.getApps();
-        Collection<App> versionedApps = new HashSet<>();
-        for (App app : apps) {
-            String moduleName = app.getId().substring(app.getId().lastIndexOf('/') + 1);
-            String name = pkg.getName() + " : " + moduleName;
-
-            app.addLabel("ONYXIA_NAME", name);
-            app.addLabel("ONYXIA_TITLE",
-                    ((Map<String, String>) ((Map<String, Object>) requestDTO.getOptions()).get("onyxia"))
-                            .get("friendly_name"));
-            app.addLabel("ONYXIA_SUBTITLE", moduleName);
-            app.addLabel("ONYXIA_SCM", pkg.getScm());
-            app.addLabel("ONYXIA_DESCRIPTION", pkg.getDescription());
-            app.addLabel("ONYXIA_STATUS", pkg.getStatus());
-            if (!app.getLabels().containsKey("ONYXIA_URL") && app.getLabels().containsKey("HAPROXY_0_VHOST")) {
-                if (app.getLabels().containsKey("HAPROXY_1_VHOST")) {
-                    app.addLabel("ONYXIA_URL", "https://" + app.getLabels().get("HAPROXY_0_VHOST") + ",https://"
-                            + app.getLabels().get("HAPROXY_1_VHOST"));
-                } else {
-                    app.addLabel("ONYXIA_URL", "https://" + app.getLabels().get("HAPROXY_0_VHOST"));
-                }
-            }
-            app.addLabel("ONYXIA_LOGO",
-                    (String) ((Map<String, Object>) ((Map<String, Object>) resource.get("resource")).get("images"))
-                            .get("icon-small"));
-
-            if (!requestDTO.isDryRun()) {
-                VersionedApp versionedApp = marathon.createApp(app);
-                versionedApps.add(versionedApp);
-            } else {
-                versionedApps.add(app);
-            }
-        }*/
-
-        return null;
     }
 
 }

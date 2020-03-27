@@ -1,6 +1,8 @@
 package fr.insee.onyxia.api.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -24,6 +26,8 @@ public class MultiverseLoader {
     @Value("${multiverse.configuration}")
     private String multiverseConf;
 
+    Logger logger = LoggerFactory.getLogger(MultiverseLoader.class);
+
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
     public Multiverse multiverse() {
@@ -31,8 +35,9 @@ public class MultiverseLoader {
                 return mapper.readValue(inputStream, Multiverse.class);
             }
             catch (Exception e) {
-                e.printStackTrace();
+                logger.error("Error : Could not load multiverse !",e);
             }
+            return new Multiverse();
     }
 
 
