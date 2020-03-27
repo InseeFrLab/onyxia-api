@@ -3,6 +3,8 @@ package fr.insee.onyxia.api.dao.universe;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.configuration.UniverseWrapper;
 import fr.insee.onyxia.model.catalog.Universe;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,8 @@ import java.io.Reader;
 @Service
 public class UniverseLoader {
 
+    private final Logger logger = LoggerFactory.getLogger(UniverseRefresher.class);
+
     @Autowired
     private ResourceLoader resourceLoader;
 
@@ -21,6 +25,7 @@ public class UniverseLoader {
 
     public void updateUniverse(UniverseWrapper uw) {
         try {
+            logger.info("updating universe with id:" + uw.getId());
             Reader reader = new InputStreamReader(resourceLoader.getResource(uw.getLocation()).getInputStream(),
                     "UTF-8");
             uw.setUniverse(mapper.readValue(reader, Universe.class));

@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.ResourceLoader;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 @Configuration
 public class MultiverseLoader {
@@ -26,9 +27,9 @@ public class MultiverseLoader {
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
     public Multiverse multiverse() throws IOException {
-        Multiverse multiverse = mapper.readValue(resourceLoader.getResource(multiverseConf).getInputStream(),
-                Multiverse.class);
-        return multiverse;
+            try(InputStream inputStream = resourceLoader.getResource(multiverseConf).getInputStream()){
+                return mapper.readValue(inputStream, Multiverse.class);
+            }
     }
 
 }
