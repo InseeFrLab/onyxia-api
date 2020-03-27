@@ -29,12 +29,13 @@ public class UniverseRefresher {
         this.refresh();
         if (refreshTime > 0L) {
             Timer timer = new Timer();
-            timer.scheduleAtFixedRate(new TimerTask() {
-                                          @Override
-                                          public void run() {
-                                              refresh();
-                                          }
-                                      },
+            TimerTask timerTask = new TimerTask() {
+                @Override
+                public void run() {
+                    refresh();
+                }
+            };
+            timer.scheduleAtFixedRate(timerTask,
                     refreshTime, refreshTime);
         }
     }
