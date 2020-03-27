@@ -2,7 +2,6 @@ package fr.insee.onyxia.api.universe;
 
 import fr.insee.onyxia.api.configuration.Multiverse;
 import fr.insee.onyxia.api.configuration.UniverseWrapper;
-import fr.insee.onyxia.api.dao.universe.UniverseRefresher;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,14 +13,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @SpringBootTest
-@TestPropertySource(properties = {"universe.refresh.ms=3000","multiverse.configuration=classpath:multiverse.json","dummy-multiverse.configuration=classpath:dummy-multiverse.json"})
+@TestPropertySource(properties = {"universe.refresh.ms=3000"})
 public class UniverseRefresherTest  {
 
     @Autowired
     private Multiverse multiverse;
-
-    @Autowired
-    private UniverseRefresher universeRefresher;
 
     @Value("${universe.refresh.ms}")
     private long refreshTime;
