@@ -64,17 +64,4 @@ public class Category {
 		this.properties = properties;
 	}
 
-	public boolean enforceUser(Map<String, String> userValues, Object object) {
-		Map<String, Object> map;
-		if (!(object instanceof Map)) {
-			return false;
-		} else {
-			map = (Map<String, Object>) object;
-		}
-		for (Map.Entry<String, Property> entry : properties.entrySet()) {
-			entry.getValue().enforceUser(userValues, map, entry.getKey());
-		}
-		return true;
-	}
-
 }

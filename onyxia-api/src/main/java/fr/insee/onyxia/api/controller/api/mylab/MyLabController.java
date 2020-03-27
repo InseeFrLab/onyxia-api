@@ -15,6 +15,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import fr.insee.onyxia.api.services.control.PublishContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -123,12 +124,6 @@ public class MyLabController {
         return multiverse.getUniverseById("inno").getUniverse().getPackageByName(name);
     }
 
-    // @GetMapping("/package/tags")
-    // public Map<String, Map<String, List>> getPackageTags() throws Exception {
-    // return multiverse.getUniverseById("inno").getUniverse().getTypeOfFile();
-    // }
-
-    // TODO : return an inputstream instead of a resolved string
     @GetMapping("/app")
     public @ResponseBody String getApp(@RequestParam("serviceId") String id)
             throws JsonParseException, JsonMappingException, IOException {
@@ -156,12 +151,6 @@ public class MyLabController {
 
     @DeleteMapping("/group")
     public Result destroyGroup(@RequestParam("serviceId") String id) throws MarathonException {
-        // String id = serviceId.serviceId;
-        // if (id == null || id.length() < 1) {
-        // id = "XXX_XXX";
-        // }
-        // HttpResponse<JsonNode> response = Unirest.delete(MarathonRessource.PATH_MESOS
-        // + "/v2/apps" + id).asJson();
         if (id == null || !id.startsWith("/users/" + userProvider.getUser().getIdep())) {
             throw new RuntimeException("hack!");
         }
@@ -172,9 +161,6 @@ public class MyLabController {
     @PostMapping("/app")
     public Result update(@RequestBody UpdateServiceDTO serviceId) throws MarathonException {
         String id = serviceId.getServiceId();
-        // if (id == null || id.length() < 1) {
-        // id = "XXX_XXX";
-        // }
         if (id == null || !id.startsWith("/users/" + userProvider.getUser().getIdep())) {
             throw new RuntimeException("hack!");
         }
@@ -195,11 +181,7 @@ public class MyLabController {
                 app.getEnv().put(key, serviceId.getEnv().get(key));
             }
         }
-        // HttpResponse<JsonNode> response = Unirest.put(MarathonRessource.PATH_MESOS +
-        // "/v2/apps" + id)
-        // .header("Content-Type", "application/json").body("{\"instances\":" +
-        // serviceId.getInstances() + "}")
-        // .asJson();
+
         Result result = marathon.updateApp(id, app, true);
         return result;
     }
@@ -213,46 +195,26 @@ public class MyLabController {
         }
         UniversePackage pkg = catalogService.getPackage(catalogId, requestDTO.getPackageName());
 
-        Map<String, Object> resource = pkg.getResource();
-        Map<String, Object> fusion = new HashMap<>();
         User user = userProvider.getUser();
         userDataService.fetchUserData(user);
 
-        // Apply every admission controller
-        long nbInvalidations = admissionControllers.stream()
-                .map(admissionController -> admissionController.validateContract(user, pkg, requestDTO.getOptions()))
-                .filter(b -> !b).count();
-        if (nbInvalidations > 0) {
-            throw new AccessDeniedException("Validation failed");
-        }
+        Map<String, Object> resource = pkg.getResource();
+        Map<String, Object> fusion = new HashMap<>();
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
         fusion.putAll(Map.of("resource", resource));
 
         String toMarathon = Mustacheur.mustache(pkg.getJsonMustache(), fusion);
         App app = mapper.readValue(toMarathon, App.class);
-        UUID uuid = UUID.randomUUID();
-        String instanceID = Long.toString(-uuid.getLeastSignificantBits());
-        app.setId(MARATHON_GROUP_NAME + "/" + user.getIdep() + "/" + pkg.getName() + "-" + instanceID);
-        Map<String, String> onyxiaOptions = ((Map<String, String>) ((Map<String, Object>) requestDTO.getOptions())
-                .get("onyxia"));
-        app.addLabel("ONYXIA_NAME", pkg.getName());
-        if (onyxiaOptions != null) {
-            app.addLabel("ONYXIA_TITLE", onyxiaOptions.get("friendly_name"));
-        }
 
-        app.addLabel("ONYXIA_SUBTITLE", pkg.getName());
-        app.addLabel("ONYXIA_SCM", pkg.getScm());
-        app.addLabel("ONYXIA_DESCRIPTION", pkg.getDescription());
-        app.addLabel("ONYXIA_STATUS", pkg.getStatus());
-        if (!app.getLabels().containsKey("ONYXIA_URL") && app.getLabels().containsKey("HAPROXY_0_VHOST")) {
-            if (app.getLabels().containsKey("HAPROXY_1_VHOST")) {
-                app.addLabel("ONYXIA_URL", "https://" + app.getLabels().get("HAPROXY_0_VHOST") + ",https://"
-                        + app.getLabels().get("HAPROXY_1_VHOST"));
-            } else {
-                app.addLabel("ONYXIA_URL", "https://" + app.getLabels().get("HAPROXY_0_VHOST"));
-            }
+        PublishContext context = new PublishContext();
+
+        // Apply every admission controller
+        long nbInvalidations = admissionControllers.stream()
+                .map(admissionController -> admissionController.validateContract(app, user, pkg, (Map<String, Object>) requestDTO.getOptions(), context))
+                .filter(b -> !b).count();
+        if (nbInvalidations > 0) {
+            throw new AccessDeniedException("Validation failed");
         }
-        app.addLabel("ONYXIA_LOGO", (String) ((Map<String, Object>) resource.get("images")).get("icon-small"));
 
         if (requestDTO.isDryRun()) {
             return app;
@@ -266,8 +228,8 @@ public class MyLabController {
     @PutMapping("/group")
     public Collection<App> publishGroup(@RequestBody CreateServiceDTO requestDTO)
             throws JsonProcessingException, IOException, MarathonException, Exception {
-
-        String catalogId = "inno";
+        System.out.println("Stub publishing group");
+        /*String catalogId = "inno";
         if (requestDTO.getCatalogId() != null && requestDTO.getCatalogId().length() > 0) {
             catalogId = requestDTO.getCatalogId();
         }
@@ -322,9 +284,9 @@ public class MyLabController {
             } else {
                 versionedApps.add(app);
             }
-        }
+        }*/
 
-        return versionedApps;
+        return null;
     }
 
 }

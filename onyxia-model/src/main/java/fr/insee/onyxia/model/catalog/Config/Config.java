@@ -46,17 +46,4 @@ public class Config {
         this.additionalProperties.put(name, value);
     }
 
-    public boolean enforceUser(Map<String, String> userValues, Object object) {
-         Map<String, Object> map;
-         if (!(object instanceof Map)) {
-         return false;
-         } else {
-         map = (Map<String, Object>) object;
-         }
-         for (Map.Entry<String, Property> entry : properties.getProperties().entrySet()) {
-         entry.getValue().enforceUser(userValues, map, entry.getKey());
-         }
-        return true;
-    }
-
 }
