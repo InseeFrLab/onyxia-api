@@ -16,7 +16,7 @@ public class UniverseLoaderTest {
     @Test
     public void loadTest() {
         UniverseWrapper uw = new UniverseWrapper();
-        uw.setLocation("classpath:universe.json");
+        uw.setLocation("classpath:universe-cloudshell.json");
         universeLoader.updateUniverse(uw);
         uw.getUniverse();
     }

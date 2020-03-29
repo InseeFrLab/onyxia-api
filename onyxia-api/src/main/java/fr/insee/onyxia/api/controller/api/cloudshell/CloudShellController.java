@@ -1,6 +1,7 @@
 package fr.insee.onyxia.api.controller.api.cloudshell;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,14 +27,17 @@ public class CloudShellController {
 	
 	@Autowired
 	private CatalogService catalogService;
+
+	@Value("${marathon.group.name}")
+	private String MARATHON_GROUP_NAME;
 	
 	@GetMapping
 	public CloudShellStatus getCloudShellStatus() {
 		CloudShellStatus status = new CloudShellStatus();
 		VersionedApp app;
-		status.setPackageToDeploy(catalogService.getPackage("inno", "cloudshell"));
+		status.setPackageToDeploy(catalogService.getPackage("cloudshell", "shelly"));
 		try {
-			app = marathonAppsService.getServiceById("/users/"+userProvider.getUser().getIdep()+"/cloudshell/webssh2");
+			app = marathonAppsService.getServiceById(MARATHON_GROUP_NAME+"/"+userProvider.getUser().getIdep()+"/cloudshell");
 			status.setStatus(CloudShellStatus.STATUS_UP);
 			status.setUrl(app.getLabels().get("ONYXIA_URL"));
 		}
@@ -43,10 +47,6 @@ public class CloudShellController {
 		}
 		
 		return status;
-	}
-	
-	private void deployCloudShell() {
-		System.out.println("WIP");
 	}
 	
 	public static class CloudShellStatus {

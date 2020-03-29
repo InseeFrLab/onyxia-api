@@ -1,12 +1,12 @@
 {
   "universes": [
     {
-      "id": "sample",
-      "name": "Sample lab",
-      "description": "A sample Universe",
-      "maintainer": "sample@example.com",
-      "location": "classpath:universe.json",
-      "status": "PROD"
+      "id": "cloudshell",
+      "name": "Cloudshell",
+      "description": "Internal universe containing the cloudshell contract",
+      "maintainer": "innovation@insee.fr",
+      "location": "classpath:universe-cloudshell.json",
+      "status": "INTERNAL"
     },
     {
       "id": "inseefrlab-datascience",
