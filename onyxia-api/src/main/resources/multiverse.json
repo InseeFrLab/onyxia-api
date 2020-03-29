@@ -1,11 +1,11 @@
 {
   "universes": [
     {
-      "id": "cloudshell",
-      "name": "Cloudshell",
-      "description": "Internal universe containing the cloudshell contract",
+      "id": "internal",
+      "name": "Internal",
+      "description": "Internal universe containing tools like the cloudshell",
       "maintainer": "innovation@insee.fr",
-      "location": "classpath:universe-cloudshell.json",
+      "location": "classpath:universe-internal.json",
       "status": "INTERNAL"
     },
     {

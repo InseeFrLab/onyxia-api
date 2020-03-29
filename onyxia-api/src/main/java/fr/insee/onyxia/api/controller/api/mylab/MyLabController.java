@@ -118,16 +118,6 @@ public class MyLabController {
 
     }
 
-    @GetMapping("/package")
-    public Universe getAvailableServices() throws Exception {
-        return multiverse.getUniverseById("inno").getUniverse();
-    }
-
-    @GetMapping("/package/{name}")
-    public UniversePackage getPackage(@PathParam("name") String name) throws Exception {
-        return multiverse.getUniverseById("inno").getUniverse().getPackageByName(name);
-    }
-
     @GetMapping("/app")
     public @ResponseBody String getApp(@RequestParam("serviceId") String id)
             throws JsonParseException, JsonMappingException, IOException {
@@ -205,7 +195,7 @@ public class MyLabController {
     }
 
     private Collection<App> publishApps(CreateServiceDTO requestDTO, boolean isGroup) throws JsonProcessingException, IOException, MarathonException, Exception {
-        String catalogId = "inno";
+        String catalogId = "internal";
         if (requestDTO.getCatalogId() != null && requestDTO.getCatalogId().length() > 0) {
             catalogId = requestDTO.getCatalogId();
         }
@@ -231,7 +221,7 @@ public class MyLabController {
         }
 
         for (App app : apps) {
-            PublishContext context = new PublishContext();
+            PublishContext context = new PublishContext(catalogId);
 
             // Apply every admission controller
             long nbInvalidations = admissionControllers.stream()

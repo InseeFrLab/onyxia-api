@@ -22,6 +22,11 @@ public class IDEnforcer implements AdmissionController {
 
     @Override
     public boolean validateContract(App app, User user, UniversePackage pkg, Map<String,Object> configData, PublishContext context) {
+        if ("internal".equals(context.getUniverseId()) && "shelly".equals(pkg.getName())) {
+            app.setId(MARATHON_GROUP_NAME + "/" + user.getIdep() + "/" + "cloudshell");
+            return true;
+        }
+
         app.setId(MARATHON_GROUP_NAME + "/" + user.getIdep() + "/" + pkg.getName() + "-" + context.getRandomizedId());
         return true;
     }

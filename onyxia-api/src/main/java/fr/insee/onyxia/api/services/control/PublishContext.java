@@ -5,6 +5,15 @@ import java.util.UUID;
 public class PublishContext {
 
     private String randomizedId;
+    private String universeId;
+
+    public PublishContext() {
+
+    }
+
+    public PublishContext(String universeId) {
+        this.universeId = universeId;
+    }
 
     /**
      *
@@ -16,5 +25,9 @@ public class PublishContext {
             randomizedId = Long.toString(-uuid.getLeastSignificantBits());;
         }
         return randomizedId;
+    }
+
+    public String getUniverseId() {
+        return universeId;
     }
 }

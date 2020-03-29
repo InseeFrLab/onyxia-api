@@ -35,7 +35,7 @@ public class CloudShellController {
 	public CloudShellStatus getCloudShellStatus() {
 		CloudShellStatus status = new CloudShellStatus();
 		VersionedApp app;
-		status.setPackageToDeploy(catalogService.getPackage("cloudshell", "shelly"));
+		status.setPackageToDeploy(catalogService.getPackage("internal", "shelly"));
 		try {
 			app = marathonAppsService.getServiceById(MARATHON_GROUP_NAME+"/"+userProvider.getUser().getIdep()+"/cloudshell");
 			status.setStatus(CloudShellStatus.STATUS_UP);
