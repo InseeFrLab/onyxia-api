@@ -111,16 +111,16 @@ public class Property {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class XForm {
 
-        boolean visible = true;
+        boolean hidden = false;
         boolean readonly = false;
         String value;
 
-        public boolean isVisible() {
-            return visible;
+        public boolean isHidden() {
+            return hidden;
         }
 
-        public void setVisible(boolean visible) {
-            this.visible = visible;
+        public void setHidden(boolean hidden) {
+            this.hidden = hidden;
         }
 
         public boolean isReadonly() {
