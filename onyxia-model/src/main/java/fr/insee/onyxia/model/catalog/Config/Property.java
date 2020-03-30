@@ -111,7 +111,7 @@ public class Property {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class XForm {
 
-        boolean hidden = true;
+        boolean hidden = false;
         boolean readonly = false;
         String value;
 
