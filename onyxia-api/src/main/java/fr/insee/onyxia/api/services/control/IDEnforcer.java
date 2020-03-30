@@ -4,6 +4,7 @@ import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.UniversePackage;
 import mesosphere.marathon.client.model.v2.App;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.endpoint.Sanitizer;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +13,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Enforce reverse proxy URLs
+ * Enforce service id
  */
 @Service
 public class IDEnforcer implements AdmissionController {
@@ -27,7 +28,12 @@ public class IDEnforcer implements AdmissionController {
             return true;
         }
 
-        app.setId(MARATHON_GROUP_NAME + "/" + user.getIdep() + "/" + pkg.getName() + "-" + context.getRandomizedId());
+        app.setId(MARATHON_GROUP_NAME + "/" + sanitize(user.getIdep()) + "/" + sanitize(pkg.getName()) + "-" + context.getRandomizedId());
         return true;
+    }
+
+    public String sanitize(String text){
+        text = text.replaceAll("[^a-zA-Z0-9]", "");
+        return text.toLowerCase();
     }
 }
