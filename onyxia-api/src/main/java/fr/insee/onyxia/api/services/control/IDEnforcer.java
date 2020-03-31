@@ -3,6 +3,8 @@ package fr.insee.onyxia.api.services.control;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.UniversePackage;
 import mesosphere.marathon.client.model.v2.App;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.endpoint.Sanitizer;
 import org.springframework.context.annotation.PropertySource;
@@ -18,22 +20,23 @@ import java.util.UUID;
 @Service
 public class IDEnforcer implements AdmissionController {
 
+    @Autowired
+    IDSanitizer sanitizer;
+
     @Value("${marathon.group.name}")
     private String MARATHON_GROUP_NAME;
 
     @Override
-    public boolean validateContract(App app, User user, UniversePackage pkg, Map<String,Object> configData, PublishContext context) {
+    public boolean validateContract(App app, User user, UniversePackage pkg, Map<String, Object> configData,
+            PublishContext context) {
         if ("internal".equals(context.getUniverseId()) && "shelly".equals(pkg.getName())) {
-            app.setId(MARATHON_GROUP_NAME + "/" + user.getIdep() + "/" + "cloudshell");
+            app.setId(MARATHON_GROUP_NAME + "/" + sanitizer.sanitize(user.getIdep()) + "/" + "cloudshell");
             return true;
         }
 
-        app.setId(MARATHON_GROUP_NAME + "/" + sanitize(user.getIdep()) + "/" + sanitize(pkg.getName()) + "-" + context.getRandomizedId());
+        app.setId(MARATHON_GROUP_NAME + "/" + sanitizer.sanitize(user.getIdep()) + "/"
+                + sanitizer.sanitize(pkg.getName()) + "-" + context.getRandomizedId());
         return true;
     }
 
-    public String sanitize(String text){
-        text = text.replaceAll("[^a-zA-Z0-9]", "");
-        return text.toLowerCase();
-    }
 }
