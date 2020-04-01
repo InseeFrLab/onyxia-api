@@ -18,7 +18,7 @@
     },
     {
       "id": "inseefrlab-catalog-wip",
-      "name": "Catalog WIP",
+      "name": "Datascience catalog WIP",
       "description": "WIP for services for datascientists. https://github.com/InseeFrLab/Universe-Datascience branch Test",
       "maintainer": "innovation@insee.fr",
       "location": "https://inseefrlab.github.io/Universe-Datascience/universe-test.json",
