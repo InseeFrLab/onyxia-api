@@ -2,24 +2,13 @@ package fr.insee.onyxia.model.catalog;
 
 import java.util.List;
 
-public class Universe {
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    private List<UniversePackage> packages;
+public class Universe extends Catalog {
 
-    public List<UniversePackage> getPackages() {
-        return packages;
+    @JsonProperty("packages")
+    public void readPackages(List<Package> packages) {
+        this.setPackages(packages);
     }
 
-    public void setPackages(List<UniversePackage> packages) {
-        this.packages = packages;
-    }
-
-    public UniversePackage getPackageByName(String name) {
-        for (UniversePackage pkg : packages) {
-            if (pkg.getName().equals(name)) {
-                return pkg;
-            }
-        }
-        return null;
-    }
 }
