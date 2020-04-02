@@ -3,30 +3,30 @@ package fr.insee.onyxia.api.services.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import fr.insee.onyxia.api.configuration.Multiverse;
-import fr.insee.onyxia.api.configuration.UniverseWrapper;
+import fr.insee.onyxia.api.configuration.CatalogWrapper;
+import fr.insee.onyxia.api.configuration.Catalogs;
 import fr.insee.onyxia.api.services.CatalogService;
-import fr.insee.onyxia.model.catalog.UniversePackage;
+import fr.insee.onyxia.model.catalog.Package;
 
 @Service
 public class UniverseCatalogService implements CatalogService {
 
    @Autowired
-   private Multiverse multiverse;
+   private Catalogs catalogs;
 
    @Override
-   public Multiverse getCatalogs() {
-      return multiverse;
+   public Catalogs getCatalogs() {
+      return catalogs;
    }
 
    @Override
-   public UniverseWrapper getCatalogById(String catalogId) {
-      return multiverse.getUniverseById(catalogId);
+   public CatalogWrapper getCatalogById(String catalogId) {
+      return catalogs.getCatalogById(catalogId);
    }
 
    @Override
-   public UniversePackage getPackage(String catalogId, String packageName) {
-      return multiverse.getUniverseById(catalogId).getUniverse().getPackageByName(packageName);
+   public Package getPackage(String catalogId, String packageName) {
+      return catalogs.getCatalogById(catalogId).getCatalog().getPackageByName(packageName);
    }
 
 }

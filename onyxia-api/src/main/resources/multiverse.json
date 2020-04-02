@@ -6,7 +6,8 @@
       "description": "Internal universe containing tools like the cloudshell",
       "maintainer": "innovation@insee.fr",
       "location": "classpath:universe-internal.json",
-      "status": "INTERNAL"
+      "status": "INTERNAL",
+      "type": "universe"
     },
     {
       "id": "inseefrlab-datascience",
@@ -14,7 +15,8 @@
       "description": "Services for datascientists. https://github.com/InseeFrLab/Universe-Datascience",
       "maintainer": "innovation@insee.fr",
       "location": "https://inseefrlab.github.io/Universe-Datascience/universe.json",
-      "status": "PROD"
+      "status": "PROD",
+      "type": "universe"
     },
     {
       "id": "inseefrlab-catalog-wip",
@@ -22,7 +24,17 @@
       "description": "WIP for services for datascientists. https://github.com/InseeFrLab/Universe-Datascience branch Test",
       "maintainer": "innovation@insee.fr",
       "location": "https://inseefrlab.github.io/Universe-Datascience/universe-test.json",
-      "status": "TEST"
+      "status": "TEST",
+      "type": "universe"
+    },
+    {
+      "id": "inseefrlab-catalog-wip-wip",
+      "name": "Datascience catalog WIP",
+      "description": "WIP for services for datascientists. https://github.com/InseeFrLab/Universe-Datascience branch Test",
+      "maintainer": "innovation@insee.fr",
+      "location": "https://inseefrlab.github.io/Universe-Datascience/universe-test.json",
+      "status": "PROD",
+      "type": "helm"
     }
   ]
 }

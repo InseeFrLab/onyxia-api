@@ -11,11 +11,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.ResourceLoader;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 @Configuration
-public class MultiverseLoader {
+public class CatalogsLoader {
 
     @Autowired
     private ResourceLoader resourceLoader;
@@ -26,19 +25,17 @@ public class MultiverseLoader {
     @Value("${multiverse.configuration}")
     private String multiverseConf;
 
-    Logger logger = LoggerFactory.getLogger(MultiverseLoader.class);
+    Logger logger = LoggerFactory.getLogger(CatalogsLoader.class);
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
-    public Multiverse multiverse() {
-            try(InputStream inputStream = resourceLoader.getResource(multiverseConf).getInputStream()){
-                return mapper.readValue(inputStream, Multiverse.class);
-            }
-            catch (Exception e) {
-                logger.error("Error : Could not load multiverse !",e);
-            }
-            return new Multiverse();
+    public Catalogs catalogs() {
+        try (InputStream inputStream = resourceLoader.getResource(multiverseConf).getInputStream()) {
+            return mapper.readValue(inputStream, Catalogs.class);
+        } catch (Exception e) {
+            logger.error("Error : Could not load multiverse !", e);
+        }
+        return new Catalogs();
     }
-
 
 }

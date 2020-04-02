@@ -6,7 +6,8 @@
       "description": "A sample Universe",
       "maintainer": "sample@example.com",
       "location": "classpath:universe.json",
-      "status": "PROD"
+      "status": "PROD",
+      "type": "universe"
     },
     {
       "id": "inseefrlab-datascience",
@@ -14,7 +15,17 @@
       "description": "Services for datascientists. https://github.com/InseeFrLab/Universe-Datascience",
       "maintainer": "innovation@insee.fr",
       "location": "https://inseefrlab.github.io/Universe-Datascience/universe.json",
-      "status": "PROD"
+      "status": "PROD",
+      "type": "universe"
+    },
+    {
+      "id": "inseefrlab-kub",
+      "name": "Datascience",
+      "description": "Services for datascientists. https://github.com/InseeFrLab/Universe-Datascience",
+      "maintainer": "innovation@insee.fr",
+      "location": "classpath:sample-helm.yaml",
+      "status": "PROD",
+      "type": "helm"
     }
   ]
 }

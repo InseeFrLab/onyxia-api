@@ -2,13 +2,13 @@ package fr.insee.onyxia.api.configuration;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import fr.insee.onyxia.model.catalog.Universe;
+import fr.insee.onyxia.model.catalog.Catalog;
 import fr.insee.onyxia.model.catalog.UniverseStatus;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class UniverseWrapper {
+public class CatalogWrapper {
 
-    private Universe universe;
+    private Catalog catalog;
     private String id;
     private String name;
     private String description;
@@ -17,13 +17,31 @@ public class UniverseWrapper {
     private UniverseStatus status;
     private long lastUpdateTime;
     private String scm;
+    private String type;
 
-    public Universe getUniverse() {
-        return universe;
+    /**
+     * @return the type
+     */
+    public String getType() {
+        return type;
     }
 
-    public void setUniverse(Universe universe) {
-        this.universe = universe;
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    /**
+     * @return the catalog
+     */
+    public Catalog getCatalog() {
+        return catalog;
+    }
+
+    /**
+     * @param catalog the catalog to set
+     */
+    public void setCatalog(Catalog catalog) {
+        this.catalog = catalog;
     }
 
     public UniverseStatus getStatus() {

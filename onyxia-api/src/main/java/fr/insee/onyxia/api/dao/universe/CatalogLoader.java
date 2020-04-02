@@ -1,7 +1,8 @@
 package fr.insee.onyxia.api.dao.universe;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.insee.onyxia.api.configuration.UniverseWrapper;
+
+import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.model.catalog.Universe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,9 +14,9 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 
 @Service
-public class UniverseLoader {
+public class CatalogLoader {
 
-    private final Logger logger = LoggerFactory.getLogger(UniverseRefresher.class);
+    private final Logger logger = LoggerFactory.getLogger(CatalogRefresher.class);
 
     @Autowired
     private ResourceLoader resourceLoader;
@@ -23,15 +24,17 @@ public class UniverseLoader {
     @Autowired
     private ObjectMapper mapper;
 
-    public void updateUniverse(UniverseWrapper uw) {
-        try {
-            logger.info("updating universe with id:" + uw.getId());
-            Reader reader = new InputStreamReader(resourceLoader.getResource(uw.getLocation()).getInputStream(),
-                    "UTF-8");
-            uw.setUniverse(mapper.readValue(reader, Universe.class));
-            uw.setLastUpdateTime(System.currentTimeMillis());
-        } catch (Exception e) {
-            e.printStackTrace();
+    public void updateCatalog(CatalogWrapper cw) {
+        if (cw.getType().equals("universe")) {
+            try {
+                logger.info("updating catalog with id:" + cw.getId());
+                Reader reader = new InputStreamReader(resourceLoader.getResource(cw.getLocation()).getInputStream(),
+                        "UTF-8");
+                cw.setCatalog(mapper.readValue(reader, Universe.class));
+                cw.setLastUpdateTime(System.currentTimeMillis());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         // Property friendlyName = new Property();

@@ -27,13 +27,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import fr.insee.onyxia.api.configuration.Multiverse;
+import fr.insee.onyxia.api.configuration.Catalogs;
 import fr.insee.onyxia.api.configuration.metrics.CustomMetrics;
 import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.api.services.UserDataService;
 import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.api.services.control.AdmissionController;
 import fr.insee.onyxia.model.User;
+import fr.insee.onyxia.model.catalog.Package;
 import fr.insee.onyxia.model.catalog.Universe;
 import fr.insee.onyxia.model.catalog.UniversePackage;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
@@ -82,7 +83,7 @@ public class MyLabController {
     private CatalogService catalogService;
 
     @Autowired
-    private Multiverse multiverse;
+    private Catalogs catalogs;
 
     @Autowired
     private List<AdmissionController> admissionControllers;
@@ -95,7 +96,7 @@ public class MyLabController {
 
     @PostConstruct
     public void postConstruct() {
-        Collections.sort(admissionControllers, (admissionController, admissionController2) ->  {
+        Collections.sort(admissionControllers, (admissionController, admissionController2) -> {
             return admissionController2.getPriority().compareTo(admissionController.getPriority());
         });
     }
@@ -180,12 +181,10 @@ public class MyLabController {
         return result;
     }
 
-
-
     @PutMapping("/app")
     public App publishService(@RequestBody CreateServiceDTO requestDTO)
             throws JsonProcessingException, IOException, MarathonException, Exception {
-        return publishApps(requestDTO,false).stream().findFirst().get();
+        return publishApps(requestDTO, false).stream().findFirst().get();
     }
 
     @PutMapping("/group")
@@ -194,12 +193,13 @@ public class MyLabController {
         return publishApps(requestDTO, true);
     }
 
-    private Collection<App> publishApps(CreateServiceDTO requestDTO, boolean isGroup) throws JsonProcessingException, IOException, MarathonException, Exception {
+    private Collection<App> publishApps(CreateServiceDTO requestDTO, boolean isGroup)
+            throws JsonProcessingException, IOException, MarathonException, Exception {
         String catalogId = "internal";
         if (requestDTO.getCatalogId() != null && requestDTO.getCatalogId().length() > 0) {
             catalogId = requestDTO.getCatalogId();
         }
-        UniversePackage pkg = catalogService.getPackage(catalogId, requestDTO.getPackageName());
+        Package pkg = catalogService.getPackage(catalogId, requestDTO.getPackageName());
 
         User user = userProvider.getUser();
         userDataService.fetchUserData(user);
@@ -214,8 +214,7 @@ public class MyLabController {
         if (isGroup) {
             Group group = mapper.readValue(toMarathon, Group.class);
             apps = group.getApps();
-        }
-        else {
+        } else {
             apps = new ArrayList<>();
             apps.add(mapper.readValue(toMarathon, App.class));
         }
@@ -224,15 +223,13 @@ public class MyLabController {
             PublishContext context = new PublishContext(catalogId);
 
             // Apply every admission controller
-            long nbInvalidations = admissionControllers.stream()
-                    .map(admissionController -> admissionController.validateContract(app, user, pkg, (Map<String, Object>) requestDTO.getOptions(), context))
+            long nbInvalidations = admissionControllers.stream().map(admissionController -> admissionController
+                    .validateContract(app, user, pkg, (Map<String, Object>) requestDTO.getOptions(), context))
                     .filter(b -> !b).count();
             if (nbInvalidations > 0) {
                 throw new AccessDeniedException("Validation failed");
             }
         }
-
-
 
         if (requestDTO.isDryRun()) {
             return apps;
