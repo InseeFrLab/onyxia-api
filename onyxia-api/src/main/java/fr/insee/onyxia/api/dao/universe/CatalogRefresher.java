@@ -23,14 +23,14 @@ public class CatalogRefresher {
     private Catalogs catalogs;
 
     @Autowired
-    private List<CatalogLoader> catalogLoaders;
+    private CatalogLoader catalogLoader;
 
     @Value("${universe.refresh.ms}")
     private long refreshTime;
 
     private void refresh() {
         catalogs.getCatalogs().parallelStream()
-                .forEach(c -> catalogLoaders.stream().forEach(cl -> cl.updateCatalog(c)));
+                .forEach(c -> catalogLoader.updateCatalog(c));
     }
 
     @PostConstruct

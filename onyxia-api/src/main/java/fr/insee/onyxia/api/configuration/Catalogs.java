@@ -29,7 +29,7 @@ public class Catalogs {
   /**
    * @param catalogs the catalogs to set
    */
-  public void setCatalogs(final List<CatalogWrapper> catalogs) {
+  public void setCatalogs(List<CatalogWrapper> catalogs) {
     this.catalogs = catalogs;
   }
 }

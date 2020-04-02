@@ -26,6 +26,7 @@ public class CatalogLoader {
     private ObjectMapper mapper;
 
     public void updateCatalog(CatalogWrapper cw) {
+        logger.info("updating catalog with id :" + cw.getId()+" and type "+cw.getType());
         switch(cw.getType()) {
             case Universe.TYPE_UNIVERSE:
                 updateUniverse(cw);
@@ -42,7 +43,6 @@ public class CatalogLoader {
      */
     private void updateUniverse(CatalogWrapper cw) {
         try {
-            logger.info("updating catalog with id:" + cw.getId());
             Reader reader = new InputStreamReader(resourceLoader.getResource(cw.getLocation()).getInputStream(),
                     "UTF-8");
             cw.setCatalog(mapper.readValue(reader, Universe.class));
