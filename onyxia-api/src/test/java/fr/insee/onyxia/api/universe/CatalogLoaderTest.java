@@ -4,22 +4,21 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import fr.insee.onyxia.api.configuration.UniverseWrapper;
-import fr.insee.onyxia.api.dao.universe.UniverseLoader;
+import fr.insee.onyxia.api.configuration.CatalogWrapper;
+import fr.insee.onyxia.api.dao.universe.CatalogLoader;
 
 @SpringBootTest
-public class UniverseLoaderTest {
+public class CatalogLoaderTest {
 
     @Autowired
-    UniverseLoader universeLoader;
+    CatalogLoader catalogLoader;
 
     @Test
     public void loadTest() {
-        UniverseWrapper uw = new UniverseWrapper();
+        CatalogWrapper uw = new CatalogWrapper();
         uw.setLocation("classpath:universe-internal.json");
-        universeLoader.updateUniverse(uw);
-        uw.getUniverse();
+        catalogLoader.updateCatalog(uw);
+        uw.getCatalog();
     }
-
 
 }
