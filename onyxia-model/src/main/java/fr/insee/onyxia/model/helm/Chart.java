@@ -46,6 +46,9 @@ public class Chart extends Package {
     private List<String> urls = null;
     @JsonProperty("version")
     private String version;
+
+    private HelmConfig config;
+
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -192,6 +195,14 @@ public class Chart extends Package {
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;
+    }
+
+    public void setConfig(HelmConfig config) {
+        this.config = config;
+    }
+
+    public HelmConfig getConfig() {
+        return config;
     }
 
     @JsonAnySetter

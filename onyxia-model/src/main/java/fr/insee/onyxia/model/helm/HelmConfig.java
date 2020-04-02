@@ -56,7 +56,7 @@ public class HelmConfig {
         this.type = type;
     }
 
-    private class Properties {
+    public class Properties {
         private String type;
         private Properties properties;
         private boolean form;
