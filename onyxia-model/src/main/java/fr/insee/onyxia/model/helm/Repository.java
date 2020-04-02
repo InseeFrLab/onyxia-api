@@ -19,6 +19,8 @@ import fr.insee.onyxia.model.catalog.Catalog;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Repository extends Catalog {
 
+    public static final String TYPE_HELM = "helm";
+
     @JsonProperty("apiVersion")
     private String apiVersion;
     @JsonProperty("generated")

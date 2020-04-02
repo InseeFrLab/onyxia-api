@@ -12,7 +12,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.services.control.PublishContext;
+import fr.insee.onyxia.model.catalog.Catalog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -199,7 +201,13 @@ public class MyLabController {
         if (requestDTO.getCatalogId() != null && requestDTO.getCatalogId().length() > 0) {
             catalogId = requestDTO.getCatalogId();
         }
-        Package pkg = catalogService.getPackage(catalogId, requestDTO.getPackageName());
+        CatalogWrapper catalog = catalogService.getCatalogById(catalogId);
+
+        if (!Universe.TYPE_UNIVERSE.equals(catalog.getType())) {
+            throw new UnsupportedOperationException("Only universe is supported right now");
+        }
+
+        UniversePackage pkg = (UniversePackage) catalog.getCatalog().getPackageByName(requestDTO.getPackageName());
 
         User user = userProvider.getUser();
         userDataService.fetchUserData(user);

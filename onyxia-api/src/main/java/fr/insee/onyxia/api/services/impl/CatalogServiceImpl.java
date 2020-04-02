@@ -9,7 +9,7 @@ import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.model.catalog.Package;
 
 @Service
-public class UniverseCatalogService implements CatalogService {
+public class CatalogServiceImpl implements CatalogService {
 
    @Autowired
    private Catalogs catalogs;
