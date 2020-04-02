@@ -28,11 +28,11 @@
       "type": "universe"
     },
     {
-      "id": "inseefrlab-catalog-wip-wip",
-      "name": "Datascience catalog WIP",
-      "description": "WIP for services for datascientists. https://github.com/InseeFrLab/Universe-Datascience branch Test",
+      "id": "inseefrlab-helm-charts",
+      "name": "Inseefrlab helm charts",
+      "description": "WIP : Various apps",
       "maintainer": "innovation@insee.fr",
-      "location": "https://inseefrlab.github.io/Universe-Datascience/universe-test.json",
+      "location": "https://inseefrlab.github.io/helm-charts/index.yaml",
       "status": "PROD",
       "type": "helm"
     }

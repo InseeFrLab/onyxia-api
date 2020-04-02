@@ -8,6 +8,7 @@ import fr.insee.onyxia.model.helm.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,10 @@ public class CatalogLoader {
 
     @Autowired
     private ObjectMapper mapper;
+
+    @Autowired
+    @Qualifier("helm")
+    private ObjectMapper mapperHelm;
 
     public void updateCatalog(CatalogWrapper cw) {
         logger.info("updating catalog with id :" + cw.getId()+" and type "+cw.getType());
@@ -68,7 +73,14 @@ public class CatalogLoader {
      * TODO : move this helm specific logic somewhere else ?
      */
     private void updateHelmRepository(CatalogWrapper cw) {
-        logger.warn("STUB : helm repository refresh is not yet supported "+cw.getId());
+        try {
+            Reader reader = new InputStreamReader(resourceLoader.getResource(cw.getLocation()).getInputStream(),
+                    "UTF-8");
+            cw.setCatalog(mapperHelm.readValue(reader, Repository.class));
+            cw.setLastUpdateTime(System.currentTimeMillis());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
