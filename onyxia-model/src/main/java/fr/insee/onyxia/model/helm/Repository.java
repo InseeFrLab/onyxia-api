@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({ "apiVersion", "entries", "generated" })
-public class indexRepo {
+public class Repository {
 
     @JsonProperty("apiVersion")
     private String apiVersion;
