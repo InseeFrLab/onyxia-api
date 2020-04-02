@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.model.catalog.Package;
 import fr.insee.onyxia.model.catalog.Universe;
+import fr.insee.onyxia.model.catalog.Config.Config;
 import fr.insee.onyxia.model.helm.Chart;
 import fr.insee.onyxia.model.helm.HelmConfig;
 import fr.insee.onyxia.model.helm.Repository;
@@ -41,13 +42,12 @@ public class CatalogLoader {
     private ObjectMapper mapperHelm;
 
     public void updateCatalog(CatalogWrapper cw) {
-        logger.info("updating catalog with id :" + cw.getId()+" and type "+cw.getType());
-        switch(cw.getType()) {
+        logger.info("updating catalog with id :" + cw.getId() + " and type " + cw.getType());
+        switch (cw.getType()) {
             case Universe.TYPE_UNIVERSE:
                 updateUniverse(cw);
                 break;
-            case Repository
-                    .TYPE_HELM:
+            case Repository.TYPE_HELM:
                 updateHelmRepository(cw);
                 break;
         }
@@ -90,8 +90,7 @@ public class CatalogLoader {
             repository.getPackages().parallelStream().forEach(pkg -> {
                 try {
                     refreshPackage(pkg);
-                }
-                catch (IOException e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             });
@@ -109,7 +108,8 @@ public class CatalogLoader {
 
         Chart chart = (Chart) pkg;
         // TODO : support multiple urls
-        InputStream inputStream = resourceLoader.getResource(chart.getUrls().stream().findFirst().get()).getInputStream();
+        InputStream inputStream = resourceLoader.getResource(chart.getUrls().stream().findFirst().get())
+                .getInputStream();
         extractDataFromTgz(inputStream, chart);
 
         inputStream.close();
@@ -117,7 +117,7 @@ public class CatalogLoader {
 
     public void extractDataFromTgz(InputStream in, Chart chart) throws IOException {
         GzipCompressorInputStream gzipIn = new GzipCompressorInputStream(in);
-        HelmConfig config = null;
+        // HelmConfig config = null;
         try (TarArchiveInputStream tarIn = new TarArchiveInputStream(gzipIn)) {
             TarArchiveEntry entry;
 
@@ -125,13 +125,12 @@ public class CatalogLoader {
                 if (entry.getName().endsWith("values.schema.json")) {
                     logger.info("Found values.schema.json !");
 
-                    //TODO : mutualize objectmapper
+                    // TODO : mutualize objectmapper
                     ObjectMapper mapper = new ObjectMapper();
                     mapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, false);
                     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                    config = mapper.readValue(tarIn,HelmConfig.class);
+                    Config config = mapper.readValue(tarIn, Config.class);
                     chart.setConfig(config);
-                    logger.info(config.getProperties().getType());
                 }
 
                 if (entry.isDirectory()) {

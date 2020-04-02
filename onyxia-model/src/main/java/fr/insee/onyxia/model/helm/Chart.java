@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import fr.insee.onyxia.model.catalog.Package;
+import fr.insee.onyxia.model.catalog.Config.Config;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({ "apiVersion", "appVersion", "created", "description", "digest", "engine", "home", "icon",
@@ -47,7 +48,7 @@ public class Chart extends Package {
     @JsonProperty("version")
     private String version;
 
-    private HelmConfig config;
+    private Config config;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
@@ -197,11 +198,11 @@ public class Chart extends Package {
         return this.additionalProperties;
     }
 
-    public void setConfig(HelmConfig config) {
+    public void setConfig(Config config) {
         this.config = config;
     }
 
-    public HelmConfig getConfig() {
+    public Config getConfig() {
         return config;
     }
 
