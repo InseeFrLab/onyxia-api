@@ -10,7 +10,6 @@ import fr.insee.onyxia.model.catalog.Package;
 import fr.insee.onyxia.model.catalog.Universe;
 import fr.insee.onyxia.model.catalog.Config.Config;
 import fr.insee.onyxia.model.helm.Chart;
-import fr.insee.onyxia.model.helm.HelmConfig;
 import fr.insee.onyxia.model.helm.Repository;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
