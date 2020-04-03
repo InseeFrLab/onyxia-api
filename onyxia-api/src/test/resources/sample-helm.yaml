@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+entries:
+  httpbin:
+    - apiVersion: v2
+      appVersion: latest
+      created: "2020-03-27T22:46:19.283017399Z"
+      description: A Helm chart for Kubernetes
+      digest: dc063676787ff6116aa07963c3e3776f7ce0320ede77bc72f29b8c3835ec47e4
+      name: httpbin
+      type: application
+      urls:
+        - https://github.com/InseeFrLab/helm-charts/releases/download/httpbin-1.1/httpbin-1.1.tgz
+      version: "1.1"
+generated: "2020-03-27T22:46:19.192701581Z"

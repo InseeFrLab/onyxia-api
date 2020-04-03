@@ -9,8 +9,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import fr.insee.onyxia.model.catalog.Config.Config;
+import fr.insee.onyxia.model.catalog.Package;
 
-public class UniversePackage {
+public class UniversePackage extends Package {
 
 	String packagingVersion;
 	String name;

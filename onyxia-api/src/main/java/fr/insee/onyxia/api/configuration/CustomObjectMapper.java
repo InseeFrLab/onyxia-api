@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.IntNode;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSerializationContext;
@@ -16,10 +17,13 @@ import mesosphere.marathon.client.model.v2.LocalVolume;
 import mesosphere.marathon.client.model.v2.PersistentLocalVolume;
 import mesosphere.marathon.client.model.v2.Volume;
 import org.apache.tomcat.jni.Local;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import org.springframework.context.annotation.Primary;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
 
@@ -27,18 +31,33 @@ import java.io.IOException;
 public class CustomObjectMapper {
 
    @Bean
+   @Primary
    public ObjectMapper objectMapper() {
        ObjectMapper mapper = new ObjectMapper();
-       mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-       mapper.setSerializationInclusion(Include.NON_NULL);
-       mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-       mapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
+       commonConfiguration(mapper);
        SimpleModule module = new SimpleModule();
        module.addDeserializer(Volume.class, new ItemDeserializer(mapper));
        mapper.registerModule(module);
 
        return mapper;
    }
+
+    @Bean
+    @Qualifier("helm")
+    public ObjectMapper objectMapperHelm() {
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+
+        commonConfiguration(mapper);
+
+        return mapper;
+    }
+
+    private void commonConfiguration(ObjectMapper mapper) {
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        mapper.setSerializationInclusion(Include.NON_NULL);
+        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        mapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
+    }
 
     public class ItemDeserializer extends StdDeserializer<Volume> {
 
