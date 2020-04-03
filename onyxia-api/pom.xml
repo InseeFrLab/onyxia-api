@@ -137,6 +137,12 @@
 			<version>1.20</version>
 		</dependency>
 
+		<dependency>
+			<groupId>io.github.inseefrlab</groupId>
+			<artifactId>java-helm-wrapper</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
+
 	</dependencies>
 
 	<properties>

@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>io.github.inseefrlab</groupId>
 	<artifactId>java-helm-wrapper</artifactId>
-	<version>0.1</version>
+	<version>0.1-SNAPSHOT</version>
 	<name>helm-wrapper</name>
 	<description>Simple wrapper for Helm (https://helm.sh)</description>
 
