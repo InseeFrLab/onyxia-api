@@ -25,12 +25,11 @@ public class CatalogRefresher {
     @Autowired
     private CatalogLoader catalogLoader;
 
-    @Value("${universe.refresh.ms}")
+    @Value("${catalog.refresh.ms}")
     private long refreshTime;
 
     private void refresh() {
-        catalogs.getCatalogs().parallelStream()
-                .forEach(c -> catalogLoader.updateCatalog(c));
+        catalogs.getCatalogs().parallelStream().forEach(c -> catalogLoader.updateCatalog(c));
     }
 
     @PostConstruct
@@ -41,7 +40,7 @@ public class CatalogRefresher {
             TimerTask timerTask = new TimerTask() {
                 @Override
                 public void run() {
-                    logger.info("refreshing universes..");
+                    logger.info("refreshing catalogs..");
                     refresh();
                 }
             };

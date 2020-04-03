@@ -3,7 +3,7 @@ package fr.insee.onyxia.api.configuration;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import fr.insee.onyxia.model.catalog.Catalog;
-import fr.insee.onyxia.model.catalog.UniverseStatus;
+import fr.insee.onyxia.model.catalog.CatalogStatus;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CatalogWrapper {
@@ -14,7 +14,7 @@ public class CatalogWrapper {
     private String description;
     private String maintainer;
     private String location;
-    private UniverseStatus status;
+    private CatalogStatus status;
     private long lastUpdateTime;
     private String scm;
     private String type;
@@ -44,11 +44,11 @@ public class CatalogWrapper {
         this.catalog = catalog;
     }
 
-    public UniverseStatus getStatus() {
+    public CatalogStatus getStatus() {
         return status;
     }
 
-    public void setStatus(UniverseStatus status) {
+    public void setStatus(CatalogStatus status) {
         this.status = status;
     }
 

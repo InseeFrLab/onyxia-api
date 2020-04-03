@@ -22,18 +22,18 @@ public class CatalogsLoader {
     @Autowired
     private ObjectMapper mapper;
 
-    @Value("${multiverse.configuration}")
-    private String multiverseConf;
+    @Value("${catalogs.configuration}")
+    private String catalogsConf;
 
     Logger logger = LoggerFactory.getLogger(CatalogsLoader.class);
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
     public Catalogs catalogs() {
-        try (InputStream inputStream = resourceLoader.getResource(multiverseConf).getInputStream()) {
+        try (InputStream inputStream = resourceLoader.getResource(catalogsConf).getInputStream()) {
             return mapper.readValue(inputStream, Catalogs.class);
         } catch (Exception e) {
-            logger.error("Error : Could not load multiverse !", e);
+            logger.error("Error : Could not load catalogs !", e);
         }
         return new Catalogs();
     }
