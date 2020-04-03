@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.github.inseefrlab.helmwrapper.model.HelmLs;
 import io.github.inseefrlab.helmwrapper.model.install.HelmInstaller;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.zeroturnaround.exec.InvalidExitValueException;
 
@@ -22,7 +23,6 @@ import io.github.inseefrlab.helmwrapper.utils.Command;
  */
 @Service
 public class HelmInstallService {
-
     public HelmInstaller installChart(String name, String chart, Map<String, String> env)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
         return new ObjectMapper().readValue(
