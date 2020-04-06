@@ -32,7 +32,7 @@
       "name": "Inseefrlab helm charts",
       "description": "WIP : Various apps",
       "maintainer": "innovation@insee.fr",
-      "location": "https://inseefrlab.github.io/helm-charts/index.yaml",
+      "location": "https://inseefrlab.github.io/helm-charts",
       "status": "TEST",
       "type": "helm"
     }

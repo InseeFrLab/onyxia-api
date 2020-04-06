@@ -91,7 +91,7 @@ public class CatalogLoader {
     private void updateHelmRepository(CatalogWrapper cw) {
         try {
             updateHelmRepo(cw);
-            Reader reader = new InputStreamReader(resourceLoader.getResource(cw.getLocation()).getInputStream(),
+            Reader reader = new InputStreamReader(resourceLoader.getResource(cw.getLocation()+"/index.yaml").getInputStream(),
                     "UTF-8");
             Repository repository = mapperHelm.readValue(reader, Repository.class);
             repository.getPackages().parallelStream().forEach(pkg -> {
@@ -109,12 +109,7 @@ public class CatalogLoader {
     }
 
     private void updateHelmRepo(CatalogWrapper cw) throws IOException, InterruptedException, TimeoutException {
-        String location = cw.getLocation();
-        Pattern pattern = Pattern.compile("(.*)/index.yaml");
-        Matcher m =pattern.matcher(location);
-        if (m.matches()){
-            helmService.addHelmRepo(cw.getLocation(),cw.getName());
-        }
+            helmService.addHelmRepo(cw.getLocation()+"/index.yaml",cw.getName());
     }
 
     private void refreshPackage(Package pkg) throws IOException {
