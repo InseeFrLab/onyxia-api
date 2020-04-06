@@ -23,7 +23,7 @@ import io.github.inseefrlab.helmwrapper.utils.Command;
  */
 @Service
 public class HelmInstallService {
-    public HelmInstaller installChart(String name, String chart, Map<String, String> env)
+    public HelmInstaller installChart(String name, String chart, Map<String, String> env, String namespace)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
         return new ObjectMapper().readValue(
                 Command.executeAndGetResponseAsJson("helm install " + name + " " + chart + " " + buildEnvVar(env))
@@ -43,7 +43,10 @@ public class HelmInstallService {
     }
 
     private String buildEnvVar(Map<String, String> env) {
-        Set<String> envKeys = env.keySet();
-        return envKeys.stream().map(key -> "--set " + key + "=" + env.get(key)).collect(Collectors.joining(" "));
+        if (env != null) {
+            Set<String> envKeys = env.keySet();
+            return envKeys.stream().map(key -> "--set " + key + "=" + env.get(key)).collect(Collectors.joining(" "));
+        }
+        return "";
     }
 }

@@ -31,4 +31,8 @@ public class HelmRepoService {
         return Command.execute("helm repo add " + nomRepo + " " + url).getOutput().getString();
     }
 
+    public void repoUpdate() throws InterruptedException, TimeoutException, IOException {
+        Command.execute("helm repo update");
+    }
+
 }

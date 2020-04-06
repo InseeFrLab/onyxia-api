@@ -109,7 +109,9 @@ public class CatalogLoader {
     }
 
     private void updateHelmRepo(CatalogWrapper cw) throws IOException, InterruptedException, TimeoutException {
-            helmService.addHelmRepo(cw.getLocation()+"/index.yaml",cw.getName());
+           logger.info(helmService.addHelmRepo(cw.getLocation(),cw.getId()));
+            // Maybe not userfull add a repo automatically update ???
+            //helmService.repoUpdate();
     }
 
     private void refreshPackage(Package pkg) throws IOException {

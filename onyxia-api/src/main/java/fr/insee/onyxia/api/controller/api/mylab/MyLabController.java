@@ -13,11 +13,14 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
+import fr.insee.onyxia.api.dao.universe.CatalogRefresher;
 import fr.insee.onyxia.api.services.control.PublishContext;
 import fr.insee.onyxia.model.catalog.Catalog;
 import fr.insee.onyxia.model.helm.Chart;
 import io.github.inseefrlab.helmwrapper.model.install.HelmInstaller;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -69,6 +72,10 @@ public class MyLabController {
     String MARATHON_URL;
 
     @Autowired
+    HelmInstallService helm;
+
+
+    @Autowired
     @Qualifier("marathon")
     private OkHttpClient marathonClient;
 
@@ -95,6 +102,9 @@ public class MyLabController {
 
     @Autowired(required = false)
     private Marathon marathon;
+
+    private final Logger logger = LoggerFactory.getLogger(MyLabController.class);
+
 
     @Value("${marathon.group.name}")
     private String MARATHON_GROUP_NAME;
@@ -205,22 +215,27 @@ public class MyLabController {
             catalogId = requestDTO.getCatalogId();
         }
         CatalogWrapper catalog = catalogService.getCatalogById(catalogId);
-
-        if (!Universe.TYPE_UNIVERSE.equals(catalog.getType())) {
-            throw new UnsupportedOperationException("Only universe is supported right now");
-        }
-
-        UniversePackage pkg = (UniversePackage) catalog.getCatalog().getPackageByName(requestDTO.getPackageName());
-
+        Package pkg = catalog.getCatalog().getPackageByName(requestDTO.getPackageName());
         User user = userProvider.getUser();
         userDataService.fetchUserData(user);
 
-        Map<String, Object> resource = pkg.getResource();
+        if (!Universe.TYPE_UNIVERSE.equals(catalog.getType())) {
+
+            HelmInstaller res=helm.installChart(pkg.getName(),requestDTO.getCatalogId()+"/"+pkg.getName(),null,"default");
+            logger.info(res.toString());
+            return null;
+        }
+
+        UniversePackage universePkg = (UniversePackage) pkg;
+
+
+
+        Map<String, Object> resource = universePkg.getResource();
         Map<String, Object> fusion = new HashMap<>();
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
         fusion.putAll(Map.of("resource", resource));
 
-        String toMarathon = Mustacheur.mustache(pkg.getJsonMustache(), fusion);
+        String toMarathon = Mustacheur.mustache(universePkg.getJsonMustache(), fusion);
         Collection<App> apps;
         if (isGroup) {
             Group group = mapper.readValue(toMarathon, Group.class);
@@ -235,7 +250,7 @@ public class MyLabController {
 
             // Apply every admission controller
             long nbInvalidations = admissionControllers.stream().map(admissionController -> admissionController
-                    .validateContract(app, user, pkg, (Map<String, Object>) requestDTO.getOptions(), context))
+                    .validateContract(app, user, universePkg, (Map<String, Object>) requestDTO.getOptions(), context))
                     .filter(b -> !b).count();
             if (nbInvalidations > 0) {
                 throw new AccessDeniedException("Validation failed");
