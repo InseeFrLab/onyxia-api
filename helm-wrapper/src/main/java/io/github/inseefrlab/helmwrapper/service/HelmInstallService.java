@@ -12,6 +12,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.github.inseefrlab.helmwrapper.model.HelmLs;
 import io.github.inseefrlab.helmwrapper.model.install.HelmInstaller;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.zeroturnaround.exec.InvalidExitValueException;
@@ -23,13 +25,19 @@ import io.github.inseefrlab.helmwrapper.utils.Command;
  */
 @Service
 public class HelmInstallService {
+
+
+    private final Logger logger = LoggerFactory.getLogger(HelmInstallService.class);
+
+
     public HelmInstaller installChart(String name, String chart, Map<String, String> env, String namespace)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        return new ObjectMapper().readValue(
-                Command.executeAndGetResponseAsJson("helm install " + name + " " + chart + " " + buildEnvVar(env))
-                        .getOutput().getString(),
-                HelmInstaller.class);
+        String res =Command.executeAndGetResponseAsJson("helm install " + name + " " + chart + " " + buildEnvVar(env) +"--dry-run")
+                .getOutput().getString();
+        logger.info(res);
+        return new ObjectMapper().readValue(res,HelmInstaller.class);
     }
+
 
     public int uninstaller(String name)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {

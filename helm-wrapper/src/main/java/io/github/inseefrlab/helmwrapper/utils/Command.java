@@ -20,4 +20,5 @@ public class Command {
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
         return new ProcessExecutor().readOutput(true).commandSplit(command).execute();
     }
+
 }

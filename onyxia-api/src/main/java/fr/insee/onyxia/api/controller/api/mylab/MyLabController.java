@@ -197,18 +197,18 @@ public class MyLabController {
     }
 
     @PutMapping("/app")
-    public App publishService(@RequestBody CreateServiceDTO requestDTO)
+    public Object publishService(@RequestBody CreateServiceDTO requestDTO)
             throws JsonProcessingException, IOException, MarathonException, Exception {
         return publishApps(requestDTO, false).stream().findFirst().get();
     }
 
     @PutMapping("/group")
-    public Collection<App> publishGroup(@RequestBody CreateServiceDTO requestDTO)
+    public Collection<Object> publishGroup(@RequestBody CreateServiceDTO requestDTO)
             throws JsonProcessingException, IOException, MarathonException, Exception {
         return publishApps(requestDTO, true);
     }
 
-    private Collection<App> publishApps(CreateServiceDTO requestDTO, boolean isGroup)
+    private Collection<Object> publishApps(CreateServiceDTO requestDTO, boolean isGroup)
             throws JsonProcessingException, IOException, MarathonException, Exception {
         String catalogId = "internal";
         if (requestDTO.getCatalogId() != null && requestDTO.getCatalogId().length() > 0) {
@@ -221,9 +221,9 @@ public class MyLabController {
 
         if (!Universe.TYPE_UNIVERSE.equals(catalog.getType())) {
 
-            HelmInstaller res=helm.installChart(pkg.getName(),requestDTO.getCatalogId()+"/"+pkg.getName(),null,"default");
+            HelmInstaller res = helm.installChart(pkg.getName(),requestDTO.getCatalogId()+"/"+pkg.getName(),null,"default");
             logger.info(res.toString());
-            return null;
+            return List.of(res);
         }
 
         UniversePackage universePkg = (UniversePackage) pkg;
@@ -234,7 +234,7 @@ public class MyLabController {
         Map<String, Object> fusion = new HashMap<>();
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
         fusion.putAll(Map.of("resource", resource));
-
+        // On remplit le contrat
         String toMarathon = Mustacheur.mustache(universePkg.getJsonMustache(), fusion);
         Collection<App> apps;
         if (isGroup) {
@@ -258,7 +258,7 @@ public class MyLabController {
         }
 
         if (requestDTO.isDryRun()) {
-            return apps;
+            return apps.stream().collect(Collectors.toList());
         } else {
             return apps.stream().map(app -> marathon.createApp(app)).collect(Collectors.toList());
         }
