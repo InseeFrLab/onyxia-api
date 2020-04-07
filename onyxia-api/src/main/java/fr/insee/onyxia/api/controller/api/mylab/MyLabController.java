@@ -229,7 +229,7 @@ public class MyLabController {
             File values = File.createTempFile("values", ".yaml");
             mapperHelm.writeValue(values,fusion);
             logger.info(Files.readString(values.toPath()));
-            HelmInstaller res = helm.installChart(pkg.getName(),requestDTO.getCatalogId()+"/"+pkg.getName(),values,user.getIdep());
+            HelmInstaller res = helm.installChart(pkg.getName(),requestDTO.getCatalogId()+"/"+pkg.getName(),values,user.getIdep(), requestDTO.isDryRun());
             values.delete();
             return List.of(res.getManifest());
         }

@@ -31,18 +31,25 @@ public class HelmInstallService {
     private final Logger logger = LoggerFactory.getLogger(HelmInstallService.class);
 
 
-    public HelmInstaller installChart(String name, String chart, Map<String, String> env, String namespace)
+    public HelmInstaller installChart(String name, String chart, Map<String, String> env, String namespace, Boolean dryRun)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        String res =Command.executeAndGetResponseAsJson("helm install " + name + " " + chart + " " + buildEnvVar(env) +"--dry-run")
-                .getOutput().getString();
+        String command = "helm install " + name + " " + chart + " " + buildEnvVar(env);
+        if (dryRun){
+            command=command.concat(" --dry-run");
+        }
+        String res =Command.executeAndGetResponseAsJson(command).getOutput().getString();
         logger.info(res);
         return new ObjectMapper().readValue(res,HelmInstaller.class);
     }
 
-    public HelmInstaller installChart(String name, String chart, File values, String namespace)
+    public HelmInstaller installChart(String name, String chart, File values, String namespace, boolean dryRun)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        String res = Command.executeAndGetResponseAsJson("helm install " + name + " " + chart + " -f " + values.getAbsolutePath() +" --dry-run")
-                .getOutput().getString();
+        String command = "helm install " + name + " " + chart + " -f " + values.getAbsolutePath();
+        if (dryRun){
+            command=command.concat(" --dry-run");
+        }
+        logger.info(command);
+        String res = Command.executeAndGetResponseAsJson(command).getOutput().getString();
         logger.info(res);
         return new ObjectMapper().readValue(res,HelmInstaller.class);
     }
