@@ -1,6 +1,8 @@
 package fr.insee.onyxia.api.controller.api.mylab;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -17,7 +19,7 @@ import fr.insee.onyxia.api.dao.universe.CatalogRefresher;
 import fr.insee.onyxia.api.services.control.PublishContext;
 import fr.insee.onyxia.model.catalog.Catalog;
 import fr.insee.onyxia.model.helm.Chart;
-import io.github.inseefrlab.helmwrapper.model.install.HelmInstaller;
+import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,6 +76,9 @@ public class MyLabController {
     @Autowired
     HelmInstallService helm;
 
+    @Autowired
+    @Qualifier("helm")
+    ObjectMapper mapperHelm;
 
     @Autowired
     @Qualifier("marathon")
@@ -218,21 +223,18 @@ public class MyLabController {
         Package pkg = catalog.getCatalog().getPackageByName(requestDTO.getPackageName());
         User user = userProvider.getUser();
         userDataService.fetchUserData(user);
-
-        if (!Universe.TYPE_UNIVERSE.equals(catalog.getType())) {
-
-            HelmInstaller res = helm.installChart(pkg.getName(),requestDTO.getCatalogId()+"/"+pkg.getName(),null,"default");
-            logger.info(res.toString());
-            return List.of(res);
-        }
-
-        UniversePackage universePkg = (UniversePackage) pkg;
-
-
-
-        Map<String, Object> resource = universePkg.getResource();
         Map<String, Object> fusion = new HashMap<>();
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
+        if (!Universe.TYPE_UNIVERSE.equals(catalog.getType())) {
+            File values = File.createTempFile("values", ".yaml");
+            mapperHelm.writeValue(values,fusion);
+            logger.info(Files.readString(values.toPath()));
+            HelmInstaller res = helm.installChart(pkg.getName(),requestDTO.getCatalogId()+"/"+pkg.getName(),values,user.getIdep());
+            values.delete();
+            return List.of(res.getManifest());
+        }
+        UniversePackage universePkg = (UniversePackage) pkg;
+        Map<String, Object> resource = universePkg.getResource();
         fusion.putAll(Map.of("resource", resource));
         // On remplit le contrat
         String toMarathon = Mustacheur.mustache(universePkg.getJsonMustache(), fusion);
