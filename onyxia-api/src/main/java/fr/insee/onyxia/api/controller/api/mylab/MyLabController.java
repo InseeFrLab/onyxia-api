@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.dao.universe.CatalogRefresher;
+import fr.insee.onyxia.api.services.control.IDSanitizer;
 import fr.insee.onyxia.api.services.control.PublishContext;
 import fr.insee.onyxia.model.catalog.Catalog;
 import fr.insee.onyxia.model.helm.Chart;
@@ -71,7 +72,13 @@ public class MyLabController {
      */
     @Deprecated
     @Value("${marathon.url}")
-    String MARATHON_URL;
+    private String MARATHON_URL;
+
+    @Value("${marathon.dns.suffix}")
+    private String MARATHON_DNS_SUFFIX;
+
+    @Autowired
+    private IDSanitizer idSanitizer;
 
     @Autowired
     HelmInstallService helm;
@@ -221,6 +228,8 @@ public class MyLabController {
         }
         CatalogWrapper catalog = catalogService.getCatalogById(catalogId);
         Package pkg = catalog.getCatalog().getPackageByName(requestDTO.getPackageName());
+        PublishContext context = new PublishContext(catalogId);
+
         User user = userProvider.getUser();
         userDataService.fetchUserData(user);
         Map<String, Object> fusion = new HashMap<>();
@@ -236,7 +245,11 @@ public class MyLabController {
         UniversePackage universePkg = (UniversePackage) pkg;
         Map<String, Object> resource = universePkg.getResource();
         fusion.putAll(Map.of("resource", resource));
-        // On remplit le contrat
+
+        Map<String, String> contextData = new HashMap<>();
+        contextData.put("internaluri",idSanitizer.sanitize(pkg.getName())+"-"+context.getRandomizedId()+"-"+idSanitizer.sanitize(user.getIdep())+"-"+idSanitizer.sanitize(MARATHON_GROUP_NAME)+"."+MARATHON_DNS_SUFFIX);
+        fusion.put("context",contextData);
+
         String toMarathon = Mustacheur.mustache(universePkg.getJsonMustache(), fusion);
         Collection<App> apps;
         if (isGroup) {
@@ -248,7 +261,7 @@ public class MyLabController {
         }
 
         for (App app : apps) {
-            PublishContext context = new PublishContext(catalogId);
+
 
             // Apply every admission controller
             long nbInvalidations = admissionControllers.stream().map(admissionController -> admissionController
