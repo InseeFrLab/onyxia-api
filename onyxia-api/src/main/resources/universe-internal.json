@@ -28,7 +28,7 @@
         },
         "assets": {
           "container": {
-            "docker": { "shelly": "inseefrlab/shelly" }
+            "docker": { "shelly": "inseefrlab/shelly:cloudshell" }
           }
         }
       },
