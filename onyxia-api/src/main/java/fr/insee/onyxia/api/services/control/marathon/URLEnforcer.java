@@ -1,8 +1,11 @@
-package fr.insee.onyxia.api.services.control;
+package fr.insee.onyxia.api.services.control.marathon;
 
+import fr.insee.onyxia.api.services.control.AdmissionController;
+import fr.insee.onyxia.api.services.control.utils.PublishContext;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.UniversePackage;
 import mesosphere.marathon.client.model.v2.App;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +20,8 @@ public class URLEnforcer implements AdmissionController {
 
     private static Pattern PATTERN_HAPROXY_VHOST = Pattern.compile("HAPROXY_([0-9]*)_VHOST");
 
-    @Value("${marathon.publish.domain}")
-    private String baseDomain;
+    @Autowired
+    private UrlGenerator urlGenerator;
 
     @Override
     public boolean validateContract(App app, User user, UniversePackage pkg, Map<String,Object> configData, PublishContext context) {
@@ -39,7 +42,6 @@ public class URLEnforcer implements AdmissionController {
     }
 
     private String getUrl(int portNumber, User user, UniversePackage pkg, Map<String,Object> configData, PublishContext context) {
-        String url = user.getIdep()+"-"+pkg.getName()+"-"+context.getRandomizedId()+(portNumber != 0 ? "-"+portNumber : "")+"."+baseDomain;
-        return url;
+        return urlGenerator.generateUrl(user.getIdep(), pkg.getName(), context.getRandomizedId(), portNumber);
     }
 }
