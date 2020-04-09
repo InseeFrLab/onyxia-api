@@ -7,7 +7,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
-import javax.websocket.server.PathParam;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -22,6 +21,9 @@ import fr.insee.onyxia.model.catalog.Catalog;
 import fr.insee.onyxia.model.helm.Chart;
 import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService;
+import fr.insee.onyxia.api.services.control.marathon.UrlGenerator;
+import fr.insee.onyxia.api.services.control.utils.IDSanitizer;
+import fr.insee.onyxia.api.services.control.utils.PublishContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +59,6 @@ import mesosphere.marathon.client.MarathonException;
 import mesosphere.marathon.client.model.v2.App;
 import mesosphere.marathon.client.model.v2.Group;
 import mesosphere.marathon.client.model.v2.Result;
-import mesosphere.marathon.client.model.v2.VersionedApp;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -114,6 +115,9 @@ public class MyLabController {
 
     @Autowired(required = false)
     private Marathon marathon;
+
+    @Autowired
+    private UrlGenerator generator;
 
     private final Logger logger = LoggerFactory.getLogger(MyLabController.class);
 
@@ -247,7 +251,11 @@ public class MyLabController {
         fusion.putAll(Map.of("resource", resource));
 
         Map<String, String> contextData = new HashMap<>();
-        contextData.put("internaluri",idSanitizer.sanitize(pkg.getName())+"-"+context.getRandomizedId()+"-"+idSanitizer.sanitize(user.getIdep())+"-"+idSanitizer.sanitize(MARATHON_GROUP_NAME)+"."+MARATHON_DNS_SUFFIX);
+        contextData.put("internaldns",idSanitizer.sanitize(pkg.getName())+"-"+context.getRandomizedId()+"-"+idSanitizer.sanitize(user.getIdep())+"-"+idSanitizer.sanitize(MARATHON_GROUP_NAME)+"."+MARATHON_DNS_SUFFIX);
+
+        for (int i = 0; i < 10; i++) {
+            contextData.put("externaldns-"+i,generator.generateUrl(user.getIdep(), pkg.getName(), context.getRandomizedId(), i));
+        }
         fusion.put("context",contextData);
 
         String toMarathon = Mustacheur.mustache(universePkg.getJsonMustache(), fusion);

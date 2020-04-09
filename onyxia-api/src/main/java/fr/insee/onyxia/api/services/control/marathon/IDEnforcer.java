@@ -1,18 +1,17 @@
-package fr.insee.onyxia.api.services.control;
+package fr.insee.onyxia.api.services.control.marathon;
 
+import fr.insee.onyxia.api.services.control.AdmissionController;
+import fr.insee.onyxia.api.services.control.utils.IDSanitizer;
+import fr.insee.onyxia.api.services.control.utils.PublishContext;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.UniversePackage;
 import mesosphere.marathon.client.model.v2.App;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.actuate.endpoint.Sanitizer;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Enforce service id
