@@ -14,11 +14,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
-import fr.insee.onyxia.api.dao.universe.CatalogRefresher;
-import fr.insee.onyxia.api.services.control.IDSanitizer;
-import fr.insee.onyxia.api.services.control.PublishContext;
-import fr.insee.onyxia.model.catalog.Catalog;
-import fr.insee.onyxia.model.helm.Chart;
 import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService;
 import fr.insee.onyxia.api.services.control.marathon.UrlGenerator;
