@@ -11,8 +11,15 @@ deploy:
   skip_cleanup: true
   provider: script
   script:
-    bash .ci/tag.sh && docker build -t inseefrlab/onyxia-api:$DOCKER_TAG onyxia-api && echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-    && docker push inseefrlab/onyxia-api:$DOCKER_TAG
+    docker build -t inseefrlab/onyxia-api:latest onyxia-api && echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    && docker push inseefrlab/onyxia-api:latest
   on:
-    branch: improve-ci
+    branch: master
+deploy:
+  skip_cleanup: true
+  provider: script
+  script:
+    docker build -t inseefrlab/onyxia-api:$TRAVIS_TAG onyxia-api && echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    && docker push inseefrlab/onyxia-api:$TRAVIS_TAG
+  on:
     tags: true
