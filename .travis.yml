@@ -15,7 +15,7 @@ deploy:
     && docker push inseefrlab/onyxia-api:latest
   on:
     branch: master
-deploy:
+deploy-tags:
   skip_cleanup: true
   provider: script
   script:
