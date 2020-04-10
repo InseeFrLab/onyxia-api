@@ -11,6 +11,7 @@ import fr.insee.onyxia.model.catalog.Universe;
 import fr.insee.onyxia.model.catalog.Config.Config;
 import fr.insee.onyxia.model.helm.Chart;
 import fr.insee.onyxia.model.helm.Repository;
+import io.github.inseefrlab.helmwrapper.service.HelmRepoService;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
@@ -23,6 +24,9 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.util.concurrent.TimeoutException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipInputStream;
 
 @Service
@@ -39,6 +43,9 @@ public class CatalogLoader {
     @Autowired
     @Qualifier("helm")
     private ObjectMapper mapperHelm;
+
+    @Autowired
+    private HelmRepoService helmService;
 
     public void updateCatalog(CatalogWrapper cw) {
         logger.info("updating catalog with id :" + cw.getId() + " and type " + cw.getType());
@@ -83,7 +90,8 @@ public class CatalogLoader {
      */
     private void updateHelmRepository(CatalogWrapper cw) {
         try {
-            Reader reader = new InputStreamReader(resourceLoader.getResource(cw.getLocation()).getInputStream(),
+            updateHelmRepo(cw);
+            Reader reader = new InputStreamReader(resourceLoader.getResource(cw.getLocation()+"/index.yaml").getInputStream(),
                     "UTF-8");
             Repository repository = mapperHelm.readValue(reader, Repository.class);
             repository.getPackages().parallelStream().forEach(pkg -> {
@@ -98,6 +106,12 @@ public class CatalogLoader {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void updateHelmRepo(CatalogWrapper cw) throws IOException, InterruptedException, TimeoutException {
+           logger.info(helmService.addHelmRepo(cw.getLocation(),cw.getId()));
+            // Maybe not userfull add a repo automatically update ???
+            //helmService.repoUpdate();
     }
 
     private void refreshPackage(Package pkg) throws IOException {

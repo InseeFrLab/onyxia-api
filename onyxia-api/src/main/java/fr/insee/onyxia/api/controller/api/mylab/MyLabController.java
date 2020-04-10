@@ -1,6 +1,8 @@
 package fr.insee.onyxia.api.controller.api.mylab;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -12,6 +14,8 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
+import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
+import io.github.inseefrlab.helmwrapper.service.HelmInstallService;
 import fr.insee.onyxia.api.services.control.marathon.UrlGenerator;
 import fr.insee.onyxia.api.services.control.utils.IDSanitizer;
 import fr.insee.onyxia.api.services.control.utils.PublishContext;
@@ -71,6 +75,13 @@ public class MyLabController {
 
     @Autowired
     private IDSanitizer idSanitizer;
+
+    @Autowired
+    HelmInstallService helm;
+
+    @Autowired
+    @Qualifier("helm")
+    ObjectMapper mapperHelm;
 
     @Autowired
     @Qualifier("marathon")
@@ -197,38 +208,41 @@ public class MyLabController {
     }
 
     @PutMapping("/app")
-    public App publishService(@RequestBody CreateServiceDTO requestDTO)
+    public Object publishService(@RequestBody CreateServiceDTO requestDTO)
             throws JsonProcessingException, IOException, MarathonException, Exception {
         return publishApps(requestDTO, false).stream().findFirst().get();
     }
 
     @PutMapping("/group")
-    public Collection<App> publishGroup(@RequestBody CreateServiceDTO requestDTO)
+    public Collection<Object> publishGroup(@RequestBody CreateServiceDTO requestDTO)
             throws JsonProcessingException, IOException, MarathonException, Exception {
         return publishApps(requestDTO, true);
     }
 
-    private Collection<App> publishApps(CreateServiceDTO requestDTO, boolean isGroup)
+    private Collection<Object> publishApps(CreateServiceDTO requestDTO, boolean isGroup)
             throws JsonProcessingException, IOException, MarathonException, Exception {
         String catalogId = "internal";
         if (requestDTO.getCatalogId() != null && requestDTO.getCatalogId().length() > 0) {
             catalogId = requestDTO.getCatalogId();
         }
         CatalogWrapper catalog = catalogService.getCatalogById(catalogId);
+        Package pkg = catalog.getCatalog().getPackageByName(requestDTO.getPackageName());
         PublishContext context = new PublishContext(catalogId);
-
-        if (!Universe.TYPE_UNIVERSE.equals(catalog.getType())) {
-            throw new UnsupportedOperationException("Only universe is supported right now");
-        }
-
-        UniversePackage pkg = (UniversePackage) catalog.getCatalog().getPackageByName(requestDTO.getPackageName());
 
         User user = userProvider.getUser();
         userDataService.fetchUserData(user);
-
-        Map<String, Object> resource = pkg.getResource();
         Map<String, Object> fusion = new HashMap<>();
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
+        if (!Universe.TYPE_UNIVERSE.equals(catalog.getType())) {
+            File values = File.createTempFile("values", ".yaml");
+            mapperHelm.writeValue(values,fusion);
+            logger.info(Files.readString(values.toPath()));
+            HelmInstaller res = helm.installChart(pkg.getName(),requestDTO.getCatalogId()+"/"+pkg.getName(),values,user.getIdep(), requestDTO.isDryRun());
+            values.delete();
+            return List.of(res.getManifest());
+        }
+        UniversePackage universePkg = (UniversePackage) pkg;
+        Map<String, Object> resource = universePkg.getResource();
         fusion.putAll(Map.of("resource", resource));
 
         Map<String, String> contextData = new HashMap<>();
@@ -239,7 +253,7 @@ public class MyLabController {
         }
         fusion.put("context",contextData);
 
-        String toMarathon = Mustacheur.mustache(pkg.getJsonMustache(), fusion);
+        String toMarathon = Mustacheur.mustache(universePkg.getJsonMustache(), fusion);
         Collection<App> apps;
         if (isGroup) {
             Group group = mapper.readValue(toMarathon, Group.class);
@@ -254,7 +268,7 @@ public class MyLabController {
 
             // Apply every admission controller
             long nbInvalidations = admissionControllers.stream().map(admissionController -> admissionController
-                    .validateContract(app, user, pkg, (Map<String, Object>) requestDTO.getOptions(), context))
+                    .validateContract(app, user, universePkg, (Map<String, Object>) requestDTO.getOptions(), context))
                     .filter(b -> !b).count();
             if (nbInvalidations > 0) {
                 throw new AccessDeniedException("Validation failed");
@@ -262,7 +276,7 @@ public class MyLabController {
         }
 
         if (requestDTO.isDryRun()) {
-            return apps;
+            return apps.stream().collect(Collectors.toList());
         } else {
             return apps.stream().map(app -> marathon.createApp(app)).collect(Collectors.toList());
         }
