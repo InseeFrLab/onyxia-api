@@ -2,7 +2,7 @@
 
 set -e
 
-export DOCKER_TAG="master"
+export DOCKER_TAG="improve-ci"
 
 if [ "$TRAVIS_TAG" != "" ];then
   export DOCKER_TAG=$TRAVIS_TAG
