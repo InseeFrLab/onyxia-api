@@ -1,20 +1,26 @@
 package fr.insee.onyxia.api.security;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import fr.insee.onyxia.api.services.UserProvider;
+import fr.insee.onyxia.api.services.utils.HttpRequestUtils;
+import fr.insee.onyxia.model.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-
-import fr.insee.onyxia.api.services.UserProvider;
-import fr.insee.onyxia.model.User;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Configuration
 @EnableWebSecurity
-@ConditionalOnProperty(name = "keycloak.enabled", havingValue = "false")
+@ConditionalOnSingleCandidate(WebSecurityConfigurerAdapter.class)
 public class NoSecurityConfiguration extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private HttpRequestUtils httpRequestUtils;
    
    @Override
    protected void configure(HttpSecurity http) throws Exception {
@@ -31,16 +37,14 @@ public class NoSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
    @Bean
    public UserProvider getUserProvider() {
-      return new UserProvider() {
-         
-         @Override
-         public User getUser() {
-            User user = User.newInstance()
-            .setEmail("toto@tld.fr")
-            .setNomComplet("John doe")
-            .setIdep("XXXXXX").build();
-            return user;
-         }
+      return () -> {
+         User user = User.newInstance()
+         .setEmail("toto@tld.fr")
+         .setNomComplet("John doe")
+         .setIdep("XXXXXX")
+                 .setIp(httpRequestUtils.getClientIpAddressIfServletRequestExist(((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()))
+                 .build();
+         return user;
       };
    }
 

@@ -25,7 +25,7 @@ public class CatalogRefresher {
     @Autowired
     private CatalogLoader catalogLoader;
 
-    @Value("${catalog.refresh.ms}")
+    @Value("${catalogs.refresh.ms}")
     private long refreshTime;
 
     private void refresh() {

@@ -1,29 +1,20 @@
 package fr.insee.onyxia.api.configuration;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonSerializationContext;
-import io.minio.messages.Item;
 import mesosphere.marathon.client.model.v2.ExternalVolume;
 import mesosphere.marathon.client.model.v2.LocalVolume;
 import mesosphere.marathon.client.model.v2.PersistentLocalVolume;
 import mesosphere.marathon.client.model.v2.Volume;
-import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import org.springframework.context.annotation.Primary;
-import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
 

@@ -38,7 +38,6 @@ import org.springframework.web.bind.annotation.RestController;
 import fr.insee.onyxia.api.configuration.Catalogs;
 import fr.insee.onyxia.api.configuration.metrics.CustomMetrics;
 import fr.insee.onyxia.api.services.CatalogService;
-import fr.insee.onyxia.api.services.UserDataService;
 import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.api.services.control.AdmissionController;
 import fr.insee.onyxia.model.User;
@@ -92,9 +91,6 @@ public class MyLabController {
 
     @Autowired
     private UserProvider userProvider;
-
-    @Autowired
-    private UserDataService userDataService;
 
     @Autowired
     private ObjectMapper mapper;
@@ -230,7 +226,6 @@ public class MyLabController {
         PublishContext context = new PublishContext(catalogId);
 
         User user = userProvider.getUser();
-        userDataService.fetchUserData(user);
         Map<String, Object> fusion = new HashMap<>();
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
         if (!Universe.TYPE_UNIVERSE.equals(catalog.getType())) {
