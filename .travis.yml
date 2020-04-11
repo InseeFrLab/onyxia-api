@@ -7,12 +7,18 @@ before_install:
   - mvn -B versions:set -DnewVersion=$TRAVIS_BRANCH
 script:
   - mvn -B package
-  - docker build -t inseefrlab/onyxia-api onyxia-api
 deploy:
-  skip_cleanup: true
-  provider: script
-  script:
-    echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-    && docker push inseefrlab/onyxia-api
-  on:
-    branch: master
+  - provider: script
+    skip_cleanup: true
+    script:
+      docker build -t inseefrlab/onyxia-api:latest onyxia-api && echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      && docker push inseefrlab/onyxia-api:latest
+    on:
+      branch: master
+  - provider: script
+    skip_cleanup: true
+    script:
+      docker build -t inseefrlab/onyxia-api:$TRAVIS_TAG onyxia-api && echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      && docker push inseefrlab/onyxia-api:$TRAVIS_TAG
+    on:
+      tags: true
