@@ -1,7 +1,8 @@
 package fr.insee.onyxia.api.security;
 
-import javax.servlet.http.HttpServletRequest;
-
+import fr.insee.onyxia.api.services.UserProvider;
+import fr.insee.onyxia.api.services.utils.HttpRequestUtils;
+import fr.insee.onyxia.model.User;
 import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.adapters.KeycloakConfigResolver;
 import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver;
@@ -11,14 +12,9 @@ import org.keycloak.adapters.springsecurity.config.KeycloakWebSecurityConfigurer
 import org.keycloak.adapters.springsecurity.management.HttpSessionManager;
 import org.keycloak.representations.AccessToken;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.context.annotation.*;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -33,16 +29,18 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import fr.insee.onyxia.api.services.UserProvider;
-import fr.insee.onyxia.model.User;
+import javax.servlet.http.HttpServletRequest;
 
 public class SpringKeycloakSecurityConfiguration {
    
    @Configuration
    @EnableWebSecurity
-   @ConditionalOnProperty(name = "keycloak.enabled", havingValue = "true", matchIfMissing = true)
+   @ConditionalOnProperty(name = "authentication.mode", havingValue = "openidconnect")
    @ComponentScan(basePackageClasses = KeycloakSecurityComponents.class)
    public static class KeycloakConfigurationAdapter extends KeycloakWebSecurityConfigurerAdapter {
+
+      @Autowired
+      private HttpRequestUtils httpRequestUtils;
       
       @Bean
       @Scope(scopeName = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
@@ -54,17 +52,15 @@ public class SpringKeycloakSecurityConfiguration {
       
       @Bean
       public UserProvider getUserProvider() {
-         return new UserProvider() {
-            
-            @Override
-            public User getUser() {
-               AccessToken token = getAccessToken();
-               User user = User.newInstance()
-               .setEmail(token.getEmail())
-               .setNomComplet(token.getName())
-               .setIdep(token.getPreferredUsername()).build();
-               return user;
-            }
+         return () -> {
+            AccessToken token = getAccessToken();
+            User user = User.newInstance()
+            .setEmail(token.getEmail())
+            .setNomComplet(token.getName())
+            .setIdep(token.getPreferredUsername())
+                    .setIp(httpRequestUtils.getClientIpAddressIfServletRequestExist(((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()))
+                    .build();
+            return user;
          };
       }
       

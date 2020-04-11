@@ -10,8 +10,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Configuration
 public class CatalogsLoader {
@@ -25,17 +28,49 @@ public class CatalogsLoader {
     @Value("${catalogs.configuration}")
     private String catalogsConf;
 
-    Logger logger = LoggerFactory.getLogger(CatalogsLoader.class);
+    @Autowired
+    private CatalogFilter catalogFilter;
+
+    private static Logger logger = LoggerFactory.getLogger(CatalogsLoader.class);
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
     public Catalogs catalogs() {
         try (InputStream inputStream = resourceLoader.getResource(catalogsConf).getInputStream()) {
-            return mapper.readValue(inputStream, Catalogs.class);
+            Catalogs catalogs = mapper.readValue(inputStream, Catalogs.class);
+            catalogs.setCatalogs(catalogFilter.filterCatalogs(catalogs.getCatalogs()));
+            return catalogs;
         } catch (Exception e) {
             logger.error("Error : Could not load catalogs !", e);
         }
         return new Catalogs();
+    }
+
+    @Service
+    public class CatalogFilter {
+
+        @Value("${marathon.enabled}")
+        private boolean marathonEnabled;
+
+        @Value("${kubernetes.enabled}")
+        private boolean kubernetesEnabled;
+
+        private Logger logger = LoggerFactory.getLogger(CatalogFilter.class);
+
+        public List<CatalogWrapper>  filterCatalogs(List<CatalogWrapper> catalogs) {
+            logger.info("Marathon support enabled : "+marathonEnabled);
+            logger.info("Kubernetes support enabled : "+kubernetesEnabled);
+            return catalogs.stream().filter(cw -> {
+                if (cw.getType().equals("universe") && marathonEnabled) {
+                    return true;
+                }
+                if (cw.getType().equals("helm") && kubernetesEnabled) {
+                    return true;
+                }
+                logger.info("Filtering out catalog "+cw.getName());
+                return false;
+            }).collect(Collectors.toList());
+        }
     }
 
 }

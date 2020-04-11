@@ -24,7 +24,6 @@ public class OnyxiaLabelsEnforcer implements AdmissionController {
         app.addLabel("ONYXIA_SUBTITLE", pkg.getName());
         app.addLabel("ONYXIA_SCM", pkg.getScm());
         app.addLabel("ONYXIA_DESCRIPTION", pkg.getDescription());
-        app.addLabel("ONYXIA_STATUS", pkg.getStatus());
         if (!app.getLabels().containsKey("ONYXIA_URL") && app.getLabels().containsKey("HAPROXY_0_VHOST")) {
             if (app.getLabels().containsKey("HAPROXY_1_VHOST")) {
                 app.addLabel("ONYXIA_URL", "https://" + app.getLabels().get("HAPROXY_0_VHOST") + ",https://"

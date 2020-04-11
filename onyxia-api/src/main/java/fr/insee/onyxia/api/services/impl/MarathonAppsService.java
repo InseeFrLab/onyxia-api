@@ -20,12 +20,6 @@ public class MarathonAppsService implements AppsService {
 
    @Autowired(required = false)
    Marathon marathon;
-   
-   @Override
-   public List<VersionedApp> getServices(Map<String, String> params) {
-      GetAppsResponse appsResponse = marathon.getApps(params);
-      return appsResponse.getApps();
-   }
 
    @Override
    public VersionedApp getServiceById(String id) {

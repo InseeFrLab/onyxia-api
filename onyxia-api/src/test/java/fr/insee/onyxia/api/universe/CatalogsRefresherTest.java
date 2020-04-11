@@ -12,13 +12,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @SpringBootTest
-@TestPropertySource(properties = { "catalog.refresh.ms=3000" })
+@TestPropertySource(properties = { "catalogs.refresh.ms=3000" })
 public class CatalogsRefresherTest {
 
     @Autowired
     private Catalogs catalogs;
 
-    @Value("${catalog.refresh.ms}")
+    @Value("${catalogs.refresh.ms}")
     private long refreshTime;
 
     @Test
