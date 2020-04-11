@@ -11,16 +11,31 @@ The opensourcing (and documentation) is still a work in progress, please be pati
 docker run -p 8080:8080 inseefrlab/onyxia-api
 ```
 
-### Using Java (maven)
+### Using Java / maven (from sources)
 
 ```
-mvn spring-boot:run
+git clone https://github.com/InseeFrLab/onyxia-api.git
+cd onyxia-api
+mvn spring-boot:run  
 ```
+
+### Using Helm (experimental)  
+
+An experimental [helm](helm.sh) package is available at [inseefrlab](https://github.com/InseeFrLab/helm-charts)
+
+```
+helm repo add inseefrlab https://inseefrlab.github.io/helm-charts
+helm install inseefrlab/onyxia
+```  
+
+Note that this install both the API and the [UI](https://github.com/inseefrlab/onyxia-ui)
 
 ## Configuration
 
 Main configuration file is [onyxia-api/src/main/resources/application.properties](onyxia-api/src/main/resources/application.properties).  
-Each variable can be overriden using env variable.
+Each variable can be overriden using environment variables.  
+
+
 
 ## Onyxia Universe package format extension
 
