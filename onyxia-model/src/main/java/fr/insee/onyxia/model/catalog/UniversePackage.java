@@ -34,8 +34,6 @@ public class UniversePackage extends Package {
 	MarathonMustache marathon;
 	Config config;
 	String jsonMustache;
-
-	String status;
 	boolean disable;
 	// String category;
 
@@ -101,14 +99,6 @@ public class UniversePackage extends Package {
 
 	public void setDisable(boolean disable) {
 		this.disable = disable;
-	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
 	}
 
 	public int getReleaseVersion() {
