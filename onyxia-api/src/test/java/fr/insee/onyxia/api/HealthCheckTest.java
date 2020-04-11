@@ -2,9 +2,11 @@ package fr.insee.onyxia.api;
 
 import fr.insee.onyxia.api.configuration.BaseTest;
 import fr.insee.onyxia.api.controller.pub.HealthCheck;
+import fr.insee.onyxia.api.services.utils.HttpRequestUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -16,6 +18,9 @@ public class HealthCheckTest extends BaseTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockBean
+    private HttpRequestUtils httpRequestUtils;
 
     @Test
     public void shouldReturnDefaultMessage() throws Exception {
