@@ -33,7 +33,7 @@ helm repo add inseefrlab https://inseefrlab.github.io/helm-charts
 helm install inseefrlab/onyxia
 ```
 
-Note that this install both the API and the [UI](https://github.com/inseefrlab/onyxia-ui)
+Note that this installs both the API and the [UI](https://github.com/inseefrlab/onyxia-ui)
 
 ## Usage
 
