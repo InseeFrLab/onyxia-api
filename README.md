@@ -54,14 +54,14 @@ Authentication configuration
 Open id configuration  
 | Key | Default | Description |
 | -------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `keycloak.realm` | | `Open id connect` configuration (See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config)) |
-| `keycloak.resource` | | `Open id connect` configuration (See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config)) |
-| `keycloak.auth-server-url` | | `Open id connect` configuration (See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config)) |
-| `keycloak.ssl-required` | `external` | `Open id connect` configuration (See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config)) |
-| `keycloak.public-client` | `true` | `Open id connect` configuration (See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config)) |
-| `keycloak.enable-basic-auth` | `true` | `Open id connect` configuration (See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config)) |
-| `keycloak.bearer-only` | `true` | `Open id connect` configuration (See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config)) |
-| `keycloak.disable-trust-manager` | `false` | `Open id connect` configuration (See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config)) |
+| `keycloak.realm` | | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
+| `keycloak.resource` | | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
+| `keycloak.auth-server-url` | | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
+| `keycloak.ssl-required` | `external` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
+| `keycloak.public-client` | `true` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
+| `keycloak.enable-basic-auth` | `true` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
+| `keycloak.bearer-only` | `true` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
+| `keycloak.disable-trust-manager` | `false` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
 
 [Marathon](https://mesosphere.github.io/marathon/) configuration
 | Key | Default | Description |
