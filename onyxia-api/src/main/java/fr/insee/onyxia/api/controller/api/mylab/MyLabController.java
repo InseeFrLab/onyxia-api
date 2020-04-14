@@ -19,6 +19,7 @@ import fr.insee.onyxia.model.catalog.Universe;
 import fr.insee.onyxia.model.catalog.UniversePackage;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
 import fr.insee.onyxia.model.dto.UpdateServiceDTO;
+import fr.insee.onyxia.model.service.Service;
 import fr.insee.onyxia.mustache.Mustacheur;
 import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService;
@@ -112,6 +113,23 @@ public class MyLabController {
         Collections.sort(admissionControllers, (admissionController, admissionController2) -> {
             return admissionController2.getPriority().compareTo(admissionController.getPriority());
         });
+    }
+
+    @GetMapping("/services")
+    public List<Service> getMyServices() throws Exception {
+        Group group = getGroup(null);
+        return group.getApps().stream().map(app -> getServiceFromApp(app)).collect(Collectors.toList());
+    }
+
+    private Service getServiceFromApp(App app) {
+        Service service = new Service();
+        service.setLabels(app.getLabels());
+        service.setCpus(app.getCpus());
+        service.setInstances(app.getInstances());
+        service.setMem(app.getMem());
+        service.setTitle(app.getId());
+        service.setId(app.getId());
+        return service;
     }
 
     @GetMapping("/group")
