@@ -1,22 +1,23 @@
 package fr.insee.onyxia.api.controller.api.cloudshell;
 
+import fr.insee.onyxia.api.services.CatalogService;
+import fr.insee.onyxia.api.services.UserProvider;
+import fr.insee.onyxia.api.services.impl.MarathonAppsService;
+import fr.insee.onyxia.model.catalog.UniversePackage;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import mesosphere.marathon.client.MarathonException;
+import mesosphere.marathon.client.model.v2.VersionedApp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import fr.insee.onyxia.api.services.CatalogService;
-import fr.insee.onyxia.api.services.UserProvider;
-import fr.insee.onyxia.api.services.impl.MarathonAppsService;
-import fr.insee.onyxia.model.catalog.UniversePackage;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import mesosphere.marathon.client.MarathonException;
-import mesosphere.marathon.client.model.v2.VersionedApp;
-
 @Tag(name = "Cloud Shell", description = "Cloud shell")
 @RequestMapping("/cloudshell")
 @RestController
+@SecurityRequirement(name="auth")
 public class CloudShellController {
 
 	@Autowired

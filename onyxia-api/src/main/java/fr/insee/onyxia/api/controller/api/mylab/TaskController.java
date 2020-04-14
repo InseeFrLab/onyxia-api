@@ -5,6 +5,7 @@ import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.mesos.MesosTask;
 import fr.insee.onyxia.model.task.ServiceFile;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -15,9 +16,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
-@Tag(name = "My lab", description = "My services")
+@Tag(name = "My lab / tasks", description = "My services")
 @RequestMapping("/my-lab/task")
 @RestController
+@SecurityRequirement(name="auth")
 public class TaskController {
 
     @Autowired
