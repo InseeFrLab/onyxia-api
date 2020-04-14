@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 
 @Configuration
-@SecurityScheme(type = SecuritySchemeType.OPENIDCONNECT)
+@SecurityScheme(type = SecuritySchemeType.HTTP, scheme = "bearer", bearerFormat = "JWT",name = "auth")
 public class OpenApiConfiguration {
 
 }
