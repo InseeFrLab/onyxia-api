@@ -22,7 +22,13 @@ import fr.insee.onyxia.model.dto.ServicesDTO;
 import fr.insee.onyxia.model.dto.UpdateServiceDTO;
 import fr.insee.onyxia.model.service.Service;
 import fr.insee.onyxia.mustache.Mustacheur;
+import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.fabric8.kubernetes.api.model.Quantity;
+import io.fabric8.kubernetes.api.model.extensions.Ingress;
+import io.fabric8.kubernetes.client.DefaultKubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
+import io.github.inseefrlab.helmwrapper.model.HelmLs;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -43,16 +49,20 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Tag(name = "My lab", description = "My services")
 @RequestMapping("/my-lab")
 @RestController
-@SecurityRequirement(name="auth")
+@SecurityRequirement(name = "auth")
 public class MyLabController {
 
     /**
@@ -64,6 +74,12 @@ public class MyLabController {
 
     @Value("${marathon.dns.suffix}")
     private String MARATHON_DNS_SUFFIX;
+
+    @Value("${kubernetes.enabled}")
+    private boolean KUB_ENABLED;
+
+    @Value("${marathon.enabled}")
+    private boolean MARATHON_ENABLED;
 
     @Autowired
     private IDSanitizer idSanitizer;
@@ -117,11 +133,44 @@ public class MyLabController {
     }
 
     @GetMapping("/services")
-    public ServicesDTO getMyServices() throws Exception {
+    public ServicesDTO getMyServices(String namespace) throws Exception {
         ServicesDTO dto = new ServicesDTO();
-        Group group = getGroup(null);
-        dto.getApps().addAll(group.getApps().stream().map(app -> getServiceFromApp(app)).collect(Collectors.toList()));
+        if (MARATHON_ENABLED) {
+            Group group = getGroup(namespace);
+            dto.getApps().addAll(group.getApps().stream().map(app -> getServiceFromApp(app)).collect(Collectors.toList()));
+        }
+        if (KUB_ENABLED) {
+            List<HelmLs> installedCharts = Arrays.asList(helm.listChartInstall(namespace));
+            List<Service> services = installedCharts.stream().map(release -> helm.getRelease(release.getName(), release.getNamespace())).map(release -> getServiceFromRelease(release)).collect(Collectors.toList());
+            dto.getApps().addAll(services);
+        }
         return dto;
+    }
+
+
+    private Service getServiceFromRelease(String description) {
+        KubernetesClient client = new DefaultKubernetesClient();
+        InputStream inputStream = new ByteArrayInputStream(description.getBytes(Charset.forName("UTF-8")));
+        List<HasMetadata> hasMetadatas = client.load(inputStream).get();
+        hasMetadatas.stream().filter(hasMetadata -> hasMetadata instanceof Ingress).map(hasMetadata -> (Ingress) hasMetadata).collect(Collectors.toList());
+        List<Ingress> ingresses = hasMetadatas.stream().filter(hasMetadata -> hasMetadata instanceof Ingress).map(hasMetadata -> (Ingress) hasMetadata).collect(Collectors.toList());
+        List<io.fabric8.kubernetes.api.model.Service> services = hasMetadatas.stream().filter(hasMetadata -> hasMetadata instanceof io.fabric8.kubernetes.api.model.Service).map(hasMetadata -> (io.fabric8.kubernetes.api.model.Service) hasMetadata).collect(Collectors.toList());
+        List<io.fabric8.kubernetes.api.model.apps.Deployment> deployments = hasMetadatas.stream().filter(hasMetadata -> hasMetadata instanceof io.fabric8.kubernetes.api.model.apps.Deployment).map(hasMetadata -> (io.fabric8.kubernetes.api.model.apps.Deployment) hasMetadata).collect(Collectors.toList());
+        Service service = new Service();
+        service.setLabels(deployments.get(0).getMetadata().getLabels());
+        Map<String, Quantity> resources = deployments.get(0).getSpec().getTemplate().getSpec().getContainers().get(0).getResources().getLimits();
+        if (resources != null) {
+            if (resources.containsKey("memory")) {
+                service.setMem(Integer.valueOf(resources.get("memory").getAmount()));
+            }
+            if (resources.containsKey("cpu")) {
+                service.setCpus(Integer.valueOf(resources.get("cpu").getAmount()));
+            }
+        }
+        service.setInstances(deployments.get(0).getSpec().getReplicas());
+        service.setTitle(deployments.get(0).getMetadata().getName());
+        service.setId(deployments.get(0).getMetadata().getName());
+        return service;
     }
 
     private Service getServiceFromApp(App app) {
@@ -154,7 +203,8 @@ public class MyLabController {
     }
 
     @GetMapping("/app")
-    public @ResponseBody String getApp(@RequestParam("serviceId") String id)
+    public @ResponseBody
+    String getApp(@RequestParam("serviceId") String id)
             throws JsonParseException, JsonMappingException, IOException {
 
         String url = MARATHON_URL + "/v2/apps/users/" + userProvider.getUser().getIdep() + "/" + id + "?"
@@ -242,9 +292,9 @@ public class MyLabController {
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
         if (!Universe.TYPE_UNIVERSE.equals(catalog.getType())) {
             File values = File.createTempFile("values", ".yaml");
-            mapperHelm.writeValue(values,fusion);
+            mapperHelm.writeValue(values, fusion);
             logger.info(Files.readString(values.toPath()));
-            HelmInstaller res = helm.installChart(pkg.getName(),requestDTO.getCatalogId()+"/"+pkg.getName(),values,user.getIdep(), requestDTO.isDryRun());
+            HelmInstaller res = helm.installChart(pkg.getName(), requestDTO.getCatalogId() + "/" + pkg.getName(), values, user.getIdep(), requestDTO.isDryRun());
             values.delete();
             return List.of(res.getManifest());
         }
@@ -253,12 +303,12 @@ public class MyLabController {
         fusion.putAll(Map.of("resource", resource));
 
         Map<String, String> contextData = new HashMap<>();
-        contextData.put("internaldns",idSanitizer.sanitize(pkg.getName())+"-"+context.getRandomizedId()+"-"+idSanitizer.sanitize(user.getIdep())+"-"+idSanitizer.sanitize(MARATHON_GROUP_NAME)+"."+MARATHON_DNS_SUFFIX);
+        contextData.put("internaldns", idSanitizer.sanitize(pkg.getName()) + "-" + context.getRandomizedId() + "-" + idSanitizer.sanitize(user.getIdep()) + "-" + idSanitizer.sanitize(MARATHON_GROUP_NAME) + "." + MARATHON_DNS_SUFFIX);
 
         for (int i = 0; i < 10; i++) {
-            contextData.put("externaldns-"+i,generator.generateUrl(user.getIdep(), pkg.getName(), context.getRandomizedId(), i));
+            contextData.put("externaldns-" + i, generator.generateUrl(user.getIdep(), pkg.getName(), context.getRandomizedId(), i));
         }
-        fusion.put("context",contextData);
+        fusion.put("context", contextData);
 
         String toMarathon = Mustacheur.mustache(universePkg.getJsonMustache(), fusion);
         Collection<App> apps;

@@ -23,7 +23,7 @@ public class InstallServiceTest {
 
     @Test
     public void shouldListInstalls() throws Exception {
-        HelmLs[] result = helmInstallService.listChartInstall();
+        HelmLs[] result = helmInstallService.listChartInstall(null);
         Assertions.assertEquals(1,result.length);
     }
 

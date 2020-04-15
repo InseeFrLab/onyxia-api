@@ -8,6 +8,7 @@ public class Service {
     private int instances;
     private double cpus;
     private double mem;
+
     private Map<String,String> labels;
 
     public String getId() {
