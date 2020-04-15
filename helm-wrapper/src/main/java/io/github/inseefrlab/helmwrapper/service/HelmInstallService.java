@@ -60,10 +60,27 @@ public class HelmInstallService {
         return Command.execute("helm uninstall " + name).getExitValue();
     }
 
-    public HelmLs[] listChartInstall() throws JsonMappingException, InvalidExitValueException,
+    public HelmLs[] listChartInstall(String namespace) throws JsonMappingException, InvalidExitValueException,
             JsonProcessingException, IOException, InterruptedException, TimeoutException {
+        String cmd ="helm ls";
+        if (namespace != null){
+            cmd= cmd+  " -n "+namespace;
+        }
         return new ObjectMapper().readValue(
-                Command.executeAndGetResponseAsJson("helm ls --output json").getOutput().getString(), HelmLs[].class);
+                Command.executeAndGetResponseAsJson(cmd).getOutput().getString(), HelmLs[].class);
+    }
+
+    public String getRelease(String id, String namespace){
+        try {
+            return Command.execute("helm get manifest " + id+" --namespace "+ namespace).getOutput().getString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
     private String buildEnvVar(Map<String, String> env) {

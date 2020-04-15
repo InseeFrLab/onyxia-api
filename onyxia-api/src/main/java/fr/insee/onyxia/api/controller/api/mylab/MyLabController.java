@@ -7,17 +7,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.configuration.Catalogs;
 import fr.insee.onyxia.api.configuration.metrics.CustomMetrics;
+import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.api.services.control.AdmissionController;
 import fr.insee.onyxia.api.services.control.marathon.UrlGenerator;
 import fr.insee.onyxia.api.services.control.utils.IDSanitizer;
 import fr.insee.onyxia.api.services.control.utils.PublishContext;
+import fr.insee.onyxia.api.services.impl.MarathonAppsService;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.Package;
 import fr.insee.onyxia.model.catalog.Universe;
 import fr.insee.onyxia.model.catalog.UniversePackage;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
+import fr.insee.onyxia.model.dto.ServicesDTO;
 import fr.insee.onyxia.model.dto.UpdateServiceDTO;
 import fr.insee.onyxia.mustache.Mustacheur;
 import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
@@ -50,7 +53,7 @@ import java.util.stream.Collectors;
 @Tag(name = "My lab", description = "My services")
 @RequestMapping("/my-lab")
 @RestController
-@SecurityRequirement(name="auth")
+@SecurityRequirement(name = "auth")
 public class MyLabController {
 
     /**
@@ -62,6 +65,12 @@ public class MyLabController {
 
     @Value("${marathon.dns.suffix}")
     private String MARATHON_DNS_SUFFIX;
+
+    @Value("${kubernetes.enabled}")
+    private boolean KUB_ENABLED;
+
+    @Value("${marathon.enabled}")
+    private boolean MARATHON_ENABLED;
 
     @Autowired
     private IDSanitizer idSanitizer;
@@ -78,6 +87,12 @@ public class MyLabController {
     private OkHttpClient marathonClient;
 
     @Autowired
+    private AppsService helmAppsService;
+
+    @Autowired
+    private MarathonAppsService marathonAppsService;
+
+    @Autowired
     private CustomMetrics metrics;
 
     @Autowired
@@ -88,6 +103,7 @@ public class MyLabController {
 
     @Autowired
     private CatalogService catalogService;
+
 
     @Autowired
     private Catalogs catalogs;
@@ -114,26 +130,30 @@ public class MyLabController {
         });
     }
 
+    @GetMapping("/services")
+    public ServicesDTO getMyServices() throws Exception {
+        User user = userProvider.getUser();
+        ServicesDTO dto = new ServicesDTO();
+        if (MARATHON_ENABLED) {
+            dto.getApps().addAll(marathonAppsService.getUserServices(user));
+        }
+        if (KUB_ENABLED) {
+            dto.getApps().addAll(helmAppsService.getUserServices(user));
+        }
+        return dto;
+    }
+
+
     @GetMapping("/group")
     public Group getGroup(@RequestParam(value = "groupId", required = false) String id)
             throws JsonParseException, JsonMappingException, IOException {
-        String uri = "";
-        if (id != null && !id.equals("")) {
-            uri = "/" + id;
-        }
-        Request requete = new Request.Builder().url(MARATHON_URL + "/v2/groups/users/"
-                + userProvider.getUser().getIdep() + uri + "?" + "embed=group.groups" + "&" + "embed=group.apps" + "&"
-                + "embed=group.apps.tasks" + "&" + "embed=group.apps.counts" + "&" + "embed=group.apps.deployments"
-                + "&" + "embed=group.apps.readiness" + "&" + "embed=group.apps.lastTaskFailure" + "&"
-                + "embed=group.pods" + "&" + "embed=group.apps.taskStats").build();
-        Response response = marathonClient.newCall(requete).execute();
-        Group groupResponse = mapper.readValue(response.body().byteStream(), Group.class);
-        return groupResponse;
+        return marathonAppsService.getGroups(id);
 
     }
 
     @GetMapping("/app")
-    public @ResponseBody String getApp(@RequestParam("serviceId") String id)
+    public @ResponseBody
+    String getApp(@RequestParam("serviceId") String id)
             throws JsonParseException, JsonMappingException, IOException {
 
         String url = MARATHON_URL + "/v2/apps/users/" + userProvider.getUser().getIdep() + "/" + id + "?"
@@ -221,9 +241,9 @@ public class MyLabController {
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
         if (!Universe.TYPE_UNIVERSE.equals(catalog.getType())) {
             File values = File.createTempFile("values", ".yaml");
-            mapperHelm.writeValue(values,fusion);
+            mapperHelm.writeValue(values, fusion);
             logger.info(Files.readString(values.toPath()));
-            HelmInstaller res = helm.installChart(pkg.getName(),requestDTO.getCatalogId()+"/"+pkg.getName(),values,user.getIdep(), requestDTO.isDryRun());
+            HelmInstaller res = helm.installChart(pkg.getName(), requestDTO.getCatalogId() + "/" + pkg.getName(), values, user.getIdep(), requestDTO.isDryRun());
             values.delete();
             return List.of(res.getManifest());
         }
@@ -232,12 +252,12 @@ public class MyLabController {
         fusion.putAll(Map.of("resource", resource));
 
         Map<String, String> contextData = new HashMap<>();
-        contextData.put("internaldns",idSanitizer.sanitize(pkg.getName())+"-"+context.getRandomizedId()+"-"+idSanitizer.sanitize(user.getIdep())+"-"+idSanitizer.sanitize(MARATHON_GROUP_NAME)+"."+MARATHON_DNS_SUFFIX);
+        contextData.put("internaldns", idSanitizer.sanitize(pkg.getName()) + "-" + context.getRandomizedId() + "-" + idSanitizer.sanitize(user.getIdep()) + "-" + idSanitizer.sanitize(MARATHON_GROUP_NAME) + "." + MARATHON_DNS_SUFFIX);
 
         for (int i = 0; i < 10; i++) {
-            contextData.put("externaldns-"+i,generator.generateUrl(user.getIdep(), pkg.getName(), context.getRandomizedId(), i));
+            contextData.put("externaldns-" + i, generator.generateUrl(user.getIdep(), pkg.getName(), context.getRandomizedId(), i));
         }
-        fusion.put("context",contextData);
+        fusion.put("context", contextData);
 
         String toMarathon = Mustacheur.mustache(universePkg.getJsonMustache(), fusion);
         Collection<App> apps;
