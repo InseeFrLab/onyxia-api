@@ -13,6 +13,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -35,6 +36,8 @@ public class MarathonAppsService implements AppsService {
     @Qualifier("marathon")
     private OkHttpClient marathonClient;
 
+    private @Value("${marathon.url}") String MARATHON_URL;
+
     public VersionedApp getServiceById(String id) {
         GetAppResponse appsResponse = marathon.getApp(id);
         VersionedApp app = appsResponse.getApp();
@@ -42,13 +45,8 @@ public class MarathonAppsService implements AppsService {
     }
 
     public Group getGroups(String id) throws IOException {
-        String uri = "";
-        if (id != null && !id.equals("")) {
-            uri = "/" + id;
-        }
-
-        Request requete = new Request.Builder().url("/v2/groups/users/"
-                + id + uri + "?" + "embed=group.groups" + "&" + "embed=group.apps" + "&"
+        Request requete = new Request.Builder().url(MARATHON_URL+"/v2/groups/users/"
+                + id + "?" + "embed=group.groups" + "&" + "embed=group.apps" + "&"
                 + "embed=group.apps.tasks" + "&" + "embed=group.apps.counts" + "&" + "embed=group.apps.deployments"
                 + "&" + "embed=group.apps.readiness" + "&" + "embed=group.apps.lastTaskFailure" + "&"
                 + "embed=group.pods" + "&" + "embed=group.apps.taskStats").build();

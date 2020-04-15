@@ -147,8 +147,7 @@ public class MyLabController {
     @GetMapping("/group")
     public Group getGroup(@RequestParam(value = "groupId", required = false) String id)
             throws JsonParseException, JsonMappingException, IOException {
-        return marathonAppsService.getGroups(id);
-
+        return marathonAppsService.getGroups(userProvider.getUser().getIdep()+"/"+(id == null ? "" : "/"+id));
     }
 
     @GetMapping("/app")
