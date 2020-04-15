@@ -10,7 +10,6 @@ import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.github.inseefrlab.helmwrapper.model.HelmLs;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService;
-import mesosphere.marathon.client.model.v2.Group;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -31,11 +30,6 @@ public class HelmAppsService implements AppsService {
     @Autowired
     HelmInstallService helm;
 
-
-    @Override
-    public Group getGroups(String id) {
-        return null;
-    }
 
     @Override
     public List<Service> getUserServices(User user) throws InterruptedException, TimeoutException, IOException {

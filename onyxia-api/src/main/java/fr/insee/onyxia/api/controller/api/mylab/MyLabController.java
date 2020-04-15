@@ -14,6 +14,7 @@ import fr.insee.onyxia.api.services.control.AdmissionController;
 import fr.insee.onyxia.api.services.control.marathon.UrlGenerator;
 import fr.insee.onyxia.api.services.control.utils.IDSanitizer;
 import fr.insee.onyxia.api.services.control.utils.PublishContext;
+import fr.insee.onyxia.api.services.impl.MarathonAppsService;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.Package;
 import fr.insee.onyxia.model.catalog.Universe;
@@ -89,7 +90,7 @@ public class MyLabController {
     private AppsService helmAppsService;
 
     @Autowired
-    private AppsService marathonAppsService;
+    private MarathonAppsService marathonAppsService;
 
     @Autowired
     private CustomMetrics metrics;
