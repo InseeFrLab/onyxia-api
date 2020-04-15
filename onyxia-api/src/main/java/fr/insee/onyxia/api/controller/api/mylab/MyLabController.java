@@ -18,6 +18,7 @@ import fr.insee.onyxia.model.catalog.Package;
 import fr.insee.onyxia.model.catalog.Universe;
 import fr.insee.onyxia.model.catalog.UniversePackage;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
+import fr.insee.onyxia.model.dto.ServicesDTO;
 import fr.insee.onyxia.model.dto.UpdateServiceDTO;
 import fr.insee.onyxia.model.service.Service;
 import fr.insee.onyxia.mustache.Mustacheur;
@@ -116,9 +117,11 @@ public class MyLabController {
     }
 
     @GetMapping("/services")
-    public List<Service> getMyServices() throws Exception {
+    public ServicesDTO getMyServices() throws Exception {
+        ServicesDTO dto = new ServicesDTO();
         Group group = getGroup(null);
-        return group.getApps().stream().map(app -> getServiceFromApp(app)).collect(Collectors.toList());
+        dto.getApps().addAll(group.getApps().stream().map(app -> getServiceFromApp(app)).collect(Collectors.toList()));
+        return dto;
     }
 
     private Service getServiceFromApp(App app) {
