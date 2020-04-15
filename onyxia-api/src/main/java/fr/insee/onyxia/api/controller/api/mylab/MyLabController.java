@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.configuration.Catalogs;
 import fr.insee.onyxia.api.configuration.metrics.CustomMetrics;
+import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.api.services.control.AdmissionController;
@@ -20,15 +21,8 @@ import fr.insee.onyxia.model.catalog.UniversePackage;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
 import fr.insee.onyxia.model.dto.ServicesDTO;
 import fr.insee.onyxia.model.dto.UpdateServiceDTO;
-import fr.insee.onyxia.model.service.Service;
 import fr.insee.onyxia.mustache.Mustacheur;
-import io.fabric8.kubernetes.api.model.HasMetadata;
-import io.fabric8.kubernetes.api.model.Quantity;
-import io.fabric8.kubernetes.api.model.extensions.Ingress;
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClient;
 import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
-import io.github.inseefrlab.helmwrapper.model.HelmLs;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -49,14 +43,10 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Tag(name = "My lab", description = "My services")
@@ -96,6 +86,12 @@ public class MyLabController {
     private OkHttpClient marathonClient;
 
     @Autowired
+    private AppsService helmAppsService;
+
+    @Autowired
+    private AppsService marathonAppsService;
+
+    @Autowired
     private CustomMetrics metrics;
 
     @Autowired
@@ -106,6 +102,7 @@ public class MyLabController {
 
     @Autowired
     private CatalogService catalogService;
+
 
     @Autowired
     private Catalogs catalogs;
@@ -133,72 +130,23 @@ public class MyLabController {
     }
 
     @GetMapping("/services")
-    public ServicesDTO getMyServices(String namespace) throws Exception {
+    public ServicesDTO getMyServices() throws Exception {
+        User user = userProvider.getUser();
         ServicesDTO dto = new ServicesDTO();
         if (MARATHON_ENABLED) {
-            Group group = getGroup(namespace);
-            dto.getApps().addAll(group.getApps().stream().map(app -> getServiceFromApp(app)).collect(Collectors.toList()));
+            dto.getApps().addAll(marathonAppsService.getUserServices(user));
         }
         if (KUB_ENABLED) {
-            List<HelmLs> installedCharts = Arrays.asList(helm.listChartInstall(namespace));
-            List<Service> services = installedCharts.stream().map(release -> helm.getRelease(release.getName(), release.getNamespace())).map(release -> getServiceFromRelease(release)).collect(Collectors.toList());
-            dto.getApps().addAll(services);
+            dto.getApps().addAll(helmAppsService.getUserServices(user));
         }
         return dto;
     }
 
 
-    private Service getServiceFromRelease(String description) {
-        KubernetesClient client = new DefaultKubernetesClient();
-        InputStream inputStream = new ByteArrayInputStream(description.getBytes(Charset.forName("UTF-8")));
-        List<HasMetadata> hasMetadatas = client.load(inputStream).get();
-        hasMetadatas.stream().filter(hasMetadata -> hasMetadata instanceof Ingress).map(hasMetadata -> (Ingress) hasMetadata).collect(Collectors.toList());
-        List<Ingress> ingresses = hasMetadatas.stream().filter(hasMetadata -> hasMetadata instanceof Ingress).map(hasMetadata -> (Ingress) hasMetadata).collect(Collectors.toList());
-        List<io.fabric8.kubernetes.api.model.Service> services = hasMetadatas.stream().filter(hasMetadata -> hasMetadata instanceof io.fabric8.kubernetes.api.model.Service).map(hasMetadata -> (io.fabric8.kubernetes.api.model.Service) hasMetadata).collect(Collectors.toList());
-        List<io.fabric8.kubernetes.api.model.apps.Deployment> deployments = hasMetadatas.stream().filter(hasMetadata -> hasMetadata instanceof io.fabric8.kubernetes.api.model.apps.Deployment).map(hasMetadata -> (io.fabric8.kubernetes.api.model.apps.Deployment) hasMetadata).collect(Collectors.toList());
-        Service service = new Service();
-        service.setLabels(deployments.get(0).getMetadata().getLabels());
-        Map<String, Quantity> resources = deployments.get(0).getSpec().getTemplate().getSpec().getContainers().get(0).getResources().getLimits();
-        if (resources != null) {
-            if (resources.containsKey("memory")) {
-                service.setMem(Integer.valueOf(resources.get("memory").getAmount()));
-            }
-            if (resources.containsKey("cpu")) {
-                service.setCpus(Integer.valueOf(resources.get("cpu").getAmount()));
-            }
-        }
-        service.setInstances(deployments.get(0).getSpec().getReplicas());
-        service.setTitle(deployments.get(0).getMetadata().getName());
-        service.setId(deployments.get(0).getMetadata().getName());
-        return service;
-    }
-
-    private Service getServiceFromApp(App app) {
-        Service service = new Service();
-        service.setLabels(app.getLabels());
-        service.setCpus(app.getCpus());
-        service.setInstances(app.getInstances());
-        service.setMem(app.getMem());
-        service.setTitle(app.getId());
-        service.setId(app.getId());
-        return service;
-    }
-
     @GetMapping("/group")
     public Group getGroup(@RequestParam(value = "groupId", required = false) String id)
             throws JsonParseException, JsonMappingException, IOException {
-        String uri = "";
-        if (id != null && !id.equals("")) {
-            uri = "/" + id;
-        }
-        Request requete = new Request.Builder().url(MARATHON_URL + "/v2/groups/users/"
-                + userProvider.getUser().getIdep() + uri + "?" + "embed=group.groups" + "&" + "embed=group.apps" + "&"
-                + "embed=group.apps.tasks" + "&" + "embed=group.apps.counts" + "&" + "embed=group.apps.deployments"
-                + "&" + "embed=group.apps.readiness" + "&" + "embed=group.apps.lastTaskFailure" + "&"
-                + "embed=group.pods" + "&" + "embed=group.apps.taskStats").build();
-        Response response = marathonClient.newCall(requete).execute();
-        Group groupResponse = mapper.readValue(response.body().byteStream(), Group.class);
-        return groupResponse;
+        return marathonAppsService.getGroups(id);
 
     }
 
