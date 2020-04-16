@@ -8,6 +8,9 @@ public class Service {
     private int instances;
     private double cpus;
     private double mem;
+    private ServiceStatus status = ServiceStatus.RUNNING;
+
+    private String startedAt;
 
     private Map<String,String> labels;
 
@@ -57,5 +60,25 @@ public class Service {
 
     public void setLabels(Map<String, String> labels) {
         this.labels = labels;
+    }
+
+    public String getStartedAt() {
+        return startedAt;
+    }
+
+    public void setStartedAt(String startedAt) {
+        this.startedAt = startedAt;
+    }
+
+    public ServiceStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ServiceStatus status) {
+        this.status = status;
+    }
+
+    public static enum ServiceStatus {
+        DEPLOYING, RUNNING, STOPPED;
     }
 }
