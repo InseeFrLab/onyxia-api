@@ -73,8 +73,9 @@ public class MarathonAppsService implements AppsService {
         service.setCpus(app.getCpus());
         service.setInstances(app.getInstances());
         service.setMem(app.getMem());
-        service.setTitle(app.getId());
+        service.setName(app.getId());
         service.setId(app.getId());
+        service.setType(fr.insee.onyxia.model.service.Service.TypeStatus.MARATHON);
         app.getTasks().stream().findFirst().ifPresent(task ->
         {
             try {

@@ -6,6 +6,7 @@ import fr.insee.onyxia.model.service.Service;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
+import io.fabric8.kubernetes.api.model.extensions.Ingress;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.github.inseefrlab.helmwrapper.model.HelmLs;
@@ -39,13 +40,15 @@ public class HelmAppsService implements AppsService {
     public List<Service> getUserServices(User user) throws InterruptedException, TimeoutException, IOException, ParseException {
         List<HelmLs> installedCharts = Arrays.asList(helm.listChartInstall("onyxia"));
         List<Service> services = new ArrayList<>();
-        for (HelmLs release:installedCharts) {
+        for (HelmLs release : installedCharts) {
             String description = helm.getRelease(release.getName(), release.getNamespace());
             Service service = getServiceFromRelease(description);
             service.setStatus(findAppStatus(release));
             service.setStartedAt(helmDateFormat.parse(release.getUpdated()).getTime());
             service.setId(release.getChart());
+            service.setName(release.getChart());
             services.add(service);
+            service.setType(Service.TypeStatus.KUBERNETES);
         }
         return services;
     }
@@ -54,10 +57,14 @@ public class HelmAppsService implements AppsService {
         KubernetesClient client = new DefaultKubernetesClient();
         InputStream inputStream = new ByteArrayInputStream(description.getBytes(Charset.forName("UTF-8")));
         List<HasMetadata> hasMetadatas = client.load(inputStream).get();
-        //List<Ingress> ingresses = hasMetadatas.stream().filter(hasMetadata -> hasMetadata instanceof Ingress).map(hasMetadata -> (Ingress) hasMetadata).collect(Collectors.toList());
+        List<Ingress> ingresses = hasMetadatas.stream().filter(hasMetadata -> hasMetadata instanceof Ingress).map(hasMetadata -> (Ingress) hasMetadata).collect(Collectors.toList());
         //List<Service> services = hasMetadatas.stream().filter(hasMetadata -> hasMetadata instanceof Service).map(hasMetadata -> (Service) hasMetadata).collect(Collectors.toList());
         List<Deployment> deployments = hasMetadatas.stream().filter(hasMetadata -> hasMetadata instanceof Deployment).map(hasMetadata -> (Deployment) hasMetadata).collect(Collectors.toList());
         Service service = new Service();
+        List<String> urls = new ArrayList<>();
+        //List<List<String>> temp = ingresses.stream().map(ingress -> ingress.getSpec().getTls().stream().map(tls -> tls.getHosts()).flatMap(c-> c.stream())).collect(Collectors.toList());
+        service.setUrl(urls);
+        ingresses.stream().findFirst().ifPresent(ingress -> service.setUrl(ingress.getSpec().getTls().get(0).getHosts()));
         service.setLabels(deployments.get(0).getMetadata().getLabels());
         Map<String, Quantity> resources = deployments.get(0).getSpec().getTemplate().getSpec().getContainers().get(0).getResources().getLimits();
         if (resources != null) {
@@ -72,14 +79,12 @@ public class HelmAppsService implements AppsService {
         return service;
     }
 
-    private Service.ServiceStatus findAppStatus(HelmLs release){
-        if (release.getStatus().equals("deployed")){
+    private Service.ServiceStatus findAppStatus(HelmLs release) {
+        if (release.getStatus().equals("deployed")) {
             return Service.ServiceStatus.RUNNING;
-        }
-        else if (release.getStatus().equals("pending")){
+        } else if (release.getStatus().equals("pending")) {
             return Service.ServiceStatus.DEPLOYING;
-        }
-        else{
+        } else {
             return Service.ServiceStatus.STOPPED;
         }
     }

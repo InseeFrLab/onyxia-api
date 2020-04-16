@@ -1,14 +1,17 @@
 package fr.insee.onyxia.model.service;
 
+import java.util.List;
 import java.util.Map;
 
 public class Service {
 
-    private String id, title;
+    private String id, name;
     private int instances;
     private double cpus;
     private double mem;
     private ServiceStatus status = ServiceStatus.RUNNING;
+    private TypeStatus type;
+    private List<String> url;
 
     private long startedAt;
 
@@ -22,12 +25,12 @@ public class Service {
         this.id = id;
     }
 
-    public String getTitle() {
-        return title;
+    public String getName() {
+        return name;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public int getInstances() {
@@ -78,7 +81,27 @@ public class Service {
         this.status = status;
     }
 
+    public TypeStatus getType() {
+        return type;
+    }
+
+    public void setType(TypeStatus type) {
+        this.type = type;
+    }
+
+    public List<String> getUrl() {
+        return url;
+    }
+
+    public void setUrl(List<String> url) {
+        this.url = url;
+    }
+
     public static enum ServiceStatus {
         DEPLOYING, RUNNING, STOPPED;
+    }
+
+    public static enum TypeStatus{
+        KUBERNETES,MARATHON
     }
 }
