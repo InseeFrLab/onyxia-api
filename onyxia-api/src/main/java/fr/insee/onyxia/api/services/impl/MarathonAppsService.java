@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
@@ -76,6 +77,9 @@ public class MarathonAppsService implements AppsService {
         service.setName(app.getId());
         service.setId(app.getId());
         service.setType(fr.insee.onyxia.model.service.Service.TypeStatus.MARATHON);
+        List<String> uris = new ArrayList<String>();
+        uris.add(app.getLabels().get("ONYXIA_URL"));
+        service.setUrl(uris);
         app.getTasks().stream().findFirst().ifPresent(task ->
         {
             try {

@@ -62,15 +62,20 @@ public class HelmAppsService implements AppsService {
         List<Deployment> deployments = hasMetadatas.stream().filter(hasMetadata -> hasMetadata instanceof Deployment).map(hasMetadata -> (Deployment) hasMetadata).collect(Collectors.toList());
         Service service = new Service();
         List<String> urls = new ArrayList<>();
-        //List<List<String>> temp = ingresses.stream().map(ingress -> ingress.getSpec().getTls().stream().map(tls -> tls.getHosts()).flatMap(c-> c.stream())).collect(Collectors.toList());
+        for (Ingress ingress: ingresses) {
+            List<String> listHost = ingress.getSpec().getTls().stream().map(tls -> tls.getHosts()).collect(Collectors.toList()).stream().flatMap(x -> x.stream()).collect(Collectors.toList());
+            urls.addAll(listHost);
+        }
         service.setUrl(urls);
         ingresses.stream().findFirst().ifPresent(ingress -> service.setUrl(ingress.getSpec().getTls().get(0).getHosts()));
         service.setLabels(deployments.get(0).getMetadata().getLabels());
         Map<String, Quantity> resources = deployments.get(0).getSpec().getTemplate().getSpec().getContainers().get(0).getResources().getLimits();
         if (resources != null) {
+
             if (resources.containsKey("memory")) {
                 service.setMem(Integer.valueOf(resources.get("memory").getAmount()));
             }
+
             if (resources.containsKey("cpu")) {
                 service.setCpus(Integer.valueOf(resources.get("cpu").getAmount()));
             }
