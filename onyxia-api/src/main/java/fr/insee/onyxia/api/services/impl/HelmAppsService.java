@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
@@ -37,7 +38,7 @@ public class HelmAppsService implements AppsService {
     private SimpleDateFormat helmDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @Override
-    public List<Service> getUserServices(User user) throws InterruptedException, TimeoutException, IOException, ParseException {
+    public CompletableFuture<List<Service>> getUserServices(User user) throws InterruptedException, TimeoutException, IOException, ParseException {
         List<HelmLs> installedCharts = Arrays.asList(helm.listChartInstall("onyxia"));
         List<Service> services = new ArrayList<>();
         for (HelmLs release : installedCharts) {
@@ -50,7 +51,7 @@ public class HelmAppsService implements AppsService {
             services.add(service);
             service.setType(Service.TypeStatus.KUBERNETES);
         }
-        return services;
+        return CompletableFuture.completedFuture(services);
     }
 
     private Service getServiceFromRelease(String description) {

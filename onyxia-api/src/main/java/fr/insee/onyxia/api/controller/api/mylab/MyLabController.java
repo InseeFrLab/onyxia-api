@@ -22,6 +22,7 @@ import fr.insee.onyxia.model.catalog.UniversePackage;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
 import fr.insee.onyxia.model.dto.ServicesDTO;
 import fr.insee.onyxia.model.dto.UpdateServiceDTO;
+import fr.insee.onyxia.model.service.Service;
 import fr.insee.onyxia.mustache.Mustacheur;
 import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService;
@@ -48,6 +49,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Tag(name = "My lab", description = "My services")
@@ -134,11 +136,15 @@ public class MyLabController {
     public ServicesDTO getMyServices() throws Exception {
         User user = userProvider.getUser();
         ServicesDTO dto = new ServicesDTO();
+        List<CompletableFuture<List<Service>>> futures = new ArrayList<>();
         if (MARATHON_ENABLED) {
-            dto.getApps().addAll(marathonAppsService.getUserServices(user));
+            futures.add(marathonAppsService.getUserServices(user));
         }
         if (KUB_ENABLED) {
-            dto.getApps().addAll(helmAppsService.getUserServices(user));
+            futures.add(helmAppsService.getUserServices(user));
+        }
+        for(var future : futures) {
+            dto.getApps().addAll(future.get());
         }
         return dto;
     }

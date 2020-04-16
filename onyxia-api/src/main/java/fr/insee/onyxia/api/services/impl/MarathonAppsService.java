@@ -22,6 +22,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
@@ -63,9 +64,9 @@ public class MarathonAppsService implements AppsService {
     }
 
     @Override
-    public List<fr.insee.onyxia.model.service.Service> getUserServices(User user) throws InterruptedException, TimeoutException, IOException {
+    public CompletableFuture<List<fr.insee.onyxia.model.service.Service>> getUserServices(User user) throws InterruptedException, TimeoutException, IOException {
         Group group = getGroups(user.getIdep());
-        return group.getApps().stream().map(app -> getServiceFromApp(app)).collect(Collectors.toList());
+        return CompletableFuture.completedFuture(group.getApps().stream().map(app -> getServiceFromApp(app)).collect(Collectors.toList()));
     }
 
     private fr.insee.onyxia.model.service.Service getServiceFromApp(App app) {
