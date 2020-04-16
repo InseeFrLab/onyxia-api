@@ -36,7 +36,8 @@ public class MarathonAppsService implements AppsService {
     @Qualifier("marathon")
     private OkHttpClient marathonClient;
 
-    private @Value("${marathon.url}") String MARATHON_URL;
+    private @Value("${marathon.url}")
+    String MARATHON_URL;
 
     public VersionedApp getServiceById(String id) {
         GetAppResponse appsResponse = marathon.getApp(id);
@@ -45,7 +46,7 @@ public class MarathonAppsService implements AppsService {
     }
 
     public Group getGroups(String id) throws IOException {
-        Request requete = new Request.Builder().url(MARATHON_URL+"/v2/groups/users/"
+        Request requete = new Request.Builder().url(MARATHON_URL + "/v2/groups/users/"
                 + id + "?" + "embed=group.groups" + "&" + "embed=group.apps" + "&"
                 + "embed=group.apps.tasks" + "&" + "embed=group.apps.counts" + "&" + "embed=group.apps.deployments"
                 + "&" + "embed=group.apps.readiness" + "&" + "embed=group.apps.lastTaskFailure" + "&"
@@ -69,7 +70,19 @@ public class MarathonAppsService implements AppsService {
         service.setMem(app.getMem());
         service.setTitle(app.getId());
         service.setId(app.getId());
+        app.getTasks().stream().findFirst().ifPresent(task -> service.setStartedAt(task.getStartedAt()));
+        service.setStatus(findAppStatus(app));
         return service;
+    }
+
+    private fr.insee.onyxia.model.service.Service.ServiceStatus findAppStatus(App app) {
+        if (app.getTasksRunning() > 0) {
+            return fr.insee.onyxia.model.service.Service.ServiceStatus.RUNNING;
+        } else if (app.getInstances() == 0) {
+            return fr.insee.onyxia.model.service.Service.ServiceStatus.STOPPED;
+        } else {
+            return fr.insee.onyxia.model.service.Service.ServiceStatus.DEPLOYING;
+        }
     }
 
 }

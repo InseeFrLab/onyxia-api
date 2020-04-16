@@ -17,6 +17,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,14 @@ public class HelmAppsService implements AppsService {
     @Override
     public List<Service> getUserServices(User user) throws InterruptedException, TimeoutException, IOException {
         List<HelmLs> installedCharts = Arrays.asList(helm.listChartInstall(user.getIdep()));
-        List<Service> services = installedCharts.stream().map(release -> helm.getRelease(release.getName(), release.getNamespace())).map(release -> getServiceFromRelease(release)).collect(Collectors.toList());
+        List<Service> services = new ArrayList<>();
+        for (HelmLs release:installedCharts) {
+            String description = helm.getRelease(release.getName(), release.getNamespace());
+            Service service = getServiceFromRelease(description);
+            service.setStartedAt(release.getStatus());
+            service.setStartedAt(release.getUpdated());
+            service.setId(release.getChart());
+        }
         return services;
     }
 
@@ -57,8 +65,18 @@ public class HelmAppsService implements AppsService {
             }
         }
         service.setInstances(deployments.get(0).getSpec().getReplicas());
-        service.setTitle(deployments.get(0).getMetadata().getName());
-        service.setId(deployments.get(0).getMetadata().getName());
         return service;
+    }
+
+    private Service.ServiceStatus findAppStatus(HelmLs release){
+        if (release.getStatus().equals("DEPLOYED")){
+            return Service.ServiceStatus.RUNNING;
+        }
+        else if (release.getStatus().equals("DEPLOYING")){
+            return Service.ServiceStatus.DEPLOYING;
+        }
+        else{
+            return Service.ServiceStatus.STOPPED;
+        }
     }
 }
