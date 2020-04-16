@@ -42,6 +42,7 @@ public class HelmAppsService implements AppsService {
             service.setStartedAt(release.getStatus());
             service.setStartedAt(release.getUpdated());
             service.setId(release.getChart());
+            services.add(service);
         }
         return services;
     }
