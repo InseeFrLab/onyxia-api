@@ -42,7 +42,7 @@ public class MarathonAppsService implements AppsService {
     private @Value("${marathon.url}")
     String MARATHON_URL;
 
-    private DateFormat marathonDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private DateFormat marathonDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
     public VersionedApp getServiceById(String id) {
         GetAppResponse appsResponse = marathon.getApp(id);

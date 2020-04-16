@@ -42,7 +42,7 @@ public class HelmAppsService implements AppsService {
         for (HelmLs release:installedCharts) {
             String description = helm.getRelease(release.getName(), release.getNamespace());
             Service service = getServiceFromRelease(description);
-            service.setStartedAt(helmDateFormat.parse(release.getStatus()).getTime());
+            service.setStatus(findAppStatus(release));
             service.setStartedAt(helmDateFormat.parse(release.getUpdated()).getTime());
             service.setId(release.getChart());
             services.add(service);
@@ -73,10 +73,10 @@ public class HelmAppsService implements AppsService {
     }
 
     private Service.ServiceStatus findAppStatus(HelmLs release){
-        if (release.getStatus().equals("DEPLOYED")){
+        if (release.getStatus().equals("deployed")){
             return Service.ServiceStatus.RUNNING;
         }
-        else if (release.getStatus().equals("DEPLOYING")){
+        else if (release.getStatus().equals("pending")){
             return Service.ServiceStatus.DEPLOYING;
         }
         else{
