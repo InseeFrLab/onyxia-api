@@ -17,6 +17,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
@@ -38,6 +41,8 @@ public class MarathonAppsService implements AppsService {
 
     private @Value("${marathon.url}")
     String MARATHON_URL;
+
+    private DateFormat marathonDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public VersionedApp getServiceById(String id) {
         GetAppResponse appsResponse = marathon.getApp(id);
@@ -70,7 +75,14 @@ public class MarathonAppsService implements AppsService {
         service.setMem(app.getMem());
         service.setTitle(app.getId());
         service.setId(app.getId());
-        app.getTasks().stream().findFirst().ifPresent(task -> service.setStartedAt(task.getStartedAt()));
+        app.getTasks().stream().findFirst().ifPresent(task ->
+        {
+            try {
+                service.setStartedAt(marathonDateFormat.parse(task.getStartedAt()).getTime());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        });
         service.setStatus(findAppStatus(app));
         return service;
     }

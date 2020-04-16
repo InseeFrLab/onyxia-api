@@ -10,7 +10,7 @@ public class Service {
     private double mem;
     private ServiceStatus status = ServiceStatus.RUNNING;
 
-    private String startedAt;
+    private long startedAt;
 
     private Map<String,String> labels;
 
@@ -62,11 +62,11 @@ public class Service {
         this.labels = labels;
     }
 
-    public String getStartedAt() {
+    public long getStartedAt() {
         return startedAt;
     }
 
-    public void setStartedAt(String startedAt) {
+    public void setStartedAt(long startedAt) {
         this.startedAt = startedAt;
     }
 

@@ -17,6 +17,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,16 +33,17 @@ public class HelmAppsService implements AppsService {
     @Autowired
     HelmInstallService helm;
 
+    private SimpleDateFormat helmDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @Override
-    public List<Service> getUserServices(User user) throws InterruptedException, TimeoutException, IOException {
-        List<HelmLs> installedCharts = Arrays.asList(helm.listChartInstall(user.getIdep()));
+    public List<Service> getUserServices(User user) throws InterruptedException, TimeoutException, IOException, ParseException {
+        List<HelmLs> installedCharts = Arrays.asList(helm.listChartInstall("onyxia"));
         List<Service> services = new ArrayList<>();
         for (HelmLs release:installedCharts) {
             String description = helm.getRelease(release.getName(), release.getNamespace());
             Service service = getServiceFromRelease(description);
-            service.setStartedAt(release.getStatus());
-            service.setStartedAt(release.getUpdated());
+            service.setStartedAt(helmDateFormat.parse(release.getStatus()).getTime());
+            service.setStartedAt(helmDateFormat.parse(release.getUpdated()).getTime());
             service.setId(release.getChart());
             services.add(service);
         }
