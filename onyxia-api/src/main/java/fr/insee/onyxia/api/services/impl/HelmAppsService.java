@@ -74,7 +74,9 @@ public class HelmAppsService implements AppsService {
             urls.addAll(listHost);
         }
         service.setUrls(urls);
-        service.setLabels(deployments.get(0).getMetadata().getLabels());
+        Map<String, String> labels = deployments.get(0).getMetadata().getLabels();
+        service.setLogo(labels.get("ONYXIA_LOGO"));
+        service.setLabels(labels);
         Map<String, Quantity> resources = deployments.get(0).getSpec().getTemplate().getSpec().getContainers().get(0).getResources().getLimits();
         if (resources != null) {
 

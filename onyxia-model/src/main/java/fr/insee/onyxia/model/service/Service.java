@@ -12,6 +12,7 @@ public class Service {
     private ServiceStatus status = ServiceStatus.RUNNING;
     private ServiceType type;
     private List<String> urls;
+    private String logo;
 
     private long startedAt;
 
@@ -95,6 +96,14 @@ public class Service {
 
     public void setUrls(List<String> urls) {
         this.urls = urls;
+    }
+
+    public String getLogo() {
+        return logo;
+    }
+
+    public void setLogo(String logo) {
+        this.logo = logo;
     }
 
     public static enum ServiceStatus {

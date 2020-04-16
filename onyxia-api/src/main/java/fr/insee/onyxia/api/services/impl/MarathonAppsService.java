@@ -81,6 +81,7 @@ public class MarathonAppsService implements AppsService {
         List<String> uris = new ArrayList<String>();
         uris.add(app.getLabels().get("ONYXIA_URL"));
         service.setUrls(uris);
+        service.setLogo(app.getLabels().get("ONYXIA_LOGO"));
         app.getTasks().stream().findFirst().ifPresent(task ->
         {
             try {
