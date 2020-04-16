@@ -77,10 +77,10 @@ public class MarathonAppsService implements AppsService {
         service.setMem(app.getMem());
         service.setName(app.getId());
         service.setId(app.getId());
-        service.setType(fr.insee.onyxia.model.service.Service.TypeStatus.MARATHON);
+        service.setType(fr.insee.onyxia.model.service.Service.ServiceType.MARATHON);
         List<String> uris = new ArrayList<String>();
         uris.add(app.getLabels().get("ONYXIA_URL"));
-        service.setUrl(uris);
+        service.setUrls(uris);
         app.getTasks().stream().findFirst().ifPresent(task ->
         {
             try {

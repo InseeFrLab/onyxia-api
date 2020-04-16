@@ -49,7 +49,7 @@ public class HelmAppsService implements AppsService {
             service.setId(release.getChart());
             service.setName(release.getChart());
             services.add(service);
-            service.setType(Service.TypeStatus.KUBERNETES);
+            service.setType(Service.ServiceType.KUBERNETES);
         }
         return CompletableFuture.completedFuture(services);
     }
@@ -67,8 +67,7 @@ public class HelmAppsService implements AppsService {
             List<String> listHost = ingress.getSpec().getTls().stream().map(tls -> tls.getHosts()).collect(Collectors.toList()).stream().flatMap(x -> x.stream()).collect(Collectors.toList());
             urls.addAll(listHost);
         }
-        service.setUrl(urls);
-        ingresses.stream().findFirst().ifPresent(ingress -> service.setUrl(ingress.getSpec().getTls().get(0).getHosts()));
+        service.setUrls(urls);
         service.setLabels(deployments.get(0).getMetadata().getLabels());
         Map<String, Quantity> resources = deployments.get(0).getSpec().getTemplate().getSpec().getContainers().get(0).getResources().getLimits();
         if (resources != null) {

@@ -10,8 +10,8 @@ public class Service {
     private double cpus;
     private double mem;
     private ServiceStatus status = ServiceStatus.RUNNING;
-    private TypeStatus type;
-    private List<String> url;
+    private ServiceType type;
+    private List<String> urls;
 
     private long startedAt;
 
@@ -81,27 +81,27 @@ public class Service {
         this.status = status;
     }
 
-    public TypeStatus getType() {
+    public ServiceType getType() {
         return type;
     }
 
-    public void setType(TypeStatus type) {
+    public void setType(ServiceType type) {
         this.type = type;
     }
 
-    public List<String> getUrl() {
-        return url;
+    public List<String> getUrls() {
+        return urls;
     }
 
-    public void setUrl(List<String> url) {
-        this.url = url;
+    public void setUrls(List<String> urls) {
+        this.urls = urls;
     }
 
     public static enum ServiceStatus {
         DEPLOYING, RUNNING, STOPPED;
     }
 
-    public static enum TypeStatus{
+    public static enum ServiceType {
         KUBERNETES,MARATHON
     }
 }
