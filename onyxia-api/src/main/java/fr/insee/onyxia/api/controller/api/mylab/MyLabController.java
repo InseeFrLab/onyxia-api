@@ -3,32 +3,19 @@ package fr.insee.onyxia.api.controller.api.mylab;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
-import fr.insee.onyxia.api.configuration.Catalogs;
-import fr.insee.onyxia.api.configuration.metrics.CustomMetrics;
-import fr.insee.onyxia.api.controller.api.kubernetes.ClusterPermissionsController;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.api.services.control.AdmissionController;
-import fr.insee.onyxia.api.services.control.marathon.UrlGenerator;
-import fr.insee.onyxia.api.services.control.utils.IDSanitizer;
-import fr.insee.onyxia.api.services.control.utils.PublishContext;
-import fr.insee.onyxia.api.services.impl.HelmAppsService;
 import fr.insee.onyxia.api.services.impl.MarathonAppsService;
-import fr.insee.onyxia.api.services.impl.kubernetes.KubernetesService;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.Package;
 import fr.insee.onyxia.model.catalog.Universe;
-import fr.insee.onyxia.model.catalog.UniversePackage;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
 import fr.insee.onyxia.model.dto.ServicesDTO;
 import fr.insee.onyxia.model.dto.UpdateServiceDTO;
 import fr.insee.onyxia.model.service.Service;
-import fr.insee.onyxia.mustache.Mustacheur;
-import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
-import io.github.inseefrlab.helmwrapper.service.HelmInstallService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import mesosphere.marathon.client.Marathon;
@@ -39,22 +26,16 @@ import mesosphere.marathon.client.model.v2.Result;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.PostConstruct;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 @Tag(name = "My lab", description = "My services")
 @RequestMapping("/my-lab")
@@ -220,10 +201,10 @@ public class MyLabController {
         User user = userProvider.getUser();
         Map<String, Object> fusion = new HashMap<>();
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
-        if (!Universe.TYPE_UNIVERSE.equals(catalog.getType())) {
-            return helmAppsService.installApp(requestDTO,isGroup,catalogId,pkg,user,fusion);
-        } else {
+        if (Universe.TYPE_UNIVERSE.equals(catalog.getType())) {
             return marathonAppsService.installApp(requestDTO,isGroup,catalogId,pkg,user,fusion);
+        } else {
+            return helmAppsService.installApp(requestDTO,isGroup,catalogId,pkg,user,fusion);
         }
 
     }
