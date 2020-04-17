@@ -15,6 +15,7 @@ import fr.insee.onyxia.api.services.control.AdmissionController;
 import fr.insee.onyxia.api.services.control.marathon.UrlGenerator;
 import fr.insee.onyxia.api.services.control.utils.IDSanitizer;
 import fr.insee.onyxia.api.services.control.utils.PublishContext;
+import fr.insee.onyxia.api.services.impl.HelmAppsService;
 import fr.insee.onyxia.api.services.impl.MarathonAppsService;
 import fr.insee.onyxia.api.services.impl.kubernetes.KubernetesService;
 import fr.insee.onyxia.model.User;
@@ -68,27 +69,11 @@ public class MyLabController {
     @Value("${marathon.url}")
     private String MARATHON_URL;
 
-    @Value("${marathon.dns.suffix}")
-    private String MARATHON_DNS_SUFFIX;
-
-    @Value("kubernetes.prefix")
-    private String KUBERNETES_NAMESPACE_PREFIX;
-
     @Value("${kubernetes.enabled}")
     private boolean KUB_ENABLED;
 
     @Value("${marathon.enabled}")
     private boolean MARATHON_ENABLED;
-
-    @Autowired
-    private IDSanitizer idSanitizer;
-
-    @Autowired
-    HelmInstallService helm;
-
-    @Autowired
-    @Qualifier("helm")
-    ObjectMapper mapperHelm;
 
     @Autowired
     @Qualifier("marathon")
@@ -100,45 +85,30 @@ public class MyLabController {
     @Autowired
     private MarathonAppsService marathonAppsService;
 
-    @Autowired
-    private CustomMetrics metrics;
 
     @Autowired
     private UserProvider userProvider;
 
-    @Autowired
-    private ObjectMapper mapper;
+
 
     @Autowired
     private CatalogService catalogService;
 
-    @Autowired
-    private KubernetesService kubernetesService;
-
-    @Autowired
-    private Catalogs catalogs;
 
     @Autowired
     private List<AdmissionController> admissionControllers;
 
+
     @Autowired(required = false)
     private Marathon marathon;
 
-    @Autowired
-    private UrlGenerator generator;
+
 
     private final Logger logger = LoggerFactory.getLogger(MyLabController.class);
 
 
-    @Value("${marathon.group.name}")
-    private String MARATHON_GROUP_NAME;
 
-    @PostConstruct
-    public void postConstruct() {
-        Collections.sort(admissionControllers, (admissionController, admissionController2) -> {
-            return admissionController2.getPriority().compareTo(admissionController.getPriority());
-        });
-    }
+
 
     @GetMapping("/services")
     public ServicesDTO getMyServices() throws Exception {
@@ -247,72 +217,15 @@ public class MyLabController {
         }
         CatalogWrapper catalog = catalogService.getCatalogById(catalogId);
         Package pkg = catalog.getCatalog().getPackageByName(requestDTO.getPackageName());
-        PublishContext context = new PublishContext(catalogId);
-
         User user = userProvider.getUser();
         Map<String, Object> fusion = new HashMap<>();
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
         if (!Universe.TYPE_UNIVERSE.equals(catalog.getType())) {
-            File values = File.createTempFile("values", ".yaml");
-            mapperHelm.writeValue(values, fusion);
-            String namespaceId = determineNamespace();
-            HelmInstaller res = helm.installChart(pkg.getName(), requestDTO.getCatalogId() + "/" + pkg.getName(), values, namespaceId, requestDTO.isDryRun());
-            values.delete();
-            return List.of(res.getManifest());
-        }
-
-        UniversePackage universePkg = (UniversePackage) pkg;
-        Map<String, Object> resource = universePkg.getResource();
-        fusion.putAll(Map.of("resource", resource));
-
-        Map<String, String> contextData = new HashMap<>();
-        contextData.put("internaldns", idSanitizer.sanitize(pkg.getName()) + "-" + context.getRandomizedId() + "-" + idSanitizer.sanitize(user.getIdep()) + "-" + idSanitizer.sanitize(MARATHON_GROUP_NAME) + "." + MARATHON_DNS_SUFFIX);
-
-        for (int i = 0; i < 10; i++) {
-            contextData.put("externaldns-" + i, generator.generateUrl(user.getIdep(), pkg.getName(), context.getRandomizedId(), i));
-        }
-        fusion.put("context", contextData);
-
-        String toMarathon = Mustacheur.mustache(universePkg.getJsonMustache(), fusion);
-        Collection<App> apps;
-        if (isGroup) {
-            Group group = mapper.readValue(toMarathon, Group.class);
-            apps = group.getApps();
+            return helmAppsService.installApp(requestDTO,isGroup,catalogId,pkg,user,fusion);
         } else {
-            apps = new ArrayList<>();
-            apps.add(mapper.readValue(toMarathon, App.class));
+            return marathonAppsService.installApp(requestDTO,isGroup,catalogId,pkg,user,fusion);
         }
 
-        for (App app : apps) {
-
-
-            // Apply every admission controller
-            long nbInvalidations = admissionControllers.stream().map(admissionController -> admissionController
-                    .validateContract(app, user, universePkg, (Map<String, Object>) requestDTO.getOptions(), context))
-                    .filter(b -> !b).count();
-            if (nbInvalidations > 0) {
-                throw new AccessDeniedException("Validation failed");
-            }
-        }
-
-        if (requestDTO.isDryRun()) {
-            return apps.stream().collect(Collectors.toList());
-        } else {
-            return apps.stream().map(app -> marathon.createApp(app)).collect(Collectors.toList());
-        }
-    }
-
-    @NotNull
-    private String determineNamespace() {
-        KubernetesService.Owner owner = new KubernetesService.Owner();
-        owner.setId(userProvider.getUser().getIdep());
-        owner.setType(KubernetesService.Owner.OwnerType.USER);
-        String namespaceId= KUBERNETES_NAMESPACE_PREFIX+"-"+owner.getId();
-        // si le namespace n'existe pas on le crée
-        if (kubernetesService.getNamespaces(owner).contains(namespaceId)) {
-            kubernetesService.createNamespace(namespaceId, owner);
-        }
-        return namespaceId;
     }
 
 }
