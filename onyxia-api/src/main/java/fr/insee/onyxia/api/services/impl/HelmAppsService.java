@@ -13,6 +13,7 @@ import io.github.inseefrlab.helmwrapper.model.HelmLs;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -35,11 +36,14 @@ public class HelmAppsService implements AppsService {
     @Autowired
     HelmInstallService helm;
 
+    @Value("kubernetes.prefix")
+    private String KUBERNETES_NAMESPACE_PREFIX;
+
     private SimpleDateFormat helmDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @Override
     public CompletableFuture<List<Service>> getUserServices(User user) throws InterruptedException, TimeoutException, IOException, ParseException {
-        List<HelmLs> installedCharts = Arrays.asList(helm.listChartInstall("onyxia"));
+        List<HelmLs> installedCharts = Arrays.asList(helm.listChartInstall(KUBERNETES_NAMESPACE_PREFIX+"-"+user.getIdep()));
         List<Service> services = new ArrayList<>();
         for (HelmLs release : installedCharts) {
             String description = helm.getRelease(release.getName(), release.getNamespace());
@@ -91,6 +95,9 @@ public class HelmAppsService implements AppsService {
         service.setInstances(deployments.get(0).getSpec().getReplicas());
         return service;
     }
+
+
+
 
     private Service.ServiceStatus findAppStatus(HelmLs release) {
         if (release.getStatus().equals("deployed")) {

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.configuration.Catalogs;
 import fr.insee.onyxia.api.configuration.metrics.CustomMetrics;
+import fr.insee.onyxia.api.controller.api.kubernetes.ClusterPermissionsController;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.api.services.UserProvider;
@@ -15,6 +16,7 @@ import fr.insee.onyxia.api.services.control.marathon.UrlGenerator;
 import fr.insee.onyxia.api.services.control.utils.IDSanitizer;
 import fr.insee.onyxia.api.services.control.utils.PublishContext;
 import fr.insee.onyxia.api.services.impl.MarathonAppsService;
+import fr.insee.onyxia.api.services.impl.kubernetes.KubernetesService;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.Package;
 import fr.insee.onyxia.model.catalog.Universe;
@@ -36,6 +38,7 @@ import mesosphere.marathon.client.model.v2.Result;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +70,9 @@ public class MyLabController {
 
     @Value("${marathon.dns.suffix}")
     private String MARATHON_DNS_SUFFIX;
+
+    @Value("kubernetes.prefix")
+    private String KUBERNETES_NAMESPACE_PREFIX;
 
     @Value("${kubernetes.enabled}")
     private boolean KUB_ENABLED;
@@ -106,6 +112,8 @@ public class MyLabController {
     @Autowired
     private CatalogService catalogService;
 
+    @Autowired
+    private KubernetesService kubernetesService;
 
     @Autowired
     private Catalogs catalogs;
@@ -143,7 +151,7 @@ public class MyLabController {
         if (KUB_ENABLED) {
             futures.add(helmAppsService.getUserServices(user));
         }
-        for(var future : futures) {
+        for (var future : futures) {
             dto.getApps().addAll(future.get());
         }
         return dto;
@@ -153,7 +161,7 @@ public class MyLabController {
     @GetMapping("/group")
     public Group getGroup(@RequestParam(value = "groupId", required = false) String id)
             throws JsonParseException, JsonMappingException, IOException {
-        return marathonAppsService.getGroups(userProvider.getUser().getIdep()+"/"+(id == null ? "" : "/"+id));
+        return marathonAppsService.getGroups(userProvider.getUser().getIdep() + "/" + (id == null ? "" : "/" + id));
     }
 
     @GetMapping("/app")
@@ -247,11 +255,12 @@ public class MyLabController {
         if (!Universe.TYPE_UNIVERSE.equals(catalog.getType())) {
             File values = File.createTempFile("values", ".yaml");
             mapperHelm.writeValue(values, fusion);
-            logger.info(Files.readString(values.toPath()));
-            HelmInstaller res = helm.installChart(pkg.getName(), requestDTO.getCatalogId() + "/" + pkg.getName(), values, user.getIdep(), requestDTO.isDryRun());
+            String namespaceId = determineNamespace();
+            HelmInstaller res = helm.installChart(pkg.getName(), requestDTO.getCatalogId() + "/" + pkg.getName(), values, namespaceId, requestDTO.isDryRun());
             values.delete();
             return List.of(res.getManifest());
         }
+
         UniversePackage universePkg = (UniversePackage) pkg;
         Map<String, Object> resource = universePkg.getResource();
         fusion.putAll(Map.of("resource", resource));
@@ -291,6 +300,19 @@ public class MyLabController {
         } else {
             return apps.stream().map(app -> marathon.createApp(app)).collect(Collectors.toList());
         }
+    }
+
+    @NotNull
+    private String determineNamespace() {
+        KubernetesService.Owner owner = new KubernetesService.Owner();
+        owner.setId(userProvider.getUser().getIdep());
+        owner.setType(KubernetesService.Owner.OwnerType.USER);
+        String namespaceId= KUBERNETES_NAMESPACE_PREFIX+"-"+owner.getId();
+        // si le namespace n'existe pas on le crée
+        if (kubernetesService.getNamespaces(owner).contains(namespaceId)) {
+            kubernetesService.createNamespace(namespaceId, owner);
+        }
+        return namespaceId;
     }
 
 }
