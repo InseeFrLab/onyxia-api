@@ -6,7 +6,6 @@ import io.fabric8.kubernetes.api.model.rbac.DoneableRoleBinding;
 import io.fabric8.kubernetes.api.model.rbac.SubjectBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,9 +16,6 @@ public class KubernetesService {
 
     @Autowired
     KubernetesClient kubClient;
-
-    @Value("${kubernetes.cluster.user.prefix:}")
-    private String userPrefix;
 
     public void createNamespace(String namespaceId, Owner owner) {
         // Label onyxia_owner is not resilient if the user has "namespace admin" role scoped to his namespace
