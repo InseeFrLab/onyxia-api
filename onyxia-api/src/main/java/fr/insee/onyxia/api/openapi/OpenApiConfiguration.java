@@ -11,7 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -31,7 +33,7 @@ public class OpenApiConfiguration {
     public final String SCHEMEKEYCLOAK = "oAuthScheme";
 
     @Bean
-    @ConditionalOnProperty(name = "com.example.demo.auth.type", havingValue = "openidconnect", matchIfMissing = true)
+    @ConditionalOnProperty(name = "authentication.mode", havingValue = "openidconnect")
     public OpenAPI customOpenAPIKeycloak() {
         final OpenAPI openapi = createOpenAPI();
         openapi.components(new Components().addSecuritySchemes(SCHEMEKEYCLOAK, new SecurityScheme()
@@ -44,7 +46,8 @@ public class OpenApiConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(name = "authentication.mode", havingValue = "none")
+    @ConditionalOnSingleCandidate(OpenAPI.class)
+    @ConditionalOnMissingBean
     public OpenAPI customOpenAPI() {
         final OpenAPI openapi = createOpenAPI();
         return openapi;
@@ -58,7 +61,7 @@ public class OpenApiConfiguration {
     }
 
 
-    @ConditionalOnProperty(name = "authentication.mode", havingValue = "openidconnect", matchIfMissing = true)
+    @ConditionalOnProperty(name = "authentication.mode", havingValue = "openidconnect")
     @Bean
     public OperationCustomizer addKeycloak() {
         return (operation, handlerMethod) -> {
