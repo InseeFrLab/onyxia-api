@@ -46,7 +46,6 @@ public class OpenApiConfiguration {
     }
 
     @Bean
-    @ConditionalOnSingleCandidate(OpenAPI.class)
     @ConditionalOnMissingBean
     public OpenAPI customOpenAPI() {
         final OpenAPI openapi = createOpenAPI();
