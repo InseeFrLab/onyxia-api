@@ -33,7 +33,7 @@
       "description": "WIP : Various apps",
       "maintainer": "innovation@insee.fr",
       "location": "https://inseefrlab.github.io/helm-charts",
-      "status": "TEST",
+      "status": "PROD",
       "type": "helm"
     }
   ]
