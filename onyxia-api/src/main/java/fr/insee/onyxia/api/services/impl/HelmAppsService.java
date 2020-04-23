@@ -63,7 +63,13 @@ public class HelmAppsService implements AppsService {
 
     @Override
     public CompletableFuture<List<Service>> getUserServices(User user) throws InterruptedException, TimeoutException, IOException, ParseException {
-        List<HelmLs> installedCharts = Arrays.asList(helm.listChartInstall(KUBERNETES_NAMESPACE_PREFIX + user.getIdep()));
+        List<HelmLs> installedCharts = null;
+        try {
+            installedCharts = Arrays.asList(helm.listChartInstall(KUBERNETES_NAMESPACE_PREFIX + user.getIdep()));
+        }
+        catch (Exception e) {
+            return CompletableFuture.completedFuture(new ArrayList<>());
+        }
         List<Service> services = new ArrayList<>();
         for (HelmLs release : installedCharts) {
             String description = helm.getRelease(release.getName(), release.getNamespace());
@@ -122,8 +128,8 @@ public class HelmAppsService implements AppsService {
         KubernetesService.Owner owner = new KubernetesService.Owner();
         owner.setId(user.getIdep());
         owner.setType(KubernetesService.Owner.OwnerType.USER);
-        String namespaceId = KUBERNETES_NAMESPACE_PREFIX + "-" + owner.getId();
-        // si le namespace n'existe pas on le crée
+        String namespaceId = KUBERNETES_NAMESPACE_PREFIX + owner.getId();
+        // If namespace is not present, create it
         if (kubernetesService.getNamespaces(owner).contains(namespaceId)) {
             kubernetesService.createNamespace(namespaceId, owner);
         }
