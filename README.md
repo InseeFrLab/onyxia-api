@@ -90,6 +90,7 @@ Other configurations
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
 | `springdoc.swagger-ui.path` | `/` | Open API (swagger) UI path |
+|`springdoc.swagger-ui.oauth.clientId`|``|clientid use by swagger to authenticate the user, in general the same which is use by onyxia-ui is ok.|
 
 ## Onyxia Universe package format extension
 
