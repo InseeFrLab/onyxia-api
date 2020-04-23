@@ -79,6 +79,7 @@ Kubernetes configuration
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
 | `kubernetes.enabled` | `false` | Enable Kubernetes support |
+| `kubernetes.namespace.prefix` | `user-` | Prefix for user namespaces. Can be blank. |
 
 Catalogs configuration  
 | Key | Default | Description |

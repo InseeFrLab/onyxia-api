@@ -1,13 +1,20 @@
 package fr.insee.onyxia.model.service;
 
+import java.util.List;
 import java.util.Map;
 
 public class Service {
 
-    private String id, title;
+    private String id, name;
     private int instances;
     private double cpus;
     private double mem;
+    private ServiceStatus status = ServiceStatus.RUNNING;
+    private ServiceType type;
+    private List<String> urls;
+    private String logo;
+
+    private long startedAt;
 
     private Map<String,String> labels;
 
@@ -19,12 +26,12 @@ public class Service {
         this.id = id;
     }
 
-    public String getTitle() {
-        return title;
+    public String getName() {
+        return name;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public int getInstances() {
@@ -57,5 +64,53 @@ public class Service {
 
     public void setLabels(Map<String, String> labels) {
         this.labels = labels;
+    }
+
+    public long getStartedAt() {
+        return startedAt;
+    }
+
+    public void setStartedAt(long startedAt) {
+        this.startedAt = startedAt;
+    }
+
+    public ServiceStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ServiceStatus status) {
+        this.status = status;
+    }
+
+    public ServiceType getType() {
+        return type;
+    }
+
+    public void setType(ServiceType type) {
+        this.type = type;
+    }
+
+    public List<String> getUrls() {
+        return urls;
+    }
+
+    public void setUrls(List<String> urls) {
+        this.urls = urls;
+    }
+
+    public String getLogo() {
+        return logo;
+    }
+
+    public void setLogo(String logo) {
+        this.logo = logo;
+    }
+
+    public static enum ServiceStatus {
+        DEPLOYING, RUNNING, STOPPED;
+    }
+
+    public static enum ServiceType {
+        KUBERNETES,MARATHON
     }
 }
