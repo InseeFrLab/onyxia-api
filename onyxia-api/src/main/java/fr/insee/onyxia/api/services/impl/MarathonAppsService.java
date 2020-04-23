@@ -23,14 +23,12 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Primary;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -164,8 +162,7 @@ public class MarathonAppsService implements AppsService {
         {
             try {
                 service.setStartedAt(marathonDateFormat.parse(task.getStartedAt()).getTime());
-            } catch (ParseException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
             }
         });
         service.setStatus(findAppStatus(app));
