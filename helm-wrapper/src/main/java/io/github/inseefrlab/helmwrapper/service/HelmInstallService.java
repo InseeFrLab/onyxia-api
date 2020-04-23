@@ -27,33 +27,34 @@ import io.github.inseefrlab.helmwrapper.utils.Command;
 @Service
 public class HelmInstallService {
 
-
     private final Logger logger = LoggerFactory.getLogger(HelmInstallService.class);
 
-
-    public HelmInstaller installChart(String name, String chart, Map<String, String> env, String namespace, Boolean dryRun)
+    public HelmInstaller installChart(String chart, String namespace, Boolean dryRun, Map<String, String> env)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        String command = "helm install " + name + " " + chart + " " + buildEnvVar(env);
-        if (dryRun){
-            command=command.concat(" --dry-run");
-        }
-        String res =Command.executeAndGetResponseAsJson(command).getOutput().getString();
-        logger.info(res);
-        return new ObjectMapper().readValue(res,HelmInstaller.class);
+        return installChart(chart, namespace, dryRun, null, env);
     }
 
-    public HelmInstaller installChart(String name, String chart, File values, String namespace, boolean dryRun)
+    public HelmInstaller installChart(String chart, String namespace, boolean dryRun, File values)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        String command = "helm install " + name + " " + chart + " -f " + values.getAbsolutePath();
-        if (dryRun){
-            command=command.concat(" --dry-run");
+        return installChart(chart, namespace, dryRun, values, null);
+    }
+
+    public HelmInstaller installChart(String chart, String namespace, boolean dryRun, File values,
+            Map<String, String> env)
+            throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
+        String command = "helm install --generate-name " + chart + " -n " + namespace;
+        if (values != null) {
+            command = command.concat(" -f " + values.getAbsolutePath());
         }
-        logger.info(command);
+        if (env != null) {
+            command = command.concat(buildEnvVar(env));
+        }
+        if (dryRun) {
+            command = command.concat(" --dry-run");
+        }
         String res = Command.executeAndGetResponseAsJson(command).getOutput().getString();
-        logger.info(res);
-        return new ObjectMapper().readValue(res,HelmInstaller.class);
+        return new ObjectMapper().readValue(res, HelmInstaller.class);
     }
-
 
     public int uninstaller(String name)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
@@ -62,17 +63,17 @@ public class HelmInstallService {
 
     public HelmLs[] listChartInstall(String namespace) throws JsonMappingException, InvalidExitValueException,
             JsonProcessingException, IOException, InterruptedException, TimeoutException {
-        String cmd ="helm ls";
-        if (namespace != null){
-            cmd= cmd+  " -n "+namespace;
+        String cmd = "helm ls";
+        if (namespace != null) {
+            cmd = cmd + " -n " + namespace;
         }
-        return new ObjectMapper().readValue(
-                Command.executeAndGetResponseAsJson(cmd).getOutput().getString(), HelmLs[].class);
+        return new ObjectMapper().readValue(Command.executeAndGetResponseAsJson(cmd).getOutput().getString(),
+                HelmLs[].class);
     }
 
-    public String getRelease(String id, String namespace){
+    public String getRelease(String id, String namespace) {
         try {
-            return Command.execute("helm get manifest " + id+" --namespace "+ namespace).getOutput().getString();
+            return Command.execute("helm get manifest " + id + " --namespace " + namespace).getOutput().getString();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {

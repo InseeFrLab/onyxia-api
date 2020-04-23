@@ -52,22 +52,24 @@ public class HelmAppsService implements AppsService {
 
     private SimpleDateFormat helmDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    public Collection<Object> installApp(CreateServiceDTO requestDTO, boolean isGroup, String catalogId, Package pkg, User user, Map<String, Object> fusion) throws IOException, TimeoutException, InterruptedException {
+    public Collection<Object> installApp(CreateServiceDTO requestDTO, boolean isGroup, String catalogId, Package pkg,
+            User user, Map<String, Object> fusion) throws IOException, TimeoutException, InterruptedException {
         File values = File.createTempFile("values", ".yaml");
         mapperHelm.writeValue(values, fusion);
         String namespaceId = determineNamespace(user);
-        HelmInstaller res = helm.installChart(pkg.getName(), catalogId + "/" + pkg.getName(), values, namespaceId, requestDTO.isDryRun());
+        HelmInstaller res = helm.installChart(catalogId + "/" + pkg.getName(), namespaceId, requestDTO.isDryRun(),
+                values);
         values.delete();
         return List.of(res.getManifest());
     }
 
     @Override
-    public CompletableFuture<List<Service>> getUserServices(User user) throws InterruptedException, TimeoutException, IOException, ParseException {
+    public CompletableFuture<List<Service>> getUserServices(User user)
+            throws InterruptedException, TimeoutException, IOException, ParseException {
         List<HelmLs> installedCharts = null;
         try {
             installedCharts = Arrays.asList(helm.listChartInstall(KUBERNETES_NAMESPACE_PREFIX + user.getIdep()));
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return CompletableFuture.completedFuture(new ArrayList<>());
         }
         List<Service> services = new ArrayList<>();
@@ -88,13 +90,18 @@ public class HelmAppsService implements AppsService {
         KubernetesClient client = new DefaultKubernetesClient();
         InputStream inputStream = new ByteArrayInputStream(description.getBytes(Charset.forName("UTF-8")));
         List<HasMetadata> hasMetadatas = client.load(inputStream).get();
-        List<Ingress> ingresses = hasMetadatas.stream().filter(hasMetadata -> hasMetadata instanceof Ingress).map(hasMetadata -> (Ingress) hasMetadata).collect(Collectors.toList());
-        //List<Service> services = hasMetadatas.stream().filter(hasMetadata -> hasMetadata instanceof Service).map(hasMetadata -> (Service) hasMetadata).collect(Collectors.toList());
-        List<Deployment> deployments = hasMetadatas.stream().filter(hasMetadata -> hasMetadata instanceof Deployment).map(hasMetadata -> (Deployment) hasMetadata).collect(Collectors.toList());
+        List<Ingress> ingresses = hasMetadatas.stream().filter(hasMetadata -> hasMetadata instanceof Ingress)
+                .map(hasMetadata -> (Ingress) hasMetadata).collect(Collectors.toList());
+        // List<Service> services = hasMetadatas.stream().filter(hasMetadata ->
+        // hasMetadata instanceof Service).map(hasMetadata -> (Service)
+        // hasMetadata).collect(Collectors.toList());
+        List<Deployment> deployments = hasMetadatas.stream().filter(hasMetadata -> hasMetadata instanceof Deployment)
+                .map(hasMetadata -> (Deployment) hasMetadata).collect(Collectors.toList());
         Service service = new Service();
         List<String> urls = new ArrayList<>();
         for (Ingress ingress : ingresses) {
-            List<String> listHost = ingress.getSpec().getTls().stream().map(tls -> tls.getHosts()).collect(Collectors.toList()).stream().flatMap(x -> x.stream()).collect(Collectors.toList());
+            List<String> listHost = ingress.getSpec().getTls().stream().map(tls -> tls.getHosts())
+                    .collect(Collectors.toList()).stream().flatMap(x -> x.stream()).collect(Collectors.toList());
             listHost = listHost.stream().map(host -> {
                 if (!host.startsWith("http")) {
                     return "https://" + host;
@@ -107,7 +114,8 @@ public class HelmAppsService implements AppsService {
         Map<String, String> labels = deployments.get(0).getMetadata().getLabels();
         service.setLogo(labels.get("ONYXIA_LOGO"));
         service.setLabels(labels);
-        Map<String, Quantity> resources = deployments.get(0).getSpec().getTemplate().getSpec().getContainers().get(0).getResources().getLimits();
+        Map<String, Quantity> resources = deployments.get(0).getSpec().getTemplate().getSpec().getContainers().get(0)
+                .getResources().getLimits();
         if (resources != null) {
 
             if (resources.containsKey("memory")) {
@@ -122,7 +130,6 @@ public class HelmAppsService implements AppsService {
         return service;
     }
 
-
     @NotNull
     private String determineNamespace(User user) {
         KubernetesService.Owner owner = new KubernetesService.Owner();
@@ -135,7 +142,6 @@ public class HelmAppsService implements AppsService {
         }
         return namespaceId;
     }
-
 
     private Service.ServiceStatus findAppStatus(HelmLs release) {
         if (release.getStatus().equals("deployed")) {
