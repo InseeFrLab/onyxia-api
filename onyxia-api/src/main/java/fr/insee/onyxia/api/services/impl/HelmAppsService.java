@@ -137,7 +137,7 @@ public class HelmAppsService implements AppsService {
         owner.setType(KubernetesService.Owner.OwnerType.USER);
         String namespaceId = KUBERNETES_NAMESPACE_PREFIX + owner.getId();
         // If namespace is not present, create it
-        if (!kubernetesService.getNamespaces(owner).contains(namespaceId)) {
+        if (kubernetesService.getNamespaces(owner).stream().filter(namespace -> namespace.getMetadata().getName().equalsIgnoreCase(namespaceId)).count() == 0) {
             kubernetesService.createNamespace(namespaceId, owner);
         }
         return namespaceId;
