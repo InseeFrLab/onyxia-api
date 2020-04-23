@@ -47,7 +47,7 @@ public class HelmAppsService implements AppsService {
     @Qualifier("helm")
     ObjectMapper mapperHelm;
 
-    @Value("kubernetes.namespace.prefix")
+    @Value("${kubernetes.namespace.prefix}")
     private String KUBERNETES_NAMESPACE_PREFIX;
 
     private SimpleDateFormat helmDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
