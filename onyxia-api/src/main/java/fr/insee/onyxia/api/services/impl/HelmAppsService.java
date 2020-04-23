@@ -47,7 +47,7 @@ public class HelmAppsService implements AppsService {
     @Qualifier("helm")
     ObjectMapper mapperHelm;
 
-    @Value("kubernetes.prefix")
+    @Value("kubernetes.namespace.prefix")
     private String KUBERNETES_NAMESPACE_PREFIX;
 
     private SimpleDateFormat helmDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -63,7 +63,7 @@ public class HelmAppsService implements AppsService {
 
     @Override
     public CompletableFuture<List<Service>> getUserServices(User user) throws InterruptedException, TimeoutException, IOException, ParseException {
-        List<HelmLs> installedCharts = Arrays.asList(helm.listChartInstall(KUBERNETES_NAMESPACE_PREFIX + "-" + user.getIdep()));
+        List<HelmLs> installedCharts = Arrays.asList(helm.listChartInstall(KUBERNETES_NAMESPACE_PREFIX + user.getIdep()));
         List<Service> services = new ArrayList<>();
         for (HelmLs release : installedCharts) {
             String description = helm.getRelease(release.getName(), release.getNamespace());
