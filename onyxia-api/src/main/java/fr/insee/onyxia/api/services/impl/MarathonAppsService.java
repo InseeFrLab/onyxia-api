@@ -10,10 +10,12 @@ import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.Package;
 import fr.insee.onyxia.model.catalog.UniversePackage;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
+import fr.insee.onyxia.model.service.UninstallService;
 import fr.insee.onyxia.mustache.Mustacheur;
 import mesosphere.marathon.client.Marathon;
 import mesosphere.marathon.client.model.v2.App;
 import mesosphere.marathon.client.model.v2.Group;
+import mesosphere.marathon.client.model.v2.Result;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -61,8 +63,7 @@ public class MarathonAppsService implements AppsService {
     @Qualifier("marathon")
     private OkHttpClient marathonClient;
 
-    private @Value("${marathon.url}")
-    String MARATHON_URL;
+    private @Value("${marathon.url}") String MARATHON_URL;
 
     private DateFormat marathonDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
@@ -76,7 +77,7 @@ public class MarathonAppsService implements AppsService {
     @NotNull
     @Override
     public Collection<Object> installApp(CreateServiceDTO requestDTO, boolean isGroup, String catalogId, Package pkg,
-                                         User user, Map<String, Object> fusion) throws Exception {
+            User user, Map<String, Object> fusion) throws Exception {
         PublishContext context = new PublishContext(catalogId);
         UniversePackage universePkg = (UniversePackage) pkg;
         Map<String, Object> resource = universePkg.getResource();
@@ -174,21 +175,37 @@ public class MarathonAppsService implements AppsService {
     }
 
     /**
-     * This methods uses a custom request as the marathon.getGroup() does not returns full data on apps (e.g : no tasks data)
+     * This methods uses a custom request as the marathon.getGroup() does not
+     * returns full data on apps (e.g : no tasks data)
      *
      * @param id
      * @return
      * @throws IOException
      */
     private Group getGroup(String id) throws IOException {
-        Request requete = new Request.Builder().url(MARATHON_URL + "/v2/groups/" + id + "?" + "embed=group.groups" + "&" + "embed=group.apps" + "&"
-                + "embed=group.apps.tasks" + "&" + "embed=group.apps.counts" + "&" + "embed=group.apps.deployments"
-                + "&" + "embed=group.apps.readiness" + "&" + "embed=group.apps.lastTaskFailure" + "&"
-                + "embed=group.pods" + "&" + "embed=group.apps.taskStats").build();
+        Request requete = new Request.Builder().url(MARATHON_URL + "/v2/groups/" + id + "?" + "embed=group.groups" + "&"
+                + "embed=group.apps" + "&" + "embed=group.apps.tasks" + "&" + "embed=group.apps.counts" + "&"
+                + "embed=group.apps.deployments" + "&" + "embed=group.apps.readiness" + "&"
+                + "embed=group.apps.lastTaskFailure" + "&" + "embed=group.pods" + "&" + "embed=group.apps.taskStats")
+                .build();
         Response response = marathonClient.newCall(requete).execute();
         Group groupResponse = mapper.readValue(response.body().byteStream(), Group.class);
         return groupResponse;
     }
 
+    @Override
+    public UninstallService destroyService(User user, String serviceId) {
+        if (serviceId == null || !serviceId.startsWith("/users/" + user.getIdep())) {
+            throw new RuntimeException("hack!");
+        }
+        Result appUninstaller = marathon.deleteApp(serviceId);
+        UninstallService result = new UninstallService();
+        result.setId(appUninstaller.getDeploymentId());
+        result.setVersion(appUninstaller.getVersion());
+        result.setSuccess(true);
+        // TODO Auto-generated method stub
+        return result;
+
+    }
 
 }

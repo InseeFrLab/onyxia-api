@@ -56,9 +56,9 @@ public class HelmInstallService {
         return new ObjectMapper().readValue(res, HelmInstaller.class);
     }
 
-    public int uninstaller(String name)
+    public int uninstaller(String name, String namespace)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        return Command.execute("helm uninstall " + name).getExitValue();
+        return Command.execute("helm uninstall " + name + " -n " + namespace).getExitValue();
     }
 
     public HelmLs[] listChartInstall(String namespace) throws JsonMappingException, InvalidExitValueException,

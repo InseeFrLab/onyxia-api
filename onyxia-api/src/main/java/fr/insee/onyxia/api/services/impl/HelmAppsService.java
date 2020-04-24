@@ -7,6 +7,7 @@ import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.Package;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
 import fr.insee.onyxia.model.service.Service;
+import fr.insee.onyxia.model.service.UninstallService;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
@@ -22,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.zeroturnaround.exec.InvalidExitValueException;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -161,8 +163,22 @@ public class HelmAppsService implements AppsService {
     }
 
     @Override
-    public Service getUserService(User user,String serviceId) throws MultipleServiceFound, ParseException {
+    public Service getUserService(User user, String serviceId) throws MultipleServiceFound, ParseException {
         HelmLs result = helm.getAppById(serviceId, determineNamespace(user));
         return getHelmApp(result);
+    }
+
+    @Override
+    public UninstallService destroyService(User user, String serviceId) throws Exception {
+        HelmLs appInfo = helm.getAppById(serviceId, determineNamespace(user));
+        UninstallService result = new UninstallService();
+        result.setId(appInfo.getName());
+        result.setVersion(appInfo.getChart());
+        int status = helm.uninstaller(serviceId, determineNamespace(user));
+        if (status != 0) {
+            result.setSuccess(false);
+        }
+        result.setSuccess(true);
+        return result;
     }
 }

@@ -14,6 +14,7 @@ import fr.insee.onyxia.model.dto.CreateServiceDTO;
 import fr.insee.onyxia.model.dto.ServicesDTO;
 import fr.insee.onyxia.model.dto.UpdateServiceDTO;
 import fr.insee.onyxia.model.service.Service;
+import fr.insee.onyxia.model.service.UninstallService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import mesosphere.marathon.client.Marathon;
@@ -93,13 +94,13 @@ public class MyLabController {
     }
 
     @GetMapping("/app")
-    public @ResponseBody Service getApp(@RequestParam("serviceId") String id, @RequestParam(required = false) Service.ServiceType type)
-            throws Exception {
+    public @ResponseBody Service getApp(@RequestParam("serviceId") String id,
+            @RequestParam(required = false) Service.ServiceType type) throws Exception {
         if (type == null) {
             type = determineServiceType(id);
         }
         if (Service.ServiceType.MARATHON.equals(type)) {
-            return marathonAppsService.getUserService(userProvider.getUser(),id);
+            return marathonAppsService.getUserService(userProvider.getUser(), id);
         } else if (Service.ServiceType.KUBERNETES.equals(type)) {
             return helmAppsService.getUserService(userProvider.getUser(), id);
         }
@@ -107,13 +108,19 @@ public class MyLabController {
     }
 
     @DeleteMapping("/app")
-    public Result destroyApp(@RequestParam("serviceId") String id) throws MarathonException {
+    public UninstallService destroyApp(@RequestParam("serviceId") String id,
+            @RequestParam(required = false) Service.ServiceType type) throws Exception {
 
-        if (id == null || !id.startsWith("/users/" + userProvider.getUser().getIdep())) {
-            throw new RuntimeException("hack!");
+        if (type == null) {
+            type = determineServiceType(id);
         }
-        Result result = marathon.deleteApp(id);
-        return result;
+        if (Service.ServiceType.MARATHON.equals(type)) {
+            return marathonAppsService.destroyService(userProvider.getUser(), id);
+
+        } else if (Service.ServiceType.KUBERNETES.equals(type)) {
+            return helmAppsService.destroyService(userProvider.getUser(), id);
+        }
+        return null;
     }
 
     @DeleteMapping("/group")
