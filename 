@@ -1,48 +1,0 @@
-[1mdiff --git a/onyxia-api/src/main/java/fr/insee/onyxia/api/services/impl/MarathonAppsService.java b/onyxia-api/src/main/java/fr/insee/onyxia/api/services/impl/MarathonAppsService.java[m
-[1mindex f81c292..83d897b 100644[m
-[1m--- a/onyxia-api/src/main/java/fr/insee/onyxia/api/services/impl/MarathonAppsService.java[m
-[1m+++ b/onyxia-api/src/main/java/fr/insee/onyxia/api/services/impl/MarathonAppsService.java[m
-[36m@@ -185,14 +185,39 @@[m [mpublic class MarathonAppsService implements AppsService {[m
-     public fr.insee.onyxia.model.service.Service getUserService(String serviceId, User user) throws Exception {[m
-         String url = MARATHON_URL + "/v2/apps/users/" + user.getIdep() + "/" + serviceId + "?" + "embed=app.tasks" + "&"[m
-                 + "embed=app.counts" + "&" + "embed=app.deployments" + "&" + "embed=app.readiness" + "&"[m
-[31m-                + "embed=app.lastTaskFailure" + "&" + "embed=app.taskStats";[m
-[32m+[m[32m                + "embed=app.lastTaskFailure";[m[41m[m
- [m
-         Request requete = new Request.Builder().url(url).build();[m
-         Response response = marathonClient.newCall(requete).execute();[m
-[31m-        mapper.[m
-[31m-        App app = mapper.readValue(response.body().byteStream(), App.class);[m
-[32m+[m[32m        AppWrapper app = mapper.readValue(response.body().charStream(), AppExtended.class);[m[41m[m
-[32m+[m[32m        return getServiceFromApp(app.getApp());[m[41m[m
-[32m+[m[32m    }[m[41m[m
-[32m+[m[41m[m
-[32m+[m[32m    public static class AppWrapper {[m[41m[m
-[32m+[m[41m[m
-[32m+[m[32m        private AppExtended app;[m[41m[m
-[32m+[m[41m[m
-[32m+[m[32m        public AppExtended getApp() {[m[41m[m
-[32m+[m[32m            return app;[m[41m[m
-[32m+[m[32m        }[m[41m[m
-[32m+[m[41m[m
-[32m+[m[32m        public void setApp(AppExtended app) {[m[41m[m
-[32m+[m[32m            this.app = app;[m[41m[m
-[32m+[m[32m        }[m[41m[m
-[32m+[m[41m[m
-[32m+[m[32m    }[m[41m[m
-[32m+[m[41m[m
-[32m+[m[32m    public static class AppExtended extends App {[m[41m[m
-[32m+[m[41m[m
-[32m+[m[41m[m
-[32m+[m[32m        mesosphere.marathon.client.model.v2.Task;[m[41m[m
-[32m+[m[32m        mesosphere.marathon.client.model.v2.Deployment;[m[41m[m
-[32m+[m[32m        mesosphere.marathon.client.model.v2.ReadinessCheck;[m[41m[m
-[32m+[m[32m        mesosphere.marathon.client.model.v2.TaskFailure;[m[41m[m
-[32m+[m[41m[m
-[32m+[m[41m[m
-[32m+[m[41m[m
- [m
-[31m-        return getServiceFromApp(app);[m
-     }[m
- [m
- }[m
