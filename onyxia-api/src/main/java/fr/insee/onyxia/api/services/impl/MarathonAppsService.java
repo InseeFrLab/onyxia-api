@@ -10,6 +10,7 @@ import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.Package;
 import fr.insee.onyxia.model.catalog.UniversePackage;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
+import fr.insee.onyxia.model.dto.ServicesListing;
 import fr.insee.onyxia.model.service.UninstallService;
 import fr.insee.onyxia.mustache.Mustacheur;
 import mesosphere.marathon.client.Marathon;
@@ -32,7 +33,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 @Service
@@ -63,7 +63,8 @@ public class MarathonAppsService implements AppsService {
     @Qualifier("marathon")
     private OkHttpClient marathonClient;
 
-    private @Value("${marathon.url}") String MARATHON_URL;
+    private @Value("${marathon.url}")
+    String MARATHON_URL;
 
     private DateFormat marathonDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
@@ -77,7 +78,7 @@ public class MarathonAppsService implements AppsService {
     @NotNull
     @Override
     public Collection<Object> installApp(CreateServiceDTO requestDTO, boolean isGroup, String catalogId, Package pkg,
-            User user, Map<String, Object> fusion) throws Exception {
+                                         User user, Map<String, Object> fusion) throws Exception {
         PublishContext context = new PublishContext(catalogId);
         UniversePackage universePkg = (UniversePackage) pkg;
         Map<String, Object> resource = universePkg.getResource();
@@ -125,19 +126,38 @@ public class MarathonAppsService implements AppsService {
     }
 
     @Override
-    public CompletableFuture<List<fr.insee.onyxia.model.service.Service>> getUserServices(User user)
-            throws InterruptedException, TimeoutException, IOException {
-        Group group = getGroup(getUserGroupPath(user));
-        return CompletableFuture.completedFuture(
-                group.getApps().stream().map(app -> getServiceFromApp(app)).collect(Collectors.toList()));
+    public CompletableFuture<ServicesListing> getUserServices(User user) throws IllegalAccessException, IOException {
+        return getUserServices(user, null);
+    }
+
+    @Override
+    public CompletableFuture<ServicesListing> getUserServices(User user, String groupId) throws IllegalAccessException, IOException {
+        if (groupId != null && !groupId.startsWith(getUserGroupPath(user))) {
+            throw new IllegalAccessException("Permission denied. " + user.getIdep() + " can not access " + groupId);
+        }
+
+        if (groupId == null) {
+            groupId = getUserGroupPath(user);
+        }
+        Group group = getGroup(groupId);
+        ServicesListing listing = new ServicesListing();
+        listing.setApps(group.getApps().stream().map(app -> mapAppToService(app)).collect(Collectors.toList()));
+        listing.setGroups(group.getGroups().stream().map(gr -> mapGroup(gr)).collect(Collectors.toList()));
+        return CompletableFuture.completedFuture(listing);
     }
 
     @Override
     public fr.insee.onyxia.model.service.Service getUserService(User user, String serviceId) throws Exception {
-        return getServiceFromApp(marathon.getApp(getUserGroupPath(user) + "/" + serviceId).getApp());
+        return mapAppToService(marathon.getApp(getUserGroupPath(user) + "/" + serviceId).getApp());
     }
 
-    private fr.insee.onyxia.model.service.Service getServiceFromApp(App app) {
+    private fr.insee.onyxia.model.service.Group mapGroup(Group marathonGroup) {
+        fr.insee.onyxia.model.service.Group group = new fr.insee.onyxia.model.service.Group();
+        group.setId(marathonGroup.getId());
+        return group;
+    }
+
+    private fr.insee.onyxia.model.service.Service mapAppToService(App app) {
         fr.insee.onyxia.model.service.Service service = new fr.insee.onyxia.model.service.Service();
         service.setLabels(app.getLabels());
         service.setCpus(app.getCpus());
@@ -183,6 +203,7 @@ public class MarathonAppsService implements AppsService {
      * @throws IOException
      */
     private Group getGroup(String id) throws IOException {
+        
         Request requete = new Request.Builder().url(MARATHON_URL + "/v2/groups/" + id + "?" + "embed=group.groups" + "&"
                 + "embed=group.apps" + "&" + "embed=group.apps.tasks" + "&" + "embed=group.apps.counts" + "&"
                 + "embed=group.apps.deployments" + "&" + "embed=group.apps.readiness" + "&"
@@ -191,6 +212,7 @@ public class MarathonAppsService implements AppsService {
         Response response = marathonClient.newCall(requete).execute();
         Group groupResponse = mapper.readValue(response.body().byteStream(), Group.class);
         return groupResponse;
+
     }
 
     @Override
@@ -203,7 +225,6 @@ public class MarathonAppsService implements AppsService {
         result.setId(appUninstaller.getDeploymentId());
         result.setVersion(appUninstaller.getVersion());
         result.setSuccess(true);
-        // TODO Auto-generated method stub
         return result;
 
     }

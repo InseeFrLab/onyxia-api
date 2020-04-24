@@ -10,7 +10,7 @@ import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.Package;
 import fr.insee.onyxia.model.catalog.Universe;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
-import fr.insee.onyxia.model.dto.ServicesDTO;
+import fr.insee.onyxia.model.dto.ServicesListing;
 import fr.insee.onyxia.model.dto.UpdateServiceDTO;
 import fr.insee.onyxia.model.service.Service;
 import fr.insee.onyxia.model.service.UninstallService;
@@ -60,18 +60,20 @@ public class MyLabController {
     private final Logger logger = LoggerFactory.getLogger(MyLabController.class);
 
     @GetMapping("/services")
-    public ServicesDTO getMyServices() throws Exception {
+    public ServicesListing getMyServices(@RequestParam(required = false) String groupId) throws Exception {
         User user = userProvider.getUser();
-        ServicesDTO dto = new ServicesDTO();
-        List<CompletableFuture<List<Service>>> futures = new ArrayList<>();
+        ServicesListing dto = new ServicesListing();
+        List<CompletableFuture<ServicesListing>> futures = new ArrayList<>();
         if (MARATHON_ENABLED) {
-            futures.add(marathonAppsService.getUserServices(user));
+            futures.add(marathonAppsService.getUserServices(user,groupId));
         }
         if (KUB_ENABLED) {
-            futures.add(helmAppsService.getUserServices(user));
+            futures.add(helmAppsService.getUserServices(user,groupId));
         }
         for (var future : futures) {
-            dto.getApps().addAll(future.get());
+            ServicesListing listing = future.get();
+            dto.getApps().addAll(listing.getApps());
+            dto.getGroups().addAll(listing.getGroups());
         }
         return dto;
     }

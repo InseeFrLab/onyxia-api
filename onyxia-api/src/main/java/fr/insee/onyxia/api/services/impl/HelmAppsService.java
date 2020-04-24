@@ -6,6 +6,7 @@ import fr.insee.onyxia.api.services.impl.kubernetes.KubernetesService;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.Package;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
+import fr.insee.onyxia.model.dto.ServicesListing;
 import fr.insee.onyxia.model.service.Service;
 import fr.insee.onyxia.model.service.UninstallService;
 import io.fabric8.kubernetes.api.model.HasMetadata;
@@ -19,6 +20,8 @@ import io.github.inseefrlab.helmwrapper.model.HelmLs;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService.MultipleServiceFound;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -54,6 +57,8 @@ public class HelmAppsService implements AppsService {
 
     private SimpleDateFormat helmDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(HelmAppsService.class);
+
     public Collection<Object> installApp(CreateServiceDTO requestDTO, boolean isGroup, String catalogId, Package pkg,
             User user, Map<String, Object> fusion) throws IOException, TimeoutException, InterruptedException {
         File values = File.createTempFile("values", ".yaml");
@@ -66,26 +71,42 @@ public class HelmAppsService implements AppsService {
     }
 
     @Override
-    public CompletableFuture<List<Service>> getUserServices(User user)
-            throws InterruptedException, TimeoutException, IOException, ParseException {
+    public CompletableFuture<ServicesListing> getUserServices(User user)
+            throws IOException, IllegalAccessException {
+        return getUserServices(user,null);
+    }
+
+    @Override
+    public CompletableFuture<ServicesListing> getUserServices(User user, String groupId) throws IOException, IllegalAccessException {
+        if (groupId != null) {
+            LOGGER.debug("STUB : group listing is currently not supported on helm");
+            return CompletableFuture.completedFuture(new ServicesListing());
+        }
         List<HelmLs> installedCharts = null;
         try {
             installedCharts = Arrays.asList(helm.listChartInstall(KUBERNETES_NAMESPACE_PREFIX + user.getIdep()));
         } catch (Exception e) {
-            return CompletableFuture.completedFuture(new ArrayList<>());
+            return CompletableFuture.completedFuture(new ServicesListing());
         }
         List<Service> services = new ArrayList<>();
         for (HelmLs release : installedCharts) {
             services.add(getHelmApp(release));
         }
-        return CompletableFuture.completedFuture(services);
+        ServicesListing listing = new ServicesListing();
+        listing.setApps(services);
+        return CompletableFuture.completedFuture(listing);
     }
 
-    private Service getHelmApp(HelmLs release) throws ParseException {
+    private Service getHelmApp(HelmLs release) {
         String description = helm.getRelease(release.getName(), release.getNamespace());
         Service service = getServiceFromRelease(description);
         service.setStatus(findAppStatus(release));
-        service.setStartedAt(helmDateFormat.parse(release.getUpdated()).getTime());
+        try {
+            service.setStartedAt(helmDateFormat.parse(release.getUpdated()).getTime());
+        }
+        catch (ParseException e) {
+            service.setStartedAt(0);
+        }
         service.setId(release.getName());
         service.setName(release.getChart());
         service.setType(Service.ServiceType.KUBERNETES);
