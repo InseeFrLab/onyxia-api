@@ -91,4 +91,17 @@ public class HelmInstallService {
         }
         return "";
     }
+
+    public HelmLs getAppById(String appId, String namespace) {
+        try {
+            return new ObjectMapper()
+                    .readValue(Command.executeAndGetResponseAsJson("helm list --filter " + appId + " -n " + namespace)
+                            .getOutput().getString(), HelmLs.class);
+        } catch (InvalidExitValueException | IOException | InterruptedException | TimeoutException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }

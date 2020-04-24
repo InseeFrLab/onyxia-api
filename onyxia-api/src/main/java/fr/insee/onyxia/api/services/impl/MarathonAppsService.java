@@ -63,11 +63,9 @@ public class MarathonAppsService implements AppsService {
     @Qualifier("marathon")
     private OkHttpClient marathonClient;
 
-    private @Value("${marathon.url}")
-    String MARATHON_URL;
+    private @Value("${marathon.url}") String MARATHON_URL;
 
     private DateFormat marathonDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-
 
     @PostConstruct
     public void postConstruct() {
@@ -76,19 +74,23 @@ public class MarathonAppsService implements AppsService {
         });
     }
 
-
     @NotNull
-    public Collection<Object> installApp(CreateServiceDTO requestDTO, boolean isGroup, String catalogId, Package pkg, User user, Map<String, Object> fusion) throws Exception {
+    public Collection<Object> installApp(CreateServiceDTO requestDTO, boolean isGroup, String catalogId, Package pkg,
+            User user, Map<String, Object> fusion) throws Exception {
         PublishContext context = new PublishContext(catalogId);
         UniversePackage universePkg = (UniversePackage) pkg;
         Map<String, Object> resource = universePkg.getResource();
         fusion.putAll(Map.of("resource", resource));
 
         Map<String, String> contextData = new HashMap<>();
-        contextData.put("internaldns", idSanitizer.sanitize(pkg.getName()) + "-" + context.getRandomizedId() + "-" + idSanitizer.sanitize(user.getIdep()) + "-" + idSanitizer.sanitize(MARATHON_GROUP_NAME) + "." + MARATHON_DNS_SUFFIX);
+        contextData.put("internaldns",
+                idSanitizer.sanitize(pkg.getName()) + "-" + context.getRandomizedId() + "-"
+                        + idSanitizer.sanitize(user.getIdep()) + "-" + idSanitizer.sanitize(MARATHON_GROUP_NAME) + "."
+                        + MARATHON_DNS_SUFFIX);
 
         for (int i = 0; i < 10; i++) {
-            contextData.put("externaldns-" + i, generator.generateUrl(user.getIdep(), pkg.getName(), context.getRandomizedId(), i));
+            contextData.put("externaldns-" + i,
+                    generator.generateUrl(user.getIdep(), pkg.getName(), context.getRandomizedId(), i));
         }
 
         fusion.put("context", contextData);
@@ -121,7 +123,6 @@ public class MarathonAppsService implements AppsService {
         }
     }
 
-
     public VersionedApp getServiceById(String id) {
         GetAppResponse appsResponse = marathon.getApp(id);
         VersionedApp app = appsResponse.getApp();
@@ -129,20 +130,22 @@ public class MarathonAppsService implements AppsService {
     }
 
     public Group getGroups(String id) throws IOException {
-        Request requete = new Request.Builder().url(MARATHON_URL + "/v2/groups/users/"
-                + id + "?" + "embed=group.groups" + "&" + "embed=group.apps" + "&"
-                + "embed=group.apps.tasks" + "&" + "embed=group.apps.counts" + "&" + "embed=group.apps.deployments"
-                + "&" + "embed=group.apps.readiness" + "&" + "embed=group.apps.lastTaskFailure" + "&"
-                + "embed=group.pods" + "&" + "embed=group.apps.taskStats").build();
+        Request requete = new Request.Builder().url(MARATHON_URL + "/v2/groups/users/" + id + "?" + "embed=group.groups"
+                + "&" + "embed=group.apps" + "&" + "embed=group.apps.tasks" + "&" + "embed=group.apps.counts" + "&"
+                + "embed=group.apps.deployments" + "&" + "embed=group.apps.readiness" + "&"
+                + "embed=group.apps.lastTaskFailure" + "&" + "embed=group.pods" + "&" + "embed=group.apps.taskStats")
+                .build();
         Response response = marathonClient.newCall(requete).execute();
         Group groupResponse = mapper.readValue(response.body().byteStream(), Group.class);
         return groupResponse;
     }
 
     @Override
-    public CompletableFuture<List<fr.insee.onyxia.model.service.Service>> getUserServices(User user) throws InterruptedException, TimeoutException, IOException {
+    public CompletableFuture<List<fr.insee.onyxia.model.service.Service>> getUserServices(User user)
+            throws InterruptedException, TimeoutException, IOException {
         Group group = getGroups(user.getIdep());
-        return CompletableFuture.completedFuture(group.getApps().stream().map(app -> getServiceFromApp(app)).collect(Collectors.toList()));
+        return CompletableFuture.completedFuture(
+                group.getApps().stream().map(app -> getServiceFromApp(app)).collect(Collectors.toList()));
     }
 
     private fr.insee.onyxia.model.service.Service getServiceFromApp(App app) {
@@ -158,8 +161,7 @@ public class MarathonAppsService implements AppsService {
         uris.add(app.getLabels().get("ONYXIA_URL"));
         service.setUrls(uris);
         service.setLogo(app.getLabels().get("ONYXIA_LOGO"));
-        app.getTasks().stream().findFirst().ifPresent(task ->
-        {
+        app.getTasks().stream().findFirst().ifPresent(task -> {
             try {
                 service.setStartedAt(marathonDateFormat.parse(task.getStartedAt()).getTime());
             } catch (Exception e) {
@@ -177,6 +179,18 @@ public class MarathonAppsService implements AppsService {
         } else {
             return fr.insee.onyxia.model.service.Service.ServiceStatus.DEPLOYING;
         }
+    }
+
+    @Override
+    public Object getApp(String serviceId, User user) throws IOException {
+        String url = MARATHON_URL + "/v2/apps/users/" + user.getIdep() + "/" + serviceId + "?" + "embed=app.tasks" + "&"
+                + "embed=app.counts" + "&" + "embed=app.deployments" + "&" + "embed=app.readiness" + "&"
+                + "embed=app.lastTaskFailure" + "&" + "embed=app.taskStats";
+
+        Request requete = new Request.Builder().url(url).build();
+        Response response = marathonClient.newCall(requete).execute();
+
+        return response.body().string();
     }
 
 }

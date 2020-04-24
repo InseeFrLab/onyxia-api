@@ -66,30 +66,19 @@ public class MyLabController {
     @Autowired
     private MarathonAppsService marathonAppsService;
 
-
     @Autowired
     private UserProvider userProvider;
-
-
 
     @Autowired
     private CatalogService catalogService;
 
-
     @Autowired
     private List<AdmissionController> admissionControllers;
-
 
     @Autowired(required = false)
     private Marathon marathon;
 
-
-
     private final Logger logger = LoggerFactory.getLogger(MyLabController.class);
-
-
-
-
 
     @GetMapping("/services")
     public ServicesDTO getMyServices() throws Exception {
@@ -108,7 +97,6 @@ public class MyLabController {
         return dto;
     }
 
-
     @GetMapping("/group")
     public Group getGroup(@RequestParam(value = "groupId", required = false) String id)
             throws JsonParseException, JsonMappingException, IOException {
@@ -116,19 +104,14 @@ public class MyLabController {
     }
 
     @GetMapping("/app")
-    public @ResponseBody
-    String getApp(@RequestParam("serviceId") String id)
+    public @ResponseBody String getApp(@RequestParam("serviceId") String id, @RequestParam Service.ServiceType type)
             throws JsonParseException, JsonMappingException, IOException {
-
-        String url = MARATHON_URL + "/v2/apps/users/" + userProvider.getUser().getIdep() + "/" + id + "?"
-                + "embed=app.tasks" + "&" + "embed=app.counts" + "&" + "embed=app.deployments" + "&"
-                + "embed=app.readiness" + "&" + "embed=app.lastTaskFailure" + "&" + "embed=app.taskStats";
-
-        Request requete = new Request.Builder().url(url).build();
-        Response response = marathonClient.newCall(requete).execute();
-
-        return response.body().string();
-
+        if (type.equals(Service.ServiceType.MARATHON)) {
+            return (String) marathonAppsService.getApp(id, userProvider.getUser());
+        } else if (type.equals(Service.ServiceType.KUBERNETES)) {
+            helmAppsService.getApp(id, userProvider.getUser());
+        }
+        return null;
     }
 
     @DeleteMapping("/app")
@@ -202,9 +185,9 @@ public class MyLabController {
         Map<String, Object> fusion = new HashMap<>();
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
         if (Universe.TYPE_UNIVERSE.equals(catalog.getType())) {
-            return marathonAppsService.installApp(requestDTO,isGroup,catalogId,pkg,user,fusion);
+            return marathonAppsService.installApp(requestDTO, isGroup, catalogId, pkg, user, fusion);
         } else {
-            return helmAppsService.installApp(requestDTO,isGroup,catalogId,pkg,user,fusion);
+            return helmAppsService.installApp(requestDTO, isGroup, catalogId, pkg, user, fusion);
         }
 
     }

@@ -17,6 +17,11 @@ import java.util.concurrent.TimeoutException;
 public interface AppsService {
 
     @Async
-    CompletableFuture<List<Service>> getUserServices(User user) throws InterruptedException, TimeoutException, IOException, ParseException;
-    Collection<Object> installApp(CreateServiceDTO requestDTO, boolean isGroup, String catalogId, Package pkg, User user, Map<String, Object> fusion) throws Exception;
+    CompletableFuture<List<Service>> getUserServices(User user)
+            throws InterruptedException, TimeoutException, IOException, ParseException;
+
+    Collection<Object> installApp(CreateServiceDTO requestDTO, boolean isGroup, String catalogId, Package pkg,
+            User user, Map<String, Object> fusion) throws Exception;
+
+    Object getApp(String serviceId, User user) throws IOException;
 }

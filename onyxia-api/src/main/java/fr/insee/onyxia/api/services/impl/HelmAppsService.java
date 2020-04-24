@@ -74,16 +74,20 @@ public class HelmAppsService implements AppsService {
         }
         List<Service> services = new ArrayList<>();
         for (HelmLs release : installedCharts) {
-            String description = helm.getRelease(release.getName(), release.getNamespace());
-            Service service = getServiceFromRelease(description);
-            service.setStatus(findAppStatus(release));
-            service.setStartedAt(helmDateFormat.parse(release.getUpdated()).getTime());
-            service.setId(release.getChart());
-            service.setName(release.getChart());
-            services.add(service);
-            service.setType(Service.ServiceType.KUBERNETES);
+            services.add(getHelmApp(release));
         }
         return CompletableFuture.completedFuture(services);
+    }
+
+    private Service getHelmApp(HelmLs release) throws ParseException {
+        String description = helm.getRelease(release.getName(), release.getNamespace());
+        Service service = getServiceFromRelease(description);
+        service.setStatus(findAppStatus(release));
+        service.setStartedAt(helmDateFormat.parse(release.getUpdated()).getTime());
+        service.setId(release.getChart());
+        service.setName(release.getChart());
+        service.setType(Service.ServiceType.KUBERNETES);
+        return service;
     }
 
     private Service getServiceFromRelease(String description) {
@@ -137,7 +141,8 @@ public class HelmAppsService implements AppsService {
         owner.setType(KubernetesService.Owner.OwnerType.USER);
         String namespaceId = KUBERNETES_NAMESPACE_PREFIX + owner.getId();
         // If namespace is not present, create it
-        if (kubernetesService.getNamespaces(owner).stream().filter(namespace -> namespace.getMetadata().getName().equalsIgnoreCase(namespaceId)).count() == 0) {
+        if (kubernetesService.getNamespaces(owner).stream()
+                .filter(namespace -> namespace.getMetadata().getName().equalsIgnoreCase(namespaceId)).count() == 0) {
             kubernetesService.createNamespace(namespaceId, owner);
         }
         return namespaceId;
@@ -151,5 +156,11 @@ public class HelmAppsService implements AppsService {
         } else {
             return Service.ServiceStatus.STOPPED;
         }
+    }
+
+    @Override
+    public Object getApp(String serviceId, User user) throws IOException {
+        helm.getAppById(serviceId, determineNamespace(user));
+        return null;
     }
 }
