@@ -159,8 +159,7 @@ public class HelmAppsService implements AppsService {
     }
 
     @Override
-    public Object getApp(String serviceId, User user) throws IOException {
-        helm.getAppById(serviceId, determineNamespace(user));
-        return null;
+    public Service getUserService(String serviceId, User user) throws Exception {
+        return getHelmApp(helm.getAppById(serviceId, determineNamespace(user)));
     }
 }

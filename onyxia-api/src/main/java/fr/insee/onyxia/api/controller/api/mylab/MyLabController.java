@@ -104,12 +104,12 @@ public class MyLabController {
     }
 
     @GetMapping("/app")
-    public @ResponseBody String getApp(@RequestParam("serviceId") String id, @RequestParam Service.ServiceType type)
-            throws JsonParseException, JsonMappingException, IOException {
+    public @ResponseBody Service getApp(@RequestParam("serviceId") String id, @RequestParam Service.ServiceType type)
+            throws Exception {
         if (type.equals(Service.ServiceType.MARATHON)) {
-            return (String) marathonAppsService.getApp(id, userProvider.getUser());
+            return marathonAppsService.getUserService(id, userProvider.getUser());
         } else if (type.equals(Service.ServiceType.KUBERNETES)) {
-            helmAppsService.getApp(id, userProvider.getUser());
+            return helmAppsService.getUserService(id, userProvider.getUser());
         }
         return null;
     }
