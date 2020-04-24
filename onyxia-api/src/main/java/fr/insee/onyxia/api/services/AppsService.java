@@ -23,5 +23,5 @@ public interface AppsService {
         Collection<Object> installApp(CreateServiceDTO requestDTO, boolean isGroup, String catalogId, Package pkg,
                         User user, Map<String, Object> fusion) throws Exception;
 
-        Service getUserService(String serviceId, User user) throws Exception;
+        Service getUserService(User user,String serviceId) throws Exception;
 }

@@ -1,8 +1,6 @@
 package fr.insee.onyxia.api.controller.api.mylab;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.CatalogService;
@@ -21,11 +19,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import mesosphere.marathon.client.Marathon;
 import mesosphere.marathon.client.MarathonException;
 import mesosphere.marathon.client.model.v2.App;
-import mesosphere.marathon.client.model.v2.Group;
 import mesosphere.marathon.client.model.v2.Result;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,19 +92,16 @@ public class MyLabController {
         return dto;
     }
 
-    @GetMapping("/group")
-    public Group getGroup(@RequestParam(value = "groupId", required = false) String id)
-            throws JsonParseException, JsonMappingException, IOException {
-        return marathonAppsService.getGroups(userProvider.getUser().getIdep() + "/" + (id == null ? "" : "/" + id));
-    }
-
     @GetMapping("/app")
-    public @ResponseBody Service getApp(@RequestParam("serviceId") String id, @RequestParam Service.ServiceType type)
+    public @ResponseBody Service getApp(@RequestParam("serviceId") String id, @RequestParam(required = false) Service.ServiceType type)
             throws Exception {
-        if (type.equals(Service.ServiceType.MARATHON)) {
-            return marathonAppsService.getUserService(id, userProvider.getUser());
-        } else if (type.equals(Service.ServiceType.KUBERNETES)) {
-            return helmAppsService.getUserService(id, userProvider.getUser());
+        if (type == null) {
+            type = determineServiceType(id);
+        }
+        if (Service.ServiceType.MARATHON.equals(type)) {
+            return marathonAppsService.getUserService(userProvider.getUser(),id);
+        } else if (Service.ServiceType.KUBERNETES.equals(type)) {
+            return helmAppsService.getUserService(userProvider.getUser(), id);
         }
         return null;
     }
@@ -189,7 +181,18 @@ public class MyLabController {
         } else {
             return helmAppsService.installApp(requestDTO, isGroup, catalogId, pkg, user, fusion);
         }
+    }
 
+    private Service.ServiceType determineServiceType(String id) {
+        if (MARATHON_ENABLED && !KUB_ENABLED) {
+            return Service.ServiceType.MARATHON;
+        }
+
+        if (!MARATHON_ENABLED && KUB_ENABLED) {
+            return Service.ServiceType.KUBERNETES;
+        }
+
+        return Service.ServiceType.MARATHON;
     }
 
 }

@@ -4,9 +4,9 @@ import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.api.services.impl.MarathonAppsService;
 import fr.insee.onyxia.model.catalog.UniversePackage;
+import fr.insee.onyxia.model.service.Service;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import mesosphere.marathon.client.MarathonException;
 import mesosphere.marathon.client.model.v2.VersionedApp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,11 +38,10 @@ public class CloudShellController {
 		VersionedApp app;
 		status.setPackageToDeploy((UniversePackage) catalogService.getPackage("internal", "shelly"));
 		try {
-			app = marathonAppsService
-					.getServiceById(MARATHON_GROUP_NAME + "/" + userProvider.getUser().getIdep() + "/cloudshell");
+			Service service = marathonAppsService.getUserService(userProvider.getUser(),"cloudshell");
 			status.setStatus(CloudShellStatus.STATUS_UP);
-			status.setUrl(app.getLabels().get("ONYXIA_URL"));
-		} catch (MarathonException e) {
+			service.getUrls().stream().findFirst().ifPresent(url -> status.setUrl(url));
+		} catch (Exception e) {
 			status.setStatus(CloudShellStatus.STATUS_DOWN);
 			status.setUrl(null);
 		}

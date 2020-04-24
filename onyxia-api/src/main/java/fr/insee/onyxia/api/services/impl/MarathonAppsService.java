@@ -13,9 +13,7 @@ import fr.insee.onyxia.model.dto.CreateServiceDTO;
 import fr.insee.onyxia.mustache.Mustacheur;
 import mesosphere.marathon.client.Marathon;
 import mesosphere.marathon.client.model.v2.App;
-import mesosphere.marathon.client.model.v2.GetAppResponse;
 import mesosphere.marathon.client.model.v2.Group;
-import mesosphere.marathon.client.model.v2.VersionedApp;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -63,7 +61,8 @@ public class MarathonAppsService implements AppsService {
     @Qualifier("marathon")
     private OkHttpClient marathonClient;
 
-    private @Value("${marathon.url}") String MARATHON_URL;
+    private @Value("${marathon.url}")
+    String MARATHON_URL;
 
     private DateFormat marathonDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
@@ -75,8 +74,9 @@ public class MarathonAppsService implements AppsService {
     }
 
     @NotNull
+    @Override
     public Collection<Object> installApp(CreateServiceDTO requestDTO, boolean isGroup, String catalogId, Package pkg,
-            User user, Map<String, Object> fusion) throws Exception {
+                                         User user, Map<String, Object> fusion) throws Exception {
         PublishContext context = new PublishContext(catalogId);
         UniversePackage universePkg = (UniversePackage) pkg;
         Map<String, Object> resource = universePkg.getResource();
@@ -123,29 +123,17 @@ public class MarathonAppsService implements AppsService {
         }
     }
 
-    public VersionedApp getServiceById(String id) {
-        GetAppResponse appsResponse = marathon.getApp(id);
-        VersionedApp app = appsResponse.getApp();
-        return app;
-    }
-
-    public Group getGroups(String id) throws IOException {
-        Request requete = new Request.Builder().url(MARATHON_URL + "/v2/groups/users/" + id + "?" + "embed=group.groups"
-                + "&" + "embed=group.apps" + "&" + "embed=group.apps.tasks" + "&" + "embed=group.apps.counts" + "&"
-                + "embed=group.apps.deployments" + "&" + "embed=group.apps.readiness" + "&"
-                + "embed=group.apps.lastTaskFailure" + "&" + "embed=group.pods" + "&" + "embed=group.apps.taskStats")
-                .build();
-        Response response = marathonClient.newCall(requete).execute();
-        Group groupResponse = mapper.readValue(response.body().byteStream(), Group.class);
-        return groupResponse;
-    }
-
     @Override
     public CompletableFuture<List<fr.insee.onyxia.model.service.Service>> getUserServices(User user)
             throws InterruptedException, TimeoutException, IOException {
-        Group group = getGroups(user.getIdep());
+        Group group = getGroup(getUserGroupPath(user));
         return CompletableFuture.completedFuture(
                 group.getApps().stream().map(app -> getServiceFromApp(app)).collect(Collectors.toList()));
+    }
+
+    @Override
+    public fr.insee.onyxia.model.service.Service getUserService(User user, String serviceId) throws Exception {
+        return getServiceFromApp(marathon.getApp(getUserGroupPath(user) + "/" + serviceId).getApp());
     }
 
     private fr.insee.onyxia.model.service.Service getServiceFromApp(App app) {
@@ -172,27 +160,35 @@ public class MarathonAppsService implements AppsService {
     }
 
     private fr.insee.onyxia.model.service.Service.ServiceStatus findAppStatus(App app) {
-        if (app.getTasksRunning() > 0) {
+        if (app.getTasksRunning() != null && app.getTasksRunning() > 0) {
             return fr.insee.onyxia.model.service.Service.ServiceStatus.RUNNING;
-        } else if (app.getInstances() == 0) {
+        } else if (app.getInstances() != null && app.getInstances() == 0) {
             return fr.insee.onyxia.model.service.Service.ServiceStatus.STOPPED;
         } else {
             return fr.insee.onyxia.model.service.Service.ServiceStatus.DEPLOYING;
         }
     }
 
-    @Override
-    public fr.insee.onyxia.model.service.Service getUserService(String serviceId, User user) throws Exception {
-        String url = MARATHON_URL + "/v2/apps/users/" + user.getIdep() + "/" + serviceId + "?" + "embed=app.tasks" + "&"
-                + "embed=app.counts" + "&" + "embed=app.deployments" + "&" + "embed=app.readiness" + "&"
-                + "embed=app.lastTaskFailure" + "&" + "embed=app.taskStats";
-
-        Request requete = new Request.Builder().url(url).build();
-        Response response = marathonClient.newCall(requete).execute();
-        mapper.
-        App app = mapper.readValue(response.body().byteStream(), App.class);
-
-        return getServiceFromApp(app);
+    private String getUserGroupPath(User user) {
+        return MARATHON_GROUP_NAME + "/" + user.getIdep();
     }
+
+    /**
+     * This methods uses a custom request as the marathon.getGroup() does not returns full data on apps (e.g : no tasks data)
+     *
+     * @param id
+     * @return
+     * @throws IOException
+     */
+    private Group getGroup(String id) throws IOException {
+        Request requete = new Request.Builder().url(MARATHON_URL + "/v2/groups/" + id + "?" + "embed=group.groups" + "&" + "embed=group.apps" + "&"
+                + "embed=group.apps.tasks" + "&" + "embed=group.apps.counts" + "&" + "embed=group.apps.deployments"
+                + "&" + "embed=group.apps.readiness" + "&" + "embed=group.apps.lastTaskFailure" + "&"
+                + "embed=group.pods" + "&" + "embed=group.apps.taskStats").build();
+        Response response = marathonClient.newCall(requete).execute();
+        Group groupResponse = mapper.readValue(response.body().byteStream(), Group.class);
+        return groupResponse;
+    }
+
 
 }

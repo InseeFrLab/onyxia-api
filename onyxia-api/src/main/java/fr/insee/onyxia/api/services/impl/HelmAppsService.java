@@ -161,7 +161,7 @@ public class HelmAppsService implements AppsService {
     }
 
     @Override
-    public Service getUserService(String serviceId, User user) throws MultipleServiceFound, ParseException {
+    public Service getUserService(User user,String serviceId) throws MultipleServiceFound, ParseException {
         HelmLs result = helm.getAppById(serviceId, determineNamespace(user));
         return getHelmApp(result);
     }
