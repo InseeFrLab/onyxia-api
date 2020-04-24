@@ -76,31 +76,31 @@ public class MyLabController {
         return dto;
     }
 
-    @GetMapping("/app")
-    public @ResponseBody Service getApp(@RequestParam("serviceId") String id,
+    @GetMapping("/app/{serviceId}")
+    public @ResponseBody Service getApp(@PathVariable String serviceId,
             @RequestParam(required = false) Service.ServiceType type) throws Exception {
         if (type == null) {
-            type = determineServiceType(id);
+            type = determineServiceType(serviceId);
         }
         if (Service.ServiceType.MARATHON.equals(type)) {
-            return marathonAppsService.getUserService(userProvider.getUser(), id);
+            return marathonAppsService.getUserService(userProvider.getUser(), serviceId);
         } else if (Service.ServiceType.KUBERNETES.equals(type)) {
-            return helmAppsService.getUserService(userProvider.getUser(), id);
+            return helmAppsService.getUserService(userProvider.getUser(), serviceId);
         }
         return null;
     }
 
     @DeleteMapping("/app")
-    public UninstallService destroyApp(@RequestParam("serviceId") String id,
+    public UninstallService destroyApp(@RequestParam("serviceId") String serviceId,
             @RequestParam(required = false) Service.ServiceType type) throws Exception {
         if (type == null) {
-            type = determineServiceType(id);
+            type = determineServiceType(serviceId);
         }
         if (Service.ServiceType.MARATHON.equals(type)) {
-            return marathonAppsService.destroyService(userProvider.getUser(), id);
+            return marathonAppsService.destroyService(userProvider.getUser(), serviceId);
 
         } else if (Service.ServiceType.KUBERNETES.equals(type)) {
-            return helmAppsService.destroyService(userProvider.getUser(), id);
+            return helmAppsService.destroyService(userProvider.getUser(), serviceId);
         }
         return null;
     }

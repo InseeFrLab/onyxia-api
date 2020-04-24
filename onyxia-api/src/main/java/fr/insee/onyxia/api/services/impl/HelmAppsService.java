@@ -18,12 +18,10 @@ import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
 import io.github.inseefrlab.helmwrapper.model.HelmLs;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService.MultipleServiceFound;
-
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.zeroturnaround.exec.InvalidExitValueException;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -88,7 +86,7 @@ public class HelmAppsService implements AppsService {
         Service service = getServiceFromRelease(description);
         service.setStatus(findAppStatus(release));
         service.setStartedAt(helmDateFormat.parse(release.getUpdated()).getTime());
-        service.setId(release.getChart());
+        service.setId(release.getName());
         service.setName(release.getChart());
         service.setType(Service.ServiceType.KUBERNETES);
         return service;
