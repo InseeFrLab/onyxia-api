@@ -182,13 +182,14 @@ public class MarathonAppsService implements AppsService {
     }
 
     @Override
-    public fr.insee.onyxia.model.service.Service getUserService(String serviceId, User user) throws IOException {
+    public fr.insee.onyxia.model.service.Service getUserService(String serviceId, User user) throws Exception {
         String url = MARATHON_URL + "/v2/apps/users/" + user.getIdep() + "/" + serviceId + "?" + "embed=app.tasks" + "&"
                 + "embed=app.counts" + "&" + "embed=app.deployments" + "&" + "embed=app.readiness" + "&"
                 + "embed=app.lastTaskFailure" + "&" + "embed=app.taskStats";
 
         Request requete = new Request.Builder().url(url).build();
         Response response = marathonClient.newCall(requete).execute();
+        mapper.
         App app = mapper.readValue(response.body().byteStream(), App.class);
 
         return getServiceFromApp(app);

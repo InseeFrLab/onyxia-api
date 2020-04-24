@@ -16,6 +16,8 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
 import io.github.inseefrlab.helmwrapper.model.HelmLs;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService;
+import io.github.inseefrlab.helmwrapper.service.HelmInstallService.MultipleServiceFound;
+
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -159,7 +161,8 @@ public class HelmAppsService implements AppsService {
     }
 
     @Override
-    public Service getUserService(String serviceId, User user) throws Exception {
-        return getHelmApp(helm.getAppById(serviceId, determineNamespace(user)));
+    public Service getUserService(String serviceId, User user) throws MultipleServiceFound, ParseException {
+        HelmLs result = helm.getAppById(serviceId, determineNamespace(user));
+        return getHelmApp(result);
     }
 }

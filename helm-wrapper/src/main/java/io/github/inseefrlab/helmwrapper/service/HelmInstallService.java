@@ -92,11 +92,26 @@ public class HelmInstallService {
         return "";
     }
 
-    public HelmLs getAppById(String appId, String namespace) {
+    /**
+     * 
+     * @param appId
+     * @param namespace
+     * @return
+     * @throws MultipleServiceFound
+     */
+    public HelmLs getAppById(String appId, String namespace) throws MultipleServiceFound {
         try {
-            return new ObjectMapper()
+            HelmLs[] result = new ObjectMapper()
                     .readValue(Command.executeAndGetResponseAsJson("helm list --filter " + appId + " -n " + namespace)
-                            .getOutput().getString(), HelmLs.class);
+                            .getOutput().getString(), HelmLs[].class);
+            if (result.length == 0) {
+                return null;
+
+            } else if (result.length == 1) {
+                return result[0];
+            } else {
+                throw new MultipleServiceFound("One service was expected but " + result.length + " were found");
+            }
         } catch (InvalidExitValueException | IOException | InterruptedException | TimeoutException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -104,4 +119,10 @@ public class HelmInstallService {
         return null;
     }
 
+    public class MultipleServiceFound extends Exception {
+
+        public MultipleServiceFound(String s) {
+            super(s);
+        }
+    }
 }
