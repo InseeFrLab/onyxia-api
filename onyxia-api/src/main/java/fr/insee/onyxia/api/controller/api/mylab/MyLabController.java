@@ -5,7 +5,6 @@ import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.api.services.UserProvider;
-import fr.insee.onyxia.api.services.control.AdmissionController;
 import fr.insee.onyxia.api.services.impl.MarathonAppsService;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.Package;
@@ -20,11 +19,9 @@ import mesosphere.marathon.client.Marathon;
 import mesosphere.marathon.client.MarathonException;
 import mesosphere.marathon.client.model.v2.App;
 import mesosphere.marathon.client.model.v2.Result;
-import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,22 +35,11 @@ import java.util.concurrent.CompletableFuture;
 @SecurityRequirement(name = "auth")
 public class MyLabController {
 
-    /**
-     * @deprecated : should be moved to the marathon http client
-     */
-    @Deprecated
-    @Value("${marathon.url}")
-    private String MARATHON_URL;
-
     @Value("${kubernetes.enabled}")
     private boolean KUB_ENABLED;
 
     @Value("${marathon.enabled}")
     private boolean MARATHON_ENABLED;
-
-    @Autowired
-    @Qualifier("marathon")
-    private OkHttpClient marathonClient;
 
     @Autowired
     private AppsService helmAppsService;
@@ -66,9 +52,6 @@ public class MyLabController {
 
     @Autowired
     private CatalogService catalogService;
-
-    @Autowired
-    private List<AdmissionController> admissionControllers;
 
     @Autowired(required = false)
     private Marathon marathon;
@@ -108,7 +91,6 @@ public class MyLabController {
 
     @DeleteMapping("/app")
     public Result destroyApp(@RequestParam("serviceId") String id) throws MarathonException {
-
         if (id == null || !id.startsWith("/users/" + userProvider.getUser().getIdep())) {
             throw new RuntimeException("hack!");
         }
