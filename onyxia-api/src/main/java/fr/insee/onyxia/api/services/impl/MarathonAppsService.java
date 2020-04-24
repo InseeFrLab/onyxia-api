@@ -154,6 +154,7 @@ public class MarathonAppsService implements AppsService {
     private fr.insee.onyxia.model.service.Group mapGroup(Group marathonGroup) {
         fr.insee.onyxia.model.service.Group group = new fr.insee.onyxia.model.service.Group();
         group.setId(marathonGroup.getId());
+        group.setApps(marathonGroup.getApps().stream().map(app -> mapAppToService(app)).collect(Collectors.toList()));
         return group;
     }
 
