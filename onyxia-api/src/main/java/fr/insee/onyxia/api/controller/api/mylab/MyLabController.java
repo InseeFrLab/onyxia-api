@@ -76,8 +76,8 @@ public class MyLabController {
         return dto;
     }
 
-    @GetMapping("/app/{serviceId}")
-    public @ResponseBody Service getApp(@PathVariable String serviceId,
+    @GetMapping("/app")
+    public @ResponseBody Service getApp(@RequestParam("serviceId") String serviceId,
             @RequestParam(required = false) Service.ServiceType type) throws Exception {
         if (type == null) {
             type = determineServiceType(serviceId);
