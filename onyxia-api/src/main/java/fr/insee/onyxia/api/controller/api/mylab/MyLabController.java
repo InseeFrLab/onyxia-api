@@ -92,6 +92,21 @@ public class MyLabController {
         return null;
     }
 
+    @GetMapping("/app/logs")
+    public @ResponseBody String getLogs(@RequestParam("serviceId") String serviceId,
+                                        @RequestParam("taskId") String taskId,
+                                        @RequestParam(required = false) Service.ServiceType type) throws Exception {
+        if (type == null) {
+            type = determineServiceType(serviceId);
+        }
+        if (Service.ServiceType.MARATHON.equals(type)) {
+            return marathonAppsService.getLogs(userProvider.getUser(),serviceId, taskId);
+        } else if (Service.ServiceType.KUBERNETES.equals(type)) {
+            return helmAppsService.getLogs(userProvider.getUser(),serviceId, taskId);
+        }
+        return null;
+    }
+
     @DeleteMapping("/app")
     public UninstallService destroyApp(@RequestParam("serviceId") String serviceId,
             @RequestParam(required = false) Service.ServiceType type) throws Exception {

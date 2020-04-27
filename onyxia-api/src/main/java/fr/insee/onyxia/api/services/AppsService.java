@@ -28,4 +28,6 @@ public interface AppsService {
         Service getUserService(User user, String serviceId) throws Exception;
 
         UninstallService destroyService(User user, String serviceId) throws Exception;
+
+        String getLogs(User user, String serviceId, String taskId);
 }

@@ -68,7 +68,7 @@ public class HelmInstallService {
                 HelmLs[].class);
     }
 
-    public String getRelease(String id, String namespace) {
+    public String getManifest(String id, String namespace) {
         try {
             return Command.execute("helm get manifest " + id + " --namespace " + namespace).getOutput().getString();
         } catch (IOException e) {

@@ -9,6 +9,8 @@ import fr.insee.onyxia.model.catalog.Package;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
 import fr.insee.onyxia.model.dto.ServicesListing;
 import fr.insee.onyxia.model.service.Service;
+import fr.insee.onyxia.model.service.Task;
+import fr.insee.onyxia.model.service.TaskStatus;
 import fr.insee.onyxia.model.service.UninstallService;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.Quantity;
@@ -63,7 +65,7 @@ public class HelmAppsService implements AppsService {
     private static final Logger LOGGER = LoggerFactory.getLogger(HelmAppsService.class);
 
     public Collection<Object> installApp(CreateServiceDTO requestDTO, boolean isGroup, String catalogId, Package pkg,
-            User user, Map<String, Object> fusion) throws IOException, TimeoutException, InterruptedException {
+                                         User user, Map<String, Object> fusion) throws IOException, TimeoutException, InterruptedException {
         File values = File.createTempFile("values", ".yaml");
         mapperHelm.writeValue(values, fusion);
         String namespaceId = determineNamespace(user);
@@ -76,7 +78,7 @@ public class HelmAppsService implements AppsService {
     @Override
     public CompletableFuture<ServicesListing> getUserServices(User user)
             throws IOException, IllegalAccessException {
-        return getUserServices(user,null);
+        return getUserServices(user, null);
     }
 
     @Override
@@ -100,14 +102,19 @@ public class HelmAppsService implements AppsService {
         return CompletableFuture.completedFuture(listing);
     }
 
+    @Override
+    public String getLogs(User user, String serviceId, String taskId) {
+        KubernetesClient client = new DefaultKubernetesClient();
+        return client.pods().inNamespace(determineNamespace(user)).withName(taskId).getLog();
+    }
+
     private Service getHelmApp(HelmLs release) {
-        String description = helm.getRelease(release.getName(), release.getNamespace());
-        Service service = getServiceFromRelease(description);
+        String manifest = helm.getManifest(release.getName(), release.getNamespace());
+        Service service = getServiceFromRelease(release, manifest);
         service.setStatus(findAppStatus(release));
         try {
             service.setStartedAt(helmDateFormat.parse(release.getUpdated()).getTime());
-        }
-        catch (ParseException e) {
+        } catch (ParseException e) {
             service.setStartedAt(0);
         }
         service.setId(release.getName());
@@ -120,7 +127,7 @@ public class HelmAppsService implements AppsService {
             node.fields()
                     .forEachRemaining(currentNode -> mapAppender(result, currentNode, new ArrayList<String>()));
             service.setEnv(result);
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -138,9 +145,9 @@ public class HelmAppsService implements AppsService {
         }
     }
 
-    private Service getServiceFromRelease(String description) {
+    private Service getServiceFromRelease(HelmLs release, String manifest) {
         KubernetesClient client = new DefaultKubernetesClient();
-        InputStream inputStream = new ByteArrayInputStream(description.getBytes(Charset.forName("UTF-8")));
+        InputStream inputStream = new ByteArrayInputStream(manifest.getBytes(Charset.forName("UTF-8")));
         List<HasMetadata> hasMetadatas = client.load(inputStream).get();
         List<Ingress> ingresses = hasMetadatas.stream().filter(hasMetadata -> hasMetadata instanceof Ingress)
                 .map(hasMetadata -> (Ingress) hasMetadata).collect(Collectors.toList());
@@ -179,6 +186,20 @@ public class HelmAppsService implements AppsService {
             }
         }
         service.setInstances(deployments.get(0).getSpec().getReplicas());
+
+        service.setTasks(client.pods().inNamespace(release.getNamespace()).withLabel("app.kubernetes.io/instance", release.getName()).list().getItems().stream().map(pod -> {
+            Task task = new Task();
+            task.setId(pod.getMetadata().getName());
+            TaskStatus status = new TaskStatus();
+            status.setStatus(pod.getStatus().getPhase());
+            status.setReason(pod.getStatus().getContainerStatuses().stream()
+                    .filter(cstatus -> cstatus.getState().getWaiting() != null)
+                    .map(cstatus -> cstatus.getState().getWaiting().getReason())
+            .findFirst().orElse(null));
+            task.setStatus(status);
+            return task;
+        }).collect(Collectors.toList()));
+
         return service;
     }
 

@@ -156,6 +156,11 @@ public class MarathonAppsService implements AppsService {
         return mapAppToService(marathon.getApp(queryId).getApp());
     }
 
+    @Override
+    public String getLogs(User user,String serviceId, String taskId) {
+        return "Feature not implemented";
+    }
+
     private fr.insee.onyxia.model.service.Group mapGroup(Group marathonGroup) {
         fr.insee.onyxia.model.service.Group group = new fr.insee.onyxia.model.service.Group();
         group.setId(marathonGroup.getId());
