@@ -1,5 +1,6 @@
 package fr.insee.onyxia.api.services.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.impl.kubernetes.KubernetesService;
@@ -37,6 +38,8 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.joining;
 
 @org.springframework.stereotype.Service
 @Qualifier("Helm")
@@ -110,7 +113,29 @@ public class HelmAppsService implements AppsService {
         service.setId(release.getName());
         service.setName(release.getChart());
         service.setType(Service.ServiceType.KUBERNETES);
+        try {
+            String values = helm.getValues(release.getName(), release.getNamespace());
+            JsonNode node = new ObjectMapper().readTree(values);
+            Map<String, String> result = new HashMap<>();
+            node.fields()
+                    .forEachRemaining(currentNode -> mapAppender(result, currentNode, new ArrayList<String>()));
+            service.setEnv(result);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return service;
+    }
+
+    private void mapAppender(Map<String, String> result, Map.Entry<String, JsonNode> node, List<String> names) {
+        names.add(node.getKey());
+        if (node.getValue().isValueNode()) {
+            String name = names.stream().collect(joining("."));
+            result.put(name, node.getValue().asText());
+        } else {
+            node.getValue().fields()
+                    .forEachRemaining(nested -> mapAppender(result, nested, new ArrayList<>(names)));
+        }
     }
 
     private Service getServiceFromRelease(String description) {
@@ -183,6 +208,9 @@ public class HelmAppsService implements AppsService {
 
     @Override
     public Service getUserService(User user, String serviceId) throws MultipleServiceFound, ParseException {
+        if (serviceId.startsWith("/")) {
+            serviceId = serviceId.substring(1);
+        }
         HelmLs result = helm.getAppById(serviceId, determineNamespace(user));
         return getHelmApp(result);
     }

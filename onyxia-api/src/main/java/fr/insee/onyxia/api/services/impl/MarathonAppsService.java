@@ -148,7 +148,11 @@ public class MarathonAppsService implements AppsService {
 
     @Override
     public fr.insee.onyxia.model.service.Service getUserService(User user, String serviceId) throws Exception {
-        return mapAppToService(marathon.getApp(getUserGroupPath(user) + "/" + serviceId).getApp());
+        String queryId = serviceId;
+        if (!queryId.startsWith("/")) {
+            queryId = getUserGroupPath(user) + "/" + serviceId;
+        }
+        return mapAppToService(marathon.getApp(queryId).getApp());
     }
 
     private fr.insee.onyxia.model.service.Group mapGroup(Group marathonGroup) {
@@ -177,6 +181,7 @@ public class MarathonAppsService implements AppsService {
             } catch (Exception e) {
             }
         });
+        app.getEnv().entrySet().stream().forEach(entry -> service.getEnv().put(entry.getKey(),entry.getValue().toString()));
         service.setStatus(findAppStatus(app));
         return service;
     }

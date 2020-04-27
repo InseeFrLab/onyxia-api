@@ -1,5 +1,6 @@
 package fr.insee.onyxia.model.service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ public class Service {
     private ServiceType type;
     private List<String> urls;
     private String logo;
+    private Map<String, String> env = new HashMap<>();
 
     private long startedAt;
 
@@ -104,6 +106,14 @@ public class Service {
 
     public void setLogo(String logo) {
         this.logo = logo;
+    }
+
+    public Map<String, String> getEnv() {
+        return env;
+    }
+
+    public void setEnv(Map<String, String> env) {
+        this.env = env;
     }
 
     public static enum ServiceStatus {
