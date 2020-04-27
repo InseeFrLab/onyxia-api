@@ -11,6 +11,7 @@ import fr.insee.onyxia.model.catalog.Package;
 import fr.insee.onyxia.model.catalog.UniversePackage;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
 import fr.insee.onyxia.model.dto.ServicesListing;
+import fr.insee.onyxia.model.service.Task;
 import fr.insee.onyxia.model.service.UninstallService;
 import fr.insee.onyxia.mustache.Mustacheur;
 import mesosphere.marathon.client.Marathon;
@@ -181,6 +182,11 @@ public class MarathonAppsService implements AppsService {
             } catch (Exception e) {
             }
         });
+        service.setTasks(app.getTasks().stream().map(task -> {
+            Task serviceTask= new Task();
+            serviceTask.setId(task.getId());
+            return serviceTask;
+        }).collect(Collectors.toList()));
         app.getEnv().entrySet().stream().forEach(entry -> service.getEnv().put(entry.getKey(),entry.getValue().toString()));
         service.setStatus(findAppStatus(app));
         return service;
