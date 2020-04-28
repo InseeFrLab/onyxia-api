@@ -1,36 +1,29 @@
 package fr.insee.onyxia.api.controller.api.mylab;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
+import fr.insee.onyxia.api.configuration.properties.OrchestratorConfiguration;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.api.services.UserProvider;
-import fr.insee.onyxia.api.services.control.AdmissionController;
 import fr.insee.onyxia.api.services.impl.MarathonAppsService;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.Package;
 import fr.insee.onyxia.model.catalog.Universe;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
-import fr.insee.onyxia.model.dto.ServicesDTO;
+import fr.insee.onyxia.model.dto.ServicesListing;
 import fr.insee.onyxia.model.dto.UpdateServiceDTO;
 import fr.insee.onyxia.model.service.Service;
+import fr.insee.onyxia.model.service.UninstallService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import mesosphere.marathon.client.Marathon;
 import mesosphere.marathon.client.MarathonException;
 import mesosphere.marathon.client.model.v2.App;
-import mesosphere.marathon.client.model.v2.Group;
 import mesosphere.marathon.client.model.v2.Result;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -42,103 +35,87 @@ import java.util.concurrent.CompletableFuture;
 @RestController
 @SecurityRequirement(name = "auth")
 public class MyLabController {
-
-    /**
-     * @deprecated : should be moved to the marathon http client
-     */
-    @Deprecated
-    @Value("${marathon.url}")
-    private String MARATHON_URL;
-
-    @Value("${kubernetes.enabled}")
-    private boolean KUB_ENABLED;
-
-    @Value("${marathon.enabled}")
-    private boolean MARATHON_ENABLED;
-
-    @Autowired
-    @Qualifier("marathon")
-    private OkHttpClient marathonClient;
-
     @Autowired
     private AppsService helmAppsService;
 
     @Autowired
     private MarathonAppsService marathonAppsService;
 
-
     @Autowired
     private UserProvider userProvider;
-
-
 
     @Autowired
     private CatalogService catalogService;
 
-
-    @Autowired
-    private List<AdmissionController> admissionControllers;
-
-
     @Autowired(required = false)
     private Marathon marathon;
 
-
+    @Autowired
+    private OrchestratorConfiguration orchestratorConfiguration;
 
     private final Logger logger = LoggerFactory.getLogger(MyLabController.class);
 
-
-
-
-
     @GetMapping("/services")
-    public ServicesDTO getMyServices() throws Exception {
+    public ServicesListing getMyServices(@RequestParam(required = false) String groupId) throws Exception {
         User user = userProvider.getUser();
-        ServicesDTO dto = new ServicesDTO();
-        List<CompletableFuture<List<Service>>> futures = new ArrayList<>();
-        if (MARATHON_ENABLED) {
-            futures.add(marathonAppsService.getUserServices(user));
+        ServicesListing dto = new ServicesListing();
+        List<CompletableFuture<ServicesListing>> futures = new ArrayList<>();
+        if (orchestratorConfiguration.isMarathonEnabled()) {
+            futures.add(marathonAppsService.getUserServices(user,groupId));
         }
-        if (KUB_ENABLED) {
-            futures.add(helmAppsService.getUserServices(user));
+        if (orchestratorConfiguration.isKubernetesEnabled()) {
+            futures.add(helmAppsService.getUserServices(user,groupId));
         }
         for (var future : futures) {
-            dto.getApps().addAll(future.get());
+            ServicesListing listing = future.get();
+            dto.getApps().addAll(listing.getApps());
+            dto.getGroups().addAll(listing.getGroups());
         }
         return dto;
     }
 
-
-    @GetMapping("/group")
-    public Group getGroup(@RequestParam(value = "groupId", required = false) String id)
-            throws JsonParseException, JsonMappingException, IOException {
-        return marathonAppsService.getGroups(userProvider.getUser().getIdep() + "/" + (id == null ? "" : "/" + id));
+    @GetMapping("/app")
+    public @ResponseBody Service getApp(@RequestParam("serviceId") String serviceId,
+            @RequestParam(required = false) Service.ServiceType type) throws Exception {
+        if (type == null) {
+            type = orchestratorConfiguration.getPreferredServiceType();
+        }
+        if (Service.ServiceType.MARATHON.equals(type)) {
+            return marathonAppsService.getUserService(userProvider.getUser(), serviceId);
+        } else if (Service.ServiceType.KUBERNETES.equals(type)) {
+            return helmAppsService.getUserService(userProvider.getUser(), serviceId);
+        }
+        return null;
     }
 
-    @GetMapping("/app")
-    public @ResponseBody
-    String getApp(@RequestParam("serviceId") String id)
-            throws JsonParseException, JsonMappingException, IOException {
-
-        String url = MARATHON_URL + "/v2/apps/users/" + userProvider.getUser().getIdep() + "/" + id + "?"
-                + "embed=app.tasks" + "&" + "embed=app.counts" + "&" + "embed=app.deployments" + "&"
-                + "embed=app.readiness" + "&" + "embed=app.lastTaskFailure" + "&" + "embed=app.taskStats";
-
-        Request requete = new Request.Builder().url(url).build();
-        Response response = marathonClient.newCall(requete).execute();
-
-        return response.body().string();
-
+    @GetMapping("/app/logs")
+    public @ResponseBody String getLogs(@RequestParam("serviceId") String serviceId,
+                                        @RequestParam("taskId") String taskId,
+                                        @RequestParam(required = false) Service.ServiceType type) throws Exception {
+        if (type == null) {
+            type = orchestratorConfiguration.getPreferredServiceType();
+        }
+        if (Service.ServiceType.MARATHON.equals(type)) {
+            return marathonAppsService.getLogs(userProvider.getUser(),serviceId, taskId);
+        } else if (Service.ServiceType.KUBERNETES.equals(type)) {
+            return helmAppsService.getLogs(userProvider.getUser(),serviceId, taskId);
+        }
+        return null;
     }
 
     @DeleteMapping("/app")
-    public Result destroyApp(@RequestParam("serviceId") String id) throws MarathonException {
-
-        if (id == null || !id.startsWith("/users/" + userProvider.getUser().getIdep())) {
-            throw new RuntimeException("hack!");
+    public UninstallService destroyApp(@RequestParam("serviceId") String serviceId,
+            @RequestParam(required = false) Service.ServiceType type) throws Exception {
+        if (type == null) {
+            type = orchestratorConfiguration.getPreferredServiceType();
         }
-        Result result = marathon.deleteApp(id);
-        return result;
+        if (Service.ServiceType.MARATHON.equals(type)) {
+            return marathonAppsService.destroyService(userProvider.getUser(), serviceId);
+
+        } else if (Service.ServiceType.KUBERNETES.equals(type)) {
+            return helmAppsService.destroyService(userProvider.getUser(), serviceId);
+        }
+        return null;
     }
 
     @DeleteMapping("/group")
@@ -202,11 +179,12 @@ public class MyLabController {
         Map<String, Object> fusion = new HashMap<>();
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
         if (Universe.TYPE_UNIVERSE.equals(catalog.getType())) {
-            return marathonAppsService.installApp(requestDTO,isGroup,catalogId,pkg,user,fusion);
+            return marathonAppsService.installApp(requestDTO, isGroup, catalogId, pkg, user, fusion);
         } else {
-            return helmAppsService.installApp(requestDTO,isGroup,catalogId,pkg,user,fusion);
+            return helmAppsService.installApp(requestDTO, isGroup, catalogId, pkg, user, fusion);
         }
-
     }
+
+
 
 }

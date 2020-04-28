@@ -1,5 +1,6 @@
 package fr.insee.onyxia.api.services.control.marathon;
 
+import fr.insee.onyxia.api.configuration.properties.CloudshellConfiguration;
 import fr.insee.onyxia.api.services.control.AdmissionController;
 import fr.insee.onyxia.api.services.control.utils.IDSanitizer;
 import fr.insee.onyxia.api.services.control.utils.PublishContext;
@@ -25,10 +26,13 @@ public class IDEnforcer implements AdmissionController {
     @Value("${marathon.group.name}")
     private String MARATHON_GROUP_NAME;
 
+    @Autowired
+    private CloudshellConfiguration cloudshellConfiguration;
+
     @Override
     public boolean validateContract(App app, User user, UniversePackage pkg, Map<String, Object> configData,
             PublishContext context) {
-        if ("internal".equals(context.getUniverseId()) && "shelly".equals(pkg.getName())) {
+        if (cloudshellConfiguration.getCatalogId().equals(context.getUniverseId()) && cloudshellConfiguration.getPackageName().equals(pkg.getName())) {
             app.setId(MARATHON_GROUP_NAME + "/" + sanitizer.sanitize(user.getIdep()) + "/" + "cloudshell");
             return true;
         }

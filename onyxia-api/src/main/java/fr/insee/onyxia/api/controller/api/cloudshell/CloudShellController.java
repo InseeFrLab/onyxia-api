@@ -1,13 +1,15 @@
 package fr.insee.onyxia.api.controller.api.cloudshell;
 
+import fr.insee.onyxia.api.configuration.properties.CloudshellConfiguration;
+import fr.insee.onyxia.api.configuration.properties.OrchestratorConfiguration;
+import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.api.services.impl.MarathonAppsService;
-import fr.insee.onyxia.model.catalog.UniversePackage;
+import fr.insee.onyxia.model.catalog.Package;
+import fr.insee.onyxia.model.service.Service;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import mesosphere.marathon.client.MarathonException;
-import mesosphere.marathon.client.model.v2.VersionedApp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +26,9 @@ public class CloudShellController {
 	private MarathonAppsService marathonAppsService;
 
 	@Autowired
+	private AppsService helmAppsService;
+
+	@Autowired
 	private UserProvider userProvider;
 
 	@Autowired
@@ -32,18 +37,30 @@ public class CloudShellController {
 	@Value("${marathon.group.name}")
 	private String MARATHON_GROUP_NAME;
 
+	@Autowired
+	private OrchestratorConfiguration orchestratorConfiguration;
+
+	@Autowired
+	private CloudshellConfiguration cloudshellConfiguration;
+
 	@GetMapping
 	public CloudShellStatus getCloudShellStatus() {
 		CloudShellStatus status = new CloudShellStatus();
-		VersionedApp app;
-		status.setPackageToDeploy((UniversePackage) catalogService.getPackage("internal", "shelly"));
+		Service.ServiceType preferredServiceType = orchestratorConfiguration.getPreferredServiceType();
 		try {
-			app = marathonAppsService
-					.getServiceById(MARATHON_GROUP_NAME + "/" + userProvider.getUser().getIdep() + "/cloudshell");
+			Service service = null;
+			if (preferredServiceType == Service.ServiceType.KUBERNETES) {
+				service = helmAppsService.getUserService(userProvider.getUser(),"cloudshell");
+			}
+			else {
+				service = marathonAppsService.getUserService(userProvider.getUser(),"cloudshell");
+			}
 			status.setStatus(CloudShellStatus.STATUS_UP);
-			status.setUrl(app.getLabels().get("ONYXIA_URL"));
-		} catch (MarathonException e) {
+			service.getUrls().stream().findFirst().ifPresent(url -> status.setUrl(url));
+		} catch (Exception e) {
 			status.setStatus(CloudShellStatus.STATUS_DOWN);
+			status.setPackageToDeploy(catalogService.getPackage(cloudshellConfiguration.getCatalogId(),cloudshellConfiguration.getPackageName()));
+			status.setCatalogId(cloudshellConfiguration.getCatalogId());
 			status.setUrl(null);
 		}
 
@@ -55,7 +72,8 @@ public class CloudShellController {
 		public static final String STATUS_UP = "UP", STATUS_LOADING = "LOADING", STATUS_DOWN = "DOWN";
 		private String status = STATUS_UP;
 		private String url = null;
-		private UniversePackage packageToDeploy = null;
+		private Package packageToDeploy = null;
+		private String catalogId;
 
 		public String getStatus() {
 			return status;
@@ -73,13 +91,20 @@ public class CloudShellController {
 			this.url = url;
 		}
 
-		public UniversePackage getPackageToDeploy() {
+		public Package getPackageToDeploy() {
 			return packageToDeploy;
 		}
 
-		public void setPackageToDeploy(UniversePackage packageToDeploy) {
+		public void setPackageToDeploy(Package packageToDeploy) {
 			this.packageToDeploy = packageToDeploy;
 		}
 
+		public String getCatalogId() {
+			return catalogId;
+		}
+
+		public void setCatalogId(String catalogId) {
+			this.catalogId = catalogId;
+		}
 	}
 }
