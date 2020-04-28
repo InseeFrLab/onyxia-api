@@ -38,7 +38,7 @@ public class CloudshellConfiguration {
             return "shelly";
         }
         else {
-            return "httpbin";
+            return "cloudshell";
         }
     }
 }
