@@ -2,6 +2,7 @@ package fr.insee.onyxia.api.services.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insee.onyxia.api.configuration.properties.CloudshellConfiguration;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.control.AdmissionControllerHelm;
 import fr.insee.onyxia.api.services.control.utils.PublishContext;
@@ -63,11 +64,8 @@ public class HelmAppsService implements AppsService {
     @Value("${kubernetes.namespace.prefix}")
     private String KUBERNETES_NAMESPACE_PREFIX;
 
-    @Value("${cloudshell.catalogid}")
-    private String cloudshellCatalogId;
-
-    @Value("${cloudshell.packagename}")
-    private String cloudshellPackageName;
+    @Autowired
+    private CloudshellConfiguration cloudshellConfiguration;
 
     @Autowired
     private List<AdmissionControllerHelm> admissionControllers;
@@ -80,7 +78,7 @@ public class HelmAppsService implements AppsService {
             User user, Map<String, Object> fusion) throws IOException, TimeoutException, InterruptedException {
 
         boolean isCloudshell =false;
-        if (catalogId.equals(cloudshellCatalogId) && pkg.getName().equals(cloudshellPackageName)) {
+        if (catalogId.equals(cloudshellConfiguration.getCatalogId()) && pkg.getName().equals(cloudshellConfiguration.getPackageName())) {
             isCloudshell =  true;
         }
         PublishContext context = new PublishContext();

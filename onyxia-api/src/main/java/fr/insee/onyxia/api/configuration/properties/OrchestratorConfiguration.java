@@ -1,4 +1,4 @@
-package fr.insee.onyxia.api.controller.api.utils;
+package fr.insee.onyxia.api.configuration.properties;
 
 import fr.insee.onyxia.model.service.Service;
 import org.springframework.beans.factory.annotation.Value;

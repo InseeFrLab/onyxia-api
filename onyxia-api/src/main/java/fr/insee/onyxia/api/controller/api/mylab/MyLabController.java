@@ -2,7 +2,7 @@ package fr.insee.onyxia.api.controller.api.mylab;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
-import fr.insee.onyxia.api.controller.api.utils.OrchestratorConfiguration;
+import fr.insee.onyxia.api.configuration.properties.OrchestratorConfiguration;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.api.services.UserProvider;

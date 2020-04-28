@@ -1,6 +1,7 @@
 package fr.insee.onyxia.api.controller.api.cloudshell;
 
-import fr.insee.onyxia.api.controller.api.utils.OrchestratorConfiguration;
+import fr.insee.onyxia.api.configuration.properties.CloudshellConfiguration;
+import fr.insee.onyxia.api.configuration.properties.OrchestratorConfiguration;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.api.services.UserProvider;
@@ -39,11 +40,8 @@ public class CloudShellController {
 	@Autowired
 	private OrchestratorConfiguration orchestratorConfiguration;
 
-	@Value("${cloudshell.catalogid}")
-	private String catalogId;
-
-	@Value("${cloudshell.packagename}")
-	private String packageName;
+	@Autowired
+	private CloudshellConfiguration cloudshellConfiguration;
 
 	@GetMapping
 	public CloudShellStatus getCloudShellStatus() {
@@ -61,8 +59,8 @@ public class CloudShellController {
 			service.getUrls().stream().findFirst().ifPresent(url -> status.setUrl(url));
 		} catch (Exception e) {
 			status.setStatus(CloudShellStatus.STATUS_DOWN);
-			status.setPackageToDeploy(catalogService.getPackage(catalogId,packageName));
-			status.setCatalogId(catalogId);
+			status.setPackageToDeploy(catalogService.getPackage(cloudshellConfiguration.getCatalogId(),cloudshellConfiguration.getPackageName()));
+			status.setCatalogId(cloudshellConfiguration.getCatalogId());
 			status.setUrl(null);
 		}
 
