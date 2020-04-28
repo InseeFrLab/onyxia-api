@@ -3,6 +3,7 @@ package fr.insee.onyxia.api.services.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.services.AppsService;
+import fr.insee.onyxia.api.services.control.AdmissionControllerHelm;
 import fr.insee.onyxia.api.services.impl.kubernetes.KubernetesService;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.Package;
@@ -60,12 +61,18 @@ public class HelmAppsService implements AppsService {
     @Value("${kubernetes.namespace.prefix}")
     private String KUBERNETES_NAMESPACE_PREFIX;
 
+    @Autowired
+    private List<AdmissionControllerHelm> admissionControllers;
+
     private SimpleDateFormat helmDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HelmAppsService.class);
 
     public Collection<Object> installApp(CreateServiceDTO requestDTO, boolean isGroup, String catalogId, Package pkg,
-                                         User user, Map<String, Object> fusion) throws IOException, TimeoutException, InterruptedException {
+            User user, Map<String, Object> fusion) throws IOException, TimeoutException, InterruptedException {
+
+        // we inject values here
+        admissionControllers.stream().map(controller -> controller.validateContract(pkg, fusion, user));
         File values = File.createTempFile("values", ".yaml");
         mapperHelm.writeValue(values, fusion);
         String namespaceId = determineNamespace(user);
@@ -76,13 +83,13 @@ public class HelmAppsService implements AppsService {
     }
 
     @Override
-    public CompletableFuture<ServicesListing> getUserServices(User user)
-            throws IOException, IllegalAccessException {
+    public CompletableFuture<ServicesListing> getUserServices(User user) throws IOException, IllegalAccessException {
         return getUserServices(user, null);
     }
 
     @Override
-    public CompletableFuture<ServicesListing> getUserServices(User user, String groupId) throws IOException, IllegalAccessException {
+    public CompletableFuture<ServicesListing> getUserServices(User user, String groupId)
+            throws IOException, IllegalAccessException {
         if (groupId != null) {
             LOGGER.debug("STUB : group listing is currently not supported on helm");
             return CompletableFuture.completedFuture(new ServicesListing());
@@ -124,8 +131,7 @@ public class HelmAppsService implements AppsService {
             String values = helm.getValues(release.getName(), release.getNamespace());
             JsonNode node = new ObjectMapper().readTree(values);
             Map<String, String> result = new HashMap<>();
-            node.fields()
-                    .forEachRemaining(currentNode -> mapAppender(result, currentNode, new ArrayList<String>()));
+            node.fields().forEachRemaining(currentNode -> mapAppender(result, currentNode, new ArrayList<String>()));
             service.setEnv(result);
         } catch (Exception e) {
             e.printStackTrace();
@@ -140,8 +146,7 @@ public class HelmAppsService implements AppsService {
             String name = names.stream().collect(joining("."));
             result.put(name, node.getValue().asText());
         } else {
-            node.getValue().fields()
-                    .forEachRemaining(nested -> mapAppender(result, nested, new ArrayList<>(names)));
+            node.getValue().fields().forEachRemaining(nested -> mapAppender(result, nested, new ArrayList<>(names)));
         }
     }
 

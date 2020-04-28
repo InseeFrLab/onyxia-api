@@ -3,7 +3,7 @@ package fr.insee.onyxia.api.services.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.control.AdmissionController;
-import fr.insee.onyxia.api.services.control.marathon.UrlGenerator;
+import fr.insee.onyxia.api.services.control.commons.UrlGenerator;
 import fr.insee.onyxia.api.services.control.utils.IDSanitizer;
 import fr.insee.onyxia.api.services.control.utils.PublishContext;
 import fr.insee.onyxia.model.User;
@@ -45,6 +45,9 @@ public class MarathonAppsService implements AppsService {
     @Value("${marathon.group.name}")
     private String MARATHON_GROUP_NAME;
 
+    @Value("${marathon.publish.domain}")
+    private String baseDomain;
+
     @Autowired(required = false)
     Marathon marathon;
 
@@ -64,8 +67,7 @@ public class MarathonAppsService implements AppsService {
     @Qualifier("marathon")
     private OkHttpClient marathonClient;
 
-    private @Value("${marathon.url}")
-    String MARATHON_URL;
+    private @Value("${marathon.url}") String MARATHON_URL;
 
     private DateFormat marathonDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
@@ -79,7 +81,7 @@ public class MarathonAppsService implements AppsService {
     @NotNull
     @Override
     public Collection<Object> installApp(CreateServiceDTO requestDTO, boolean isGroup, String catalogId, Package pkg,
-                                         User user, Map<String, Object> fusion) throws Exception {
+            User user, Map<String, Object> fusion) throws Exception {
         PublishContext context = new PublishContext(catalogId);
         UniversePackage universePkg = (UniversePackage) pkg;
         Map<String, Object> resource = universePkg.getResource();
@@ -93,7 +95,7 @@ public class MarathonAppsService implements AppsService {
 
         for (int i = 0; i < 10; i++) {
             contextData.put("externaldns-" + i,
-                    generator.generateUrl(user.getIdep(), pkg.getName(), context.getRandomizedId(), i));
+                    generator.generateUrl(user.getIdep(), pkg.getName(), context.getRandomizedId(), i, baseDomain));
         }
 
         fusion.put("context", contextData);
@@ -132,7 +134,8 @@ public class MarathonAppsService implements AppsService {
     }
 
     @Override
-    public CompletableFuture<ServicesListing> getUserServices(User user, String groupId) throws IllegalAccessException, IOException {
+    public CompletableFuture<ServicesListing> getUserServices(User user, String groupId)
+            throws IllegalAccessException, IOException {
         if (groupId != null && !groupId.startsWith(getUserGroupPath(user))) {
             throw new IllegalAccessException("Permission denied. " + user.getIdep() + " can not access " + groupId);
         }
@@ -188,11 +191,12 @@ public class MarathonAppsService implements AppsService {
             }
         });
         service.setTasks(app.getTasks().stream().map(task -> {
-            Task serviceTask= new Task();
+            Task serviceTask = new Task();
             serviceTask.setId(task.getId());
             return serviceTask;
         }).collect(Collectors.toList()));
-        app.getEnv().entrySet().stream().forEach(entry -> service.getEnv().put(entry.getKey(),entry.getValue().toString()));
+        app.getEnv().entrySet().stream()
+                .forEach(entry -> service.getEnv().put(entry.getKey(), entry.getValue().toString()));
         service.setStatus(findAppStatus(app));
         return service;
     }
@@ -220,7 +224,7 @@ public class MarathonAppsService implements AppsService {
      * @throws IOException
      */
     private Group getGroup(String id) throws IOException {
-        
+
         Request requete = new Request.Builder().url(MARATHON_URL + "/v2/groups/" + id + "?" + "embed=group.groups" + "&"
                 + "embed=group.apps" + "&" + "embed=group.apps.tasks" + "&" + "embed=group.apps.counts" + "&"
                 + "embed=group.apps.deployments" + "&" + "embed=group.apps.readiness" + "&"
