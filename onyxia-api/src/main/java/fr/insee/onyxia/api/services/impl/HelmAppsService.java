@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.control.AdmissionControllerHelm;
+import fr.insee.onyxia.api.services.control.utils.PublishContext;
 import fr.insee.onyxia.api.services.impl.kubernetes.KubernetesService;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.Package;
@@ -29,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -71,8 +73,12 @@ public class HelmAppsService implements AppsService {
     public Collection<Object> installApp(CreateServiceDTO requestDTO, boolean isGroup, String catalogId, Package pkg,
             User user, Map<String, Object> fusion) throws IOException, TimeoutException, InterruptedException {
 
-        // we inject values here
-        admissionControllers.stream().forEach(controller -> controller.validateContract(pkg, fusion, user));
+        PublishContext context = new PublishContext();
+        long nbInvalidations = admissionControllers.stream().map(controller -> controller.validateContract(pkg, fusion, user, context))
+                .filter(b -> !b).count();
+        if (nbInvalidations > 0) {
+            throw new AccessDeniedException("Validation failed");
+        }
         File values = File.createTempFile("values", ".yaml");
         mapperHelm.writeValue(values, fusion);
         String namespaceId = determineNamespace(user);
