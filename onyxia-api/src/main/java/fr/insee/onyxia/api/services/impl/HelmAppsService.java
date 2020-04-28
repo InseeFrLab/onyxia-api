@@ -72,7 +72,7 @@ public class HelmAppsService implements AppsService {
             User user, Map<String, Object> fusion) throws IOException, TimeoutException, InterruptedException {
 
         // we inject values here
-        admissionControllers.stream().map(controller -> controller.validateContract(pkg, fusion, user));
+        admissionControllers.stream().forEach(controller -> controller.validateContract(pkg, fusion, user));
         File values = File.createTempFile("values", ".yaml");
         mapperHelm.writeValue(values, fusion);
         String namespaceId = determineNamespace(user);
