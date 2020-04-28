@@ -152,16 +152,40 @@ public class MarathonAppsService implements AppsService {
 
     @Override
     public fr.insee.onyxia.model.service.Service getUserService(User user, String serviceId) throws Exception {
-        String queryId = serviceId;
-        if (!queryId.startsWith("/")) {
-            queryId = getUserGroupPath(user) + "/" + serviceId;
-        }
-        return mapAppToService(marathon.getApp(queryId).getApp());
+        String fullServiceId = getFullServiceId(user,serviceId);
+        checkPermission(user,fullServiceId);
+        return mapAppToService(marathon.getApp(fullServiceId.substring(1)).getApp());
     }
 
     @Override
     public String getLogs(User user,String serviceId, String taskId) {
         return "Feature not implemented";
+    }
+
+    @Override
+    public UninstallService destroyService(User user, String serviceId) throws IllegalAccessException {
+        String fullId = getFullServiceId(user,serviceId);
+        checkPermission(user,fullId);
+        Result appUninstaller = marathon.deleteApp(fullId.substring(1));
+        UninstallService result = new UninstallService();
+        result.setId(appUninstaller.getDeploymentId());
+        result.setVersion(appUninstaller.getVersion());
+        result.setSuccess(true);
+        return result;
+    }
+
+    private void checkPermission(User user, String fullId) throws IllegalAccessException {
+        if (!fullId.startsWith("/"+MARATHON_GROUP_NAME+"/"+user.getIdep())) {
+            throw new IllegalAccessException("User "+user.getIdep()+" can not access "+fullId);
+        }
+    }
+
+    private String getFullServiceId(User user, String serviceId) {
+        String fullId = serviceId;
+        if (!fullId.startsWith("/")) {
+            fullId = "/"+getUserGroupPath(user) + "/" + serviceId;
+        }
+        return fullId;
     }
 
     private fr.insee.onyxia.model.service.Group mapGroup(Group marathonGroup) {
@@ -195,8 +219,10 @@ public class MarathonAppsService implements AppsService {
             serviceTask.setId(task.getId());
             return serviceTask;
         }).collect(Collectors.toList()));
-        app.getEnv().entrySet().stream()
-                .forEach(entry -> service.getEnv().put(entry.getKey(), entry.getValue().toString()));
+        if (app.getEnv() != null) {
+            app.getEnv().entrySet().stream()
+                    .forEach(entry -> service.getEnv().put(entry.getKey(), entry.getValue().toString()));
+        }
         service.setStatus(findAppStatus(app));
         return service;
     }
@@ -236,18 +262,6 @@ public class MarathonAppsService implements AppsService {
 
     }
 
-    @Override
-    public UninstallService destroyService(User user, String serviceId) {
-        if (serviceId == null || !serviceId.startsWith("/users/" + user.getIdep())) {
-            throw new RuntimeException("hack!");
-        }
-        Result appUninstaller = marathon.deleteApp(serviceId);
-        UninstallService result = new UninstallService();
-        result.setId(appUninstaller.getDeploymentId());
-        result.setVersion(appUninstaller.getVersion());
-        result.setSuccess(true);
-        return result;
 
-    }
 
 }

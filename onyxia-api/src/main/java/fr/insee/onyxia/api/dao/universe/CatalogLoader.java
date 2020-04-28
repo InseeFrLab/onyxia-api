@@ -1,21 +1,18 @@
 package fr.insee.onyxia.api.dao.universe;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
+import fr.insee.onyxia.model.catalog.Config.Config;
 import fr.insee.onyxia.model.catalog.Package;
 import fr.insee.onyxia.model.catalog.Universe;
-import fr.insee.onyxia.model.catalog.Config.Config;
 import fr.insee.onyxia.model.helm.Chart;
 import fr.insee.onyxia.model.helm.Repository;
 import io.github.inseefrlab.helmwrapper.service.HelmRepoService;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +20,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.concurrent.TimeoutException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.zip.ZipInputStream;
 
 @Service
 public class CatalogLoader {
@@ -136,8 +133,6 @@ public class CatalogLoader {
 
             while ((entry = tarIn.getNextTarEntry()) != null) {
                 if (entry.getName().endsWith("values.schema.json")) {
-                    logger.info("Found values.schema.json !");
-
                     // TODO : mutualize objectmapper
                     ObjectMapper mapper = new ObjectMapper();
                     mapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, false);
@@ -152,8 +147,6 @@ public class CatalogLoader {
 
                 }
             }
-
-            System.out.println("Untar completed successfully!");
         }
 
     }
