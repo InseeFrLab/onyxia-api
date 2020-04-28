@@ -63,6 +63,12 @@ public class HelmAppsService implements AppsService {
     @Value("${kubernetes.namespace.prefix}")
     private String KUBERNETES_NAMESPACE_PREFIX;
 
+    @Value("${cloudshell.catalogid}")
+    private String cloudshellCatalogId;
+
+    @Value("${cloudshell.packagename}")
+    private String cloudshellPackageName;
+
     @Autowired
     private List<AdmissionControllerHelm> admissionControllers;
 
@@ -73,6 +79,10 @@ public class HelmAppsService implements AppsService {
     public Collection<Object> installApp(CreateServiceDTO requestDTO, boolean isGroup, String catalogId, Package pkg,
             User user, Map<String, Object> fusion) throws IOException, TimeoutException, InterruptedException {
 
+        boolean isCloudshell =false;
+        if (catalogId.equals(cloudshellCatalogId) && pkg.getName().equals(cloudshellPackageName)) {
+            isCloudshell =  true;
+        }
         PublishContext context = new PublishContext();
         long nbInvalidations = admissionControllers.stream().map(controller -> controller.validateContract(pkg, fusion, user, context))
                 .filter(b -> !b).count();
@@ -82,7 +92,8 @@ public class HelmAppsService implements AppsService {
         File values = File.createTempFile("values", ".yaml");
         mapperHelm.writeValue(values, fusion);
         String namespaceId = determineNamespace(user);
-        HelmInstaller res = helm.installChart(catalogId + "/" + pkg.getName(), namespaceId, requestDTO.isDryRun(),
+        String name = isCloudshell ? "cloudshell" : null;
+        HelmInstaller res = helm.installChart(catalogId + "/" + pkg.getName(), namespaceId, name, requestDTO.isDryRun(),
                 values);
         values.delete();
         return List.of(res.getManifest());

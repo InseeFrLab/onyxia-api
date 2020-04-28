@@ -25,10 +25,16 @@ public class IDEnforcer implements AdmissionController {
     @Value("${marathon.group.name}")
     private String MARATHON_GROUP_NAME;
 
+    @Value("${cloudshell.catalogid}")
+    private String cloudshellCatalogId;
+
+    @Value("${cloudshell.packagename}")
+    private String cloudshellPackageName;
+
     @Override
     public boolean validateContract(App app, User user, UniversePackage pkg, Map<String, Object> configData,
             PublishContext context) {
-        if ("internal".equals(context.getUniverseId()) && "shelly".equals(pkg.getName())) {
+        if (cloudshellCatalogId.equals(context.getUniverseId()) && cloudshellPackageName.equals(pkg.getName())) {
             app.setId(MARATHON_GROUP_NAME + "/" + sanitizer.sanitize(user.getIdep()) + "/" + "cloudshell");
             return true;
         }

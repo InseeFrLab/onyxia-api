@@ -2,6 +2,7 @@ package fr.insee.onyxia.api.controller.api.mylab;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
+import fr.insee.onyxia.api.controller.api.utils.OrchestratorConfiguration;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.api.services.UserProvider;
@@ -23,7 +24,6 @@ import mesosphere.marathon.client.model.v2.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -35,13 +35,6 @@ import java.util.concurrent.CompletableFuture;
 @RestController
 @SecurityRequirement(name = "auth")
 public class MyLabController {
-
-    @Value("${kubernetes.enabled}")
-    private boolean KUB_ENABLED;
-
-    @Value("${marathon.enabled}")
-    private boolean MARATHON_ENABLED;
-
     @Autowired
     private AppsService helmAppsService;
 
@@ -57,6 +50,9 @@ public class MyLabController {
     @Autowired(required = false)
     private Marathon marathon;
 
+    @Autowired
+    private OrchestratorConfiguration orchestratorConfiguration;
+
     private final Logger logger = LoggerFactory.getLogger(MyLabController.class);
 
     @GetMapping("/services")
@@ -64,10 +60,10 @@ public class MyLabController {
         User user = userProvider.getUser();
         ServicesListing dto = new ServicesListing();
         List<CompletableFuture<ServicesListing>> futures = new ArrayList<>();
-        if (MARATHON_ENABLED) {
+        if (orchestratorConfiguration.isMarathonEnabled()) {
             futures.add(marathonAppsService.getUserServices(user,groupId));
         }
-        if (KUB_ENABLED) {
+        if (orchestratorConfiguration.isKubernetesEnabled()) {
             futures.add(helmAppsService.getUserServices(user,groupId));
         }
         for (var future : futures) {
@@ -82,7 +78,7 @@ public class MyLabController {
     public @ResponseBody Service getApp(@RequestParam("serviceId") String serviceId,
             @RequestParam(required = false) Service.ServiceType type) throws Exception {
         if (type == null) {
-            type = determineServiceType(serviceId);
+            type = orchestratorConfiguration.getPreferredServiceType();
         }
         if (Service.ServiceType.MARATHON.equals(type)) {
             return marathonAppsService.getUserService(userProvider.getUser(), serviceId);
@@ -97,7 +93,7 @@ public class MyLabController {
                                         @RequestParam("taskId") String taskId,
                                         @RequestParam(required = false) Service.ServiceType type) throws Exception {
         if (type == null) {
-            type = determineServiceType(serviceId);
+            type = orchestratorConfiguration.getPreferredServiceType();
         }
         if (Service.ServiceType.MARATHON.equals(type)) {
             return marathonAppsService.getLogs(userProvider.getUser(),serviceId, taskId);
@@ -111,7 +107,7 @@ public class MyLabController {
     public UninstallService destroyApp(@RequestParam("serviceId") String serviceId,
             @RequestParam(required = false) Service.ServiceType type) throws Exception {
         if (type == null) {
-            type = determineServiceType(serviceId);
+            type = orchestratorConfiguration.getPreferredServiceType();
         }
         if (Service.ServiceType.MARATHON.equals(type)) {
             return marathonAppsService.destroyService(userProvider.getUser(), serviceId);
@@ -189,16 +185,6 @@ public class MyLabController {
         }
     }
 
-    private Service.ServiceType determineServiceType(String id) {
-        if (MARATHON_ENABLED && !KUB_ENABLED) {
-            return Service.ServiceType.MARATHON;
-        }
 
-        if (!MARATHON_ENABLED && KUB_ENABLED) {
-            return Service.ServiceType.KUBERNETES;
-        }
-
-        return Service.ServiceType.MARATHON;
-    }
 
 }

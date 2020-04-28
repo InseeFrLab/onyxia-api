@@ -26,20 +26,28 @@ public class HelmInstallService {
 
     private final Logger logger = LoggerFactory.getLogger(HelmInstallService.class);
 
-    public HelmInstaller installChart(String chart, String namespace, Boolean dryRun, Map<String, String> env)
+    public HelmInstaller installChart(String chart, String namespace, String name, Boolean dryRun, Map<String, String> env)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        return installChart(chart, namespace, dryRun, null, env);
+        return installChart(chart, namespace, name, dryRun, null, env);
     }
 
-    public HelmInstaller installChart(String chart, String namespace, boolean dryRun, File values)
+    public HelmInstaller installChart(String chart, String namespace, String name, boolean dryRun, File values)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        return installChart(chart, namespace, dryRun, values, null);
+        return installChart(chart, namespace, name, dryRun, values, null);
     }
 
-    public HelmInstaller installChart(String chart, String namespace, boolean dryRun, File values,
+    public HelmInstaller installChart(String chart, String namespace, String name, boolean dryRun, File values,
             Map<String, String> env)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        String command = "helm install --generate-name " + chart + " -n " + namespace;
+        String command = "helm install ";
+        if (name != null) {
+            command = command.concat(name+ " ");
+        }
+        else {
+            command = command.concat("--generate-name ");
+        }
+        command = command.concat(chart+" ");
+        command = command.concat("-n "+namespace);
         if (values != null) {
             command = command.concat(" -f " + values.getAbsolutePath());
         }
