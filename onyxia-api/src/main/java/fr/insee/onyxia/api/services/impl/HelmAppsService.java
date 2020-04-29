@@ -2,6 +2,7 @@ package fr.insee.onyxia.api.services.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insee.onyxia.api.configuration.kubernetes.KubernetesClientProvider;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.control.AdmissionControllerHelm;
 import fr.insee.onyxia.api.services.control.utils.PublishContext;
@@ -19,7 +20,6 @@ import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.extensions.Ingress;
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
 import io.github.inseefrlab.helmwrapper.model.HelmLs;
@@ -67,6 +67,9 @@ public class HelmAppsService implements AppsService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HelmAppsService.class);
 
+    @Autowired
+    private KubernetesClientProvider kubernetesClientProvider;
+
     @Override
     public Collection<Object> installApp(Region region,CreateServiceDTO requestDTO, boolean isGroup, String catalogId, Package pkg,
             User user, Map<String, Object> fusion) throws IOException, TimeoutException, InterruptedException {
@@ -111,7 +114,7 @@ public class HelmAppsService implements AppsService {
         }
         List<Service> services = new ArrayList<>();
         for (HelmLs release : installedCharts) {
-            services.add(getHelmApp(release));
+            services.add(getHelmApp(region,release));
         }
         ServicesListing listing = new ServicesListing();
         listing.setApps(services);
@@ -120,7 +123,7 @@ public class HelmAppsService implements AppsService {
 
     @Override
     public String getLogs(Region region,User user, String serviceId, String taskId) {
-        KubernetesClient client = new DefaultKubernetesClient();
+        KubernetesClient client = kubernetesClientProvider.getClientForRegion(region);
         return client.pods().inNamespace(determineNamespace(region.getNamespacePrefix(),user)).withName(taskId).getLog();
     }
 
@@ -130,7 +133,7 @@ public class HelmAppsService implements AppsService {
             serviceId = serviceId.substring(1);
         }
         HelmLs result = helm.getAppById(serviceId, determineNamespace(region.getNamespacePrefix(),user));
-        return getHelmApp(result);
+        return getHelmApp(region,result);
     }
 
     @Override
@@ -147,9 +150,9 @@ public class HelmAppsService implements AppsService {
         return result;
     }
 
-    private Service getHelmApp(HelmLs release) {
+    private Service getHelmApp(Region region, HelmLs release) {
         String manifest = helm.getManifest(release.getName(), release.getNamespace());
-        Service service = getServiceFromRelease(release, manifest);
+        Service service = getServiceFromRelease(region, release, manifest);
         service.setStatus(findAppStatus(release));
         try {
             service.setStartedAt(helmDateFormat.parse(release.getUpdated()).getTime());
@@ -182,8 +185,8 @@ public class HelmAppsService implements AppsService {
         }
     }
 
-    private Service getServiceFromRelease(HelmLs release, String manifest) {
-        KubernetesClient client = new DefaultKubernetesClient();
+    private Service getServiceFromRelease(Region region, HelmLs release, String manifest) {
+        KubernetesClient client = kubernetesClientProvider.getClientForRegion(region);
         InputStream inputStream = new ByteArrayInputStream(manifest.getBytes(Charset.forName("UTF-8")));
         List<HasMetadata> hasMetadatas = client.load(inputStream).get();
         List<Ingress> ingresses = hasMetadatas.stream().filter(hasMetadata -> hasMetadata instanceof Ingress)
