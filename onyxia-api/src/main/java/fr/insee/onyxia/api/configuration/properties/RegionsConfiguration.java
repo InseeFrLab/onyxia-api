@@ -20,6 +20,7 @@ import java.util.Optional;
 
 @Configuration
 @PropertySource(value = "classpath:regions.json",factory = RegionsConfiguration.JsonLoader.class)
+@PropertySource(value = "classpath:regions-default.json",factory = RegionsConfiguration.JsonLoader.class,ignoreResourceNotFound = true)
 @ConfigurationProperties
 public class RegionsConfiguration {
 

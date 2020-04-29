@@ -9,21 +9,6 @@
         "catalogId" : "inseefrlab-helm-charts",
         "packageName" : "cloudshell"
       }
-    },
-    {
-      "regionId": "marathon",
-      "type": "MARATHON",
-      "serverUrl": "",
-      "publish-domain": "fakedomain.marathon.example.com",
-      "namespace-prefix": "users",
-      "marathon-dns-suffix": "marathon.containerip.dcos.thisdcos.directory",
-      "cloudshell" : {
-        "catalogId" : "internal",
-        "packageName" : "shelly"
-      },
-      "auth": {
-        "token": ""
-      }
     }
   ]
 }

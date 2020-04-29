@@ -1,2 +1,3 @@
 /target/
 src/main/resources/application-default.properties
+src/main/resources/*-default.json
