@@ -1,6 +1,7 @@
 package fr.insee.onyxia.api.services.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insee.onyxia.api.configuration.HttpClientProvider;
 import fr.insee.onyxia.api.configuration.properties.RegionsConfiguration;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.control.AdmissionController;
@@ -20,7 +21,6 @@ import mesosphere.marathon.client.Marathon;
 import mesosphere.marathon.client.model.v2.App;
 import mesosphere.marathon.client.model.v2.Group;
 import mesosphere.marathon.client.model.v2.Result;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
@@ -57,8 +57,7 @@ public class MarathonAppsService implements AppsService {
     private UrlGenerator generator;
 
     @Autowired
-    @Qualifier("marathon")
-    private OkHttpClient marathonClient;
+    private HttpClientProvider httpClientProvider;
 
     private DateFormat marathonDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
@@ -251,7 +250,7 @@ public class MarathonAppsService implements AppsService {
                 + "embed=group.apps.deployments" + "&" + "embed=group.apps.readiness" + "&"
                 + "embed=group.apps.lastTaskFailure" + "&" + "embed=group.pods" + "&" + "embed=group.apps.taskStats")
                 .build();
-        Response response = marathonClient.newCall(requete).execute();
+        Response response = httpClientProvider.getClientForRegion(region).newCall(requete).execute();
         Group groupResponse = mapper.readValue(response.body().byteStream(), Group.class);
         return groupResponse;
 
