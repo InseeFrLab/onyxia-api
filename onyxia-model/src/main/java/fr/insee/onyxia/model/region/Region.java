@@ -1,9 +1,10 @@
 package fr.insee.onyxia.model.region;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.insee.onyxia.model.service.Service;
 
+@JsonIgnoreProperties(value={"auth","serverUrl"},allowSetters = true)
 public class Region {
     String regionId;
     Service.ServiceType type;
@@ -66,7 +67,6 @@ public class Region {
         this.marathonDnsSuffix = marathonDnsSuffix;
     }
 
-    @JsonIgnore
     public Auth getAuth() {
         return auth;
     }
