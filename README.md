@@ -98,6 +98,12 @@ A valid `JSON` is expected with a list of `region` :
 ]
 ```
 
+when using docker, passing json as env can be done using :
+
+```shell
+docker run -p 8080:8080 --env "regions=$(<conf.json)" inseefrlab/onyxia-api
+```
+
 Catalogs configuration  
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
