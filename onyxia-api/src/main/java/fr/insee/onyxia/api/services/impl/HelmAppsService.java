@@ -2,7 +2,7 @@ package fr.insee.onyxia.api.services.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.insee.onyxia.api.configuration.properties.CloudshellConfiguration;
+import fr.insee.onyxia.api.configuration.properties.RegionsConfiguration;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.control.AdmissionControllerHelm;
 import fr.insee.onyxia.api.services.control.utils.PublishContext;
@@ -11,6 +11,7 @@ import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.Package;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
 import fr.insee.onyxia.model.dto.ServicesListing;
+import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.Service;
 import fr.insee.onyxia.model.service.Task;
 import fr.insee.onyxia.model.service.TaskStatus;
@@ -30,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 
 import java.io.ByteArrayInputStream;
@@ -61,11 +61,8 @@ public class HelmAppsService implements AppsService {
     @Qualifier("helm")
     ObjectMapper mapperHelm;
 
-    @Value("${kubernetes.namespace.prefix}")
-    private String KUBERNETES_NAMESPACE_PREFIX;
-
     @Autowired
-    private CloudshellConfiguration cloudshellConfiguration;
+    private RegionsConfiguration regionsConfiguration;
 
     @Autowired
     private List<AdmissionControllerHelm> admissionControllers;
@@ -76,9 +73,10 @@ public class HelmAppsService implements AppsService {
 
     public Collection<Object> installApp(CreateServiceDTO requestDTO, boolean isGroup, String catalogId, Package pkg,
             User user, Map<String, Object> fusion) throws IOException, TimeoutException, InterruptedException {
-
+        Region region = regionsConfiguration.getDefaultRegion();
+        Region.CloudshellConfiguration cloudshellConfiguration = region.getCloudshellConfiguration();
         boolean isCloudshell =false;
-        if (catalogId.equals(cloudshellConfiguration.getCatalogId()) && pkg.getName().equals(cloudshellConfiguration.getPackageName())) {
+        if (cloudshellConfiguration != null && catalogId.equals(cloudshellConfiguration.getCatalogId()) && pkg.getName().equals(cloudshellConfiguration.getPackageName())) {
             isCloudshell =  true;
         }
         PublishContext context = new PublishContext();
@@ -105,13 +103,14 @@ public class HelmAppsService implements AppsService {
     @Override
     public CompletableFuture<ServicesListing> getUserServices(User user, String groupId)
             throws IOException, IllegalAccessException {
+        Region region = regionsConfiguration.getDefaultRegion();
         if (groupId != null) {
             LOGGER.debug("STUB : group listing is currently not supported on helm");
             return CompletableFuture.completedFuture(new ServicesListing());
         }
         List<HelmLs> installedCharts = null;
         try {
-            installedCharts = Arrays.asList(helm.listChartInstall(KUBERNETES_NAMESPACE_PREFIX + user.getIdep()));
+            installedCharts = Arrays.asList(helm.listChartInstall(region.getNamespacePrefix() + user.getIdep()));
         } catch (Exception e) {
             return CompletableFuture.completedFuture(new ServicesListing());
         }
@@ -225,10 +224,11 @@ public class HelmAppsService implements AppsService {
 
     @NotNull
     private String determineNamespace(User user) {
+        Region region = regionsConfiguration.getDefaultRegion();
         KubernetesService.Owner owner = new KubernetesService.Owner();
         owner.setId(user.getIdep());
         owner.setType(KubernetesService.Owner.OwnerType.USER);
-        String namespaceId = KUBERNETES_NAMESPACE_PREFIX + owner.getId();
+        String namespaceId = region.getNamespacePrefix() + owner.getId();
         // If namespace is not present, create it
         if (kubernetesService.getNamespaces(owner).stream()
                 .filter(namespace -> namespace.getMetadata().getName().equalsIgnoreCase(namespaceId)).count() == 0) {

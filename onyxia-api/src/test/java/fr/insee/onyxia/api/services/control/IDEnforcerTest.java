@@ -1,29 +1,25 @@
 package fr.insee.onyxia.api.services.control;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import fr.insee.onyxia.api.services.control.marathon.IDEnforcer;
+import fr.insee.onyxia.api.services.control.utils.PublishContext;
+import fr.insee.onyxia.model.User;
+import fr.insee.onyxia.model.catalog.UniversePackage;
+import mesosphere.marathon.client.model.v2.App;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import fr.insee.onyxia.api.services.control.marathon.IDEnforcer;
-import fr.insee.onyxia.api.services.control.utils.PublishContext;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-
-import fr.insee.onyxia.model.User;
-import fr.insee.onyxia.model.catalog.UniversePackage;
-import mesosphere.marathon.client.model.v2.App;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * IDEnforcerTest
  */
 @SpringBootTest
 public class IDEnforcerTest {
-    @Value("${marathon.group.name}")
-    private String MARATHON_GROUP_NAME;
     @Autowired
     IDEnforcer idEnforcer;
 
@@ -37,7 +33,7 @@ public class IDEnforcerTest {
         pkg.setName(pkgName);
         PublishContext context = new PublishContext(universeId);
         idEnforcer.validateContract(app, user, pkg, null, context);
-        Pattern pattern = Pattern.compile(MARATHON_GROUP_NAME + "/[a-z0-9]*/[a-z0-9]*-?.*");
+        Pattern pattern = Pattern.compile("users" + "/[a-z0-9]*/[a-z0-9]*-?.*");
         Matcher m = pattern.matcher(app.getId());
         assertTrue(m.matches());
     }

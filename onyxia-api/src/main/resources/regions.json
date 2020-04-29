@@ -1,0 +1,21 @@
+{
+  "regions" : [
+    {
+      "regionId": "kub",
+      "type": "KUBERNETES",
+      "namespace-prefix": "user-",
+      "publish-domain": "fakedomain.kub.example.com"
+    },
+    {
+      "regionId": "marathon",
+      "type": "MARATHON",
+      "serverUrl": "",
+      "publish-domain": "fakedomain.marathon.example.com",
+      "namespace-prefix": "users",
+      "marathon-dns-suffix": "marathon.containerip.dcos.thisdcos.directory",
+      "auth": {
+        "token": ""
+      }
+    }
+  ]
+}

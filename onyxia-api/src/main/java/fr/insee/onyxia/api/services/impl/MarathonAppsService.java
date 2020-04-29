@@ -1,6 +1,7 @@
 package fr.insee.onyxia.api.services.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insee.onyxia.api.configuration.properties.RegionsConfiguration;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.control.AdmissionController;
 import fr.insee.onyxia.api.services.control.commons.UrlGenerator;
@@ -11,6 +12,7 @@ import fr.insee.onyxia.model.catalog.Package;
 import fr.insee.onyxia.model.catalog.UniversePackage;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
 import fr.insee.onyxia.model.dto.ServicesListing;
+import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.Task;
 import fr.insee.onyxia.model.service.UninstallService;
 import fr.insee.onyxia.mustache.Mustacheur;
@@ -24,7 +26,6 @@ import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -39,14 +40,6 @@ import java.util.stream.Collectors;
 @Service
 @Qualifier("Marathon")
 public class MarathonAppsService implements AppsService {
-    @Value("${marathon.dns.suffix}")
-    private String MARATHON_DNS_SUFFIX;
-
-    @Value("${marathon.group.name}")
-    private String MARATHON_GROUP_NAME;
-
-    @Value("${marathon.publish.domain}")
-    private String baseDomain;
 
     @Autowired(required = false)
     Marathon marathon;
@@ -67,9 +60,10 @@ public class MarathonAppsService implements AppsService {
     @Qualifier("marathon")
     private OkHttpClient marathonClient;
 
-    private @Value("${marathon.url}") String MARATHON_URL;
-
     private DateFormat marathonDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+
+    @Autowired
+    private RegionsConfiguration regionsConfiguration;
 
     @PostConstruct
     public void postConstruct() {
@@ -82,6 +76,7 @@ public class MarathonAppsService implements AppsService {
     @Override
     public Collection<Object> installApp(CreateServiceDTO requestDTO, boolean isGroup, String catalogId, Package pkg,
             User user, Map<String, Object> fusion) throws Exception {
+        Region region = regionsConfiguration.getDefaultRegion();
         PublishContext context = new PublishContext(catalogId);
         UniversePackage universePkg = (UniversePackage) pkg;
         Map<String, Object> resource = universePkg.getResource();
@@ -90,12 +85,12 @@ public class MarathonAppsService implements AppsService {
         Map<String, String> contextData = new HashMap<>();
         contextData.put("internaldns",
                 idSanitizer.sanitize(pkg.getName()) + "-" + context.getRandomizedId() + "-"
-                        + idSanitizer.sanitize(user.getIdep()) + "-" + idSanitizer.sanitize(MARATHON_GROUP_NAME) + "."
-                        + MARATHON_DNS_SUFFIX);
+                        + idSanitizer.sanitize(user.getIdep()) + "-" + idSanitizer.sanitize(region.getNamespacePrefix()) + "."
+                        + region.getMarathonDnsSuffix());
 
         for (int i = 0; i < 10; i++) {
             contextData.put("externaldns-" + i,
-                    generator.generateUrl(user.getIdep(), pkg.getName(), context.getRandomizedId(), i, baseDomain));
+                    generator.generateUrl(user.getIdep(), pkg.getName(), context.getRandomizedId(), i, region.getPublishDomain()));
         }
 
         fusion.put("context", contextData);
@@ -175,7 +170,8 @@ public class MarathonAppsService implements AppsService {
     }
 
     private void checkPermission(User user, String fullId) throws IllegalAccessException {
-        if (!fullId.startsWith("/"+MARATHON_GROUP_NAME+"/"+user.getIdep())) {
+        Region region = regionsConfiguration.getDefaultRegion();
+        if (!fullId.startsWith("/"+region.getNamespacePrefix()+"/"+user.getIdep())) {
             throw new IllegalAccessException("User "+user.getIdep()+" can not access "+fullId);
         }
     }
@@ -238,7 +234,7 @@ public class MarathonAppsService implements AppsService {
     }
 
     private String getUserGroupPath(User user) {
-        return MARATHON_GROUP_NAME + "/" + user.getIdep();
+        return regionsConfiguration.getDefaultRegion().getNamespacePrefix() + "/" + user.getIdep();
     }
 
     /**
@@ -251,7 +247,7 @@ public class MarathonAppsService implements AppsService {
      */
     private Group getGroup(String id) throws IOException {
 
-        Request requete = new Request.Builder().url(MARATHON_URL + "/v2/groups/" + id + "?" + "embed=group.groups" + "&"
+        Request requete = new Request.Builder().url(regionsConfiguration.getDefaultRegion().getServerUrl() + "/v2/groups/" + id + "?" + "embed=group.groups" + "&"
                 + "embed=group.apps" + "&" + "embed=group.apps.tasks" + "&" + "embed=group.apps.counts" + "&"
                 + "embed=group.apps.deployments" + "&" + "embed=group.apps.readiness" + "&"
                 + "embed=group.apps.lastTaskFailure" + "&" + "embed=group.pods" + "&" + "embed=group.apps.taskStats")

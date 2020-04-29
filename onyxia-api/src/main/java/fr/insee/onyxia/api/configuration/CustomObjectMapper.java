@@ -48,6 +48,7 @@ public class CustomObjectMapper {
         mapper.setSerializationInclusion(Include.NON_NULL);
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         mapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
+        mapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
     }
 
     public class ItemDeserializer extends StdDeserializer<Volume> {
