@@ -2,7 +2,6 @@ package fr.insee.onyxia.api.services.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.insee.onyxia.api.configuration.properties.RegionsConfiguration;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.control.AdmissionControllerHelm;
 import fr.insee.onyxia.api.services.control.utils.PublishContext;
@@ -62,32 +61,29 @@ public class HelmAppsService implements AppsService {
     ObjectMapper mapperHelm;
 
     @Autowired
-    private RegionsConfiguration regionsConfiguration;
-
-    @Autowired
     private List<AdmissionControllerHelm> admissionControllers;
 
     private SimpleDateFormat helmDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HelmAppsService.class);
 
-    public Collection<Object> installApp(CreateServiceDTO requestDTO, boolean isGroup, String catalogId, Package pkg,
+    @Override
+    public Collection<Object> installApp(Region region,CreateServiceDTO requestDTO, boolean isGroup, String catalogId, Package pkg,
             User user, Map<String, Object> fusion) throws IOException, TimeoutException, InterruptedException {
-        Region region = regionsConfiguration.getDefaultRegion();
         Region.CloudshellConfiguration cloudshellConfiguration = region.getCloudshellConfiguration();
         boolean isCloudshell =false;
         if (cloudshellConfiguration != null && catalogId.equals(cloudshellConfiguration.getCatalogId()) && pkg.getName().equals(cloudshellConfiguration.getPackageName())) {
             isCloudshell =  true;
         }
         PublishContext context = new PublishContext();
-        long nbInvalidations = admissionControllers.stream().map(controller -> controller.validateContract(pkg, fusion, user, context))
+        long nbInvalidations = admissionControllers.stream().map(controller -> controller.validateContract(region, pkg, fusion, user, context))
                 .filter(b -> !b).count();
         if (nbInvalidations > 0) {
             throw new AccessDeniedException("Validation failed");
         }
         File values = File.createTempFile("values", ".yaml");
         mapperHelm.writeValue(values, fusion);
-        String namespaceId = determineNamespace(user);
+        String namespaceId = determineNamespace(region.getNamespacePrefix(), user);
         String name = isCloudshell ? "cloudshell" : null;
         HelmInstaller res = helm.installChart(catalogId + "/" + pkg.getName(), namespaceId, name, requestDTO.isDryRun(),
                 values);
@@ -96,14 +92,13 @@ public class HelmAppsService implements AppsService {
     }
 
     @Override
-    public CompletableFuture<ServicesListing> getUserServices(User user) throws IOException, IllegalAccessException {
-        return getUserServices(user, null);
+    public CompletableFuture<ServicesListing> getUserServices(Region region,User user) throws IOException, IllegalAccessException {
+        return getUserServices(region, user, null);
     }
 
     @Override
-    public CompletableFuture<ServicesListing> getUserServices(User user, String groupId)
+    public CompletableFuture<ServicesListing> getUserServices(Region region,User user, String groupId)
             throws IOException, IllegalAccessException {
-        Region region = regionsConfiguration.getDefaultRegion();
         if (groupId != null) {
             LOGGER.debug("STUB : group listing is currently not supported on helm");
             return CompletableFuture.completedFuture(new ServicesListing());
@@ -124,9 +119,32 @@ public class HelmAppsService implements AppsService {
     }
 
     @Override
-    public String getLogs(User user, String serviceId, String taskId) {
+    public String getLogs(Region region,User user, String serviceId, String taskId) {
         KubernetesClient client = new DefaultKubernetesClient();
-        return client.pods().inNamespace(determineNamespace(user)).withName(taskId).getLog();
+        return client.pods().inNamespace(determineNamespace(region.getNamespacePrefix(),user)).withName(taskId).getLog();
+    }
+
+    @Override
+    public Service getUserService(Region region, User user, String serviceId) throws MultipleServiceFound, ParseException {
+        if (serviceId.startsWith("/")) {
+            serviceId = serviceId.substring(1);
+        }
+        HelmLs result = helm.getAppById(serviceId, determineNamespace(region.getNamespacePrefix(),user));
+        return getHelmApp(result);
+    }
+
+    @Override
+    public UninstallService destroyService(Region region, User user, String serviceId) throws Exception {
+        HelmLs appInfo = helm.getAppById(serviceId, determineNamespace(region.getNamespacePrefix(), user));
+        UninstallService result = new UninstallService();
+        result.setId(appInfo.getName());
+        result.setVersion(appInfo.getChart());
+        int status = helm.uninstaller(serviceId, determineNamespace(region.getNamespacePrefix(), user));
+        if (status != 0) {
+            result.setSuccess(false);
+        }
+        result.setSuccess(true);
+        return result;
     }
 
     private Service getHelmApp(HelmLs release) {
@@ -223,12 +241,11 @@ public class HelmAppsService implements AppsService {
     }
 
     @NotNull
-    private String determineNamespace(User user) {
-        Region region = regionsConfiguration.getDefaultRegion();
+    private String determineNamespace(String namespacePrefix,User user) {
         KubernetesService.Owner owner = new KubernetesService.Owner();
         owner.setId(user.getIdep());
         owner.setType(KubernetesService.Owner.OwnerType.USER);
-        String namespaceId = region.getNamespacePrefix() + owner.getId();
+        String namespaceId = namespacePrefix + owner.getId();
         // If namespace is not present, create it
         if (kubernetesService.getNamespaces(owner).stream()
                 .filter(namespace -> namespace.getMetadata().getName().equalsIgnoreCase(namespaceId)).count() == 0) {
@@ -247,26 +264,5 @@ public class HelmAppsService implements AppsService {
         }
     }
 
-    @Override
-    public Service getUserService(User user, String serviceId) throws MultipleServiceFound, ParseException {
-        if (serviceId.startsWith("/")) {
-            serviceId = serviceId.substring(1);
-        }
-        HelmLs result = helm.getAppById(serviceId, determineNamespace(user));
-        return getHelmApp(result);
-    }
 
-    @Override
-    public UninstallService destroyService(User user, String serviceId) throws Exception {
-        HelmLs appInfo = helm.getAppById(serviceId, determineNamespace(user));
-        UninstallService result = new UninstallService();
-        result.setId(appInfo.getName());
-        result.setVersion(appInfo.getChart());
-        int status = helm.uninstaller(serviceId, determineNamespace(user));
-        if (status != 0) {
-            result.setSuccess(false);
-        }
-        result.setSuccess(true);
-        return result;
-    }
 }

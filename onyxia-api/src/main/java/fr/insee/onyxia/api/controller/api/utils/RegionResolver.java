@@ -28,7 +28,11 @@ public class RegionResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public Object resolveArgument(MethodParameter methodParameter, ModelAndViewContainer modelAndViewContainer, NativeWebRequest nativeWebRequest, WebDataBinderFactory webDataBinderFactory) throws Exception {
-        System.out.println("STUB : determine current region");
-        return regionsConfiguration.getDefaultRegion();
+        String region = nativeWebRequest.getHeader("ONYXIA-REGION");
+        Region defaultRegion = regionsConfiguration.getDefaultRegion();
+        if (region != null) {
+            return regionsConfiguration.getRegionById(region).orElse(defaultRegion);
+        }
+        return defaultRegion;
     }
 }

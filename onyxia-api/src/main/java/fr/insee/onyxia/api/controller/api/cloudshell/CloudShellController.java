@@ -37,17 +37,16 @@ public class CloudShellController {
 	private RegionsConfiguration regionsConfiguration;
 
 	@GetMapping
-	public CloudShellStatus getCloudShellStatus() {
+	public CloudShellStatus getCloudShellStatus(Region region) {
 		CloudShellStatus status = new CloudShellStatus();
-		Region region = regionsConfiguration.getDefaultRegion();
 		Region.CloudshellConfiguration cloudshellConfiguration = region.getCloudshellConfiguration();
 		try {
 			Service service = null;
 			if (region.getType().equals(Service.ServiceType.KUBERNETES)) {
-				service = helmAppsService.getUserService(userProvider.getUser(),"cloudshell");
+				service = helmAppsService.getUserService(region, userProvider.getUser(),"cloudshell");
 			}
 			else {
-				service = marathonAppsService.getUserService(userProvider.getUser(),"cloudshell");
+				service = marathonAppsService.getUserService(region, userProvider.getUser(),"cloudshell");
 			}
 			status.setStatus(CloudShellStatus.STATUS_UP);
 			service.getUrls().stream().findFirst().ifPresent(url -> status.setUrl(url));

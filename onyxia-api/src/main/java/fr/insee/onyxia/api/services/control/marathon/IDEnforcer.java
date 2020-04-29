@@ -26,9 +26,8 @@ public class IDEnforcer implements AdmissionController {
     private RegionsConfiguration regionsConfiguration;
 
     @Override
-    public boolean validateContract(App app, User user, UniversePackage pkg, Map<String, Object> configData,
+    public boolean validateContract(Region region, App app, User user, UniversePackage pkg, Map<String, Object> configData,
             PublishContext context) {
-        Region region = regionsConfiguration.getDefaultRegion();
         Region.CloudshellConfiguration cloudshellConfiguration = region.getCloudshellConfiguration();
         if (cloudshellConfiguration != null && cloudshellConfiguration.getCatalogId().equals(context.getUniverseId()) && cloudshellConfiguration.getPackageName().equals(pkg.getName())) {
             app.setId(region.getNamespacePrefix() + "/" + sanitizer.sanitize(user.getIdep()) + "/" + "cloudshell");

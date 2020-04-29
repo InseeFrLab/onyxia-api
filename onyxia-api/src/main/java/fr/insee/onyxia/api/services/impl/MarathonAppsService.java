@@ -74,9 +74,8 @@ public class MarathonAppsService implements AppsService {
 
     @NotNull
     @Override
-    public Collection<Object> installApp(CreateServiceDTO requestDTO, boolean isGroup, String catalogId, Package pkg,
+    public Collection<Object> installApp(Region region, CreateServiceDTO requestDTO, boolean isGroup, String catalogId, Package pkg,
             User user, Map<String, Object> fusion) throws Exception {
-        Region region = regionsConfiguration.getDefaultRegion();
         PublishContext context = new PublishContext(catalogId);
         UniversePackage universePkg = (UniversePackage) pkg;
         Map<String, Object> resource = universePkg.getResource();
@@ -109,7 +108,7 @@ public class MarathonAppsService implements AppsService {
 
             // Apply every admission controller
             long nbInvalidations = admissionControllers.stream().map(admissionController -> admissionController
-                    .validateContract(app, user, universePkg, (Map<String, Object>) requestDTO.getOptions(), context))
+                    .validateContract(region, app, user, universePkg, (Map<String, Object>) requestDTO.getOptions(), context))
                     .filter(b -> !b).count();
             if (nbInvalidations > 0) {
                 throw new AccessDeniedException("Validation failed");
@@ -124,21 +123,22 @@ public class MarathonAppsService implements AppsService {
     }
 
     @Override
-    public CompletableFuture<ServicesListing> getUserServices(User user) throws IllegalAccessException, IOException {
-        return getUserServices(user, null);
+    public CompletableFuture<ServicesListing> getUserServices(Region region, User user) throws IllegalAccessException, IOException {
+        return getUserServices(region, user, null);
     }
 
     @Override
-    public CompletableFuture<ServicesListing> getUserServices(User user, String groupId)
+    public CompletableFuture<ServicesListing> getUserServices(Region region, User user, String groupId)
             throws IllegalAccessException, IOException {
-        if (groupId != null && !groupId.startsWith(getUserGroupPath(user))) {
+        String namespacePrefix = region.getNamespacePrefix();
+        if (groupId != null && !groupId.startsWith(getUserGroupPath(namespacePrefix,user))) {
             throw new IllegalAccessException("Permission denied. " + user.getIdep() + " can not access " + groupId);
         }
 
         if (groupId == null) {
-            groupId = getUserGroupPath(user);
+            groupId = getUserGroupPath(namespacePrefix,user);
         }
-        Group group = getGroup(groupId);
+        Group group = getGroup(region, groupId);
         ServicesListing listing = new ServicesListing();
         listing.setApps(group.getApps().stream().map(app -> mapAppToService(app)).collect(Collectors.toList()));
         listing.setGroups(group.getGroups().stream().map(gr -> mapGroup(gr)).collect(Collectors.toList()));
@@ -146,21 +146,21 @@ public class MarathonAppsService implements AppsService {
     }
 
     @Override
-    public fr.insee.onyxia.model.service.Service getUserService(User user, String serviceId) throws Exception {
-        String fullServiceId = getFullServiceId(user,serviceId);
-        checkPermission(user,fullServiceId);
+    public fr.insee.onyxia.model.service.Service getUserService(Region region, User user, String serviceId) throws Exception {
+        String fullServiceId = getFullServiceId(user,region.getNamespacePrefix(), serviceId);
+        checkPermission(region, user,fullServiceId);
         return mapAppToService(marathon.getApp(fullServiceId.substring(1)).getApp());
     }
 
     @Override
-    public String getLogs(User user,String serviceId, String taskId) {
+    public String getLogs(Region region, User user,String serviceId, String taskId) {
         return "Feature not implemented";
     }
 
     @Override
-    public UninstallService destroyService(User user, String serviceId) throws IllegalAccessException {
-        String fullId = getFullServiceId(user,serviceId);
-        checkPermission(user,fullId);
+    public UninstallService destroyService(Region region, User user, String serviceId) throws IllegalAccessException {
+        String fullId = getFullServiceId(user,region.getNamespacePrefix(), serviceId);
+        checkPermission(region, user,fullId);
         Result appUninstaller = marathon.deleteApp(fullId.substring(1));
         UninstallService result = new UninstallService();
         result.setId(appUninstaller.getDeploymentId());
@@ -169,17 +169,16 @@ public class MarathonAppsService implements AppsService {
         return result;
     }
 
-    private void checkPermission(User user, String fullId) throws IllegalAccessException {
-        Region region = regionsConfiguration.getDefaultRegion();
+    private void checkPermission(Region region, User user, String fullId) throws IllegalAccessException {
         if (!fullId.startsWith("/"+region.getNamespacePrefix()+"/"+user.getIdep())) {
             throw new IllegalAccessException("User "+user.getIdep()+" can not access "+fullId);
         }
     }
 
-    private String getFullServiceId(User user, String serviceId) {
+    private String getFullServiceId(User user, String namespacePrefix, String serviceId) {
         String fullId = serviceId;
         if (!fullId.startsWith("/")) {
-            fullId = "/"+getUserGroupPath(user) + "/" + serviceId;
+            fullId = "/"+getUserGroupPath(namespacePrefix, user) + "/" + serviceId;
         }
         return fullId;
     }
@@ -233,8 +232,8 @@ public class MarathonAppsService implements AppsService {
         }
     }
 
-    private String getUserGroupPath(User user) {
-        return regionsConfiguration.getDefaultRegion().getNamespacePrefix() + "/" + user.getIdep();
+    private String getUserGroupPath(String namespacePrefix, User user) {
+        return namespacePrefix + "/" + user.getIdep();
     }
 
     /**
@@ -245,9 +244,9 @@ public class MarathonAppsService implements AppsService {
      * @return
      * @throws IOException
      */
-    private Group getGroup(String id) throws IOException {
+    private Group getGroup(Region region, String id) throws IOException {
 
-        Request requete = new Request.Builder().url(regionsConfiguration.getDefaultRegion().getServerUrl() + "/v2/groups/" + id + "?" + "embed=group.groups" + "&"
+        Request requete = new Request.Builder().url(region.getServerUrl() + "/v2/groups/" + id + "?" + "embed=group.groups" + "&"
                 + "embed=group.apps" + "&" + "embed=group.apps.tasks" + "&" + "embed=group.apps.counts" + "&"
                 + "embed=group.apps.deployments" + "&" + "embed=group.apps.readiness" + "&"
                 + "embed=group.apps.lastTaskFailure" + "&" + "embed=group.pods" + "&" + "embed=group.apps.taskStats")

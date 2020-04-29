@@ -1,13 +1,14 @@
 package fr.insee.onyxia.api.services.control.marathon;
 
+import fr.insee.onyxia.api.configuration.properties.RegionsConfiguration;
 import fr.insee.onyxia.api.services.control.AdmissionController;
 import fr.insee.onyxia.api.services.control.commons.UrlGenerator;
 import fr.insee.onyxia.api.services.control.utils.PublishContext;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.UniversePackage;
+import fr.insee.onyxia.model.region.Region;
 import mesosphere.marathon.client.model.v2.App;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,11 +25,11 @@ public class URLEnforcer implements AdmissionController {
     @Autowired
     private UrlGenerator urlGenerator;
 
-    @Value("${marathon.publish.domain}")
-    private String baseDomain;
+    @Autowired
+    private RegionsConfiguration regionsConfiguration;
 
     @Override
-    public boolean validateContract(App app, User user, UniversePackage pkg, Map<String, Object> configData,
+    public boolean validateContract(Region region, App app, User user, UniversePackage pkg, Map<String, Object> configData,
             PublishContext context) {
         List<Integer> openedPortsIds = app.getLabels().entrySet().stream()
                 .filter(entry -> PATTERN_HAPROXY_VHOST.matcher(entry.getKey()).matches()).map(entry -> {
@@ -37,15 +38,15 @@ public class URLEnforcer implements AdmissionController {
                     return Integer.parseInt(matcher.group(1));
                 }).collect(Collectors.toList());
         openedPortsIds.stream().forEach(portId -> {
-            app.addLabel("HAPROXY_" + portId + "_VHOST", getUrl(portId, user, pkg, configData, context));
+            app.addLabel("HAPROXY_" + portId + "_VHOST", getUrl(region.getPublishDomain(), portId, user, pkg, configData, context));
             app.addLabel("HAPROXY_" + portId + "_ENABLED", "true");
         });
         return true;
     }
 
-    private String getUrl(int portNumber, User user, UniversePackage pkg, Map<String, Object> configData,
+    private String getUrl(String publishDomain, int portNumber, User user, UniversePackage pkg, Map<String, Object> configData,
             PublishContext context) {
         return urlGenerator.generateUrl(user.getIdep(), pkg.getName(), context.getRandomizedId(), portNumber,
-                baseDomain);
+                publishDomain);
     }
 }

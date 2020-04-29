@@ -15,6 +15,7 @@ public class Region {
     @JsonProperty("marathon-dns-suffix")
     String marathonDnsSuffix;
     Auth auth;
+    @JsonProperty("cloudshell")
     CloudshellConfiguration cloudshellConfiguration;
 
     public String getRegionId() {
@@ -105,6 +106,7 @@ public class Region {
 
     public static class Auth {
         private String token;
+        private String username, password;
 
         public String getToken() {
             return token;
@@ -112,6 +114,22 @@ public class Region {
 
         public void setToken(String token) {
             this.token = token;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public void setUsername(String username) {
+            this.username = username;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
         }
     }
 }

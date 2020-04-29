@@ -10,7 +10,6 @@ import fr.insee.onyxia.model.task.ServiceFile;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -24,8 +23,7 @@ public class MesosTaskService implements TaskService {
     @Autowired
     private OkHttpClient httpClient;
 
-    @Value("${mesos.url}")
-    private String mesosUrl;
+    private String mesosUrl = "STUB";
 
     @Override
     public MesosTask getTaskFromMesos(String taskId) {

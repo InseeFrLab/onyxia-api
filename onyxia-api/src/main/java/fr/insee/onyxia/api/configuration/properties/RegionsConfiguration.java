@@ -13,7 +13,10 @@ import org.springframework.core.io.support.PropertySourceFactory;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Configuration
 @PropertySource(value = "classpath:regions.json",factory = RegionsConfiguration.JsonLoader.class)
@@ -22,19 +25,23 @@ public class RegionsConfiguration {
 
     private String regions;
 
-    private Region[] resolvedRegions;
+    private List<Region> resolvedRegions;
 
     @Autowired
     private ObjectMapper mapper;
 
     @PostConstruct
     public void debug() throws Exception {
-        resolvedRegions = mapper.readValue(regions, Region[].class);
-        System.out.println("Serving in "+resolvedRegions.length+" regions");
+        resolvedRegions = Arrays.asList(mapper.readValue(regions, Region[].class));
+        System.out.println("Serving in "+resolvedRegions.size()+" regions");
+    }
+
+    public Optional<Region> getRegionById(String regionId) {
+        return resolvedRegions.stream().filter(region -> region.getRegionId().equals(regionId)).findFirst();
     }
 
     public Region getDefaultRegion() {
-        return resolvedRegions[0];
+        return resolvedRegions.get(0);
     }
 
     public String getRegions() {
@@ -45,7 +52,7 @@ public class RegionsConfiguration {
         this.regions = regions;
     }
 
-    public Region[] getResolvedRegions() {
+    public List<Region> getResolvedRegions() {
         return resolvedRegions;
     }
 

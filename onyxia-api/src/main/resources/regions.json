@@ -4,7 +4,11 @@
       "regionId": "kub",
       "type": "KUBERNETES",
       "namespace-prefix": "user-",
-      "publish-domain": "fakedomain.kub.example.com"
+      "publish-domain": "fakedomain.kub.example.com",
+      "cloudshell" : {
+        "catalogId" : "inseefrlab-helm-charts",
+        "packageName" : "cloudshell"
+      }
     },
     {
       "regionId": "marathon",
@@ -13,6 +17,10 @@
       "publish-domain": "fakedomain.marathon.example.com",
       "namespace-prefix": "users",
       "marathon-dns-suffix": "marathon.containerip.dcos.thisdcos.directory",
+      "cloudshell" : {
+        "catalogId" : "internal",
+        "packageName" : "shelly"
+      },
       "auth": {
         "token": ""
       }

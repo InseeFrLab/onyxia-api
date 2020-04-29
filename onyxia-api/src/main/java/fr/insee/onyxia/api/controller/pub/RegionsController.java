@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @Tag(name = "Regions", description = "Regions")
 @RequestMapping("/public/regions")
 @RestController
@@ -17,7 +19,7 @@ public class RegionsController {
     private RegionsConfiguration regionsConfiguration;
 
     @GetMapping
-    public Region[] getRegions() {
+    public List<Region>  getRegions() {
         return regionsConfiguration.getResolvedRegions();
     }
 }

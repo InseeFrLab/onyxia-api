@@ -1,17 +1,18 @@
 package fr.insee.onyxia.api.configuration;
 
-import feign.Logger;
+import fr.insee.onyxia.api.configuration.properties.RegionsConfiguration;
+import fr.insee.onyxia.model.region.Region;
 import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import okhttp3.OkHttpClient;
 
 import java.io.IOException;
 
@@ -30,19 +31,20 @@ public class CustomHttpClient {
 
     @Bean
     @Qualifier("marathon")
-    public OkHttpClient marathonHttpClient(final @Value("${marathon.url}") String MARATHON_URL, final @Value("${marathon.auth.token}") String MARATHON_AUTH_TOKEN) {
+    public OkHttpClient marathonHttpClient(@Autowired RegionsConfiguration configuration) {
 
 
         OkHttpClient.Builder builder = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
             @NotNull
             @Override
             public Response intercept(@NotNull Chain chain) throws IOException {
+                Region region = configuration.getDefaultRegion();
                 Request request = chain.request();
                 Request newRequest = request;
 
-                if (MARATHON_AUTH_TOKEN != null) {
+                if (region.getAuth() != null && region.getAuth().getToken() != null) {
                     newRequest = request.newBuilder()
-                            .addHeader("Authorization", "token="+MARATHON_AUTH_TOKEN)
+                            .addHeader("Authorization", "token="+region.getAuth().getToken())
                             .build();
                 }
 
