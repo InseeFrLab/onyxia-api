@@ -3,12 +3,12 @@ package io.github.inseefrlab.helmwrapper.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.inseefrlab.helmwrapper.configuration.HelmConfiguration;
 import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
 import io.github.inseefrlab.helmwrapper.model.HelmLs;
 import io.github.inseefrlab.helmwrapper.utils.Command;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 import org.zeroturnaround.exec.InvalidExitValueException;
 
 import java.io.File;
@@ -21,10 +21,18 @@ import java.util.stream.Collectors;
 /**
  * HelmInstall
  */
-@Service
 public class HelmInstallService {
 
     private final Logger logger = LoggerFactory.getLogger(HelmInstallService.class);
+    private HelmConfiguration configuration;
+
+    public HelmInstallService() {
+
+    }
+
+    public HelmInstallService(HelmConfiguration configuration) {
+        this.configuration = configuration;
+    }
 
     public HelmInstaller installChart(String chart, String namespace, String name, Boolean dryRun, Map<String, String> env)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
@@ -57,13 +65,13 @@ public class HelmInstallService {
         if (dryRun) {
             command = command.concat(" --dry-run");
         }
-        String res = Command.executeAndGetResponseAsJson(command).getOutput().getString();
+        String res = Command.executeAndGetResponseAsJson(configuration, command).getOutput().getString();
         return new ObjectMapper().readValue(res, HelmInstaller.class);
     }
 
     public int uninstaller(String name, String namespace)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        return Command.execute("helm uninstall " + name + " -n " + namespace).getExitValue();
+        return Command.execute(configuration,"helm uninstall " + name + " -n " + namespace).getExitValue();
     }
 
     public HelmLs[] listChartInstall(String namespace) throws JsonMappingException, InvalidExitValueException,
@@ -72,13 +80,13 @@ public class HelmInstallService {
         if (namespace != null) {
             cmd = cmd + " -n " + namespace;
         }
-        return new ObjectMapper().readValue(Command.executeAndGetResponseAsJson(cmd).getOutput().getString(),
+        return new ObjectMapper().readValue(Command.executeAndGetResponseAsJson(configuration,cmd).getOutput().getString(),
                 HelmLs[].class);
     }
 
     public String getManifest(String id, String namespace) {
         try {
-            return Command.execute("helm get manifest " + id + " --namespace " + namespace).getOutput().getString();
+            return Command.execute(configuration,"helm get manifest " + id + " --namespace " + namespace).getOutput().getString();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -91,7 +99,7 @@ public class HelmInstallService {
 
     public String getValues(String id, String namespace) {
         try {
-            return Command.executeAndGetResponseAsJson("helm get values " + id + " --namespace " + namespace).getOutput().getString();
+            return Command.executeAndGetResponseAsJson(configuration,"helm get values " + id + " --namespace " + namespace).getOutput().getString();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -120,7 +128,7 @@ public class HelmInstallService {
     public HelmLs getAppById(String appId, String namespace) throws MultipleServiceFound {
         try {
             HelmLs[] result = new ObjectMapper()
-                    .readValue(Command.executeAndGetResponseAsJson("helm list --filter " + appId + " -n " + namespace)
+                    .readValue(Command.executeAndGetResponseAsJson(configuration,"helm list --filter " + appId + " -n " + namespace)
                             .getOutput().getString(), HelmLs[].class);
             if (result.length == 0) {
                 return null;

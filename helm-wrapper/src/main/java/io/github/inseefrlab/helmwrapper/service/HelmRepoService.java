@@ -1,21 +1,17 @@
 package io.github.inseefrlab.helmwrapper.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.inseefrlab.helmwrapper.model.HelmRepo;
+import io.github.inseefrlab.helmwrapper.utils.Command;
+import org.zeroturnaround.exec.InvalidExitValueException;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import io.github.inseefrlab.helmwrapper.model.HelmRepo;
-import org.springframework.stereotype.Service;
-import org.zeroturnaround.exec.InvalidExitValueException;
-
-import io.github.inseefrlab.helmwrapper.utils.Command;
-
 /**
  * HelmExecuter
  */
-@Service
 public class HelmRepoService {
 
     public HelmRepo[] getHelmRepo()

@@ -2,6 +2,7 @@ package fr.insee.onyxia.api.services.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insee.onyxia.api.configuration.kubernetes.HelmClientProvider;
 import fr.insee.onyxia.api.configuration.kubernetes.KubernetesClientProvider;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.control.AdmissionControllerHelm;
@@ -51,9 +52,6 @@ import static java.util.stream.Collectors.joining;
 public class HelmAppsService implements AppsService {
 
     @Autowired
-    HelmInstallService helm;
-
-    @Autowired
     private KubernetesService kubernetesService;
 
     @Autowired
@@ -69,6 +67,13 @@ public class HelmAppsService implements AppsService {
 
     @Autowired
     private KubernetesClientProvider kubernetesClientProvider;
+
+    @Autowired
+    private HelmClientProvider helmClientProvider;
+
+    private HelmInstallService getHelmInstallService(Region region) {
+        return helmClientProvider.getHelmInstallServiceForRegion(region);
+    }
 
     @Override
     public Collection<Object> installApp(Region region,CreateServiceDTO requestDTO, boolean isGroup, String catalogId, Package pkg,
@@ -88,7 +93,7 @@ public class HelmAppsService implements AppsService {
         mapperHelm.writeValue(values, fusion);
         String namespaceId = determineNamespace(region.getNamespacePrefix(), user);
         String name = isCloudshell ? "cloudshell" : null;
-        HelmInstaller res = helm.installChart(catalogId + "/" + pkg.getName(), namespaceId, name, requestDTO.isDryRun(),
+        HelmInstaller res = getHelmInstallService(region).installChart(catalogId + "/" + pkg.getName(), namespaceId, name, requestDTO.isDryRun(),
                 values);
         values.delete();
         return List.of(res.getManifest());
@@ -108,7 +113,7 @@ public class HelmAppsService implements AppsService {
         }
         List<HelmLs> installedCharts = null;
         try {
-            installedCharts = Arrays.asList(helm.listChartInstall(region.getNamespacePrefix() + user.getIdep()));
+            installedCharts = Arrays.asList(getHelmInstallService(region).listChartInstall(region.getNamespacePrefix() + user.getIdep()));
         } catch (Exception e) {
             return CompletableFuture.completedFuture(new ServicesListing());
         }
@@ -132,17 +137,17 @@ public class HelmAppsService implements AppsService {
         if (serviceId.startsWith("/")) {
             serviceId = serviceId.substring(1);
         }
-        HelmLs result = helm.getAppById(serviceId, determineNamespace(region.getNamespacePrefix(),user));
+        HelmLs result = getHelmInstallService(region).getAppById(serviceId, determineNamespace(region.getNamespacePrefix(),user));
         return getHelmApp(region,result);
     }
 
     @Override
     public UninstallService destroyService(Region region, User user, String serviceId) throws Exception {
-        HelmLs appInfo = helm.getAppById(serviceId, determineNamespace(region.getNamespacePrefix(), user));
+        HelmLs appInfo = getHelmInstallService(region).getAppById(serviceId, determineNamespace(region.getNamespacePrefix(), user));
         UninstallService result = new UninstallService();
         result.setId(appInfo.getName());
         result.setVersion(appInfo.getChart());
-        int status = helm.uninstaller(serviceId, determineNamespace(region.getNamespacePrefix(), user));
+        int status = getHelmInstallService(region).uninstaller(serviceId, determineNamespace(region.getNamespacePrefix(), user));
         if (status != 0) {
             result.setSuccess(false);
         }
@@ -151,7 +156,7 @@ public class HelmAppsService implements AppsService {
     }
 
     private Service getHelmApp(Region region, HelmLs release) {
-        String manifest = helm.getManifest(release.getName(), release.getNamespace());
+        String manifest = getHelmInstallService(region).getManifest(release.getName(), release.getNamespace());
         Service service = getServiceFromRelease(region, release, manifest);
         service.setStatus(findAppStatus(release));
         try {
@@ -163,7 +168,7 @@ public class HelmAppsService implements AppsService {
         service.setName(release.getChart());
         service.setType(Service.ServiceType.KUBERNETES);
         try {
-            String values = helm.getValues(release.getName(), release.getNamespace());
+            String values = getHelmInstallService(region).getValues(release.getName(), release.getNamespace());
             JsonNode node = new ObjectMapper().readTree(values);
             Map<String, String> result = new HashMap<>();
             node.fields().forEachRemaining(currentNode -> mapAppender(result, currentNode, new ArrayList<String>()));
