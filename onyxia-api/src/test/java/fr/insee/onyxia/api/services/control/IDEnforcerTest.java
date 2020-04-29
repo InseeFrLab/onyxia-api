@@ -5,6 +5,7 @@ import fr.insee.onyxia.api.services.control.utils.PublishContext;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.UniversePackage;
 import fr.insee.onyxia.model.region.Region;
+import fr.insee.onyxia.model.service.Service;
 import mesosphere.marathon.client.model.v2.App;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -25,9 +26,11 @@ public class IDEnforcerTest {
     IDEnforcer idEnforcer;
 
     @ParameterizedTest
-    @CsvSource({ "az/*e-efizea, shelly,internal", "az/*e-efizea, ea/*e/ae-e,datascience" })
-    public void shouldChangeServiceIdCloudshell(String userId, String pkgName, String universeId) {
+    @CsvSource({ "users,az/*e-efizea, shelly,internal", ",az/*e-efizea, ea/*e/ae-e,datascience" })
+    public void shouldChangeServiceIdCloudshell(String marathonGroupName, String userId, String pkgName, String universeId) {
         Region region = new Region();
+        region.setType(Service.ServiceType.MARATHON);
+        region.setNamespacePrefix(marathonGroupName);
         User user = new User();
         user.setIdep(userId);
         App app = new App();
@@ -35,7 +38,8 @@ public class IDEnforcerTest {
         pkg.setName(pkgName);
         PublishContext context = new PublishContext(universeId);
         idEnforcer.validateContract(region, app, user, pkg, null, context);
-        Pattern pattern = Pattern.compile("users" + "/[a-z0-9]*/[a-z0-9]*-?.*");
+        Pattern pattern = Pattern.compile(marathonGroupName + "/[a-z0-9]*/[a-z0-9]*-?.*");
+        System.out.println(app.getId());
         Matcher m = pattern.matcher(app.getId());
         assertTrue(m.matches());
     }
