@@ -63,23 +63,46 @@ Open id configuration
 | `keycloak.bearer-only` | `true` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
 | `keycloak.disable-trust-manager` | `false` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
 
-[Marathon](https://mesosphere.github.io/marathon/) configuration
-| Key | Default | Description |
-| --------------------- | ------- | ------------------------------------------------------------------ |
-| `marathon.enabled` | `true` | Enable Marathon support |
-| `marathon.url` | | Marathon base URL |
-| `marathon.auth.token` | | If using DC/OS entreprise security, a valid token with `read, create, update, delete` permissions on `dcos:service:marathon:marathon:services:/{marathon.group.name}` |
-| `marathon.auth.basic.username` | | |
-| `marathon.auth.basic.password` | | |
-| `marathon.group.name` | `users` | Base group / subgroup to deploy apps to. |
-| `marathon.dns.suffix` | `marathon.containerip.dcos.thisdcos.directory` | |
-| `marathon.publish.domain` | `selfservice.example.com` | External dns name |
+Regions configuration :
 
-Kubernetes configuration  
-| Key | Default | Description |
-| --------------------- | ------- | ------------------------------------------------------------------ |
-| `kubernetes.enabled` | `false` | Enable Kubernetes support |
-| `kubernetes.namespace.prefix` | `user-` | Prefix for user namespaces. Can be blank. |
+The env variable that configures regions is `regions`.  
+A valid `JSON` is expected with a list of `region` :
+
+```JSON
+[
+  {
+    "regionId": "kub",
+    "type": "KUBERNETES",
+    "namespace-prefix": "user-",
+    "publish-domain": "fakedomain.kub.example.com",
+    "cloudshell": {
+      "catalogId": "inseefrlab-helm-charts",
+      "packageName": "cloudshell"
+    }
+  },
+  {
+    "regionId": "marathon",
+    "type": "MARATHON",
+    "serverUrl": "",
+    "publish-domain": "fakedomain.marathon.example.com",
+    "namespace-prefix": "users",
+    "marathon-dns-suffix": "marathon.containerip.dcos.thisdcos.directory",
+    "cloudshell": {
+      "catalogId": "internal",
+      "packageName": "shelly"
+    },
+    "auth": {
+      "token": "xxxxx"
+    }
+  }
+]
+```
+
+when using docker, passing json as env can be done using :
+
+```shell
+docker run -p 8080:8080 --env "regions=$(<conf.json)" inseefrlab/onyxia-api
+```
 
 Catalogs configuration  
 | Key | Default | Description |

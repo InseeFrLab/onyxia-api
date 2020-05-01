@@ -2,6 +2,7 @@ package fr.insee.onyxia.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.configuration.BaseTest;
+import fr.insee.onyxia.api.configuration.properties.RegionsConfiguration;
 import fr.insee.onyxia.api.controller.api.user.UserController;
 import fr.insee.onyxia.api.services.utils.HttpRequestUtils;
 import fr.insee.onyxia.model.User;
@@ -28,6 +29,9 @@ public class UserControllerTest extends BaseTest {
 
    @MockBean
    private HttpRequestUtils httpRequestUtils;
+
+   @MockBean
+   private RegionsConfiguration regionsConfiguration;
 
    @Test
    public void shouldReturnUserInfo() throws Exception {

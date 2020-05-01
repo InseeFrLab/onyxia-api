@@ -2,6 +2,7 @@ package fr.insee.onyxia.api.universe;
 
 import fr.insee.onyxia.api.configuration.Catalogs;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 
 @SpringBootTest
 @TestPropertySource(properties = { "catalogs.refresh.ms=3000" })
+@Disabled
 public class CatalogsRefresherTest {
 
     @Autowired

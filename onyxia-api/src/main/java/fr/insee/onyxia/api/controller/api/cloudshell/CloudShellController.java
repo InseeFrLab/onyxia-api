@@ -1,17 +1,16 @@
 package fr.insee.onyxia.api.controller.api.cloudshell;
 
-import fr.insee.onyxia.api.configuration.properties.CloudshellConfiguration;
-import fr.insee.onyxia.api.configuration.properties.OrchestratorConfiguration;
+import fr.insee.onyxia.api.configuration.properties.RegionsConfiguration;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.api.services.impl.MarathonAppsService;
 import fr.insee.onyxia.model.catalog.Package;
+import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.Service;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,26 +33,20 @@ public class CloudShellController {
 	@Autowired
 	private CatalogService catalogService;
 
-	@Value("${marathon.group.name}")
-	private String MARATHON_GROUP_NAME;
-
 	@Autowired
-	private OrchestratorConfiguration orchestratorConfiguration;
-
-	@Autowired
-	private CloudshellConfiguration cloudshellConfiguration;
+	private RegionsConfiguration regionsConfiguration;
 
 	@GetMapping
-	public CloudShellStatus getCloudShellStatus() {
+	public CloudShellStatus getCloudShellStatus(Region region) {
 		CloudShellStatus status = new CloudShellStatus();
-		Service.ServiceType preferredServiceType = orchestratorConfiguration.getPreferredServiceType();
+		Region.CloudshellConfiguration cloudshellConfiguration = region.getCloudshellConfiguration();
 		try {
 			Service service = null;
-			if (preferredServiceType == Service.ServiceType.KUBERNETES) {
-				service = helmAppsService.getUserService(userProvider.getUser(),"cloudshell");
+			if (region.getType().equals(Service.ServiceType.KUBERNETES)) {
+				service = helmAppsService.getUserService(region, userProvider.getUser(),"cloudshell");
 			}
 			else {
-				service = marathonAppsService.getUserService(userProvider.getUser(),"cloudshell");
+				service = marathonAppsService.getUserService(region, userProvider.getUser(),"cloudshell");
 			}
 			status.setStatus(CloudShellStatus.STATUS_UP);
 			service.getUrls().stream().findFirst().ifPresent(url -> status.setUrl(url));

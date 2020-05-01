@@ -1,6 +1,8 @@
 package fr.insee.onyxia.api.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insee.onyxia.api.configuration.properties.RegionsConfiguration;
+import fr.insee.onyxia.model.region.Region;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,15 +51,16 @@ public class CatalogsLoader {
     @Service
     public class CatalogFilter {
 
-        @Value("${marathon.enabled}")
-        private boolean marathonEnabled;
-
-        @Value("${kubernetes.enabled}")
-        private boolean kubernetesEnabled;
+        @Autowired
+        private RegionsConfiguration regionsConfiguration;
 
         private Logger logger = LoggerFactory.getLogger(CatalogFilter.class);
 
         public List<CatalogWrapper>  filterCatalogs(List<CatalogWrapper> catalogs) {
+            List<Region> regions = regionsConfiguration.getResolvedRegions();
+            boolean marathonEnabled = regions.stream().filter(region -> region.getType().equals(fr.insee.onyxia.model.service.Service.ServiceType.MARATHON)).count() > 0;
+            boolean kubernetesEnabled = regions.stream().filter(region -> region.getType().equals(fr.insee.onyxia.model.service.Service.ServiceType.KUBERNETES)).count() > 0;
+
             logger.info("Marathon support enabled : "+marathonEnabled);
             logger.info("Kubernetes support enabled : "+kubernetesEnabled);
             return catalogs.stream().filter(cw -> {

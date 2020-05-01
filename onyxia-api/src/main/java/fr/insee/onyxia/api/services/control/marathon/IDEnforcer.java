@@ -1,15 +1,14 @@
 package fr.insee.onyxia.api.services.control.marathon;
 
-import fr.insee.onyxia.api.configuration.properties.CloudshellConfiguration;
+import fr.insee.onyxia.api.configuration.properties.RegionsConfiguration;
 import fr.insee.onyxia.api.services.control.AdmissionController;
 import fr.insee.onyxia.api.services.control.utils.IDSanitizer;
 import fr.insee.onyxia.api.services.control.utils.PublishContext;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.UniversePackage;
+import fr.insee.onyxia.model.region.Region;
 import mesosphere.marathon.client.model.v2.App;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -23,21 +22,19 @@ public class IDEnforcer implements AdmissionController {
     @Autowired
     IDSanitizer sanitizer;
 
-    @Value("${marathon.group.name}")
-    private String MARATHON_GROUP_NAME;
-
     @Autowired
-    private CloudshellConfiguration cloudshellConfiguration;
+    private RegionsConfiguration regionsConfiguration;
 
     @Override
-    public boolean validateContract(App app, User user, UniversePackage pkg, Map<String, Object> configData,
+    public boolean validateContract(Region region, App app, User user, UniversePackage pkg, Map<String, Object> configData,
             PublishContext context) {
-        if (cloudshellConfiguration.getCatalogId().equals(context.getUniverseId()) && cloudshellConfiguration.getPackageName().equals(pkg.getName())) {
-            app.setId(MARATHON_GROUP_NAME + "/" + sanitizer.sanitize(user.getIdep()) + "/" + "cloudshell");
+        Region.CloudshellConfiguration cloudshellConfiguration = region.getCloudshellConfiguration();
+        if (cloudshellConfiguration != null && cloudshellConfiguration.getCatalogId().equals(context.getUniverseId()) && cloudshellConfiguration.getPackageName().equals(pkg.getName())) {
+            app.setId(region.getNamespacePrefix() + "/" + sanitizer.sanitize(user.getIdep()) + "/" + "cloudshell");
             return true;
         }
 
-        app.setId(MARATHON_GROUP_NAME + "/" + sanitizer.sanitize(user.getIdep()) + "/"
+        app.setId(region.getNamespacePrefix() + "/" + sanitizer.sanitize(user.getIdep()) + "/"
                 + sanitizer.sanitize(pkg.getName()) + "-" + context.getRandomizedId());
         return true;
     }

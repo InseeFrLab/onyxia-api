@@ -42,7 +42,7 @@ public class CatalogLoader {
     private ObjectMapper mapperHelm;
 
     @Autowired
-    private HelmRepoService helmService;
+    private HelmRepoService helmRepoService;
 
     public void updateCatalog(CatalogWrapper cw) {
         logger.info("updating catalog with id :" + cw.getId() + " and type " + cw.getType());
@@ -106,7 +106,7 @@ public class CatalogLoader {
     }
 
     private void updateHelmRepo(CatalogWrapper cw) throws IOException, InterruptedException, TimeoutException {
-           logger.info(helmService.addHelmRepo(cw.getLocation(),cw.getId()));
+           logger.info(helmRepoService.addHelmRepo(cw.getLocation(),cw.getId()));
             // Maybe not userfull add a repo automatically update ???
             //helmService.repoUpdate();
     }

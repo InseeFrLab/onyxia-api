@@ -1,0 +1,14 @@
+{
+  "regions" : [
+    {
+      "regionId": "kub",
+      "type": "KUBERNETES",
+      "namespace-prefix": "user-",
+      "publish-domain": "fakedomain.kub.example.com",
+      "cloudshell" : {
+        "catalogId" : "inseefrlab-helm-charts",
+        "packageName" : "cloudshell"
+      }
+    }
+  ]
+}

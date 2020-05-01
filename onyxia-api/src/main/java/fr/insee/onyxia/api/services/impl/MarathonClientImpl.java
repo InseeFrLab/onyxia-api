@@ -1,29 +1,36 @@
 package fr.insee.onyxia.api.services.impl;
 
+import fr.insee.onyxia.api.configuration.properties.RegionsConfiguration;
+import fr.insee.onyxia.model.region.Region;
 import mesosphere.marathon.client.Marathon;
 import mesosphere.marathon.client.MarathonClient;
-import org.springframework.beans.factory.annotation.Value;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
 
 @Configuration
 public class MarathonClientImpl {
 
-    @Value("${marathon.url}")
-    private String MARATHON_URL;
-
-    @Value("${marathon.auth.token}")
-    private String MARATHON_AUTH_TOKEN;
-
-    @Value("${marathon.auth.basic.username}")
-    private String MARATHON_AUTH_BASIC_USERNAME;
-
-    @Value("${marathon.auth.basic.password}")
-    private String MARATHON_AUTH_BASIC_PASSWORD;
+    @Autowired
+    private RegionsConfiguration regionsConfiguration;
 
     @Bean
     public Marathon marathonClient() {
+        Region region = regionsConfiguration.getResolvedRegions().get(0);
+        String MARATHON_URL = region.getServerUrl();
+        String MARATHON_AUTH_TOKEN = null;
+        String MARATHON_AUTH_BASIC_USERNAME = null;
+        String MARATHON_AUTH_BASIC_PASSWORD = null;
+        if (region.getAuth() != null) {
+            if (!StringUtils.isBlank(region.getAuth().getToken())) {
+                MARATHON_AUTH_TOKEN =region.getAuth().getToken();
+            }
+            else if (!StringUtils.isBlank(region.getAuth().getUsername()) && !StringUtils.isBlank(region.getAuth().getPassword())) {
+                MARATHON_AUTH_BASIC_USERNAME =region.getAuth().getPassword();
+                MARATHON_AUTH_BASIC_PASSWORD = region.getAuth().getUsername();
+            }
+        }
         if (MARATHON_URL == null || MARATHON_URL.isBlank()) {
             return null;
         }

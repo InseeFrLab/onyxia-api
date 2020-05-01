@@ -2,7 +2,7 @@ package fr.insee.onyxia.api.controller.api.mylab;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
-import fr.insee.onyxia.api.configuration.properties.OrchestratorConfiguration;
+import fr.insee.onyxia.api.configuration.properties.RegionsConfiguration;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.api.services.UserProvider;
@@ -13,6 +13,7 @@ import fr.insee.onyxia.model.catalog.Universe;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
 import fr.insee.onyxia.model.dto.ServicesListing;
 import fr.insee.onyxia.model.dto.UpdateServiceDTO;
+import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.Service;
 import fr.insee.onyxia.model.service.UninstallService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -51,20 +52,20 @@ public class MyLabController {
     private Marathon marathon;
 
     @Autowired
-    private OrchestratorConfiguration orchestratorConfiguration;
+    private RegionsConfiguration regionsConfiguration;
 
     private final Logger logger = LoggerFactory.getLogger(MyLabController.class);
 
     @GetMapping("/services")
-    public ServicesListing getMyServices(@RequestParam(required = false) String groupId) throws Exception {
+    public ServicesListing getMyServices(@RequestParam(required = false) String groupId, Region region) throws Exception {
         User user = userProvider.getUser();
         ServicesListing dto = new ServicesListing();
         List<CompletableFuture<ServicesListing>> futures = new ArrayList<>();
-        if (orchestratorConfiguration.isMarathonEnabled()) {
-            futures.add(marathonAppsService.getUserServices(user,groupId));
+        if (region.getType().equals(Service.ServiceType.MARATHON)) {
+            futures.add(marathonAppsService.getUserServices(region,user,groupId));
         }
-        if (orchestratorConfiguration.isKubernetesEnabled()) {
-            futures.add(helmAppsService.getUserServices(user,groupId));
+        if (region.getType().equals(Service.ServiceType.KUBERNETES)) {
+            futures.add(helmAppsService.getUserServices(region,user,groupId));
         }
         for (var future : futures) {
             ServicesListing listing = future.get();
@@ -76,14 +77,11 @@ public class MyLabController {
 
     @GetMapping("/app")
     public @ResponseBody Service getApp(@RequestParam("serviceId") String serviceId,
-            @RequestParam(required = false) Service.ServiceType type) throws Exception {
-        if (type == null) {
-            type = orchestratorConfiguration.getPreferredServiceType();
-        }
-        if (Service.ServiceType.MARATHON.equals(type)) {
-            return marathonAppsService.getUserService(userProvider.getUser(), serviceId);
-        } else if (Service.ServiceType.KUBERNETES.equals(type)) {
-            return helmAppsService.getUserService(userProvider.getUser(), serviceId);
+           Region region) throws Exception {
+        if (Service.ServiceType.MARATHON.equals(region.getType())) {
+            return marathonAppsService.getUserService(region, userProvider.getUser(), serviceId);
+        } else if (Service.ServiceType.KUBERNETES.equals(region.getType())) {
+            return helmAppsService.getUserService(region,userProvider.getUser(), serviceId);
         }
         return null;
     }
@@ -91,29 +89,23 @@ public class MyLabController {
     @GetMapping("/app/logs")
     public @ResponseBody String getLogs(@RequestParam("serviceId") String serviceId,
                                         @RequestParam("taskId") String taskId,
-                                        @RequestParam(required = false) Service.ServiceType type) throws Exception {
-        if (type == null) {
-            type = orchestratorConfiguration.getPreferredServiceType();
-        }
-        if (Service.ServiceType.MARATHON.equals(type)) {
-            return marathonAppsService.getLogs(userProvider.getUser(),serviceId, taskId);
-        } else if (Service.ServiceType.KUBERNETES.equals(type)) {
-            return helmAppsService.getLogs(userProvider.getUser(),serviceId, taskId);
+                                       Region region) throws Exception {
+        if (Service.ServiceType.MARATHON.equals(region.getType())) {
+            return marathonAppsService.getLogs(region, userProvider.getUser(),serviceId, taskId);
+        } else if (Service.ServiceType.KUBERNETES.equals(region.getType())) {
+            return helmAppsService.getLogs(region, userProvider.getUser(),serviceId, taskId);
         }
         return null;
     }
 
     @DeleteMapping("/app")
     public UninstallService destroyApp(@RequestParam("serviceId") String serviceId,
-            @RequestParam(required = false) Service.ServiceType type) throws Exception {
-        if (type == null) {
-            type = orchestratorConfiguration.getPreferredServiceType();
-        }
-        if (Service.ServiceType.MARATHON.equals(type)) {
-            return marathonAppsService.destroyService(userProvider.getUser(), serviceId);
+           Region region) throws Exception {
+        if (Service.ServiceType.MARATHON.equals(region.getType())) {
+            return marathonAppsService.destroyService(region, userProvider.getUser(), serviceId);
 
-        } else if (Service.ServiceType.KUBERNETES.equals(type)) {
-            return helmAppsService.destroyService(userProvider.getUser(), serviceId);
+        } else if (Service.ServiceType.KUBERNETES.equals(region.getType())) {
+            return helmAppsService.destroyService(region, userProvider.getUser(), serviceId);
         }
         return null;
     }
@@ -156,18 +148,18 @@ public class MyLabController {
     }
 
     @PutMapping("/app")
-    public Object publishService(@RequestBody CreateServiceDTO requestDTO)
+    public Object publishService(@RequestBody CreateServiceDTO requestDTO, Region region)
             throws JsonProcessingException, IOException, MarathonException, Exception {
-        return publishApps(requestDTO, false).stream().findFirst().get();
+        return publishApps(region, requestDTO, false).stream().findFirst().get();
     }
 
     @PutMapping("/group")
-    public Collection<Object> publishGroup(@RequestBody CreateServiceDTO requestDTO)
+    public Collection<Object> publishGroup(@RequestBody CreateServiceDTO requestDTO, Region region)
             throws JsonProcessingException, IOException, MarathonException, Exception {
-        return publishApps(requestDTO, true);
+        return publishApps(region, requestDTO, true);
     }
 
-    private Collection<Object> publishApps(CreateServiceDTO requestDTO, boolean isGroup)
+    private Collection<Object> publishApps(Region region, CreateServiceDTO requestDTO, boolean isGroup)
             throws JsonProcessingException, IOException, MarathonException, Exception {
         String catalogId = "internal";
         if (requestDTO.getCatalogId() != null && requestDTO.getCatalogId().length() > 0) {
@@ -179,9 +171,9 @@ public class MyLabController {
         Map<String, Object> fusion = new HashMap<>();
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
         if (Universe.TYPE_UNIVERSE.equals(catalog.getType())) {
-            return marathonAppsService.installApp(requestDTO, isGroup, catalogId, pkg, user, fusion);
+            return marathonAppsService.installApp(region,requestDTO, isGroup, catalogId, pkg, user, fusion);
         } else {
-            return helmAppsService.installApp(requestDTO, isGroup, catalogId, pkg, user, fusion);
+            return helmAppsService.installApp(region,requestDTO, isGroup, catalogId, pkg, user, fusion);
         }
     }
 

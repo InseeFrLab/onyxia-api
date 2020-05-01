@@ -1,6 +1,8 @@
 package fr.insee.onyxia.api.services.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insee.onyxia.api.configuration.HttpClientProvider;
+import fr.insee.onyxia.api.configuration.properties.RegionsConfiguration;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.control.AdmissionController;
 import fr.insee.onyxia.api.services.control.commons.UrlGenerator;
@@ -11,6 +13,7 @@ import fr.insee.onyxia.model.catalog.Package;
 import fr.insee.onyxia.model.catalog.UniversePackage;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
 import fr.insee.onyxia.model.dto.ServicesListing;
+import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.Task;
 import fr.insee.onyxia.model.service.UninstallService;
 import fr.insee.onyxia.mustache.Mustacheur;
@@ -18,13 +21,11 @@ import mesosphere.marathon.client.Marathon;
 import mesosphere.marathon.client.model.v2.App;
 import mesosphere.marathon.client.model.v2.Group;
 import mesosphere.marathon.client.model.v2.Result;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -39,14 +40,6 @@ import java.util.stream.Collectors;
 @Service
 @Qualifier("Marathon")
 public class MarathonAppsService implements AppsService {
-    @Value("${marathon.dns.suffix}")
-    private String MARATHON_DNS_SUFFIX;
-
-    @Value("${marathon.group.name}")
-    private String MARATHON_GROUP_NAME;
-
-    @Value("${marathon.publish.domain}")
-    private String baseDomain;
 
     @Autowired(required = false)
     Marathon marathon;
@@ -64,12 +57,12 @@ public class MarathonAppsService implements AppsService {
     private UrlGenerator generator;
 
     @Autowired
-    @Qualifier("marathon")
-    private OkHttpClient marathonClient;
-
-    private @Value("${marathon.url}") String MARATHON_URL;
+    private HttpClientProvider httpClientProvider;
 
     private DateFormat marathonDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+
+    @Autowired
+    private RegionsConfiguration regionsConfiguration;
 
     @PostConstruct
     public void postConstruct() {
@@ -80,7 +73,7 @@ public class MarathonAppsService implements AppsService {
 
     @NotNull
     @Override
-    public Collection<Object> installApp(CreateServiceDTO requestDTO, boolean isGroup, String catalogId, Package pkg,
+    public Collection<Object> installApp(Region region, CreateServiceDTO requestDTO, boolean isGroup, String catalogId, Package pkg,
             User user, Map<String, Object> fusion) throws Exception {
         PublishContext context = new PublishContext(catalogId);
         UniversePackage universePkg = (UniversePackage) pkg;
@@ -90,12 +83,12 @@ public class MarathonAppsService implements AppsService {
         Map<String, String> contextData = new HashMap<>();
         contextData.put("internaldns",
                 idSanitizer.sanitize(pkg.getName()) + "-" + context.getRandomizedId() + "-"
-                        + idSanitizer.sanitize(user.getIdep()) + "-" + idSanitizer.sanitize(MARATHON_GROUP_NAME) + "."
-                        + MARATHON_DNS_SUFFIX);
+                        + idSanitizer.sanitize(user.getIdep()) + "-" + idSanitizer.sanitize(region.getNamespacePrefix()) + "."
+                        + region.getMarathonDnsSuffix());
 
         for (int i = 0; i < 10; i++) {
             contextData.put("externaldns-" + i,
-                    generator.generateUrl(user.getIdep(), pkg.getName(), context.getRandomizedId(), i, baseDomain));
+                    generator.generateUrl(user.getIdep(), pkg.getName(), context.getRandomizedId(), i, region.getPublishDomain()));
         }
 
         fusion.put("context", contextData);
@@ -114,7 +107,7 @@ public class MarathonAppsService implements AppsService {
 
             // Apply every admission controller
             long nbInvalidations = admissionControllers.stream().map(admissionController -> admissionController
-                    .validateContract(app, user, universePkg, (Map<String, Object>) requestDTO.getOptions(), context))
+                    .validateContract(region, app, user, universePkg, (Map<String, Object>) requestDTO.getOptions(), context))
                     .filter(b -> !b).count();
             if (nbInvalidations > 0) {
                 throw new AccessDeniedException("Validation failed");
@@ -129,21 +122,22 @@ public class MarathonAppsService implements AppsService {
     }
 
     @Override
-    public CompletableFuture<ServicesListing> getUserServices(User user) throws IllegalAccessException, IOException {
-        return getUserServices(user, null);
+    public CompletableFuture<ServicesListing> getUserServices(Region region, User user) throws IllegalAccessException, IOException {
+        return getUserServices(region, user, null);
     }
 
     @Override
-    public CompletableFuture<ServicesListing> getUserServices(User user, String groupId)
+    public CompletableFuture<ServicesListing> getUserServices(Region region, User user, String groupId)
             throws IllegalAccessException, IOException {
-        if (groupId != null && !groupId.startsWith(getUserGroupPath(user))) {
+        String namespacePrefix = region.getNamespacePrefix();
+        if (groupId != null && !groupId.startsWith(getUserGroupPath(namespacePrefix,user))) {
             throw new IllegalAccessException("Permission denied. " + user.getIdep() + " can not access " + groupId);
         }
 
         if (groupId == null) {
-            groupId = getUserGroupPath(user);
+            groupId = getUserGroupPath(namespacePrefix,user);
         }
-        Group group = getGroup(groupId);
+        Group group = getGroup(region, groupId);
         ServicesListing listing = new ServicesListing();
         listing.setApps(group.getApps().stream().map(app -> mapAppToService(app)).collect(Collectors.toList()));
         listing.setGroups(group.getGroups().stream().map(gr -> mapGroup(gr)).collect(Collectors.toList()));
@@ -151,21 +145,21 @@ public class MarathonAppsService implements AppsService {
     }
 
     @Override
-    public fr.insee.onyxia.model.service.Service getUserService(User user, String serviceId) throws Exception {
-        String fullServiceId = getFullServiceId(user,serviceId);
-        checkPermission(user,fullServiceId);
+    public fr.insee.onyxia.model.service.Service getUserService(Region region, User user, String serviceId) throws Exception {
+        String fullServiceId = getFullServiceId(user,region.getNamespacePrefix(), serviceId);
+        checkPermission(region, user,fullServiceId);
         return mapAppToService(marathon.getApp(fullServiceId.substring(1)).getApp());
     }
 
     @Override
-    public String getLogs(User user,String serviceId, String taskId) {
+    public String getLogs(Region region, User user,String serviceId, String taskId) {
         return "Feature not implemented";
     }
 
     @Override
-    public UninstallService destroyService(User user, String serviceId) throws IllegalAccessException {
-        String fullId = getFullServiceId(user,serviceId);
-        checkPermission(user,fullId);
+    public UninstallService destroyService(Region region, User user, String serviceId) throws IllegalAccessException {
+        String fullId = getFullServiceId(user,region.getNamespacePrefix(), serviceId);
+        checkPermission(region, user,fullId);
         Result appUninstaller = marathon.deleteApp(fullId.substring(1));
         UninstallService result = new UninstallService();
         result.setId(appUninstaller.getDeploymentId());
@@ -174,16 +168,16 @@ public class MarathonAppsService implements AppsService {
         return result;
     }
 
-    private void checkPermission(User user, String fullId) throws IllegalAccessException {
-        if (!fullId.startsWith("/"+MARATHON_GROUP_NAME+"/"+user.getIdep())) {
+    private void checkPermission(Region region, User user, String fullId) throws IllegalAccessException {
+        if (!fullId.startsWith("/"+region.getNamespacePrefix()+"/"+user.getIdep())) {
             throw new IllegalAccessException("User "+user.getIdep()+" can not access "+fullId);
         }
     }
 
-    private String getFullServiceId(User user, String serviceId) {
+    private String getFullServiceId(User user, String namespacePrefix, String serviceId) {
         String fullId = serviceId;
         if (!fullId.startsWith("/")) {
-            fullId = "/"+getUserGroupPath(user) + "/" + serviceId;
+            fullId = "/"+getUserGroupPath(namespacePrefix, user) + "/" + serviceId;
         }
         return fullId;
     }
@@ -237,8 +231,8 @@ public class MarathonAppsService implements AppsService {
         }
     }
 
-    private String getUserGroupPath(User user) {
-        return MARATHON_GROUP_NAME + "/" + user.getIdep();
+    private String getUserGroupPath(String namespacePrefix, User user) {
+        return namespacePrefix + "/" + user.getIdep();
     }
 
     /**
@@ -249,14 +243,14 @@ public class MarathonAppsService implements AppsService {
      * @return
      * @throws IOException
      */
-    private Group getGroup(String id) throws IOException {
+    private Group getGroup(Region region, String id) throws IOException {
 
-        Request requete = new Request.Builder().url(MARATHON_URL + "/v2/groups/" + id + "?" + "embed=group.groups" + "&"
+        Request requete = new Request.Builder().url(region.getServerUrl() + "/v2/groups/" + id + "?" + "embed=group.groups" + "&"
                 + "embed=group.apps" + "&" + "embed=group.apps.tasks" + "&" + "embed=group.apps.counts" + "&"
                 + "embed=group.apps.deployments" + "&" + "embed=group.apps.readiness" + "&"
                 + "embed=group.apps.lastTaskFailure" + "&" + "embed=group.pods" + "&" + "embed=group.apps.taskStats")
                 .build();
-        Response response = marathonClient.newCall(requete).execute();
+        Response response = httpClientProvider.getClientForRegion(region).newCall(requete).execute();
         Group groupResponse = mapper.readValue(response.body().byteStream(), Group.class);
         return groupResponse;
 
