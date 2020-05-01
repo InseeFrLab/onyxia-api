@@ -1,6 +1,6 @@
 package fr.insee.onyxia.api.services.control;
 
-import fr.insee.onyxia.api.services.control.marathon.IDEnforcer;
+import fr.insee.onyxia.api.services.control.marathon.IDValidator;
 import fr.insee.onyxia.api.services.control.utils.PublishContext;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.UniversePackage;
@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest
 public class IDEnforcerTest {
     @Autowired
-    IDEnforcer idEnforcer;
+    IDValidator idEnforcer;
 
     @ParameterizedTest
     @CsvSource({ "users,az/*e-efizea, shelly,internal", ",az/*e-efizea, ea/*e/ae-e,datascience" })
@@ -37,7 +37,7 @@ public class IDEnforcerTest {
         UniversePackage pkg = new UniversePackage();
         pkg.setName(pkgName);
         PublishContext context = new PublishContext(universeId);
-        idEnforcer.validateContract(region, app, user, pkg, null, context);
+        idEnforcer.validateContract(region, null, app, user, pkg, null, context);
         Pattern pattern = Pattern.compile(marathonGroupName + "/[a-z0-9]*/[a-z0-9]*-?.*");
         System.out.println(app.getId());
         Matcher m = pattern.matcher(app.getId());

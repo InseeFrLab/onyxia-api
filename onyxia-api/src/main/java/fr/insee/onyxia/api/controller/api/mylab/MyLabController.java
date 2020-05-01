@@ -150,16 +150,10 @@ public class MyLabController {
     @PutMapping("/app")
     public Object publishService(@RequestBody CreateServiceDTO requestDTO, Region region)
             throws JsonProcessingException, IOException, MarathonException, Exception {
-        return publishApps(region, requestDTO, false).stream().findFirst().get();
+        return publishApps(region, requestDTO);
     }
 
-    @PutMapping("/group")
-    public Collection<Object> publishGroup(@RequestBody CreateServiceDTO requestDTO, Region region)
-            throws JsonProcessingException, IOException, MarathonException, Exception {
-        return publishApps(region, requestDTO, true);
-    }
-
-    private Collection<Object> publishApps(Region region, CreateServiceDTO requestDTO, boolean isGroup)
+    private Collection<Object> publishApps(Region region, CreateServiceDTO requestDTO)
             throws JsonProcessingException, IOException, MarathonException, Exception {
         String catalogId = "internal";
         if (requestDTO.getCatalogId() != null && requestDTO.getCatalogId().length() > 0) {
@@ -171,9 +165,9 @@ public class MyLabController {
         Map<String, Object> fusion = new HashMap<>();
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
         if (Universe.TYPE_UNIVERSE.equals(catalog.getType())) {
-            return marathonAppsService.installApp(region,requestDTO, isGroup, catalogId, pkg, user, fusion);
+            return marathonAppsService.installApp(region,requestDTO,  catalogId, pkg, user, fusion);
         } else {
-            return helmAppsService.installApp(region,requestDTO, isGroup, catalogId, pkg, user, fusion);
+            return helmAppsService.installApp(region,requestDTO, catalogId, pkg, user, fusion);
         }
     }
 

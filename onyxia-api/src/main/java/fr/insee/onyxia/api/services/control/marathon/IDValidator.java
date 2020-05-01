@@ -2,7 +2,7 @@ package fr.insee.onyxia.api.services.control.marathon;
 
 import fr.insee.onyxia.api.configuration.properties.RegionsConfiguration;
 import fr.insee.onyxia.api.services.control.AdmissionControllerMarathon;
-import fr.insee.onyxia.api.services.control.commons.UrlGenerator;
+import fr.insee.onyxia.api.services.control.utils.IDSanitizer;
 import fr.insee.onyxia.api.services.control.utils.PublishContext;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.UniversePackage;
@@ -13,15 +13,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
-import java.util.regex.Pattern;
 
+/**
+ * Enforce service id
+ */
 @Service
-public class URLEnforcer implements AdmissionControllerMarathon {
-
-    private static Pattern PATTERN_HAPROXY_VHOST = Pattern.compile("HAPROXY_([0-9]*)_VHOST");
+public class IDValidator implements AdmissionControllerMarathon {
 
     @Autowired
-    private UrlGenerator urlGenerator;
+    IDSanitizer sanitizer;
 
     @Autowired
     private RegionsConfiguration regionsConfiguration;
@@ -32,8 +32,4 @@ public class URLEnforcer implements AdmissionControllerMarathon {
         return true;
     }
 
-    @Override
-    public Integer getPriority() {
-        return Integer.MAX_VALUE;
-    }
 }

@@ -23,7 +23,7 @@ public interface AppsService {
         CompletableFuture<ServicesListing> getUserServices(Region region,User user, String groupId)
                 throws IllegalAccessException,  IOException;
 
-        Collection<Object> installApp(Region region,CreateServiceDTO requestDTO, boolean isGroup, String catalogId, Package pkg,
+        Collection<Object> installApp(Region region,CreateServiceDTO requestDTO, String catalogId, Package pkg,
                         User user, Map<String, Object> fusion) throws Exception;
 
         Service getUserService(Region region,User user, String serviceId) throws Exception;

@@ -4,11 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.configuration.HttpClientProvider;
 import fr.insee.onyxia.api.configuration.properties.RegionsConfiguration;
 import fr.insee.onyxia.api.services.AppsService;
-import fr.insee.onyxia.api.services.control.AdmissionController;
+import fr.insee.onyxia.api.services.control.AdmissionControllerMarathon;
 import fr.insee.onyxia.api.services.control.commons.UrlGenerator;
 import fr.insee.onyxia.api.services.control.utils.IDSanitizer;
 import fr.insee.onyxia.api.services.control.utils.PublishContext;
 import fr.insee.onyxia.model.User;
+import fr.insee.onyxia.model.catalog.Config.Property;
 import fr.insee.onyxia.model.catalog.Package;
 import fr.insee.onyxia.model.catalog.UniversePackage;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
@@ -51,7 +52,7 @@ public class MarathonAppsService implements AppsService {
     private IDSanitizer idSanitizer;
 
     @Autowired
-    private List<AdmissionController> admissionControllers;
+    private List<AdmissionControllerMarathon> admissionControllers;
 
     @Autowired
     private UrlGenerator generator;
@@ -71,47 +72,173 @@ public class MarathonAppsService implements AppsService {
         });
     }
 
+
+    private static class XGeneratedContext {
+        private String groupIdKey;
+        private Map<String, Scope> scopes = new HashMap<>();
+
+        public String getGroupIdKey() {
+            return groupIdKey;
+        }
+
+        public void setGroupIdKey(String groupIdKey) {
+            this.groupIdKey = groupIdKey;
+        }
+
+        public Map<String, Scope> getScopes() {
+            return scopes;
+        }
+
+        public void setScopes(Map<String, Scope> scopes) {
+            this.scopes = scopes;
+        }
+
+        private static class Scope {
+            private String scopeName;
+            private Map<String, Property.XGenerated> xGenerateds = new HashMap<>();
+
+            public String getScopeName() {
+                return scopeName;
+            }
+
+            public void setScopeName(String scopeName) {
+                this.scopeName = scopeName;
+            }
+
+            public Map<String, Property.XGenerated> getxGenerateds() {
+                return xGenerateds;
+            }
+
+            public void setxGenerateds(Map<String, Property.XGenerated> xGenerateds) {
+                this.xGenerateds = xGenerateds;
+            }
+        }
+    }
+
+    private void readXGenerated(List<String> path, Property property, XGeneratedContext context) {
+        String currentPath = path.stream().collect(Collectors.joining("."));
+        if (property.getProperties() != null) {
+            for (Map.Entry<String,Property> prop: property.getProperties().entrySet()) {
+                List<String> newPath = new ArrayList<>();
+                newPath.addAll(path);
+                newPath.add(prop.getKey());
+                readXGenerated(newPath, prop.getValue(), context);
+            }
+        }
+        else if (property.getxGenerated() != null) {
+            Property.XGenerated xGenerated = property.getxGenerated();
+            if (xGenerated.getType() == Property.XGenerated.XGeneratedType.GroupID) {
+                context.setGroupIdKey(path.stream().collect(Collectors.joining(".")));
+                return;
+            }
+
+            String scopeName = xGenerated.getScope();
+            if (!context.getScopes().containsKey(scopeName)) {
+                context.getScopes().put(scopeName,new XGeneratedContext.Scope());
+            }
+
+            XGeneratedContext.Scope scope = context.getScopes().get(scopeName);
+            scope.getxGenerateds().put(currentPath,property.getxGenerated());
+        }
+    }
+
+    private String generateBaseId(Region region, User user, String groupName, String randomizedId) {
+        return "/"+region.getNamespacePrefix() + "/" + idSanitizer.sanitize(user.getIdep()) + (groupName != null ? "/" + groupName+"-"+ randomizedId : "");
+    }
+
+    private String generateGroupId(Region region, User user, String groupName, String randomizedId) {
+        return generateBaseId(region, user, groupName, randomizedId);
+    }
+
+    private String generateAppId(Region region, User user, String groupName, String appName, String randomizedId) {
+        return generateBaseId(region, user, groupName,randomizedId)+"/"+idSanitizer.sanitize(appName)+(groupName != null ? "" :  "-" + randomizedId);
+    }
+
+    private void injectIntoContext(Map<String, Object> context, Map<String,String> toInject ) {
+        toInject.forEach((k,v) -> {
+            System.out.println(k);
+            String[] splittedPath = k.split("\\.");
+            Map<String,Object> currentContext = context;
+            for (int i = 0; i < splittedPath.length - 1; i++) {
+                currentContext.putIfAbsent(splittedPath[i], new HashMap<String,Object>());
+                currentContext = (Map<String,Object>) currentContext.get(splittedPath[i]);
+            }
+            currentContext.put(splittedPath[splittedPath.length-1],v);
+        });
+    }
+
     @NotNull
     @Override
-    public Collection<Object> installApp(Region region, CreateServiceDTO requestDTO, boolean isGroup, String catalogId, Package pkg,
+    public Collection<Object> installApp(Region region, CreateServiceDTO requestDTO, String catalogId, Package pkg,
             User user, Map<String, Object> fusion) throws Exception {
         PublishContext context = new PublishContext(catalogId);
         UniversePackage universePkg = (UniversePackage) pkg;
         Map<String, Object> resource = universePkg.getResource();
         fusion.putAll(Map.of("resource", resource));
 
-        Map<String, String> contextData = new HashMap<>();
-        contextData.put("internaldns",
-                idSanitizer.sanitize(pkg.getName()) + "-" + context.getRandomizedId() + "-"
-                        + idSanitizer.sanitize(user.getIdep()) + "-" + idSanitizer.sanitize(region.getNamespacePrefix()) + "."
-                        + region.getMarathonDnsSuffix());
+        XGeneratedContext xGeneratedContext = new XGeneratedContext();
+        universePkg.getConfig().getProperties().getProperties().entrySet().stream().forEach((entry) -> {
+            readXGenerated(Arrays.asList(entry.getKey()),entry.getValue(),xGeneratedContext);
+        });
 
-        for (int i = 0; i < 10; i++) {
-            contextData.put("externaldns-" + i,
-                    generator.generateUrl(user.getIdep(), pkg.getName(), context.getRandomizedId(), i, region.getPublishDomain()));
+        boolean isGroup = false;
+        final String sanitizedPackageName = idSanitizer.sanitize(pkg.getName());
+        Map<String,String> xGeneratedValues = new HashMap<>();
+        if (xGeneratedContext.getGroupIdKey() != null) {
+            isGroup = true;
+            if (xGeneratedContext.getGroupIdKey() != null) {
+                xGeneratedValues.put(xGeneratedContext.getGroupIdKey(), generateGroupId(region,user, pkg.getName(), context.getGlobalContext().getRandomizedId()));
+            }
         }
 
-        fusion.put("context", contextData);
+        final boolean isGroupFinal = isGroup;
+        xGeneratedContext.getScopes().forEach((scopeName,scope) -> {
+            scope.getxGenerateds().forEach((name,xGenerated) -> {
+                if (xGenerated.getType() == Property.XGenerated.XGeneratedType.AppID) {
+                    xGeneratedValues.put(name, generateAppId(region,user,isGroupFinal ? sanitizedPackageName : null,scopeName, context.getGlobalContext().getRandomizedId()));
+                }
+                if (xGenerated.getType() == Property.XGenerated.XGeneratedType.ExternalDNS) {
+                    xGeneratedValues.put(name, generator.generateUrl(user.getIdep(), pkg.getName(), context.getGlobalContext().getRandomizedId(), scopeName, region.getPublishDomain()));
+                }
+
+                if (xGenerated.getType() == Property.XGenerated.XGeneratedType.InternalDNS) {
+                    xGeneratedValues.put(name, idSanitizer.sanitize(scopeName) + "-" + (isGroupFinal ? sanitizedPackageName + "-" + context.getGlobalContext().getRandomizedId() : sanitizedPackageName) + "-"
+                            + idSanitizer.sanitize(user.getIdep()) + "-" + idSanitizer.sanitize(region.getNamespacePrefix()) + "."
+                            + region.getMarathonDnsSuffix());
+                }
+            });
+        });
+
+        xGeneratedValues.entrySet().forEach(entry -> {
+            System.out.println(entry.getKey()+":"+entry.getValue());
+        });
+
+        injectIntoContext(fusion,xGeneratedValues);
 
         String toMarathon = Mustacheur.mustache(universePkg.getJsonMustache(), fusion);
         Collection<App> apps;
+        Group enclosingGroup = null;
         if (isGroup) {
-            Group group = mapper.readValue(toMarathon, Group.class);
-            apps = group.getApps();
+            enclosingGroup = mapper.readValue(toMarathon, Group.class);
+            apps = enclosingGroup.getApps();
         } else {
             apps = new ArrayList<>();
             apps.add(mapper.readValue(toMarathon, App.class));
         }
 
         for (App app : apps) {
-
+            final Group enclosingGroupFinal = enclosingGroup;
             // Apply every admission controller
             long nbInvalidations = admissionControllers.stream().map(admissionController -> admissionController
-                    .validateContract(region, app, user, universePkg, (Map<String, Object>) requestDTO.getOptions(), context))
+                    .validateContract(region, enclosingGroupFinal, app, user, universePkg, (Map<String, Object>) requestDTO.getOptions(), context))
                     .filter(b -> !b).count();
             if (nbInvalidations > 0) {
                 throw new AccessDeniedException("Validation failed");
             }
+        }
+
+        for (App app : apps) {
+            checkPermission(region,user,app.getId());
         }
 
         if (requestDTO.isDryRun()) {

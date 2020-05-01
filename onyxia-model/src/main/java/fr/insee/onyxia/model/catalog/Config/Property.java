@@ -1,11 +1,9 @@
 package fr.insee.onyxia.model.catalog.Config;
 
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.print.attribute.standard.Media;
+import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Property {
@@ -22,6 +20,9 @@ public class Property {
 
     @JsonProperty("x-form")
     private XForm xform;
+
+    @JsonProperty("x-generated")
+    private XGenerated xGenerated;
 
     public XForm getXform() {
         return xform;
@@ -95,6 +96,14 @@ public class Property {
         this.minimum = minimum;
     }
 
+    public XGenerated getxGenerated() {
+        return xGenerated;
+    }
+
+    public void setxGenerated(XGenerated xGenerated) {
+        this.xGenerated = xGenerated;
+    }
+
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Media {
         String type;
@@ -137,6 +146,35 @@ public class Property {
 
         public void setValue(String value) {
             this.value = value;
+        }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class XGenerated {
+
+        private XGeneratedType type;
+        private String scope;
+
+        public XGeneratedType getType() {
+            return type;
+        }
+
+        public void setType(XGeneratedType type) {
+            this.type = type;
+        }
+
+        public String getScope() {
+            return scope;
+        }
+
+        public void setScope(String scope) {
+            this.scope = scope;
+        }
+
+        public static enum XGeneratedType {
+            GroupID, AppID, RandomID, InternalDNS,
+            @JsonProperty("external-DNS")
+            ExternalDNS;
         }
     }
 

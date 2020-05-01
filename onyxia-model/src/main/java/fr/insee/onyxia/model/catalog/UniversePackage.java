@@ -1,15 +1,13 @@
 package fr.insee.onyxia.model.catalog;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import fr.insee.onyxia.model.catalog.Config.Config;
+
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import fr.insee.onyxia.model.catalog.Config.Config;
-import fr.insee.onyxia.model.catalog.Package;
 
 public class UniversePackage extends Package {
 
