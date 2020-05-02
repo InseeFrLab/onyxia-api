@@ -148,7 +148,7 @@ public class MarathonAppsService implements AppsService {
     }
 
     private String generateBaseId(Region region, User user, String groupName, String randomizedId) {
-        return "/"+region.getNamespacePrefix() + "/" + idSanitizer.sanitize(user.getIdep()) + (groupName != null ? "/" + groupName+"-"+ randomizedId : "");
+        return "/"+region.getNamespacePrefix() + "/" + idSanitizer.sanitize(user.getIdep()) + (groupName != null ? "/" + idSanitizer.sanitize(groupName)+"-"+ randomizedId : "");
     }
 
     private String generateGroupId(Region region, User user, String groupName, String randomizedId) {
