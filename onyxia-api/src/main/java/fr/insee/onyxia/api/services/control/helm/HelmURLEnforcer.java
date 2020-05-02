@@ -42,7 +42,7 @@ public class HelmURLEnforcer implements AdmissionControllerHelm {
 
     private String getUrl(String publishDomain, User user, Package pkg, PublishContext context) {
         return urlGenerator.generateUrl(user.getIdep(), pkg.getName(),
-                context.getRandomizedId(), 0, publishDomain);
+                context.getGlobalContext().getRandomizedId(), "", publishDomain);
     }
 
 }

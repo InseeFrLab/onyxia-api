@@ -76,7 +76,7 @@ public class HelmAppsService implements AppsService {
     }
 
     @Override
-    public Collection<Object> installApp(Region region,CreateServiceDTO requestDTO, boolean isGroup, String catalogId, Package pkg,
+    public Collection<Object> installApp(Region region,CreateServiceDTO requestDTO, String catalogId, Package pkg,
             User user, Map<String, Object> fusion) throws IOException, TimeoutException, InterruptedException {
         Region.CloudshellConfiguration cloudshellConfiguration = region.getCloudshellConfiguration();
         boolean isCloudshell =false;

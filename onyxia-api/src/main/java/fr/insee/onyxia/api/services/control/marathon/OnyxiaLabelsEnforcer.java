@@ -1,20 +1,21 @@
 package fr.insee.onyxia.api.services.control.marathon;
 
-import fr.insee.onyxia.api.services.control.AdmissionController;
+import fr.insee.onyxia.api.services.control.AdmissionControllerMarathon;
 import fr.insee.onyxia.api.services.control.utils.PublishContext;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.UniversePackage;
 import fr.insee.onyxia.model.region.Region;
 import mesosphere.marathon.client.model.v2.App;
+import mesosphere.marathon.client.model.v2.Group;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
 @Service
-public class OnyxiaLabelsEnforcer implements AdmissionController {
+public class OnyxiaLabelsEnforcer implements AdmissionControllerMarathon {
 
     @Override
-    public boolean validateContract(Region region, App app, User user, UniversePackage pkg, Map<String,Object> configData, PublishContext context) {
+    public boolean validateContract(Region region, Group group, App app, User user, UniversePackage pkg, Map<String,Object> configData, PublishContext context) {
 
         Map<String, String> onyxiaOptions = (Map<String,String>) configData.get("onyxia");
         app.addLabel("ONYXIA_NAME", pkg.getName());
