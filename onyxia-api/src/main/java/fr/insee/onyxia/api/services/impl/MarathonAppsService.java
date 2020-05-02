@@ -191,7 +191,7 @@ public class MarathonAppsService implements AppsService {
         if (xGeneratedContext.getGroupIdKey() != null) {
             isGroup = true;
             if (xGeneratedContext.getGroupIdKey() != null) {
-                xGeneratedValues.put(xGeneratedContext.getGroupIdKey(), generateGroupId(region,user, pkg.getName(), context.getGlobalContext().getRandomizedId()));
+                xGeneratedValues.put(xGeneratedContext.getGroupIdKey(), generateGroupId(region,user, sanitizedPackageName, context.getGlobalContext().getRandomizedId()));
             }
         }
 
@@ -202,7 +202,7 @@ public class MarathonAppsService implements AppsService {
                     xGeneratedValues.put(name, generateAppId(region,user,isGroupFinal ? sanitizedPackageName : null,scopeName, context.getGlobalContext().getRandomizedId()));
                 }
                 if (xGenerated.getType() == Property.XGenerated.XGeneratedType.ExternalDNS) {
-                    xGeneratedValues.put(name, generator.generateUrl(user.getIdep(), pkg.getName(), context.getGlobalContext().getRandomizedId(), scopeName+(StringUtils.isNotBlank(xGenerated.getName()) ? "-"+xGenerated.getName() : ""), region.getPublishDomain()));
+                    xGeneratedValues.put(name, generator.generateUrl(user.getIdep(), sanitizedPackageName context.getGlobalContext().getRandomizedId(), scopeName+(StringUtils.isNotBlank(xGenerated.getName()) ? "-"+xGenerated.getName() : ""), region.getPublishDomain()));
                 }
 
                 if (xGenerated.getType() == Property.XGenerated.XGeneratedType.InternalDNS) {
