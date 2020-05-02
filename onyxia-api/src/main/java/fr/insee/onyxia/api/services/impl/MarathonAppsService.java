@@ -6,6 +6,7 @@ import fr.insee.onyxia.api.configuration.properties.RegionsConfiguration;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.control.AdmissionControllerMarathon;
 import fr.insee.onyxia.api.services.control.commons.UrlGenerator;
+import fr.insee.onyxia.api.services.control.marathon.security.PermissionsChecker;
 import fr.insee.onyxia.api.services.control.utils.IDSanitizer;
 import fr.insee.onyxia.api.services.control.utils.PublishContext;
 import fr.insee.onyxia.model.User;
@@ -65,6 +66,9 @@ public class MarathonAppsService implements AppsService {
 
     @Autowired
     private RegionsConfiguration regionsConfiguration;
+
+    @Autowired
+    private PermissionsChecker permissionsChecker;
 
     @PostConstruct
     public void postConstruct() {
@@ -233,10 +237,6 @@ public class MarathonAppsService implements AppsService {
             }
         }
 
-        for (App app : apps) {
-            checkPermission(region,user,app.getId());
-        }
-
         if (requestDTO.isDryRun()) {
             return apps.stream().collect(Collectors.toList());
         } else {
@@ -270,7 +270,7 @@ public class MarathonAppsService implements AppsService {
     @Override
     public fr.insee.onyxia.model.service.Service getUserService(Region region, User user, String serviceId) throws Exception {
         String fullServiceId = getFullServiceId(user,region.getNamespacePrefix(), serviceId);
-        checkPermission(region, user,fullServiceId);
+        permissionsChecker.checkPermission(region, user,fullServiceId);
         return mapAppToService(marathon.getApp(fullServiceId.substring(1)).getApp());
     }
 
@@ -282,7 +282,7 @@ public class MarathonAppsService implements AppsService {
     @Override
     public UninstallService destroyService(Region region, User user, String serviceId) throws IllegalAccessException {
         String fullId = getFullServiceId(user,region.getNamespacePrefix(), serviceId);
-        checkPermission(region, user,fullId);
+        permissionsChecker.checkPermission(region, user,fullId);
         Result appUninstaller = marathon.deleteApp(fullId.substring(1));
         UninstallService result = new UninstallService();
         result.setId(appUninstaller.getDeploymentId());
@@ -291,11 +291,7 @@ public class MarathonAppsService implements AppsService {
         return result;
     }
 
-    private void checkPermission(Region region, User user, String fullId) throws IllegalAccessException {
-        if (!fullId.startsWith("/"+region.getNamespacePrefix()+"/"+user.getIdep())) {
-            throw new IllegalAccessException("User "+user.getIdep()+" can not access "+fullId);
-        }
-    }
+
 
     private String getFullServiceId(User user, String namespacePrefix, String serviceId) {
         String fullId = serviceId;

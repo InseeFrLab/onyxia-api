@@ -1,8 +1,7 @@
 package fr.insee.onyxia.api.services.control.marathon;
 
-import fr.insee.onyxia.api.configuration.properties.RegionsConfiguration;
 import fr.insee.onyxia.api.services.control.AdmissionControllerMarathon;
-import fr.insee.onyxia.api.services.control.utils.IDSanitizer;
+import fr.insee.onyxia.api.services.control.marathon.security.PermissionsChecker;
 import fr.insee.onyxia.api.services.control.utils.PublishContext;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.UniversePackage;
@@ -19,16 +18,18 @@ import java.util.Map;
  */
 @Service
 public class IDValidator implements AdmissionControllerMarathon {
-
     @Autowired
-    IDSanitizer sanitizer;
-
-    @Autowired
-    private RegionsConfiguration regionsConfiguration;
+    private PermissionsChecker permissionsChecker;
 
     @Override
     public boolean validateContract(Region region, Group group, App app, User user, UniversePackage pkg, Map<String, Object> configData,
                                     PublishContext context) {
+        try {
+            permissionsChecker.checkPermission(region, user, app.getId());
+        }
+        catch (IllegalAccessException e) {
+            return false;
+        }
         return true;
     }
 
