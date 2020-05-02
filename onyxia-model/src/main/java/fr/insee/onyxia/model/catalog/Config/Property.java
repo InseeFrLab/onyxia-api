@@ -1,5 +1,6 @@
 package fr.insee.onyxia.model.catalog.Config;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -154,6 +155,7 @@ public class Property {
 
         private XGeneratedType type;
         private String scope;
+        private String name;
 
         public XGeneratedType getType() {
             return type;
@@ -171,9 +173,22 @@ public class Property {
             this.scope = scope;
         }
 
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
         public static enum XGeneratedType {
-            GroupID, AppID, RandomID, InternalDNS,
-            @JsonProperty("external-DNS")
+            GroupID, AppID, RandomID,
+
+            @JsonProperty("internalDNS")
+            @JsonAlias("internal-DNS")
+            InternalDNS,
+            @JsonProperty("externalDNS")
+            @JsonAlias("external-DNS")
             ExternalDNS;
         }
     }

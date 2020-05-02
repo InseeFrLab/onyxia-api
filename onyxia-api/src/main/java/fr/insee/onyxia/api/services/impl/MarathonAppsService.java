@@ -24,6 +24,7 @@ import mesosphere.marathon.client.model.v2.Group;
 import mesosphere.marathon.client.model.v2.Result;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -156,7 +157,6 @@ public class MarathonAppsService implements AppsService {
 
     private void injectIntoContext(Map<String, Object> context, Map<String,String> toInject ) {
         toInject.forEach((k,v) -> {
-            System.out.println(k);
             String[] splittedPath = k.split("\\.");
             Map<String,Object> currentContext = context;
             for (int i = 0; i < splittedPath.length - 1; i++) {
@@ -198,7 +198,7 @@ public class MarathonAppsService implements AppsService {
                     xGeneratedValues.put(name, generateAppId(region,user,isGroupFinal ? sanitizedPackageName : null,scopeName, context.getGlobalContext().getRandomizedId()));
                 }
                 if (xGenerated.getType() == Property.XGenerated.XGeneratedType.ExternalDNS) {
-                    xGeneratedValues.put(name, generator.generateUrl(user.getIdep(), pkg.getName(), context.getGlobalContext().getRandomizedId(), scopeName, region.getPublishDomain()));
+                    xGeneratedValues.put(name, generator.generateUrl(user.getIdep(), pkg.getName(), context.getGlobalContext().getRandomizedId(), scopeName+(StringUtils.isNotBlank(xGenerated.getName()) ? "-"+xGenerated.getName() : ""), region.getPublishDomain()));
                 }
 
                 if (xGenerated.getType() == Property.XGenerated.XGeneratedType.InternalDNS) {
@@ -207,10 +207,6 @@ public class MarathonAppsService implements AppsService {
                             + region.getMarathonDnsSuffix());
                 }
             });
-        });
-
-        xGeneratedValues.entrySet().forEach(entry -> {
-            System.out.println(entry.getKey()+":"+entry.getValue());
         });
 
         injectIntoContext(fusion,xGeneratedValues);
