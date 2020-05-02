@@ -47,7 +47,10 @@ public class Command {
             newCommand = newCommand.concat(" --kube-token="+helmConfiguration.getKubeToken()).concat(" ");
         }
 
-        newCommand = newCommand.concat(" --kubeconfig="+(helmConfiguration.getKubeConfig() != null ? helmConfiguration.getKubeConfig() : "/dev/null")).concat(" ");
+        if (StringUtils.isNotEmpty(helmConfiguration.getKubeConfig())) {
+            newCommand = newCommand.concat(" --kubeconfig="+ helmConfiguration.getKubeConfig()).concat(" ");
+        }
+
 
         System.out.println(newCommand);
         return newCommand;
