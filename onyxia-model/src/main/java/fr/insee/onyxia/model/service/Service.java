@@ -19,6 +19,7 @@ public class Service {
     private Map<String, String> env = new HashMap<>();
     private List<Task> tasks = new ArrayList<>();
     private List<Event> events = new ArrayList<>();
+    private String subtitle;
 
     private long startedAt;
 
@@ -126,6 +127,14 @@ public class Service {
 
     public void setTasks(List<Task> tasks) {
         this.tasks = tasks;
+    }
+
+    public String getSubtitle() {
+        return subtitle;
+    }
+
+    public void setSubtitle(String subtitle) {
+        this.subtitle = subtitle;
     }
 
     public List<Event> getEvents() {
