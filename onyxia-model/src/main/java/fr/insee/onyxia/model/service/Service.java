@@ -18,6 +18,7 @@ public class Service {
     private String logo;
     private Map<String, String> env = new HashMap<>();
     private List<Task> tasks = new ArrayList<>();
+    private List<Event> events = new ArrayList<>();
 
     private long startedAt;
 
@@ -125,6 +126,14 @@ public class Service {
 
     public void setTasks(List<Task> tasks) {
         this.tasks = tasks;
+    }
+
+    public List<Event> getEvents() {
+        return events;
+    }
+
+    public void setEvents(List<Event> events) {
+        this.events = events;
     }
 
     public List<String> getInternalUrls() {

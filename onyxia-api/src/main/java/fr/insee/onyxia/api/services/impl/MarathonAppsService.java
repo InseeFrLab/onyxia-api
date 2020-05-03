@@ -16,6 +16,7 @@ import fr.insee.onyxia.model.catalog.UniversePackage;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
 import fr.insee.onyxia.model.dto.ServicesListing;
 import fr.insee.onyxia.model.region.Region;
+import fr.insee.onyxia.model.service.Event;
 import fr.insee.onyxia.model.service.Task;
 import fr.insee.onyxia.model.service.UninstallService;
 import fr.insee.onyxia.mustache.Mustacheur;
@@ -317,6 +318,7 @@ public class MarathonAppsService implements AppsService {
         service.setName( app.getLabels().get("ONYXIA_TITLE") != null ?app.getLabels().get("ONYXIA_TITLE") : app.getLabels().get("ONYXIA_NAME"));
         service.setId(app.getId());
         service.setType(fr.insee.onyxia.model.service.Service.ServiceType.MARATHON);
+
         List<String> uris = new ArrayList<String>();
         if (app.getLabels().containsKey("ONYXIA_URL")) {
             uris.add(app.getLabels().get("ONYXIA_URL"));
@@ -344,6 +346,19 @@ public class MarathonAppsService implements AppsService {
                     .forEach(entry -> service.getEnv().put(entry.getKey(), entry.getValue().toString()));
         }
         service.setStatus(findAppStatus(app));
+
+        if (app.getLastTaskFailure() != null) {
+            Event event = new Event();
+            event.setMessage(app.getLastTaskFailure().getMessage());
+            try {
+                event.setTimestamp(marathonDateFormat.parse(app.getLastTaskFailure().getTimestamp()).getTime());
+            }
+            catch (Exception e) {
+
+            }
+            service.getEvents().add(event);
+        }
+
         return service;
     }
 
