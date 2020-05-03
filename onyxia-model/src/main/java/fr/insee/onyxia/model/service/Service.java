@@ -14,6 +14,7 @@ public class Service {
     private ServiceStatus status = ServiceStatus.RUNNING;
     private ServiceType type;
     private List<String> urls;
+    private List<String> internalUrls;
     private String logo;
     private Map<String, String> env = new HashMap<>();
     private List<Task> tasks = new ArrayList<>();
@@ -124,6 +125,14 @@ public class Service {
 
     public void setTasks(List<Task> tasks) {
         this.tasks = tasks;
+    }
+
+    public List<String> getInternalUrls() {
+        return internalUrls;
+    }
+
+    public void setInternalUrls(List<String> internalUrls) {
+        this.internalUrls = internalUrls;
     }
 
     public static enum ServiceStatus {

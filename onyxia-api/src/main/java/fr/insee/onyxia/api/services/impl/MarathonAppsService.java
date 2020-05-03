@@ -322,6 +322,11 @@ public class MarathonAppsService implements AppsService {
             uris.add(app.getLabels().get("ONYXIA_URL"));
         }
         service.setUrls(uris);
+        List<String> internalUrls = new ArrayList<String>();
+        if (app.getLabels().containsKey("ONYXIA_PRIVATE_ENDPOINT")) {
+            internalUrls.add(app.getLabels().get("ONYXIA_PRIVATE_ENDPOINT"));
+        }
+        service.setInternalUrls(internalUrls);
         service.setLogo(app.getLabels().get("ONYXIA_LOGO"));
         app.getTasks().stream().findFirst().ifPresent(task -> {
             try {
