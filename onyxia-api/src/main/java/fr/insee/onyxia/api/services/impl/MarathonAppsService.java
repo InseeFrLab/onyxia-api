@@ -318,7 +318,9 @@ public class MarathonAppsService implements AppsService {
         service.setId(app.getId());
         service.setType(fr.insee.onyxia.model.service.Service.ServiceType.MARATHON);
         List<String> uris = new ArrayList<String>();
-        uris.add(app.getLabels().get("ONYXIA_URL"));
+        if (app.getLabels().containsKey("ONYXIA_URL")) {
+            uris.add(app.getLabels().get("ONYXIA_URL"));
+        }
         service.setUrls(uris);
         service.setLogo(app.getLabels().get("ONYXIA_LOGO"));
         app.getTasks().stream().findFirst().ifPresent(task -> {
