@@ -20,7 +20,7 @@ public class OnyxiaLabelsEnforcer implements AdmissionControllerMarathon {
         Map<String, String> onyxiaOptions = (Map<String,String>) configData.get("onyxia");
         app.addLabel("ONYXIA_NAME", pkg.getName());
         if (onyxiaOptions != null) {
-            app.addLabel("ONYXIA_TITLE", onyxiaOptions.get("friendly_name"));
+            app.addLabel("ONYXIA_TITLE", onyxiaOptions.get("friendlyName"));
         }
 
         app.addLabel("ONYXIA_SUBTITLE", pkg.getName());

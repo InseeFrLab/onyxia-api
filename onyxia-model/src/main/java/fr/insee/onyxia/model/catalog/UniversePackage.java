@@ -2,7 +2,6 @@ package fr.insee.onyxia.model.catalog;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import fr.insee.onyxia.model.catalog.Config.Config;
 
 import java.util.Base64;
 import java.util.HashMap;
@@ -30,7 +29,6 @@ public class UniversePackage extends Package {
 	int releaseVersion;
 	Map<String, Object> resource = new HashMap<>();
 	MarathonMustache marathon;
-	Config config;
 	String jsonMustache;
 	boolean disable;
 	// String category;
@@ -233,14 +231,6 @@ public class UniversePackage extends Package {
 
 	public void setResource(Map<String, Object> resource) {
 		this.resource = resource;
-	}
-
-	public Config getConfig() {
-		return config;
-	}
-
-	public void setConfig(Config properties) {
-		this.config = properties;
 	}
 
 	public static class Images {

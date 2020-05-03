@@ -314,7 +314,7 @@ public class MarathonAppsService implements AppsService {
         service.setCpus(app.getCpus());
         service.setInstances(app.getInstances());
         service.setMem(app.getMem());
-        service.setName(app.getLabels().get("ONYXIA_NAME"));
+        service.setName( app.getLabels().get("ONYXIA_TITLE") != null ?app.getLabels().get("ONYXIA_TITLE") : app.getLabels().get("ONYXIA_NAME"));
         service.setId(app.getId());
         service.setType(fr.insee.onyxia.model.service.Service.ServiceType.MARATHON);
         List<String> uris = new ArrayList<String>();
