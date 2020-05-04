@@ -147,13 +147,16 @@ public class HelmAppsService implements AppsService {
         HelmInstallService helmService = getHelmInstallService(region);
         int status = 0;
         if (bulk) {
+            // If bulk in kub we ignore the path and delete every helm release
             HelmLs[] releases = getHelmInstallService(region).listChartInstall(namespace);
             for (int i = 0; i <releases.length; i++){
-                status = Math.max(0,helmService.uninstaller(path,namespace));
+                status = Math.max(0,helmService.uninstaller(releases[i].getName(),namespace));
             }
         }
         else {
-            status = getHelmInstallService(region).uninstaller(path, namespace);
+            // Strip / if present
+            String cannonicalPath = path.startsWith("/") ? path.substring(1) : path;
+            status = getHelmInstallService(region).uninstaller(cannonicalPath, namespace);
         }
 
         result.setSuccess(status == 0);

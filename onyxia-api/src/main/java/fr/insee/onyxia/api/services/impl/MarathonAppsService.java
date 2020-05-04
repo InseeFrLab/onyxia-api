@@ -336,7 +336,8 @@ public class MarathonAppsService implements AppsService {
 
         List<String> uris = new ArrayList<String>();
         if (app.getLabels().containsKey("ONYXIA_URL")) {
-            uris.add(app.getLabels().get("ONYXIA_URL"));
+            String onyxiaUrls = app.getLabels().get("ONYXIA_URL");
+            uris.addAll(Arrays.asList(onyxiaUrls.split(",")));
         }
         service.setUrls(uris);
         List<String> internalUrls = new ArrayList<String>();
