@@ -14,9 +14,12 @@ public class Service {
     private ServiceStatus status = ServiceStatus.RUNNING;
     private ServiceType type;
     private List<String> urls;
+    private List<String> internalUrls;
     private String logo;
     private Map<String, String> env = new HashMap<>();
     private List<Task> tasks = new ArrayList<>();
+    private List<Event> events = new ArrayList<>();
+    private String subtitle;
 
     private long startedAt;
 
@@ -124,6 +127,30 @@ public class Service {
 
     public void setTasks(List<Task> tasks) {
         this.tasks = tasks;
+    }
+
+    public String getSubtitle() {
+        return subtitle;
+    }
+
+    public void setSubtitle(String subtitle) {
+        this.subtitle = subtitle;
+    }
+
+    public List<Event> getEvents() {
+        return events;
+    }
+
+    public void setEvents(List<Event> events) {
+        this.events = events;
+    }
+
+    public List<String> getInternalUrls() {
+        return internalUrls;
+    }
+
+    public void setInternalUrls(List<String> internalUrls) {
+        this.internalUrls = internalUrls;
     }
 
     public static enum ServiceStatus {

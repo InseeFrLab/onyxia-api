@@ -16,6 +16,7 @@ import fr.insee.onyxia.model.catalog.UniversePackage;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
 import fr.insee.onyxia.model.dto.ServicesListing;
 import fr.insee.onyxia.model.region.Region;
+import fr.insee.onyxia.model.service.Event;
 import fr.insee.onyxia.model.service.Task;
 import fr.insee.onyxia.model.service.UninstallService;
 import fr.insee.onyxia.mustache.Mustacheur;
@@ -262,8 +263,14 @@ public class MarathonAppsService implements AppsService {
         }
         Group group = getGroup(region, groupId);
         ServicesListing listing = new ServicesListing();
-        listing.setApps(group.getApps().stream().map(app -> mapAppToService(app)).collect(Collectors.toList()));
-        listing.setGroups(group.getGroups().stream().map(gr -> mapGroup(gr)).collect(Collectors.toList()));
+        if (group.getApps() != null) {
+            listing.setApps(group.getApps().stream().map(app -> mapAppToService(app)).collect(Collectors.toList()));
+        }
+        if (group.getGroups() != null) {
+            listing.setGroups(group.getGroups().stream().map(gr -> mapGroup(gr)).collect(Collectors.toList()));
+        }
+
+
         return CompletableFuture.completedFuture(listing);
     }
 
@@ -280,13 +287,18 @@ public class MarathonAppsService implements AppsService {
     }
 
     @Override
-    public UninstallService destroyService(Region region, User user, String serviceId) throws IllegalAccessException {
-        String fullId = getFullServiceId(user,region.getNamespacePrefix(), serviceId);
+    public UninstallService destroyService(Region region, User user, String path, boolean bulk) throws IllegalAccessException {
+        String fullId = getFullServiceId(user,region.getNamespacePrefix(), path);
         permissionsChecker.checkPermission(region, user,fullId);
-        Result appUninstaller = marathon.deleteApp(fullId.substring(1));
+        Result appUninstaller;
+        if (bulk) {
+            appUninstaller = marathon.deleteGroup(fullId.substring(1), true);
+        }
+        else {
+            appUninstaller = marathon.deleteApp(fullId.substring(1));
+        }
         UninstallService result = new UninstallService();
-        result.setId(appUninstaller.getDeploymentId());
-        result.setVersion(appUninstaller.getVersion());
+        result.setPath(path);
         result.setSuccess(true);
         return result;
     }
@@ -294,9 +306,13 @@ public class MarathonAppsService implements AppsService {
 
 
     private String getFullServiceId(User user, String namespacePrefix, String serviceId) {
+        String basePath = "/"+getUserGroupPath(namespacePrefix, user) + "/";
+        if (serviceId == null) {
+            return basePath;
+        }
         String fullId = serviceId;
         if (!fullId.startsWith("/")) {
-            fullId = "/"+getUserGroupPath(namespacePrefix, user) + "/" + serviceId;
+            fullId = basePath + serviceId;
         }
         return fullId;
     }
@@ -314,14 +330,20 @@ public class MarathonAppsService implements AppsService {
         service.setCpus(app.getCpus());
         service.setInstances(app.getInstances());
         service.setMem(app.getMem());
-        service.setName(app.getLabels().get("ONYXIA_NAME"));
+        service.setName( app.getLabels().get("ONYXIA_TITLE") != null ?app.getLabels().get("ONYXIA_TITLE") : app.getLabels().get("ONYXIA_NAME"));
         service.setId(app.getId());
         service.setType(fr.insee.onyxia.model.service.Service.ServiceType.MARATHON);
+
         List<String> uris = new ArrayList<String>();
         if (app.getLabels().containsKey("ONYXIA_URL")) {
             uris.add(app.getLabels().get("ONYXIA_URL"));
         }
         service.setUrls(uris);
+        List<String> internalUrls = new ArrayList<String>();
+        if (app.getLabels().containsKey("ONYXIA_PRIVATE_ENDPOINT")) {
+            internalUrls.add(app.getLabels().get("ONYXIA_PRIVATE_ENDPOINT"));
+        }
+        service.setInternalUrls(internalUrls);
         service.setLogo(app.getLabels().get("ONYXIA_LOGO"));
         app.getTasks().stream().findFirst().ifPresent(task -> {
             try {
@@ -339,6 +361,19 @@ public class MarathonAppsService implements AppsService {
                     .forEach(entry -> service.getEnv().put(entry.getKey(), entry.getValue().toString()));
         }
         service.setStatus(findAppStatus(app));
+
+        if (app.getLastTaskFailure() != null) {
+            Event event = new Event();
+            event.setMessage(app.getLastTaskFailure().getMessage());
+            try {
+                event.setTimestamp(marathonDateFormat.parse(app.getLastTaskFailure().getTimestamp()).getTime());
+            }
+            catch (Exception e) {
+
+            }
+            service.getEvents().add(event);
+        }
+
         return service;
     }
 

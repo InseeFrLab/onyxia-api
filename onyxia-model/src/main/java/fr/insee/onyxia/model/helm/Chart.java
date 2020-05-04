@@ -1,18 +1,12 @@
 
 package fr.insee.onyxia.model.helm;
 
+import com.fasterxml.jackson.annotation.*;
+import fr.insee.onyxia.model.catalog.Package;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import fr.insee.onyxia.model.catalog.Package;
-import fr.insee.onyxia.model.catalog.Config.Config;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({ "apiVersion", "appVersion", "created", "description", "digest", "engine", "home", "icon",
@@ -47,8 +41,6 @@ public class Chart extends Package {
     private List<String> urls = null;
     @JsonProperty("version")
     private String version;
-
-    private Config config;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
@@ -196,14 +188,6 @@ public class Chart extends Package {
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;
-    }
-
-    public void setConfig(Config config) {
-        this.config = config;
-    }
-
-    public Config getConfig() {
-        return config;
     }
 
     @JsonAnySetter

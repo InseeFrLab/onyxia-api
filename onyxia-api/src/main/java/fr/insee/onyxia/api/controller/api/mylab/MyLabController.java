@@ -12,16 +12,14 @@ import fr.insee.onyxia.model.catalog.Package;
 import fr.insee.onyxia.model.catalog.Universe;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
 import fr.insee.onyxia.model.dto.ServicesListing;
-import fr.insee.onyxia.model.dto.UpdateServiceDTO;
 import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.Service;
 import fr.insee.onyxia.model.service.UninstallService;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import mesosphere.marathon.client.Marathon;
 import mesosphere.marathon.client.MarathonException;
-import mesosphere.marathon.client.model.v2.App;
-import mesosphere.marathon.client.model.v2.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +55,7 @@ public class MyLabController {
     private final Logger logger = LoggerFactory.getLogger(MyLabController.class);
 
     @GetMapping("/services")
-    public ServicesListing getMyServices(@RequestParam(required = false) String groupId, Region region) throws Exception {
+    public ServicesListing getMyServices(@Parameter(hidden = true) Region region, @RequestParam(required = false) String groupId) throws Exception {
         User user = userProvider.getUser();
         ServicesListing dto = new ServicesListing();
         List<CompletableFuture<ServicesListing>> futures = new ArrayList<>();
@@ -76,8 +74,7 @@ public class MyLabController {
     }
 
     @GetMapping("/app")
-    public @ResponseBody Service getApp(@RequestParam("serviceId") String serviceId,
-           Region region) throws Exception {
+    public @ResponseBody Service getApp(@Parameter(hidden = true) Region region,@RequestParam("serviceId") String serviceId) throws Exception {
         if (Service.ServiceType.MARATHON.equals(region.getType())) {
             return marathonAppsService.getUserService(region, userProvider.getUser(), serviceId);
         } else if (Service.ServiceType.KUBERNETES.equals(region.getType())) {
@@ -87,9 +84,8 @@ public class MyLabController {
     }
 
     @GetMapping("/app/logs")
-    public @ResponseBody String getLogs(@RequestParam("serviceId") String serviceId,
-                                        @RequestParam("taskId") String taskId,
-                                       Region region) throws Exception {
+    public @ResponseBody String getLogs( @Parameter(hidden = true) Region region, @RequestParam("serviceId") String serviceId,
+                                        @RequestParam("taskId") String taskId) throws Exception {
         if (Service.ServiceType.MARATHON.equals(region.getType())) {
             return marathonAppsService.getLogs(region, userProvider.getUser(),serviceId, taskId);
         } else if (Service.ServiceType.KUBERNETES.equals(region.getType())) {
@@ -99,56 +95,17 @@ public class MyLabController {
     }
 
     @DeleteMapping("/app")
-    public UninstallService destroyApp(@RequestParam("serviceId") String serviceId,
-           Region region) throws Exception {
+    public UninstallService destroyApp(@Parameter(hidden = true) Region region,@RequestParam(value = "path", required = false) String path,@RequestParam(value = "bulk", required = false) boolean bulk) throws Exception {
         if (Service.ServiceType.MARATHON.equals(region.getType())) {
-            return marathonAppsService.destroyService(region, userProvider.getUser(), serviceId);
-
+            return marathonAppsService.destroyService(region, userProvider.getUser(), path, bulk);
         } else if (Service.ServiceType.KUBERNETES.equals(region.getType())) {
-            return helmAppsService.destroyService(region, userProvider.getUser(), serviceId);
+            return helmAppsService.destroyService(region, userProvider.getUser(), path, bulk);
         }
         return null;
     }
 
-    @DeleteMapping("/group")
-    public Result destroyGroup(@RequestParam("serviceId") String id) throws MarathonException {
-        if (id == null || !id.startsWith("/users/" + userProvider.getUser().getIdep())) {
-            throw new RuntimeException("hack!");
-        }
-        Result result = marathon.deleteGroup(id, true);
-        return result;
-    }
-
-    @PostMapping("/app")
-    public Result update(@RequestBody UpdateServiceDTO serviceId) throws MarathonException {
-        String id = serviceId.getServiceId();
-        if (id == null || !id.startsWith("/users/" + userProvider.getUser().getIdep())) {
-            throw new RuntimeException("hack!");
-        }
-        App app = marathon.getApp(id).getApp();
-        if (serviceId.getCpus() != null && serviceId.getCpus() > 0) {
-            app.setCpus(serviceId.getCpus());
-        }
-        if (serviceId.getMems() != null && serviceId.getMems() > 0) {
-            app.setMem(serviceId.getMems());
-        }
-
-        app.setInstances(serviceId.getInstances());
-        if (serviceId.getFriendlyName() != null && !serviceId.getFriendlyName().equals("")) {
-            app.getLabels().put("ONYXIA_TITLE", serviceId.getFriendlyName());
-        }
-        if (serviceId.getEnv() != null) {
-            for (String key : serviceId.getEnv().keySet()) {
-                app.getEnv().put(key, serviceId.getEnv().get(key));
-            }
-        }
-
-        Result result = marathon.updateApp(id, app, true);
-        return result;
-    }
-
     @PutMapping("/app")
-    public Object publishService(@RequestBody CreateServiceDTO requestDTO, Region region)
+    public Object publishService(@Parameter(hidden = true) Region region,@RequestBody CreateServiceDTO requestDTO)
             throws JsonProcessingException, IOException, MarathonException, Exception {
         return publishApps(region, requestDTO);
     }

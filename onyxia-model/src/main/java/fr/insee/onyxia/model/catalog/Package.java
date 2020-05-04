@@ -1,9 +1,20 @@
 package fr.insee.onyxia.model.catalog;
 
+import fr.insee.onyxia.model.catalog.Config.Config;
+
 public class Package {
     private String name;
     private String description;
     private String version;
+    private Config config;
+
+    public void setConfig(Config config) {
+        this.config = config;
+    }
+
+    public Config getConfig() {
+        return config;
+    }
 
     public String getName() {
         return this.name;

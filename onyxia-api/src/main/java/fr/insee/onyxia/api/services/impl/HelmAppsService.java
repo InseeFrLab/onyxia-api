@@ -13,10 +13,8 @@ import fr.insee.onyxia.model.catalog.Package;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
 import fr.insee.onyxia.model.dto.ServicesListing;
 import fr.insee.onyxia.model.region.Region;
-import fr.insee.onyxia.model.service.Service;
-import fr.insee.onyxia.model.service.Task;
-import fr.insee.onyxia.model.service.TaskStatus;
-import fr.insee.onyxia.model.service.UninstallService;
+import fr.insee.onyxia.model.service.*;
+import io.fabric8.kubernetes.api.model.EventList;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
@@ -142,16 +140,23 @@ public class HelmAppsService implements AppsService {
     }
 
     @Override
-    public UninstallService destroyService(Region region, User user, String serviceId) throws Exception {
-        HelmLs appInfo = getHelmInstallService(region).getAppById(serviceId, determineNamespace(region.getNamespacePrefix(), user));
+    public UninstallService destroyService(Region region, User user, final String path, boolean bulk) throws Exception {
+        final String namespace = determineNamespace(region.getNamespacePrefix(), user);
         UninstallService result = new UninstallService();
-        result.setId(appInfo.getName());
-        result.setVersion(appInfo.getChart());
-        int status = getHelmInstallService(region).uninstaller(serviceId, determineNamespace(region.getNamespacePrefix(), user));
-        if (status != 0) {
-            result.setSuccess(false);
+        result.setPath(path);
+        HelmInstallService helmService = getHelmInstallService(region);
+        int status = 0;
+        if (bulk) {
+            HelmLs[] releases = getHelmInstallService(region).listChartInstall(namespace);
+            for (int i = 0; i <releases.length; i++){
+                status = Math.max(0,helmService.uninstaller(path,namespace));
+            }
         }
-        result.setSuccess(true);
+        else {
+            status = getHelmInstallService(region).uninstaller(path, namespace);
+        }
+
+        result.setSuccess(status == 0);
         return result;
     }
 
@@ -165,7 +170,8 @@ public class HelmAppsService implements AppsService {
             service.setStartedAt(0);
         }
         service.setId(release.getName());
-        service.setName(release.getChart());
+        service.setName(release.getName());
+        service.setSubtitle(release.getChart());
         service.setType(Service.ServiceType.KUBERNETES);
         try {
             String values = getHelmInstallService(region).getValues(release.getName(), release.getNamespace());
@@ -244,6 +250,21 @@ public class HelmAppsService implements AppsService {
             task.setStatus(status);
             return task;
         }).collect(Collectors.toList()));
+
+        EventList eventList = client.events().inNamespace(release.getNamespace()).list();
+        List<Event> events = eventList.getItems().stream().filter(event -> event.getInvolvedObject().getName().contains(release.getName())).map(event -> {
+            Event newEvent = new Event();
+            newEvent.setMessage(event.getMessage());
+            try {
+                // TODO : use kubernetes time format instead of helm
+                newEvent.setTimestamp(helmDateFormat.parse(event.getLastTimestamp()).getTime());
+            }
+            catch (Exception e) {
+
+            }
+            return newEvent;
+        }).collect(Collectors.toList());
+        service.setEvents(events);
 
         return service;
     }
