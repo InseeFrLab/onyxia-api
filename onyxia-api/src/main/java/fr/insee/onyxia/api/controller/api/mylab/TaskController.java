@@ -8,6 +8,7 @@ import fr.insee.onyxia.model.task.ServiceFile;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,9 @@ import java.io.IOException;
 @RequestMapping("/my-lab/task")
 @RestController
 @SecurityRequirement(name="auth")
+// This controller - mesos specific - is not used anymore
+@ConditionalOnExpression("false")
+@Deprecated
 public class TaskController {
 
     @Autowired

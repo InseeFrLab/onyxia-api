@@ -2,38 +2,17 @@ package fr.insee.onyxia.model.service;
 
 public class UninstallService {
 
-    private String id;
+    private String path;
 
-    private String version;
 
     private Boolean success;
 
-    /**
-     * @return the id
-     */
-    public String getId() {
-        return id;
+    public String getPath() {
+        return path;
     }
 
-    /**
-     * @return the version
-     */
-    public String getVersion() {
-        return version;
-    }
-
-    /**
-     * @param id the id to set
-     */
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    /**
-     * @param version the version to set
-     */
-    public void setVersion(String version) {
-        this.version = version;
+    public void setPath(String path) {
+        this.path = path;
     }
 
     /**

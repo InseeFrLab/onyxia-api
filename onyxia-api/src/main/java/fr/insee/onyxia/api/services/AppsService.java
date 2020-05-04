@@ -28,7 +28,7 @@ public interface AppsService {
 
         Service getUserService(Region region,User user, String serviceId) throws Exception;
 
-        UninstallService destroyService(Region region,User user, String serviceId) throws Exception;
+        UninstallService destroyService(Region region,User user, String path, boolean bulk) throws Exception;
 
         String getLogs(Region region,User user, String serviceId, String taskId);
 }

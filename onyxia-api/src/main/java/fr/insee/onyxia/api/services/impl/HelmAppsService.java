@@ -140,16 +140,23 @@ public class HelmAppsService implements AppsService {
     }
 
     @Override
-    public UninstallService destroyService(Region region, User user, String serviceId) throws Exception {
-        HelmLs appInfo = getHelmInstallService(region).getAppById(serviceId, determineNamespace(region.getNamespacePrefix(), user));
+    public UninstallService destroyService(Region region, User user, final String path, boolean bulk) throws Exception {
+        final String namespace = determineNamespace(region.getNamespacePrefix(), user);
         UninstallService result = new UninstallService();
-        result.setId(appInfo.getName());
-        result.setVersion(appInfo.getChart());
-        int status = getHelmInstallService(region).uninstaller(serviceId, determineNamespace(region.getNamespacePrefix(), user));
-        if (status != 0) {
-            result.setSuccess(false);
+        result.setPath(path);
+        HelmInstallService helmService = getHelmInstallService(region);
+        int status = 0;
+        if (bulk) {
+            HelmLs[] releases = getHelmInstallService(region).listChartInstall(namespace);
+            for (int i = 0; i <releases.length; i++){
+                status = Math.max(0,helmService.uninstaller(path,namespace));
+            }
         }
-        result.setSuccess(true);
+        else {
+            status = getHelmInstallService(region).uninstaller(path, namespace);
+        }
+
+        result.setSuccess(status == 0);
         return result;
     }
 

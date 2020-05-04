@@ -287,13 +287,18 @@ public class MarathonAppsService implements AppsService {
     }
 
     @Override
-    public UninstallService destroyService(Region region, User user, String serviceId) throws IllegalAccessException {
-        String fullId = getFullServiceId(user,region.getNamespacePrefix(), serviceId);
+    public UninstallService destroyService(Region region, User user, String path, boolean bulk) throws IllegalAccessException {
+        String fullId = getFullServiceId(user,region.getNamespacePrefix(), path);
         permissionsChecker.checkPermission(region, user,fullId);
-        Result appUninstaller = marathon.deleteApp(fullId.substring(1));
+        Result appUninstaller;
+        if (bulk) {
+            appUninstaller = marathon.deleteGroup(fullId.substring(1), true);
+        }
+        else {
+            appUninstaller = marathon.deleteApp(fullId.substring(1));
+        }
         UninstallService result = new UninstallService();
-        result.setId(appUninstaller.getDeploymentId());
-        result.setVersion(appUninstaller.getVersion());
+        result.setPath(path);
         result.setSuccess(true);
         return result;
     }
@@ -301,9 +306,13 @@ public class MarathonAppsService implements AppsService {
 
 
     private String getFullServiceId(User user, String namespacePrefix, String serviceId) {
+        String basePath = "/"+getUserGroupPath(namespacePrefix, user) + "/";
+        if (serviceId == null) {
+            return basePath;
+        }
         String fullId = serviceId;
         if (!fullId.startsWith("/")) {
-            fullId = "/"+getUserGroupPath(namespacePrefix, user) + "/" + serviceId;
+            fullId = basePath + serviceId;
         }
         return fullId;
     }
