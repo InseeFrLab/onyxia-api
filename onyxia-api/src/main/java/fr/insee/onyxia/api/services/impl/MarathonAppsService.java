@@ -263,8 +263,14 @@ public class MarathonAppsService implements AppsService {
         }
         Group group = getGroup(region, groupId);
         ServicesListing listing = new ServicesListing();
-        listing.setApps(group.getApps().stream().map(app -> mapAppToService(app)).collect(Collectors.toList()));
-        listing.setGroups(group.getGroups().stream().map(gr -> mapGroup(gr)).collect(Collectors.toList()));
+        if (group.getApps() != null) {
+            listing.setApps(group.getApps().stream().map(app -> mapAppToService(app)).collect(Collectors.toList()));
+        }
+        if (group.getGroups() != null) {
+            listing.setGroups(group.getGroups().stream().map(gr -> mapGroup(gr)).collect(Collectors.toList()));
+        }
+
+
         return CompletableFuture.completedFuture(listing);
     }
 
