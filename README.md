@@ -107,7 +107,7 @@ docker run -p 8080:8080 --env "regions=$(<conf.json)" inseefrlab/onyxia-api
 Catalogs configuration  
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
-| `catalogs.configuration` | `classpath:multiverse.json` | Catalogs to use. Defaults to [multiverse.json](onyxia-api/src/main/resources/multiverse.json). `http://`, `https://` and `file:` schemes are supported |  
+| `catalogs.configuration` | `classpath:catalogs.json` | Catalogs to use. Defaults to [catalogs.json](onyxia-api/src/main/resources/catalogs.json). `http://`, `https://` and `file:` schemes are supported |  
 | `catalogs.refresh.ms` | `300000` (5 minutes) | The rate at which the catalogs should be refreshed. `<= 0` means no refreshs after initial loading |
 
 Other configurations
