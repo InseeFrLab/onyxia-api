@@ -45,7 +45,14 @@
               "name": {
                 "description": "The name of the service to display in the DC/OS dashboard.",
                 "type": "string",
-                "default": "shelly"
+                "default": "shelly",
+                "x-form": {
+                  "hidden": true
+                },
+                "x-generated": {
+                  "type": "appID",
+                  "scope": "shelly"
+                }
               },
               "cpus": {
                 "description": "CPU shares to allocate to this WordPress instance.",
@@ -69,27 +76,20 @@
               "virtual-host": {
                 "description": "The virtual host address to configure for integration with Marathon-lb.",
                 "type": "string",
-                "default": "changeme"
+                "default": "changeme",
+                "x-form": {
+                    "hidden": true
+                },
+                "x-generated": {
+                  "type": "externalDNS",
+                  "scope": "shelly",
+                  "name": "webssh"
+                }
               },
               "https-redirect": {
                 "description": "Whether Marathon-lb should redirect HTTP traffic to HTTPS. This requires 'virtual-host' to be set. By default, this is false.",
                 "type": "boolean",
                 "default": false
-              }
-            }
-          },
-          "storage": {
-            "description": "Storage-related configuration properties for WordPress on DC/OS.",
-            "type": "object",
-            "properties": {
-              "host-volume": {
-                "description": "The location of a volume on the host to be used for persisting WordPress files. The final location will be derived from this value plus the name set in `name` (e.g. `/mnt/host_volume/wordpress`). Note that this path must be the same on all DC/OS agents unless you are using a pinned-hostname (below).",
-                "type": "string",
-                "default": "/tmp"
-              },
-              "pinned-hostname": {
-                "description": "An optional DC/OS agent hostname to run this WordPress instance on (e.g. 10.0.0.1).",
-                "type": "string"
               }
             }
           }
