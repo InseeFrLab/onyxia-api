@@ -63,6 +63,11 @@ Open id configuration
 | `keycloak.bearer-only` | `true` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
 | `keycloak.disable-trust-manager` | `false` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
 
+CORS configuration :
+| Key | Default | Description |
+| --------------------- | ------- | ------------------------------------------------------------------ |
+| `cors.origins` | `*` | See [CORS configuration with spring](https://spring.io/blog/2015/06/08/cors-support-in-spring-framework)|
+
 Regions configuration :
 
 The env variable that configures regions is `regions`.  
