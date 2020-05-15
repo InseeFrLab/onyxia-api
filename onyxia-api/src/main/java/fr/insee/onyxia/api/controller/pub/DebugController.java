@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Tag(name="Public")
 @RequestMapping("/public")
-public class Debug {
+public class DebugController {
 
     @Autowired
     BuildProperties buildProperties;
