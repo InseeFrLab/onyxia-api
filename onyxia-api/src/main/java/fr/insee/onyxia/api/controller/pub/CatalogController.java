@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.Map;
 
-@Tag(name = "Catalog", description = "Catalog")
+@Tag(name = "Public")
 @RequestMapping("/public/catalog")
 @RestController
 public class CatalogController {
