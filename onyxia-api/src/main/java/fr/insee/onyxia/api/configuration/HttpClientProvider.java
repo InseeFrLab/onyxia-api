@@ -1,11 +1,12 @@
 package fr.insee.onyxia.api.configuration;
 
 import fr.insee.onyxia.model.region.Region;
-import okhttp3.Interceptor;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import okhttp3.*;
 import okhttp3.logging.HttpLoggingInterceptor;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -35,16 +36,23 @@ public class HttpClientProvider {
                 Request newRequest = request;
 
                 if (region.getAuth() != null && region.getAuth().getToken() != null) {
-                    newRequest = request.newBuilder()
+                    newRequest = newRequest.newBuilder()
                             .addHeader("Authorization", "token="+region.getAuth().getToken())
                             .build();
                 }
 
-                // TODO : add basic auth support
+                if (region.getAuth() != null && region.getAuth().getUsername() != null) {
+                    String credentials = Credentials.basic(region.getAuth().getUsername(),region.getAuth().getPassword());
+                    newRequest = newRequest.newBuilder()
+                            .addHeader("Authorization", credentials)
+                            .build();
+                }
 
                 return chain.proceed(newRequest);
             }
         });
+
+
 
         enableDebugFeatureIfEnabled(builder);
 
