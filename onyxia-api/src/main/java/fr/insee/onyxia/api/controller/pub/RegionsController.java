@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Tag(name = "Regions", description = "Regions")
+@Tag(name = "Public")
 @RequestMapping("/public/regions")
 @RestController
 public class RegionsController {

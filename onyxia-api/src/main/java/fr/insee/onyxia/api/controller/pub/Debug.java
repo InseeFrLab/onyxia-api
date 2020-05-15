@@ -10,14 +10,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Tag(name="Public")
 @RequestMapping("/public")
-public class HealthCheck {
+public class Debug {
 
     @Autowired
     BuildProperties buildProperties;
 
-    @GetMapping("/healthcheck")
-    public String healthcheck() {
-       return buildProperties.getTime().toString();
+    @GetMapping("/debug")
+    public BuildProperties healthcheck() {
+       return buildProperties;
     }
     
 }
