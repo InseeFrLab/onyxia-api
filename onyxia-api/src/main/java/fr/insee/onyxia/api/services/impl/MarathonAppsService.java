@@ -172,6 +172,20 @@ public class MarathonAppsService implements AppsService {
         });
     }
 
+    public String getInternalDnsFromId(String id, String dnsSuffix) {
+        String[] parts = id.split("/");
+        StringBuffer internalDns = new StringBuffer();
+        for (int i = parts.length - 1; i >= 0; i--) {
+            internalDns.append(parts[i]);
+            if (i > 1) {
+                internalDns.append("-");
+            }
+        }
+        internalDns.append(".");
+        internalDns.append(dnsSuffix);
+        return internalDns.toString();
+    }
+
     @NotNull
     @Override
     public Collection<Object> installApp(Region region, CreateServiceDTO requestDTO, String catalogId, Package pkg,
@@ -199,17 +213,16 @@ public class MarathonAppsService implements AppsService {
         final boolean isGroupFinal = isGroup;
         xGeneratedContext.getScopes().forEach((scopeName,scope) -> {
             scope.getxGenerateds().forEach((name,xGenerated) -> {
+                String appId = generateAppId(region,user,isGroupFinal ? sanitizedPackageName : null,scopeName, context.getGlobalContext().getRandomizedId());
                 if (xGenerated.getType() == Property.XGenerated.XGeneratedType.AppID) {
-                    xGeneratedValues.put(name, generateAppId(region,user,isGroupFinal ? sanitizedPackageName : null,scopeName, context.getGlobalContext().getRandomizedId()));
+                    xGeneratedValues.put(name, appId);
                 }
                 if (xGenerated.getType() == Property.XGenerated.XGeneratedType.ExternalDNS) {
                     xGeneratedValues.put(name, generator.generateUrl(user.getIdep(), sanitizedPackageName, context.getGlobalContext().getRandomizedId(), scopeName+(StringUtils.isNotBlank(xGenerated.getName()) ? "-"+xGenerated.getName() : ""), region.getPublishDomain()));
                 }
 
                 if (xGenerated.getType() == Property.XGenerated.XGeneratedType.InternalDNS) {
-                    xGeneratedValues.put(name, idSanitizer.sanitize(scopeName) + "-" + (isGroupFinal ? sanitizedPackageName + "-" + context.getGlobalContext().getRandomizedId() : sanitizedPackageName) + "-"
-                            + idSanitizer.sanitize(user.getIdep()) + "-" + idSanitizer.sanitize(region.getNamespacePrefix()) + "."
-                            + region.getMarathonDnsSuffix());
+                    xGeneratedValues.put(name, getInternalDnsFromId(appId, region.getMarathonDnsSuffix()));
                 }
             });
         });
