@@ -156,8 +156,12 @@ public class MarathonAppsService implements AppsService {
         return generateBaseId(region, user, groupName, randomizedId);
     }
 
-    private String generateAppId(Region region, User user, String groupName, String appName, String randomizedId) {
-        return generateBaseId(region, user, groupName,randomizedId)+"/"+idSanitizer.sanitize(appName)+(groupName != null ? "" :  "-" + randomizedId);
+    private String generateAppId(Region region, User user, String groupName, String appName, String randomizedId, boolean isCloudshell) {
+        String appId = idSanitizer.sanitize(appName)+(groupName != null ? "" :  "-" + randomizedId);
+        if (isCloudshell) {
+            appId = "cloudshell";
+        }
+        return generateBaseId(region, user, groupName,randomizedId)+"/"+appId;
     }
 
     private void injectIntoContext(Map<String, Object> context, Map<String,String> toInject ) {
@@ -211,9 +215,10 @@ public class MarathonAppsService implements AppsService {
         }
 
         final boolean isGroupFinal = isGroup;
+        final boolean isCloudshell = region.getCloudshellConfiguration() != null && region.getCloudshellConfiguration().getCatalogId().equals(catalogId) && region.getCloudshellConfiguration().getPackageName().equals(pkg.getName());
         xGeneratedContext.getScopes().forEach((scopeName,scope) -> {
             scope.getxGenerateds().forEach((name,xGenerated) -> {
-                String appId = generateAppId(region,user,isGroupFinal ? sanitizedPackageName : null,scopeName, context.getGlobalContext().getRandomizedId());
+                String appId = generateAppId(region,user,isGroupFinal ? sanitizedPackageName : null,scopeName, context.getGlobalContext().getRandomizedId(), isCloudshell);
                 if (xGenerated.getType() == Property.XGenerated.XGeneratedType.AppID) {
                     xGeneratedValues.put(name, appId);
                 }
