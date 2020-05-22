@@ -5,15 +5,12 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.OAuthFlow;
 import io.swagger.v3.oas.models.security.OAuthFlows;
-import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -30,7 +27,7 @@ public class OpenApiConfiguration {
     @Value("${keycloak.realm}")
     public String realmName;
 
-    public final String SCHEMEKEYCLOAK = "oAuthScheme";
+    public final String SCHEMEKEYCLOAK = "auth";
 
     @Bean
     @ConditionalOnProperty(name = "authentication.mode", havingValue = "openidconnect")
@@ -57,18 +54,5 @@ public class OpenApiConfiguration {
         final OpenAPI openapi = new OpenAPI()
                 .info(new Info().title("Onyxia-api").description("Swagger onyxia-api"));
         return openapi;
-    }
-
-
-    @ConditionalOnProperty(name = "authentication.mode", havingValue = "openidconnect")
-    @Bean
-    public OperationCustomizer addKeycloak() {
-        return (operation, handlerMethod) -> {
-            // all urls with /public doesn't need header authorization
-            if (handlerMethod.getMethod().getName().startsWith("/public/")) {
-                return operation;
-            }
-            return operation.addSecurityItem(new SecurityRequirement().addList(SCHEMEKEYCLOAK));
-        };
     }
 }
