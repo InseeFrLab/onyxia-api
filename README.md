@@ -66,7 +66,8 @@ Open id configuration
 CORS configuration :
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
-| `cors.origins` | `*` | See [CORS configuration with spring](https://spring.io/blog/2015/06/08/cors-support-in-spring-framework)|
+| `cors.allowed` | `true` | To enabled or not [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)|
+| `cors.origins.allowed` | `*` | To indicate which origins are allowed by CORS|
 
 Regions configuration :
 
