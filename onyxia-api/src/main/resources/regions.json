@@ -5,6 +5,7 @@
       "type": "KUBERNETES",
       "namespace-prefix": "user-",
       "publish-domain": "fakedomain.kub.example.com",
+      "serviceMonitoringURLPattern": "https://graphana.kub.example.com/$appIdSlug",
       "cloudshell": {
         "catalogId": "inseefrlab-helm-charts-datascience",
         "packageName": "cloudshell"
