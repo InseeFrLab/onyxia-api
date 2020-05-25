@@ -393,6 +393,12 @@ public class MarathonAppsService implements AppsService {
             service.getEvents().add(event);
         }
 
+        if (app.getLabels().containsKey("ONYXIA_MONITORING")) {
+            fr.insee.onyxia.model.service.Service.Monitoring monitoring = new fr.insee.onyxia.model.service.Service.Monitoring();
+            monitoring.setUrl(app.getLabels().get("ONYXIA_MONITORING"));
+            service.setMonitoring(monitoring);
+        }
+
         return service;
     }
 
