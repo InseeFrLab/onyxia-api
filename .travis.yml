@@ -4,7 +4,7 @@ services:
 jdk:
   - openjdk11
 before_install:
-  - mvn -B versions:set -DnewVersion=$TRAVIS_BRANCH
+  - mvn -B versions:set -DnewVersion=$TRAVIS_BRANCH -DprocessAllModules -DgenerateBackupPoms=false
 script:
   - mvn -B package
 deploy:
