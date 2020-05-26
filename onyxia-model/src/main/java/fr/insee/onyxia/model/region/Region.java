@@ -6,27 +6,34 @@ import fr.insee.onyxia.model.service.Service;
 
 @JsonIgnoreProperties(value={"auth","serverUrl"},allowSetters = true)
 public class Region {
-    String regionId;
+    String id;
+    String name;
     Service.ServiceType type;
     String serverUrl;
-    @JsonProperty("publish-domain")
     String publishDomain;
-    @JsonProperty("namespace-prefix")
     String namespacePrefix;
-    @JsonProperty("marathon-dns-suffix")
     String marathonDnsSuffix;
     Auth auth;
     @JsonProperty("cloudshell")
     CloudshellConfiguration cloudshellConfiguration;
     @JsonProperty("serviceMonitoringURLPattern")
     String serviceMonitoringURLPattern;
+    Location location;
 
-    public String getRegionId() {
-        return regionId;
+    public String getId() {
+        return id;
     }
 
-    public void setRegionId(String regionId) {
-        this.regionId = regionId;
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Service.ServiceType getType() {
@@ -81,6 +88,14 @@ public class Region {
         return cloudshellConfiguration;
     }
 
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
     public void setCloudshellConfiguration(CloudshellConfiguration cloudshellConfiguration) {
         this.cloudshellConfiguration = cloudshellConfiguration;
     }
@@ -91,6 +106,39 @@ public class Region {
 
     public String getServiceMonitoringURLPattern() {
         return serviceMonitoringURLPattern;
+    }
+
+    public static class Location {
+
+        private double lat;
+        @JsonProperty("long")
+        private double longitude;
+        private String name;
+
+
+        public void setLat(double lat) {
+            this.lat = lat;
+        }
+
+        public void setLongitude(double longitude) {
+            this.longitude = longitude;
+        }
+
+        public double getLat() {
+            return lat;
+        }
+
+        public double getLongitude() {
+            return longitude;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
     }
 
     public static class CloudshellConfiguration {

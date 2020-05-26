@@ -71,22 +71,29 @@ A valid `JSON` is expected with a list of `region` :
 ```JSON
 [
   {
-    "regionId": "kub",
+    "id": "kub",
+    "name": "Kubernetes (in-cluster)",
     "type": "KUBERNETES",
-    "namespace-prefix": "user-",
-    "publish-domain": "fakedomain.kub.example.com",
+    "namespacePrefix": "user-",
+    "publishDomain": "fakedomain.kub.example.com",
     "cloudshell": {
       "catalogId": "inseefrlab-helm-charts",
       "packageName": "cloudshell"
+    },
+    "location": {
+        "lat": 48.8164,
+        "long": 2.3174,
+        "name": "Montrouge (France)"
     }
   },
   {
-    "regionId": "marathon",
+    "id": "marathon",
+    "name": "Marathon",
     "type": "MARATHON",
     "serverUrl": "",
-    "publish-domain": "fakedomain.marathon.example.com",
-    "namespace-prefix": "users",
-    "marathon-dns-suffix": "marathon.containerip.dcos.thisdcos.directory",
+    "publishDomain": "fakedomain.marathon.example.com",
+    "namespacePrefix": "users",
+    "marathonDnsSuffix": "marathon.containerip.dcos.thisdcos.directory",
     "serviceMonitoringURLPattern": "https://graphana.example.com/$appIdSlug",
     "cloudshell": {
       "catalogId": "internal",
@@ -94,7 +101,12 @@ A valid `JSON` is expected with a list of `region` :
     },
     "auth": {
       "token": "xxxxx"
-    }
+    },
+    "location" : {
+        "name" : "Unknown",
+        "lat" : 0,
+        "long": 0
+      }
   }
 ]
 ```

@@ -1,14 +1,20 @@
 {
   "regions": [
     {
-      "regionId": "kub",
+      "id": "kub",
+      "name": "Kubernetes (in-cluster)",
       "type": "KUBERNETES",
-      "namespace-prefix": "user-",
-      "publish-domain": "fakedomain.kub.example.com",
+      "namespacePrefix": "user-",
+      "publishDomain": "fakedomain.kub.example.com",
       "serviceMonitoringURLPattern": "https://graphana.kub.example.com/$appIdSlug",
       "cloudshell": {
         "catalogId": "inseefrlab-helm-charts-datascience",
         "packageName": "cloudshell"
+      },
+      "location" : {
+        "name" : "Unknown",
+        "lat" : 0,
+        "long": 0
       }
     }
   ]

@@ -38,7 +38,7 @@ public class RegionsConfiguration {
     }
 
     public Optional<Region> getRegionById(String regionId) {
-        return resolvedRegions.stream().filter(region -> region.getRegionId().equals(regionId)).findFirst();
+        return resolvedRegions.stream().filter(region -> region.getId().equals(regionId)).findFirst();
     }
 
     public Region getDefaultRegion() {
