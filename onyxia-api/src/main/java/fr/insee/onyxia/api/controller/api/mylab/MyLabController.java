@@ -59,10 +59,10 @@ public class MyLabController {
         User user = userProvider.getUser();
         ServicesListing dto = new ServicesListing();
         List<CompletableFuture<ServicesListing>> futures = new ArrayList<>();
-        if (region.getType().equals(Service.ServiceType.MARATHON)) {
+        if (region.getServices().getType().equals(Service.ServiceType.MARATHON)) {
             futures.add(marathonAppsService.getUserServices(region,user,groupId));
         }
-        if (region.getType().equals(Service.ServiceType.KUBERNETES)) {
+        if (region.getServices().getType().equals(Service.ServiceType.KUBERNETES)) {
             futures.add(helmAppsService.getUserServices(region,user,groupId));
         }
         for (var future : futures) {
@@ -75,9 +75,9 @@ public class MyLabController {
 
     @GetMapping("/app")
     public @ResponseBody Service getApp(@Parameter(hidden = true) Region region,@RequestParam("serviceId") String serviceId) throws Exception {
-        if (Service.ServiceType.MARATHON.equals(region.getType())) {
+        if (Service.ServiceType.MARATHON.equals(region.getServices().getType())) {
             return marathonAppsService.getUserService(region, userProvider.getUser(), serviceId);
-        } else if (Service.ServiceType.KUBERNETES.equals(region.getType())) {
+        } else if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
             return helmAppsService.getUserService(region,userProvider.getUser(), serviceId);
         }
         return null;
@@ -86,9 +86,9 @@ public class MyLabController {
     @GetMapping("/app/logs")
     public @ResponseBody String getLogs( @Parameter(hidden = true) Region region, @RequestParam("serviceId") String serviceId,
                                         @RequestParam("taskId") String taskId) throws Exception {
-        if (Service.ServiceType.MARATHON.equals(region.getType())) {
+        if (Service.ServiceType.MARATHON.equals(region.getServices().getType())) {
             return marathonAppsService.getLogs(region, userProvider.getUser(),serviceId, taskId);
-        } else if (Service.ServiceType.KUBERNETES.equals(region.getType())) {
+        } else if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
             return helmAppsService.getLogs(region, userProvider.getUser(),serviceId, taskId);
         }
         return null;
@@ -96,9 +96,9 @@ public class MyLabController {
 
     @DeleteMapping("/app")
     public UninstallService destroyApp(@Parameter(hidden = true) Region region,@RequestParam(value = "path", required = false) String path,@RequestParam(value = "bulk", required = false) boolean bulk) throws Exception {
-        if (Service.ServiceType.MARATHON.equals(region.getType())) {
+        if (Service.ServiceType.MARATHON.equals(region.getServices().getType())) {
             return marathonAppsService.destroyService(region, userProvider.getUser(), path, bulk);
-        } else if (Service.ServiceType.KUBERNETES.equals(region.getType())) {
+        } else if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
             return helmAppsService.destroyService(region, userProvider.getUser(), path, bulk);
         }
         return null;

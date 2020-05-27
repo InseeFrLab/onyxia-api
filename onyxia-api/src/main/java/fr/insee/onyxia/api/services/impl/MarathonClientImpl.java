@@ -18,17 +18,18 @@ public class MarathonClientImpl {
     @Bean
     public Marathon marathonClient() {
         Region region = regionsConfiguration.getResolvedRegions().get(0);
-        String MARATHON_URL = region.getServerUrl();
+        String MARATHON_URL = region.getServices().getServer().getURL();
         String MARATHON_AUTH_TOKEN = null;
         String MARATHON_AUTH_BASIC_USERNAME = null;
         String MARATHON_AUTH_BASIC_PASSWORD = null;
-        if (region.getAuth() != null) {
-            if (!StringUtils.isBlank(region.getAuth().getToken())) {
-                MARATHON_AUTH_TOKEN =region.getAuth().getToken();
+        Region.Auth auth = region.getServices().getServer().getAuth();
+        if (auth != null) {
+            if (!StringUtils.isBlank(auth.getToken())) {
+                MARATHON_AUTH_TOKEN =auth.getToken();
             }
-            else if (!StringUtils.isBlank(region.getAuth().getUsername()) && !StringUtils.isBlank(region.getAuth().getPassword())) {
-                MARATHON_AUTH_BASIC_USERNAME =region.getAuth().getPassword();
-                MARATHON_AUTH_BASIC_PASSWORD = region.getAuth().getUsername();
+            else if (!StringUtils.isBlank(auth.getUsername()) && !StringUtils.isBlank(auth.getPassword())) {
+                MARATHON_AUTH_BASIC_USERNAME =auth.getPassword();
+                MARATHON_AUTH_BASIC_PASSWORD =auth.getUsername();
             }
         }
         if (MARATHON_URL == null || MARATHON_URL.isBlank()) {

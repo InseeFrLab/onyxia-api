@@ -35,13 +35,13 @@ public class OnyxiaLabelsEnforcer implements AdmissionControllerMarathon {
             }
         }
         app.addLabel("ONYXIA_LOGO", (String) ((Map<String, Object>) pkg.getResource().get("images")).get("icon-small"));
-        if (region.getServiceMonitoringURLPattern() != null) {
+        if (region.getServices().getMonitoring() != null) {
             String slugId = app.getId();
             if (slugId.startsWith("/")) {
                 slugId = slugId.substring(1);
             }
             slugId = slugId.replaceAll("/","_");
-            String monitoringUrl = region.getServiceMonitoringURLPattern().replaceAll("\\$appIdSlug",slugId);
+            String monitoringUrl = region.getServices().getMonitoring().getURLPattern().replaceAll("\\$appIdSlug",slugId);
             app.addLabel("ONYXIA_MONITORING", monitoringUrl);
         }
 

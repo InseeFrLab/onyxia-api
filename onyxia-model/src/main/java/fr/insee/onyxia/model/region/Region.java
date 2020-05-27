@@ -4,21 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.insee.onyxia.model.service.Service;
 
-@JsonIgnoreProperties(value={"auth","serverUrl"},allowSetters = true)
 public class Region {
-    String id;
-    String name;
-    Service.ServiceType type;
-    String serverUrl;
-    String publishDomain;
-    String namespacePrefix;
-    String marathonDnsSuffix;
-    Auth auth;
-    @JsonProperty("cloudshell")
-    CloudshellConfiguration cloudshellConfiguration;
-    @JsonProperty("serviceMonitoringURLPattern")
-    String serviceMonitoringURLPattern;
-    Location location;
+    private String id;
+    private String name;
+    private Location location;
+    private Services services;
+    private OnyxiaAPI onyxiaAPI;
 
     public String getId() {
         return id;
@@ -36,58 +27,6 @@ public class Region {
         this.name = name;
     }
 
-    public Service.ServiceType getType() {
-        return type;
-    }
-
-    public void setType(Service.ServiceType type) {
-        this.type = type;
-    }
-
-    public String getServerUrl() {
-        return serverUrl;
-    }
-
-    public void setServerUrl(String serverUrl) {
-        this.serverUrl = serverUrl;
-    }
-
-    public String getPublishDomain() {
-        return publishDomain;
-    }
-
-    public void setPublishDomain(String publishDomain) {
-        this.publishDomain = publishDomain;
-    }
-
-    public String getNamespacePrefix() {
-        return namespacePrefix;
-    }
-
-    public void setNamespacePrefix(String namespacePrefix) {
-        this.namespacePrefix = namespacePrefix;
-    }
-
-    public String getMarathonDnsSuffix() {
-        return marathonDnsSuffix;
-    }
-
-    public void setMarathonDnsSuffix(String marathonDnsSuffix) {
-        this.marathonDnsSuffix = marathonDnsSuffix;
-    }
-
-    public Auth getAuth() {
-        return auth;
-    }
-
-    public void setAuth(Auth auth) {
-        this.auth = auth;
-    }
-
-    public CloudshellConfiguration getCloudshellConfiguration() {
-        return cloudshellConfiguration;
-    }
-
     public Location getLocation() {
         return location;
     }
@@ -96,16 +35,147 @@ public class Region {
         this.location = location;
     }
 
-    public void setCloudshellConfiguration(CloudshellConfiguration cloudshellConfiguration) {
-        this.cloudshellConfiguration = cloudshellConfiguration;
+    public Services getServices() {
+        return services;
     }
 
-    public void setServiceMonitoringURLPattern(String serviceMonitoringURLPattern) {
-        this.serviceMonitoringURLPattern = serviceMonitoringURLPattern;
+    public void setServices(Services services) {
+        this.services = services;
     }
 
-    public String getServiceMonitoringURLPattern() {
-        return serviceMonitoringURLPattern;
+    public OnyxiaAPI getOnyxiaAPI() {
+        return onyxiaAPI;
+    }
+
+    public void setOnyxiaAPI(OnyxiaAPI onyxiaAPI) {
+        this.onyxiaAPI = onyxiaAPI;
+    }
+
+    @JsonIgnoreProperties(value={"server"},allowSetters = true)
+    public static class Services {
+
+        private Service.ServiceType type;
+        private String namespacePrefix;
+        private String marathonDnsSuffix;
+        private Expose expose;
+        private Server server;
+        private Monitoring monitoring;
+        private CloudshellConfiguration cloudshell;
+
+        public Service.ServiceType getType() {
+            return type;
+        }
+
+        public void setType(Service.ServiceType type) {
+            this.type = type;
+        }
+
+        public String getNamespacePrefix() {
+            return namespacePrefix;
+        }
+
+        public void setNamespacePrefix(String namespacePrefix) {
+            this.namespacePrefix = namespacePrefix;
+        }
+
+        public String getMarathonDnsSuffix() {
+            return marathonDnsSuffix;
+        }
+
+        public void setMarathonDnsSuffix(String marathonDnsSuffix) {
+            this.marathonDnsSuffix = marathonDnsSuffix;
+        }
+
+        public Expose getExpose() {
+            return expose;
+        }
+
+        public void setExpose(Expose expose) {
+            this.expose = expose;
+        }
+
+        public Server getServer() {
+            return server;
+        }
+
+        public void setServer(Server server) {
+            this.server = server;
+        }
+
+        public CloudshellConfiguration getCloudshell() {
+            return cloudshell;
+        }
+
+        public void setCloudshell(CloudshellConfiguration cloudshell) {
+            this.cloudshell = cloudshell;
+        }
+
+        public Monitoring getMonitoring() {
+            return monitoring;
+        }
+
+        public void setMonitoring(Monitoring monitoring) {
+            this.monitoring = monitoring;
+        }
+    }
+
+    public static class Monitoring {
+        @JsonProperty("URLPattern")
+        private String urlPattern;
+
+        public void setUrlPattern(String urlPattern) {
+            this.urlPattern = urlPattern;
+        }
+
+        public String getUrlPattern() {
+            return urlPattern;
+        }
+    }
+
+    public static class Expose {
+        private String domain;
+
+        public void setDomain(String domain) {
+            this.domain = domain;
+        }
+
+        public String getDomain() {
+            return domain;
+        }
+    }
+
+    public static class Server {
+
+        private String URL;
+        private Auth auth;
+
+        public String getURL() {
+            return URL;
+        }
+
+        public void setURL(String URL) {
+            this.URL = URL;
+        }
+
+        public Auth getAuth() {
+            return auth;
+        }
+
+        public void setAuth(Auth auth) {
+            this.auth = auth;
+        }
+    }
+
+    public static class OnyxiaAPI {
+        private String baseURL;
+
+        public String getBaseURL() {
+            return baseURL;
+        }
+
+        public void setBaseURL(String baseURL) {
+            this.baseURL = baseURL;
+        }
     }
 
     public static class Location {

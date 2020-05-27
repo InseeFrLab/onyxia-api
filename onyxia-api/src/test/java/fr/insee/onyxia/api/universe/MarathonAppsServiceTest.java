@@ -17,8 +17,9 @@ public class MarathonAppsServiceTest {
     public void testGetInternalDns(String id, String response) {
         MarathonAppsService marathonAppsService = new MarathonAppsService();
         Region region = new Region();
+        region.setServices(new Region.Services());
         String dnsSuffix = "dnsSuffix";
-        region.setMarathonDnsSuffix(dnsSuffix);
-        Assertions.assertEquals(marathonAppsService.getInternalDnsFromId(id, region.getMarathonDnsSuffix()), response);
+        region.getServices().setMarathonDnsSuffix(dnsSuffix);
+        Assertions.assertEquals(marathonAppsService.getInternalDnsFromId(id, region.getServices().getMarathonDnsSuffix()), response);
     }
 }

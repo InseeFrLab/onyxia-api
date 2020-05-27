@@ -58,8 +58,8 @@ public class CatalogsLoader {
 
         public List<CatalogWrapper>  filterCatalogs(List<CatalogWrapper> catalogs) {
             List<Region> regions = regionsConfiguration.getResolvedRegions();
-            boolean marathonEnabled = regions.stream().filter(region -> region.getType().equals(fr.insee.onyxia.model.service.Service.ServiceType.MARATHON)).count() > 0;
-            boolean kubernetesEnabled = regions.stream().filter(region -> region.getType().equals(fr.insee.onyxia.model.service.Service.ServiceType.KUBERNETES)).count() > 0;
+            boolean marathonEnabled = regions.stream().filter(region -> region.getServices().getType().equals(fr.insee.onyxia.model.service.Service.ServiceType.MARATHON)).count() > 0;
+            boolean kubernetesEnabled = regions.stream().filter(region -> region.getServices().getType().equals(fr.insee.onyxia.model.service.Service.ServiceType.KUBERNETES)).count() > 0;
 
             logger.info("Marathon support enabled : "+marathonEnabled);
             logger.info("Kubernetes support enabled : "+kubernetesEnabled);

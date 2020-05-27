@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 public class PermissionsChecker {
 
     public void checkPermission(Region region, User user, String fullId) throws IllegalAccessException {
-        if (!fullId.startsWith("/"+region.getNamespacePrefix()+"/"+user.getIdep())) {
+        if (!fullId.startsWith("/"+region.getServices().getNamespacePrefix()+"/"+user.getIdep())) {
             throw new IllegalAccessException("User "+user.getIdep()+" can not access "+fullId);
         }
     }

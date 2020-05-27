@@ -33,7 +33,7 @@ public class HelmURLEnforcer implements AdmissionControllerHelm {
             if (values.containsKey("ingress")) {
                 newIngressConfig = (Map<String,Object>) values.get("ingress");
             }
-            newIngressConfig.put("hostname",getUrl(region.getPublishDomain(), user,pkg, context));
+            newIngressConfig.put("hostname",getUrl(region.getServices().getExpose().getDomain(), user,pkg, context));
             newIngressConfig.put("enabled", true);
             values.put("ingress",newIngressConfig);
         }

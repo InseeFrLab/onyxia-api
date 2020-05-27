@@ -3,13 +3,36 @@
     {
       "id": "kub",
       "name": "Kubernetes (in-cluster)",
-      "type": "KUBERNETES",
-      "namespacePrefix": "user-",
-      "publishDomain": "fakedomain.kub.example.com",
-      "serviceMonitoringURLPattern": "https://graphana.kub.example.com/$appIdSlug",
-      "cloudshell": {
-        "catalogId": "inseefrlab-helm-charts-datascience",
-        "packageName": "cloudshell"
+      "onyxiaAPI": {
+        "baseURL": ""
+      },
+      "services": {
+        "type": "KUBERNETES",
+        "namespacePrefix": "user-",
+        "server": {
+          "URL": "",
+          "auth" : {
+
+          }
+        },
+        "expose": {
+          "domain": "fakedomain.kub.example.com"
+        },
+        "monitoring": {
+          "URLPattern": "https://graphana.kub.example.com/$appIdSlug"
+        },
+        "cloudshell": {
+          "catalogId": "inseefrlab-helm-charts-datascience",
+          "packageName": "cloudshell"
+        }
+      },
+      "data": {
+        "s3" : {
+          "url": "https://minio.example.com"
+        }
+      },
+      "auth": {
+        "type": "openidconnect"
       },
       "location" : {
         "name" : "Unknown",

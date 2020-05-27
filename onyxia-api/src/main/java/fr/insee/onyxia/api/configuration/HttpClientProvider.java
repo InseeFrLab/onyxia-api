@@ -31,14 +31,16 @@ public class HttpClientProvider {
                 Request request = chain.request();
                 Request newRequest = request;
 
-                if (region.getAuth() != null && region.getAuth().getToken() != null) {
+                Region.Auth auth = region.getServices().getServer().getAuth();
+
+                if (auth != null && auth.getToken() != null) {
                     newRequest = newRequest.newBuilder()
-                            .addHeader("Authorization", "token="+region.getAuth().getToken())
+                            .addHeader("Authorization", "token="+auth.getToken())
                             .build();
                 }
 
-                if (region.getAuth() != null && region.getAuth().getUsername() != null) {
-                    String credentials = Credentials.basic(region.getAuth().getUsername(),region.getAuth().getPassword());
+                if (auth != null && auth.getUsername() != null) {
+                    String credentials = Credentials.basic(auth.getUsername(),auth.getPassword());
                     newRequest = newRequest.newBuilder()
                             .addHeader("Authorization", credentials)
                             .build();
