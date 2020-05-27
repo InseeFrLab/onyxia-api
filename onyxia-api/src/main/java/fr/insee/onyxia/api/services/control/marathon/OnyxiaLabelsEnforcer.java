@@ -41,7 +41,7 @@ public class OnyxiaLabelsEnforcer implements AdmissionControllerMarathon {
                 slugId = slugId.substring(1);
             }
             slugId = slugId.replaceAll("/","_");
-            String monitoringUrl = region.getServices().getMonitoring().getURLPattern().replaceAll("\\$appIdSlug",slugId);
+            String monitoringUrl = region.getServices().getMonitoring().getUrlPattern().replaceAll("\\$appIdSlug",slugId);
             app.addLabel("ONYXIA_MONITORING", monitoringUrl);
         }
 
