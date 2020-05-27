@@ -27,7 +27,7 @@
         }
       },
       "data": {
-        "s3" : {
+        "S3" : {
           "url": "https://minio.example.com"
         }
       },

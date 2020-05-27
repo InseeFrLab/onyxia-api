@@ -10,6 +10,7 @@ public class Region {
     private Location location;
     private Services services;
     private OnyxiaAPI onyxiaAPI;
+    private Data data;
 
     public String getId() {
         return id;
@@ -41,6 +42,15 @@ public class Region {
 
     public void setServices(Services services) {
         this.services = services;
+    }
+
+
+    public Data getData() {
+        return data;
+    }
+
+    public void setData(Data data) {
+        this.data = data;
     }
 
     public OnyxiaAPI getOnyxiaAPI() {
@@ -129,6 +139,32 @@ public class Region {
 
         public String getUrlPattern() {
             return urlPattern;
+        }
+    }
+
+    public static class Data {
+        @JsonProperty("S3")
+        private S3 s3;
+
+        public S3 getS3() {
+            return s3;
+        }
+
+        public void setS3(S3 s3) {
+            this.s3 = s3;
+        }
+    }
+
+    public static class S3 {
+        @JsonProperty("URL")
+        private String url;
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
+
+        public String getUrl() {
+            return url;
         }
     }
 
