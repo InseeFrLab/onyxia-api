@@ -28,7 +28,7 @@
       },
       "data": {
         "S3" : {
-          "url": "https://minio.example.com"
+          "URL": "https://minio.example.com"
         }
       },
       "auth": {
