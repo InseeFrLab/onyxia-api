@@ -35,9 +35,9 @@
         "type": "openidconnect"
       },
       "location" : {
-        "name" : "Unknown",
-        "lat" : 0,
-        "long": 0
+        "name" : "Paris",
+        "lat" : 48.8453225,
+        "long": 2.3024401
       }
     }
   ]
