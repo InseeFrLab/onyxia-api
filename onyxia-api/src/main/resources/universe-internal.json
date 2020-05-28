@@ -33,7 +33,7 @@
         }
       },
       "marathon": {
-        "v2AppMustacheTemplate": "ewogICJpZCI6ICJ7e3NlcnZpY2UubmFtZX19IiwKICAiY3B1cyI6IDAuMSwKICAibWVtIjogNDA5NiwKICAiaW5zdGFuY2VzIjogMSwKICAiY29udGFpbmVyIjogewogICAgICAgInR5cGUiOiAiRE9DS0VSIiwKICAgICAgICJkb2NrZXIiOiB7CiAgICAgICAgICAgImltYWdlIjogInt7cmVzb3VyY2UuYXNzZXRzLmNvbnRhaW5lci5kb2NrZXIuc2hlbGx5fX0iLAogICAgICAgICAgICJuZXR3b3JrIjogIkJSSURHRSIsCiAgICAgICAgICAgInBvcnRNYXBwaW5ncyI6IFsKICAgICAgICAgICAgICB7ICJjb250YWluZXJQb3J0IjogMjIyMiwgImhvc3RQb3J0IjogMCB9CiAgICAgICAgICBdCiAgICAgICB9CiAgIH0sCiAgICJoZWFsdGhDaGVja3MiOiBbCiAgICB7CiAgICAgICJwb3J0SW5kZXgiOiAwLAogICAgICAicHJvdG9jb2wiOiAiTUVTT1NfVENQIiwKICAgICAgImdyYWNlUGVyaW9kU2Vjb25kcyI6IDMwLAogICAgICAiaW50ZXJ2YWxTZWNvbmRzIjogNjAsCiAgICAgICJ0aW1lb3V0U2Vjb25kcyI6IDIwLAogICAgICAibWF4Q29uc2VjdXRpdmVGYWlsdXJlcyI6IDMKICAgIH0KICBdLAogICJsYWJlbHMiOiB7CiAgICAiSEFQUk9YWV9HUk9VUCI6ImV4dGVybmFsIiwKICAgICJIQVBST1hZXzBfVkhPU1QiOiJ7e25ldHdvcmtpbmcudmlydHVhbC1ob3N0fX0iLAogICAgIkhBUFJPWFlfMF9FTkFCTEVEIjogInRydWUiLAogICAgIkhBUFJPWFlfMF9SRURJUkVDVF9UT19IVFRQUyI6ICJ7e25ldHdvcmtpbmcuaHR0cHMtcmVkaXJlY3R9fSIsCiAgICAiTUFSQVRIT05fU0lOR0xFX0lOU1RBTkNFX0FQUCI6ICJ0cnVlIgogIH0sCiAgInVwZ3JhZGVTdHJhdGVneSI6ewogICAgIm1pbmltdW1IZWFsdGhDYXBhY2l0eSI6IDAsCiAgICAibWF4aW11bU92ZXJDYXBhY2l0eSI6IDAKICB9Cn0K"
+        "v2AppMustacheTemplate": "ewogICAgImlkIjogInt7c2VydmljZS5uYW1lfX0iLAogICAgImNwdXMiOiAwLjEsCiAgICAibWVtIjogNDA5NiwKICAgICJpbnN0YW5jZXMiOiAxLAogICAgImNtZCI6ICJiYXNoIC9tbnQvbWVzb3Mvc2FuZGJveC9vbnl4aWEtaW5pdC5zaCAmJiAvdXNyL3NiaW4vc3NoZCA7IC91c3IvYmluL25vZGUgL3Jvb3Qvd2Vic3NoMi9hcHAvaW5kZXguanMiLAogICAgImNvbnRhaW5lciI6IHsKICAgICAgICAgInR5cGUiOiAiRE9DS0VSIiwKICAgICAgICAgImRvY2tlciI6IHsKICAgICAgICAgICAgICJpbWFnZSI6ICJ7e3Jlc291cmNlLmFzc2V0cy5jb250YWluZXIuZG9ja2VyLnNoZWxseX19IiwKICAgICAgICAgICAgICJuZXR3b3JrIjogIkJSSURHRSIsCiAgICAgICAgICAgICAicG9ydE1hcHBpbmdzIjogWwogICAgICAgICAgICAgICAgeyAiY29udGFpbmVyUG9ydCI6IDIyMjIsICJob3N0UG9ydCI6IDAgfQogICAgICAgICAgICBdCiAgICAgICAgIH0KICAgICB9LAogICAgICJoZWFsdGhDaGVja3MiOiBbCiAgICAgIHsKICAgICAgICAicG9ydEluZGV4IjogMCwKICAgICAgICAicHJvdG9jb2wiOiAiTUVTT1NfVENQIiwKICAgICAgICAiZ3JhY2VQZXJpb2RTZWNvbmRzIjogMzAsCiAgICAgICAgImludGVydmFsU2Vjb25kcyI6IDYwLAogICAgICAgICJ0aW1lb3V0U2Vjb25kcyI6IDIwLAogICAgICAgICJtYXhDb25zZWN1dGl2ZUZhaWx1cmVzIjogMwogICAgICB9CiAgICBdLAogICAgImxhYmVscyI6IHsKICAgICAgIkhBUFJPWFlfR1JPVVAiOiJleHRlcm5hbCIsCiAgICAgICJIQVBST1hZXzBfVkhPU1QiOiJ7e25ldHdvcmtpbmcudmlydHVhbC1ob3N0fX0iLAogICAgICAiSEFQUk9YWV8wX0VOQUJMRUQiOiAidHJ1ZSIsCiAgICAgICJIQVBST1hZXzBfUkVESVJFQ1RfVE9fSFRUUFMiOiAie3tuZXR3b3JraW5nLmh0dHBzLXJlZGlyZWN0fX0iLAogICAgICAiTUFSQVRIT05fU0lOR0xFX0lOU1RBTkNFX0FQUCI6ICJ0cnVlIgogICAgfSwKICAgICJlbnYiOiB7CiAgICAgICAgIkFXU19BQ0NFU1NfS0VZX0lEIjogInt7czMuYWNjZXNzS2V5SWR9fSIsCiAgICAgICAgIkFXU19TRUNSRVRfQUNDRVNTX0tFWSI6ICJ7e3MzLnNlY3JldEFjY2Vzc0tleX19IiwKICAgICAgICAiQVdTX1NFU1NJT05fVE9LRU4iOiAie3tzMy5zZXNzaW9uVG9rZW59fSIsCiAgICAgICAgIkFXU19ERUZBVUxUX1JFR0lPTiI6ICJ7e3MzLmRlZmF1bHRSZWdpb259fSIsCiAgICAgICAgIkFXU19TM19FTkRQT0lOVCI6ICJ7e3MzLmVuZHBvaW50fX0iLAogICAgICAgICJBV1NfRVhQSVJBVElPTiI6ICJ7e3MzLmV4cGlyYXRpb259fSIsCiAgICAgICAgIkdJVF9VU0VSX05BTUUiOiAie3tnaXQubmFtZX19IiwKICAgICAgICAiR0lUX1VTRVJfTUFJTCI6ICJ7e2dpdC5lbWFpbH19IiwKICAgICAgICAiR0lUX0NSRURFTlRJQUxTX0NBQ0hFX0RVUkFUSU9OIjogInt7Z2l0LmNhY2hlfX0iICAgIAogICAgfSwKICAgICJmZXRjaCI6IFsKICAgICAgICB7CiAgICAgICAgICAidXJpIjogImh0dHBzOi8vZ2l0LmxhYi5zc3BjbG91ZC5mci9pbm5vdmF0aW9uL3BsYXRlZm9ybWUtb255eGlhL3NlcnZpY2VzLXJlc3NvdXJjZXMvLS9yYXcvbWFzdGVyL29ueXhpYS1pbml0LnNoIiwKICAgICAgICAgICJleHRyYWN0IjogZmFsc2UsCiAgICAgICAgICAiZXhlY3V0YWJsZSI6IHRydWUsCiAgICAgICAgICAiY2FjaGUiOiBmYWxzZSwKICAgICAgICAgICJkZXN0UGF0aCI6ICJvbnl4aWEtaW5pdC5zaCIKICAgICAgICB9CiAgICBdLAogICAgInVwZ3JhZGVTdHJhdGVneSI6ewogICAgICAibWluaW11bUhlYWx0aENhcGFjaXR5IjogMCwKICAgICAgIm1heGltdW1PdmVyQ2FwYWNpdHkiOiAwCiAgICB9Cn0K"
       },
       "config": {
         "type": "object",
@@ -55,13 +55,13 @@
                 }
               },
               "cpus": {
-                "description": "CPU shares to allocate to this WordPress instance.",
+                "description": "CPU shares to allocate to this shelly instance.",
                 "type": "number",
                 "default": 0.1,
                 "minimum": 0.1
               },
               "mem": {
-                "description": "Memory (in MB) to allocate to this WordPress instance.",
+                "description": "Memory (in MB) to allocate to this shelly instance.",
                 "type": "number",
                 "default": 1024.0,
                 "minimum": 256.0
@@ -69,6 +69,87 @@
             },
             "required": ["name", "cpus", "mem"]
           },
+          "git": {
+            "description": "Git user configuration",
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "user name for git",
+                "default": "",
+                "x-form": {
+                  "value": "{{git.name}}",
+                  "readonly": true
+                }
+              },
+              "email": {
+                "type": "string",
+                "description": "user email for git",
+                "default": "",
+                "x-form": {
+                  "value": "{{git.email}}",
+                  "readonly": true
+                }
+              },
+              "cache": {
+                "type": "string",
+                "description": "duration in seconds of the credentials cache duration",
+                "default": "",
+                "x-form": {
+                  "value": "{{git.credentials_cache_duration}}",
+                  "readonly": false
+                }
+              }
+            }
+          },
+          "s3": {
+            "description": "Configuration of temporary identity",
+            "type": "object",
+            "properties": {
+              "accessKeyId": {
+                "description": "AWS Access Key",
+                "type": "string",
+                "x-form": {
+                  "value": "{{s3.AWS_ACCESS_KEY_ID}}"
+                }
+              },
+              "endpoint": {
+                "description": "AWS S3 Endpoint",
+                "type": "string",
+                "x-form": {
+                  "value": "{{s3.AWS_S3_ENDPOINT}}"
+                }
+              },
+              "defaultRegion": {
+                "description": "AWS S3 default region",
+                "type": "string",
+                "x-form": {
+                  "value": "{{s3.AWS_DEFAULT_REGION}}"
+                }
+              },
+              "secretAccessKey": {
+                "description": "AWS S3 secret access key",
+                "type": "string",
+                "x-form": {
+                  "value": "{{s3.AWS_SECRET_ACCESS_KEY}}"
+                }
+              },
+              "sessionToken": {
+                "description": "AWS S3 session Token",
+                "type": "string",
+                "x-form": {
+                  "value": "{{s3.AWS_SESSION_TOKEN}}"
+                }
+              },
+              "expiration": {
+                "description": "Temporary identity expiration date",
+                "type": "string",
+                "x-form": {
+                  "value": "{{s3.AWS_EXPIRATION}}"
+                }
+              }
+            }
+        },
           "networking": {
             "description": "Networking-related configuration properties for Shelly.",
             "type": "object",

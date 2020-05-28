@@ -18,6 +18,8 @@ public class Region {
     Auth auth;
     @JsonProperty("cloudshell")
     CloudshellConfiguration cloudshellConfiguration;
+    @JsonProperty("serviceMonitoringURLPattern")
+    String serviceMonitoringURLPattern;
 
     public String getRegionId() {
         return regionId;
@@ -81,6 +83,14 @@ public class Region {
 
     public void setCloudshellConfiguration(CloudshellConfiguration cloudshellConfiguration) {
         this.cloudshellConfiguration = cloudshellConfiguration;
+    }
+
+    public void setServiceMonitoringURLPattern(String serviceMonitoringURLPattern) {
+        this.serviceMonitoringURLPattern = serviceMonitoringURLPattern;
+    }
+
+    public String getServiceMonitoringURLPattern() {
+        return serviceMonitoringURLPattern;
     }
 
     public static class CloudshellConfiguration {

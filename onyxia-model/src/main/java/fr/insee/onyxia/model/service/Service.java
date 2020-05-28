@@ -20,6 +20,7 @@ public class Service {
     private List<Task> tasks = new ArrayList<>();
     private List<Event> events = new ArrayList<>();
     private String subtitle;
+    private Monitoring monitoring;
 
     private long startedAt;
 
@@ -153,11 +154,31 @@ public class Service {
         this.internalUrls = internalUrls;
     }
 
+    public Monitoring getMonitoring() {
+        return monitoring;
+    }
+
+    public void setMonitoring(Monitoring monitoring) {
+        this.monitoring = monitoring;
+    }
+
     public static enum ServiceStatus {
         DEPLOYING, RUNNING, STOPPED;
     }
 
     public static enum ServiceType {
         KUBERNETES,MARATHON
+    }
+
+    public static class Monitoring {
+        private String url;
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
     }
 }

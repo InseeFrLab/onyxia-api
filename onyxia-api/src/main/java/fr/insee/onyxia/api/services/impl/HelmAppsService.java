@@ -14,10 +14,10 @@ import fr.insee.onyxia.model.dto.CreateServiceDTO;
 import fr.insee.onyxia.model.dto.ServicesListing;
 import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.*;
+import io.fabric8.kubernetes.api.model.EventList;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
-import io.fabric8.kubernetes.api.model.events.EventList;
 import io.fabric8.kubernetes.api.model.extensions.Ingress;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
@@ -255,9 +255,9 @@ public class HelmAppsService implements AppsService {
         }).collect(Collectors.toList()));
 
         EventList eventList = client.events().inNamespace(release.getNamespace()).list();
-        List<Event> events = eventList.getItems().stream().filter(event -> event.getRegarding().getName().contains(release.getName())).map(event -> {
+        List<Event> events = eventList.getItems().stream().filter(event -> event.getInvolvedObject().getName().contains(release.getName())).map(event -> {
             Event newEvent = new Event();
-            newEvent.setMessage(event.getNote());
+            newEvent.setMessage(event.getMessage());
             try {
                 // TODO : use kubernetes time format instead of helm
                 newEvent.setTimestamp(helmDateFormat.parse(event.getEventTime().getTime()).getTime());

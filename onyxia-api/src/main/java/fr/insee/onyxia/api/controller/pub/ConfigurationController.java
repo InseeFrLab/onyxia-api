@@ -25,7 +25,10 @@ public class ConfigurationController {
     @GetMapping("/configuration")
     public AppInfo configuration() {
         AppInfo appInfo = new AppInfo();
-        appInfo.setBuild(build);
+        BuildInfo buildInfo = new BuildInfo();
+        buildInfo.setVersion(build.getVersion());
+        buildInfo.setTimestamp(build.getTime().getEpochSecond());
+        appInfo.setBuild(buildInfo);
         appInfo.setRegions(regionsConfiguration.getResolvedRegions());
         return appInfo;
     }
@@ -33,11 +36,11 @@ public class ConfigurationController {
     public class AppInfo {
 
 
-        private BuildProperties build;
+        private BuildInfo build;
         private List<Region> regions;
 
 
-        public void setBuild(BuildProperties build) {
+        public void setBuild(BuildInfo build) {
             this.build = build;
         }
 
@@ -45,12 +48,33 @@ public class ConfigurationController {
             this.regions = regions;
         }
 
-        public BuildProperties getBuild() {
+        public BuildInfo getBuild() {
             return build;
         }
 
         public List<Region> getRegions() {
             return regionsConfiguration.getResolvedRegions();
+        }
+    }
+
+    public class BuildInfo {
+        private String version;
+        private long timestamp;
+
+        public void setTimestamp(long timestamp) {
+            this.timestamp = timestamp;
+        }
+
+        public void setVersion(String version) {
+            this.version = version;
+        }
+
+        public long getTimestamp() {
+            return timestamp;
+        }
+
+        public String getVersion() {
+            return version;
         }
     }
 }

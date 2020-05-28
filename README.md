@@ -93,6 +93,7 @@ A valid `JSON` is expected with a list of `region` :
     "publish-domain": "fakedomain.marathon.example.com",
     "namespace-prefix": "users",
     "marathon-dns-suffix": "marathon.containerip.dcos.thisdcos.directory",
+    "serviceMonitoringURLPattern": "https://graphana.example.com/$appIdSlug",
     "cloudshell": {
       "catalogId": "internal",
       "packageName": "shelly"

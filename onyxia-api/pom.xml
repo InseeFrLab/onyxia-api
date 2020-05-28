@@ -4,7 +4,7 @@
 
 	<groupId>innovation.insee</groupId>
 	<artifactId>onyxia-v2</artifactId>
-	<version>0.1.0</version>
+	<version>0.0.1-SNAPSHOT</version>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -60,12 +60,12 @@
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>okhttp</artifactId>
-			<version>4.6.0</version>
+			<version>4.7.2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>logging-interceptor</artifactId>
-			<version>4.6.0</version>
+			<version>4.7.2</version>
 		</dependency>
 		<dependency>
 			<groupId>innovation.insee</groupId>
@@ -103,7 +103,7 @@
 		<dependency>
 			<groupId>io.github.inseefrlab</groupId>
 			<artifactId>java-helm-wrapper</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>

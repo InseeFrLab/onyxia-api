@@ -32,7 +32,7 @@
       "name": "Inseefrlab datascience",
       "description": "Services for datascientists. https://github.com/InseeFrLab/helm-charts-datascience",
       "maintainer": "innovation@insee.fr",
-      "location": "https://inseefrlab.github.io/helm-charts",
+      "location": "https://inseefrlab.github.io/helm-charts-datascience",
       "status": "PROD",
       "type": "helm"
     }
