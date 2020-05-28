@@ -18,7 +18,7 @@ public class MarathonClientImpl {
     @Bean
     public Marathon marathonClient() {
         Region region = regionsConfiguration.getResolvedRegions().get(0);
-        String MARATHON_URL = region.getServices().getServer().getURL();
+        String MARATHON_URL = region.getServices().getServer().getUrl();
         String MARATHON_AUTH_TOKEN = null;
         String MARATHON_AUTH_BASIC_USERNAME = null;
         String MARATHON_AUTH_BASIC_PASSWORD = null;

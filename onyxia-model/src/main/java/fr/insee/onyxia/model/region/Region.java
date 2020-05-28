@@ -182,15 +182,16 @@ public class Region {
 
     public static class Server {
 
-        private String URL;
+        @JsonProperty("URL")
+        private String url;
         private Auth auth;
 
-        public String getURL() {
-            return URL;
+        public String getUrl() {
+            return url;
         }
 
-        public void setURL(String URL) {
-            this.URL = URL;
+        public void setUrl(String url) {
+            this.url = url;
         }
 
         public Auth getAuth() {

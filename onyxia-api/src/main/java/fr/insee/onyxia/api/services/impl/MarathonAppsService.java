@@ -426,7 +426,7 @@ public class MarathonAppsService implements AppsService {
      */
     private Group getGroup(Region region, String id) throws IOException {
 
-        Request requete = new Request.Builder().url(region.getServices().getServer().getURL() + "/v2/groups/" + id + "?" + "embed=group.groups" + "&"
+        Request requete = new Request.Builder().url(region.getServices().getServer().getUrl() + "/v2/groups/" + id + "?" + "embed=group.groups" + "&"
                 + "embed=group.apps" + "&" + "embed=group.apps.tasks" + "&" + "embed=group.apps.counts" + "&"
                 + "embed=group.apps.deployments" + "&" + "embed=group.apps.readiness" + "&"
                 + "embed=group.apps.lastTaskFailure" + "&" + "embed=group.pods" + "&" + "embed=group.apps.taskStats")

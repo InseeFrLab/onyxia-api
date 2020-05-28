@@ -19,20 +19,23 @@ public class KubernetesClientProvider {
 
     public KubernetesClient getClientForRegion(Region region) {
         ConfigBuilder configBuilder = new ConfigBuilder();
-        if (region.getServices().getServer() != null && region.getServices().getServer().getURL() != null) {
-            configBuilder.withMasterUrl(region.getServices().getServer().getURL() );
+        if (region.getServices().getServer() != null && region.getServices().getServer().getUrl() != null) {
+            configBuilder.withMasterUrl(region.getServices().getServer().getUrl() );
         }
 
-        Region.Auth auth = region.getServices().getServer().getAuth();
-        if (auth != null) {
-            if (StringUtils.isNotEmpty(auth.getToken())) {
-                configBuilder.withOauthToken(auth.getToken());
-            }
-            if (StringUtils.isNotEmpty(auth.getUsername()) && StringUtils.isNotEmpty(auth.getPassword())) {
-                configBuilder.withUsername(auth.getUsername());
-                configBuilder.withPassword(auth.getPassword());
+        if (region.getServices().getServer() != null) {
+            Region.Auth auth = region.getServices().getServer().getAuth();
+            if (auth != null) {
+                if (StringUtils.isNotEmpty(auth.getToken())) {
+                    configBuilder.withOauthToken(auth.getToken());
+                }
+                if (StringUtils.isNotEmpty(auth.getUsername()) && StringUtils.isNotEmpty(auth.getPassword())) {
+                    configBuilder.withUsername(auth.getUsername());
+                    configBuilder.withPassword(auth.getPassword());
+                }
             }
         }
+
         Config config = configBuilder.build();
         KubernetesClient client = new DefaultKubernetesClient(config);
         return client;
