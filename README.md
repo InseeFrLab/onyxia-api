@@ -66,8 +66,7 @@ Open id configuration
 CORS configuration :
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
-| `cors.allowed` | `true` | To enabled or not [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)|
-| `cors.origins.allowed` | `*` | To indicate which origins are allowed by CORS|
+| `cors.allowed_origins` | `*` | To indicate which origins are allowed by [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) |
 
 Regions configuration :
 
