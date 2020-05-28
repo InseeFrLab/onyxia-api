@@ -1,4 +1,4 @@
-package com.mixed.kotlin
+package fr.insee.onyxia
 import fr.insee.onyxia.model.User
 
 data class Person(val name: String) {
