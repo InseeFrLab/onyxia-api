@@ -1,11 +1,11 @@
 package fr.insee.onyxia.mustache;
 
-import java.io.StringReader;
-import java.io.StringWriter;
-
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
+
+import java.io.StringReader;
+import java.io.StringWriter;
 
 public class Mustacheur {
 
