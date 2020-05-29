@@ -24,7 +24,7 @@ cd onyxia-api
 mvn spring-boot:run
 ```
 
-### Using Helm (work in progress)
+### Using Helm
 
 A [helm](helm.sh) package is available at [inseefrlab](https://github.com/InseeFrLab/helm-charts)
 
