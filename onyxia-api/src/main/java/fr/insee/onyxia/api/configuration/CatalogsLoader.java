@@ -56,13 +56,13 @@ public class CatalogsLoader {
 
         private Logger logger = LoggerFactory.getLogger(CatalogFilter.class);
 
-        public List<CatalogWrapper>  filterCatalogs(List<CatalogWrapper> catalogs) {
+        public List<CatalogWrapper> filterCatalogs(List<CatalogWrapper> catalogs) {
             List<Region> regions = regionsConfiguration.getResolvedRegions();
             boolean marathonEnabled = regions.stream().filter(region -> region.getServices().getType().equals(fr.insee.onyxia.model.service.Service.ServiceType.MARATHON)).count() > 0;
             boolean kubernetesEnabled = regions.stream().filter(region -> region.getServices().getType().equals(fr.insee.onyxia.model.service.Service.ServiceType.KUBERNETES)).count() > 0;
 
-            logger.info("Marathon support enabled : "+marathonEnabled);
-            logger.info("Kubernetes support enabled : "+kubernetesEnabled);
+            logger.info("Marathon support enabled : " + marathonEnabled);
+            logger.info("Kubernetes support enabled : " + kubernetesEnabled);
             return catalogs.stream().filter(cw -> {
                 if (cw.getType().equals("universe") && marathonEnabled) {
                     return true;
@@ -70,7 +70,7 @@ public class CatalogsLoader {
                 if (cw.getType().equals("helm") && kubernetesEnabled) {
                     return true;
                 }
-                logger.info("Filtering out catalog "+cw.getName());
+                logger.info("Filtering out catalog " + cw.getName());
                 return false;
             }).collect(Collectors.toList());
         }
