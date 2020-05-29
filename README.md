@@ -70,44 +70,71 @@ A valid `JSON` is expected with a list of `region` :
 
 ```JSON
 [
-  {
-    "id": "kub",
-    "name": "Kubernetes (in-cluster)",
-    "type": "KUBERNETES",
-    "namespacePrefix": "user-",
-    "publishDomain": "fakedomain.kub.example.com",
-    "cloudshell": {
-      "catalogId": "inseefrlab-helm-charts",
-      "packageName": "cloudshell"
-    },
-    "location": {
-        "lat": 48.8164,
-        "long": 2.3174,
-        "name": "Montrouge (France)"
-    }
-  },
-  {
-    "id": "marathon",
-    "name": "Marathon",
-    "type": "MARATHON",
-    "serverUrl": "",
-    "publishDomain": "fakedomain.marathon.example.com",
-    "namespacePrefix": "users",
-    "marathonDnsSuffix": "marathon.containerip.dcos.thisdcos.directory",
-    "serviceMonitoringURLPattern": "https://graphana.example.com/$appIdSlug",
-    "cloudshell": {
-      "catalogId": "internal",
-      "packageName": "shelly"
-    },
-    "auth": {
-      "token": "xxxxx"
-    },
-    "location" : {
-        "name" : "Unknown",
-        "lat" : 0,
-        "long": 0
+   {
+      "id":"eu-west-1",
+      "name":"eu-west-1",
+      "services":{
+         "type":"MARATHON",
+         "namespacePrefix":"users",
+         "server":{
+            "URL":"https://marathon.example.com",
+            "auth":{
+               "token":"XYZ"
+            }
+         },
+         "expose":{
+            "domain":"example.example.com"
+         },
+         "monitoring":{
+            "URLPattern":"https://graphana.example.com/$appIdSlug"
+         },
+         "cloudshell":{
+            "catalogId":"internal",
+            "packageName":"shelly"
+         }
+      },
+      "data":{
+         "S3":{
+            "url":"https://minio.example.com"
+         }
+      },
+      "auth":{
+         "type":"openidconnect"
+      },
+      "location":{
+         "lat":48.8164,
+         "long":2.3174,
+         "name":"Paris (France)"
       }
-  }
+   },
+   {
+      "id":"in-cluster",
+      "name":"In cluster",
+      "services":{
+         "type":"KUBERNETES",
+         "namespacePrefix":"user-",
+         "expose":{
+            "domain":"example2.example.com"
+         },
+         "cloudshell":{
+            "catalogId":"inseefrlab-helm-charts-datascience",
+            "packageName":"cloudshell"
+         }
+      },
+      "data":{
+         "S3":{
+            "URL":"https://s3.example.com"
+         }
+      },
+      "auth":{
+         "type":"openidconnect"
+      },
+      "location":{
+         "name":"St. Ghislain (Belgium)",
+         "lat":50.8503,
+         "long":4.3517
+      }
+   }
 ]
 ```
 
