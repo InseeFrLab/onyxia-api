@@ -6,18 +6,15 @@ import mesosphere.marathon.client.Marathon;
 import mesosphere.marathon.client.MarathonClient;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class MarathonClientImpl {
+public class MarathonClientProvider {
 
     @Autowired
     private RegionsConfiguration regionsConfiguration;
 
-    @Bean
-    public Marathon marathonClient() {
-        Region region = regionsConfiguration.getResolvedRegions().get(0);
+    public Marathon getMarathonClientForRegion(Region region) {
         String MARATHON_URL = region.getServerUrl();
         String MARATHON_AUTH_TOKEN = null;
         String MARATHON_AUTH_BASIC_USERNAME = null;
@@ -38,7 +35,7 @@ public class MarathonClientImpl {
             return MarathonClient.getInstanceWithTokenAuth(MARATHON_URL,MARATHON_AUTH_TOKEN);
         }
         else if (MARATHON_AUTH_BASIC_USERNAME != null && !MARATHON_AUTH_BASIC_USERNAME.isBlank()
-        && MARATHON_AUTH_BASIC_PASSWORD != null && !MARATHON_AUTH_BASIC_PASSWORD.isBlank()) {
+                && MARATHON_AUTH_BASIC_PASSWORD != null && !MARATHON_AUTH_BASIC_PASSWORD.isBlank()) {
             return MarathonClient.getInstanceWithBasicAuth(MARATHON_URL,MARATHON_AUTH_BASIC_USERNAME, MARATHON_AUTH_BASIC_PASSWORD);
         }
         else {

@@ -18,7 +18,6 @@ import fr.insee.onyxia.model.service.UninstallService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import mesosphere.marathon.client.Marathon;
 import mesosphere.marathon.client.MarathonException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,9 +44,6 @@ public class MyLabController {
 
     @Autowired
     private CatalogService catalogService;
-
-    @Autowired(required = false)
-    private Marathon marathon;
 
     @Autowired
     private RegionsConfiguration regionsConfiguration;
