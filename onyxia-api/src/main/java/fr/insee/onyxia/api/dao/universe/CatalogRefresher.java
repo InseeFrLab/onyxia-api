@@ -1,18 +1,15 @@
 package fr.insee.onyxia.api.dao.universe;
 
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import javax.annotation.PostConstruct;
-
+import fr.insee.onyxia.api.configuration.Catalogs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import fr.insee.onyxia.api.configuration.Catalogs;
+import javax.annotation.PostConstruct;
+import java.util.Timer;
+import java.util.TimerTask;
 
 @Service
 public class CatalogRefresher {
