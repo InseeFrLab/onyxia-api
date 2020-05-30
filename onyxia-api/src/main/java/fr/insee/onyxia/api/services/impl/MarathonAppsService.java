@@ -20,7 +20,6 @@ import fr.insee.onyxia.model.service.Event;
 import fr.insee.onyxia.model.service.Task;
 import fr.insee.onyxia.model.service.UninstallService;
 import fr.insee.onyxia.mustache.Mustacheur;
-import mesosphere.marathon.client.Marathon;
 import mesosphere.marathon.client.model.v2.App;
 import mesosphere.marathon.client.model.v2.Group;
 import mesosphere.marathon.client.model.v2.Result;
@@ -45,8 +44,8 @@ import java.util.stream.Collectors;
 @Qualifier("Marathon")
 public class MarathonAppsService implements AppsService {
 
-    @Autowired(required = false)
-    Marathon marathon;
+    @Autowired
+    MarathonClientProvider marathonClientProvider;
 
     @Autowired
     private ObjectMapper mapper;
@@ -259,7 +258,7 @@ public class MarathonAppsService implements AppsService {
         if (requestDTO.isDryRun()) {
             return apps.stream().collect(Collectors.toList());
         } else {
-            return apps.stream().map(app -> marathon.createApp(app)).collect(Collectors.toList());
+            return apps.stream().map(app -> marathonClientProvider.getMarathonClientForRegion(region).createApp(app)).collect(Collectors.toList());
         }
     }
 
@@ -296,7 +295,7 @@ public class MarathonAppsService implements AppsService {
     public fr.insee.onyxia.model.service.Service getUserService(Region region, User user, String serviceId) throws Exception {
         String fullServiceId = getFullServiceId(user,region.getNamespacePrefix(), serviceId);
         permissionsChecker.checkPermission(region, user,fullServiceId);
-        return mapAppToService(marathon.getApp(fullServiceId.substring(1)).getApp());
+        return mapAppToService(marathonClientProvider.getMarathonClientForRegion(region).getApp(fullServiceId.substring(1)).getApp());
     }
 
     @Override
@@ -310,10 +309,10 @@ public class MarathonAppsService implements AppsService {
         permissionsChecker.checkPermission(region, user,fullId);
         Result appUninstaller;
         if (bulk) {
-            appUninstaller = marathon.deleteGroup(fullId.substring(1), true);
+            appUninstaller = marathonClientProvider.getMarathonClientForRegion(region).deleteGroup(fullId.substring(1), true);
         }
         else {
-            appUninstaller = marathon.deleteApp(fullId.substring(1));
+            appUninstaller = marathonClientProvider.getMarathonClientForRegion(region).deleteApp(fullId.substring(1));
         }
         UninstallService result = new UninstallService();
         result.setPath(path);
