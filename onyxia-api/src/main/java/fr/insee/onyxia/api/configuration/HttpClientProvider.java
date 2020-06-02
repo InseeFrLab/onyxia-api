@@ -4,7 +4,6 @@ import fr.insee.onyxia.model.region.Region;
 import okhttp3.*;
 import okhttp3.logging.HttpLoggingInterceptor;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -12,9 +11,6 @@ import java.io.IOException;
 
 @Configuration
 public class HttpClientProvider {
-
-    @Value("${debug.http.log}")
-    boolean LOG_HTTP;
 
     @Bean
     public OkHttpClient httpClient(){
@@ -59,7 +55,8 @@ public class HttpClientProvider {
     }
 
     private void enableDebugFeatureIfEnabled(OkHttpClient.Builder builder) {
-        if (LOG_HTTP) {
+        // Currently disabled
+        if (false) {
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
             logging.level(HttpLoggingInterceptor.Level.BODY);
             builder.addInterceptor(logging);
