@@ -78,6 +78,7 @@ A valid `JSON` is expected with a list of `region` :
    {
       "id":"eu-west-1",
       "name":"eu-west-1",
+      "description": "Onyxia supports Marathon but you need to set the credentials to connect to the API.",
       "services":{
          "type":"MARATHON",
          "namespacePrefix":"users",
@@ -115,6 +116,7 @@ A valid `JSON` is expected with a list of `region` :
    {
       "id":"in-cluster",
       "name":"In cluster",
+      "description": "For kubernetes, you can either set the credentials yourself or use the default in-cluster configuration.",
       "services":{
          "type":"KUBERNETES",
          "namespacePrefix":"user-",

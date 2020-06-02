@@ -7,6 +7,7 @@ import fr.insee.onyxia.model.service.Service;
 public class Region {
     private String id;
     private String name;
+    private String description;
     private Location location;
     private Services services;
     private OnyxiaAPI onyxiaAPI;
@@ -26,6 +27,14 @@ public class Region {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Location getLocation() {

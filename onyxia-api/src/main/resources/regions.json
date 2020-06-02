@@ -3,6 +3,7 @@
     {
       "id": "kub",
       "name": "Kubernetes (in-cluster)",
+      "description": "The in-cluster Kubernetes region.",
       "onyxiaAPI": {
         "baseURL": ""
       },
