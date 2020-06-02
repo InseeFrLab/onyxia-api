@@ -39,10 +39,10 @@ public class CloudShellController {
 	@GetMapping
 	public CloudShellStatus getCloudShellStatus(Region region) {
 		CloudShellStatus status = new CloudShellStatus();
-		Region.CloudshellConfiguration cloudshellConfiguration = region.getCloudshellConfiguration();
+		Region.CloudshellConfiguration cloudshellConfiguration = region.getServices().getCloudshell();
 		try {
 			Service service = null;
-			if (region.getType().equals(Service.ServiceType.KUBERNETES)) {
+			if (region.getServices().getType().equals(Service.ServiceType.KUBERNETES)) {
 				service = helmAppsService.getUserService(region, userProvider.getUser(),"cloudshell");
 			}
 			else {

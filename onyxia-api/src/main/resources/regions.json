@@ -1,14 +1,44 @@
 {
   "regions": [
     {
-      "regionId": "kub",
-      "type": "KUBERNETES",
-      "namespace-prefix": "user-",
-      "publish-domain": "fakedomain.kub.example.com",
-      "serviceMonitoringURLPattern": "https://graphana.kub.example.com/$appIdSlug",
-      "cloudshell": {
-        "catalogId": "inseefrlab-helm-charts-datascience",
-        "packageName": "cloudshell"
+      "id": "kub",
+      "name": "Kubernetes (in-cluster)",
+      "description": "The in-cluster Kubernetes region.",
+      "onyxiaAPI": {
+        "baseURL": ""
+      },
+      "services": {
+        "type": "KUBERNETES",
+        "namespacePrefix": "user-",
+        "server": {
+          "URL": "",
+          "auth" : {
+
+          }
+        },
+        "expose": {
+          "domain": "fakedomain.kub.example.com"
+        },
+        "monitoring": {
+          "URLPattern": "https://graphana.kub.example.com/$appIdSlug"
+        },
+        "cloudshell": {
+          "catalogId": "inseefrlab-helm-charts-datascience",
+          "packageName": "cloudshell"
+        }
+      },
+      "data": {
+        "S3" : {
+          "URL": "https://minio.example.com"
+        }
+      },
+      "auth": {
+        "type": "openidconnect"
+      },
+      "location" : {
+        "name" : "Paris",
+        "lat" : 48.8453225,
+        "long": 2.3024401
       }
     }
   ]

@@ -4,93 +4,257 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.insee.onyxia.model.service.Service;
 
-@JsonIgnoreProperties(value={"auth","serverUrl"},allowSetters = true)
 public class Region {
-    String regionId;
-    Service.ServiceType type;
-    String serverUrl;
-    @JsonProperty("publish-domain")
-    String publishDomain;
-    @JsonProperty("namespace-prefix")
-    String namespacePrefix;
-    @JsonProperty("marathon-dns-suffix")
-    String marathonDnsSuffix;
-    Auth auth;
-    @JsonProperty("cloudshell")
-    CloudshellConfiguration cloudshellConfiguration;
-    @JsonProperty("serviceMonitoringURLPattern")
-    String serviceMonitoringURLPattern;
+    private String id;
+    private String name;
+    private String description;
+    private Location location;
+    private Services services;
+    private OnyxiaAPI onyxiaAPI;
+    private Data data;
 
-    public String getRegionId() {
-        return regionId;
+    public String getId() {
+        return id;
     }
 
-    public void setRegionId(String regionId) {
-        this.regionId = regionId;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public Service.ServiceType getType() {
-        return type;
+    public String getName() {
+        return name;
     }
 
-    public void setType(Service.ServiceType type) {
-        this.type = type;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getServerUrl() {
-        return serverUrl;
+    public String getDescription() {
+        return description;
     }
 
-    public void setServerUrl(String serverUrl) {
-        this.serverUrl = serverUrl;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public String getPublishDomain() {
-        return publishDomain;
+    public Location getLocation() {
+        return location;
     }
 
-    public void setPublishDomain(String publishDomain) {
-        this.publishDomain = publishDomain;
+    public void setLocation(Location location) {
+        this.location = location;
     }
 
-    public String getNamespacePrefix() {
-        return namespacePrefix;
+    public Services getServices() {
+        return services;
     }
 
-    public void setNamespacePrefix(String namespacePrefix) {
-        this.namespacePrefix = namespacePrefix;
+    public void setServices(Services services) {
+        this.services = services;
     }
 
-    public String getMarathonDnsSuffix() {
-        return marathonDnsSuffix;
+
+    public Data getData() {
+        return data;
     }
 
-    public void setMarathonDnsSuffix(String marathonDnsSuffix) {
-        this.marathonDnsSuffix = marathonDnsSuffix;
+    public void setData(Data data) {
+        this.data = data;
     }
 
-    public Auth getAuth() {
-        return auth;
+    public OnyxiaAPI getOnyxiaAPI() {
+        return onyxiaAPI;
     }
 
-    public void setAuth(Auth auth) {
-        this.auth = auth;
+    public void setOnyxiaAPI(OnyxiaAPI onyxiaAPI) {
+        this.onyxiaAPI = onyxiaAPI;
     }
 
-    public CloudshellConfiguration getCloudshellConfiguration() {
-        return cloudshellConfiguration;
+    @JsonIgnoreProperties(value={"server"},allowSetters = true)
+    public static class Services {
+
+        private Service.ServiceType type;
+        private String namespacePrefix;
+        private String marathonDnsSuffix;
+        private Expose expose;
+        private Server server;
+        private Monitoring monitoring;
+        private CloudshellConfiguration cloudshell;
+
+        public Service.ServiceType getType() {
+            return type;
+        }
+
+        public void setType(Service.ServiceType type) {
+            this.type = type;
+        }
+
+        public String getNamespacePrefix() {
+            return namespacePrefix;
+        }
+
+        public void setNamespacePrefix(String namespacePrefix) {
+            this.namespacePrefix = namespacePrefix;
+        }
+
+        public String getMarathonDnsSuffix() {
+            return marathonDnsSuffix;
+        }
+
+        public void setMarathonDnsSuffix(String marathonDnsSuffix) {
+            this.marathonDnsSuffix = marathonDnsSuffix;
+        }
+
+        public Expose getExpose() {
+            return expose;
+        }
+
+        public void setExpose(Expose expose) {
+            this.expose = expose;
+        }
+
+        public Server getServer() {
+            return server;
+        }
+
+        public void setServer(Server server) {
+            this.server = server;
+        }
+
+        public CloudshellConfiguration getCloudshell() {
+            return cloudshell;
+        }
+
+        public void setCloudshell(CloudshellConfiguration cloudshell) {
+            this.cloudshell = cloudshell;
+        }
+
+        public Monitoring getMonitoring() {
+            return monitoring;
+        }
+
+        public void setMonitoring(Monitoring monitoring) {
+            this.monitoring = monitoring;
+        }
     }
 
-    public void setCloudshellConfiguration(CloudshellConfiguration cloudshellConfiguration) {
-        this.cloudshellConfiguration = cloudshellConfiguration;
+    public static class Monitoring {
+        @JsonProperty("URLPattern")
+        private String urlPattern;
+
+        public void setUrlPattern(String urlPattern) {
+            this.urlPattern = urlPattern;
+        }
+
+        public String getUrlPattern() {
+            return urlPattern;
+        }
     }
 
-    public void setServiceMonitoringURLPattern(String serviceMonitoringURLPattern) {
-        this.serviceMonitoringURLPattern = serviceMonitoringURLPattern;
+    public static class Data {
+        @JsonProperty("S3")
+        private S3 s3;
+
+        public S3 getS3() {
+            return s3;
+        }
+
+        public void setS3(S3 s3) {
+            this.s3 = s3;
+        }
     }
 
-    public String getServiceMonitoringURLPattern() {
-        return serviceMonitoringURLPattern;
+    public static class S3 {
+        @JsonProperty("URL")
+        private String url;
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+    }
+
+    public static class Expose {
+        private String domain;
+
+        public void setDomain(String domain) {
+            this.domain = domain;
+        }
+
+        public String getDomain() {
+            return domain;
+        }
+    }
+
+    public static class Server {
+
+        @JsonProperty("URL")
+        private String url;
+        private Auth auth;
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
+
+        public Auth getAuth() {
+            return auth;
+        }
+
+        public void setAuth(Auth auth) {
+            this.auth = auth;
+        }
+    }
+
+    public static class OnyxiaAPI {
+        private String baseURL;
+
+        public String getBaseURL() {
+            return baseURL;
+        }
+
+        public void setBaseURL(String baseURL) {
+            this.baseURL = baseURL;
+        }
+    }
+
+    public static class Location {
+
+        private double lat;
+        @JsonProperty("long")
+        private double longitude;
+        private String name;
+
+
+        public void setLat(double lat) {
+            this.lat = lat;
+        }
+
+        public void setLongitude(double longitude) {
+            this.longitude = longitude;
+        }
+
+        public double getLat() {
+            return lat;
+        }
+
+        public double getLongitude() {
+            return longitude;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
     }
 
     public static class CloudshellConfiguration {

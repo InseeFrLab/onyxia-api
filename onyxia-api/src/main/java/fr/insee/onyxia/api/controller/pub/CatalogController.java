@@ -6,6 +6,9 @@ import fr.insee.onyxia.api.configuration.NotFoundException;
 import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.model.catalog.Config.Property;
 import fr.insee.onyxia.model.catalog.Package;
+import fr.insee.onyxia.model.region.Region;
+import fr.insee.onyxia.model.service.Service;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Tag(name = "Public")
 @RequestMapping("/public/catalog")
@@ -25,8 +29,10 @@ public class CatalogController {
    private CatalogService catalogService;
 
    @GetMapping
-   public Catalogs getCatalogs() {
-      return catalogService.getCatalogs();
+   public Catalogs getCatalogs(@Parameter(hidden = true) Region region) {
+      Catalogs filteredCatalogs = new Catalogs();
+      filteredCatalogs.setCatalogs(catalogService.getCatalogs().getCatalogs().stream().filter((catalog) -> isCatalogEnabled(region, catalog)).collect(Collectors.toList()));
+      return filteredCatalogs;
    }
 
    @GetMapping("{catalogId}")
@@ -46,6 +52,22 @@ public class CatalogController {
          throw new NotFoundException();
       }
       return pkg;
+   }
+
+   private boolean isCatalogEnabled(Region region, CatalogWrapper catalog) {
+      if (region == null) {
+         return true;
+      }
+
+      if (catalog.getType().equalsIgnoreCase("UNIVERSE")) {
+         return region.getServices().getType().equals(Service.ServiceType.MARATHON);
+      }
+
+      if (catalog.getType().equalsIgnoreCase("HELM")) {
+         return region.getServices().getType().equals(Service.ServiceType.KUBERNETES);
+      }
+
+      return false;
    }
 
    private void addCustomOnyxiaProperties(Package pkg) {

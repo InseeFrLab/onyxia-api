@@ -148,7 +148,7 @@ public class MarathonAppsService implements AppsService {
     }
 
     private String generateBaseId(Region region, User user, String groupName, String randomizedId) {
-        return "/"+region.getNamespacePrefix() + "/" + idSanitizer.sanitize(user.getIdep()) + (groupName != null ? "/" + idSanitizer.sanitize(groupName)+"-"+ randomizedId : "");
+        return "/"+region.getServices().getNamespacePrefix() + "/" + idSanitizer.sanitize(user.getIdep()) + (groupName != null ? "/" + idSanitizer.sanitize(groupName)+"-"+ randomizedId : "");
     }
 
     private String generateGroupId(Region region, User user, String groupName, String randomizedId) {
@@ -214,7 +214,7 @@ public class MarathonAppsService implements AppsService {
         }
 
         final boolean isGroupFinal = isGroup;
-        final boolean isCloudshell = region.getCloudshellConfiguration() != null && region.getCloudshellConfiguration().getCatalogId().equals(catalogId) && region.getCloudshellConfiguration().getPackageName().equals(pkg.getName());
+        final boolean isCloudshell = region.getServices().getCloudshell() != null && region.getServices().getCloudshell().getCatalogId().equals(catalogId) && region.getServices().getCloudshell().getPackageName().equals(pkg.getName());
         xGeneratedContext.getScopes().forEach((scopeName,scope) -> {
             scope.getxGenerateds().forEach((name,xGenerated) -> {
                 String appId = generateAppId(region,user,isGroupFinal ? sanitizedPackageName : null,scopeName, context.getGlobalContext().getRandomizedId(), isCloudshell);
@@ -222,11 +222,11 @@ public class MarathonAppsService implements AppsService {
                     xGeneratedValues.put(name, appId);
                 }
                 if (xGenerated.getType() == Property.XGenerated.XGeneratedType.ExternalDNS) {
-                    xGeneratedValues.put(name, generator.generateUrl(user.getIdep(), sanitizedPackageName, context.getGlobalContext().getRandomizedId(), scopeName+(StringUtils.isNotBlank(xGenerated.getName()) ? "-"+xGenerated.getName() : ""), region.getPublishDomain()));
+                    xGeneratedValues.put(name, generator.generateUrl(user.getIdep(), sanitizedPackageName, context.getGlobalContext().getRandomizedId(), scopeName+(StringUtils.isNotBlank(xGenerated.getName()) ? "-"+xGenerated.getName() : ""), region.getServices().getExpose().getDomain()));
                 }
 
                 if (xGenerated.getType() == Property.XGenerated.XGeneratedType.InternalDNS) {
-                    xGeneratedValues.put(name, getInternalDnsFromId(appId, region.getMarathonDnsSuffix()));
+                    xGeneratedValues.put(name, getInternalDnsFromId(appId, region.getServices().getMarathonDnsSuffix()));
                 }
             });
         });
@@ -270,7 +270,7 @@ public class MarathonAppsService implements AppsService {
     @Override
     public CompletableFuture<ServicesListing> getUserServices(Region region, User user, String groupId)
             throws IllegalAccessException, IOException {
-        String namespacePrefix = region.getNamespacePrefix();
+        String namespacePrefix = region.getServices().getNamespacePrefix();
         if (groupId != null && !groupId.startsWith(getUserGroupPath(namespacePrefix,user))) {
             throw new IllegalAccessException("Permission denied. " + user.getIdep() + " can not access " + groupId);
         }
@@ -293,7 +293,7 @@ public class MarathonAppsService implements AppsService {
 
     @Override
     public fr.insee.onyxia.model.service.Service getUserService(Region region, User user, String serviceId) throws Exception {
-        String fullServiceId = getFullServiceId(user,region.getNamespacePrefix(), serviceId);
+        String fullServiceId = getFullServiceId(user,region.getServices().getNamespacePrefix(), serviceId);
         permissionsChecker.checkPermission(region, user,fullServiceId);
         return mapAppToService(marathonClientProvider.getMarathonClientForRegion(region).getApp(fullServiceId.substring(1)).getApp());
     }
@@ -305,7 +305,7 @@ public class MarathonAppsService implements AppsService {
 
     @Override
     public UninstallService destroyService(Region region, User user, String path, boolean bulk) throws IllegalAccessException {
-        String fullId = getFullServiceId(user,region.getNamespacePrefix(), path);
+        String fullId = getFullServiceId(user,region.getServices().getNamespacePrefix(), path);
         permissionsChecker.checkPermission(region, user,fullId);
         Result appUninstaller;
         if (bulk) {
@@ -425,7 +425,7 @@ public class MarathonAppsService implements AppsService {
      */
     private Group getGroup(Region region, String id) throws IOException {
 
-        Request requete = new Request.Builder().url(region.getServerUrl() + "/v2/groups/" + id + "?" + "embed=group.groups" + "&"
+        Request requete = new Request.Builder().url(region.getServices().getServer().getUrl() + "/v2/groups/" + id + "?" + "embed=group.groups" + "&"
                 + "embed=group.apps" + "&" + "embed=group.apps.tasks" + "&" + "embed=group.apps.counts" + "&"
                 + "embed=group.apps.deployments" + "&" + "embed=group.apps.readiness" + "&"
                 + "embed=group.apps.lastTaskFailure" + "&" + "embed=group.pods" + "&" + "embed=group.apps.taskStats")

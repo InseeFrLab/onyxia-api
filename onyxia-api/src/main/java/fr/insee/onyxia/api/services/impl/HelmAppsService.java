@@ -76,7 +76,7 @@ public class HelmAppsService implements AppsService {
     @Override
     public Collection<Object> installApp(Region region,CreateServiceDTO requestDTO, String catalogId, Package pkg,
             User user, Map<String, Object> fusion) throws IOException, TimeoutException, InterruptedException {
-        Region.CloudshellConfiguration cloudshellConfiguration = region.getCloudshellConfiguration();
+        Region.CloudshellConfiguration cloudshellConfiguration = region.getServices().getCloudshell();
         boolean isCloudshell =false;
         if (cloudshellConfiguration != null && catalogId.equals(cloudshellConfiguration.getCatalogId()) && pkg.getName().equals(cloudshellConfiguration.getPackageName())) {
             isCloudshell =  true;
@@ -89,7 +89,7 @@ public class HelmAppsService implements AppsService {
         }
         File values = File.createTempFile("values", ".yaml");
         mapperHelm.writeValue(values, fusion);
-        String namespaceId = determineNamespace(region.getNamespacePrefix(), user);
+        String namespaceId = determineNamespace(region.getServices().getNamespacePrefix(), user);
         String name = isCloudshell ? "cloudshell" : null;
         HelmInstaller res = getHelmInstallService(region).installChart(catalogId + "/" + pkg.getName(), namespaceId, name, requestDTO.isDryRun(),
                 values);
@@ -111,7 +111,7 @@ public class HelmAppsService implements AppsService {
         }
         List<HelmLs> installedCharts = null;
         try {
-            installedCharts = Arrays.asList(getHelmInstallService(region).listChartInstall(region.getNamespacePrefix() + user.getIdep()));
+            installedCharts = Arrays.asList(getHelmInstallService(region).listChartInstall(region.getServices().getNamespacePrefix() + user.getIdep()));
         } catch (Exception e) {
             return CompletableFuture.completedFuture(new ServicesListing());
         }
@@ -127,7 +127,7 @@ public class HelmAppsService implements AppsService {
     @Override
     public String getLogs(Region region,User user, String serviceId, String taskId) {
         KubernetesClient client = kubernetesClientProvider.getClientForRegion(region);
-        return client.pods().inNamespace(determineNamespace(region.getNamespacePrefix(),user)).withName(taskId).getLog();
+        return client.pods().inNamespace(determineNamespace(region.getServices().getNamespacePrefix(),user)).withName(taskId).getLog();
     }
 
     @Override
@@ -135,13 +135,13 @@ public class HelmAppsService implements AppsService {
         if (serviceId.startsWith("/")) {
             serviceId = serviceId.substring(1);
         }
-        HelmLs result = getHelmInstallService(region).getAppById(serviceId, determineNamespace(region.getNamespacePrefix(),user));
+        HelmLs result = getHelmInstallService(region).getAppById(serviceId, determineNamespace(region.getServices().getNamespacePrefix(),user));
         return getHelmApp(region,result);
     }
 
     @Override
     public UninstallService destroyService(Region region, User user, final String path, boolean bulk) throws Exception {
-        final String namespace = determineNamespace(region.getNamespacePrefix(), user);
+        final String namespace = determineNamespace(region.getServices().getNamespacePrefix(), user);
         UninstallService result = new UninstallService();
         result.setPath(path);
         HelmInstallService helmService = getHelmInstallService(region);

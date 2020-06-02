@@ -27,11 +27,14 @@ public class HelmClientProvider {
 
     private HelmConfiguration generateConfigurationForRegion(Region region) {
         HelmConfiguration helmConfiguration = new HelmConfiguration();
-        if (region.getAuth() != null) {
-            helmConfiguration.setKubeToken(region.getAuth().getToken());
+        if (region.getServices().getServer() != null) {
+            Region.Auth auth = region.getServices().getServer().getAuth();
+            if (auth != null) {
+                helmConfiguration.setKubeToken(auth.getToken());
+            }
+            helmConfiguration.setApiserverUrl(region.getServices().getServer().getUrl());
+            helmConfiguration.setKubeConfig(null);
         }
-        helmConfiguration.setApiserverUrl(region.getServerUrl());
-        helmConfiguration.setKubeConfig(null);
         return helmConfiguration;
     }
 }

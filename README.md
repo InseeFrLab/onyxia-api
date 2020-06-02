@@ -24,7 +24,7 @@ cd onyxia-api
 mvn spring-boot:run
 ```
 
-### Using Helm (work in progress)
+### Using Helm
 
 A [helm](helm.sh) package is available at [inseefrlab](https://github.com/InseeFrLab/helm-charts)
 
@@ -75,32 +75,73 @@ A valid `JSON` is expected with a list of `region` :
 
 ```JSON
 [
-  {
-    "regionId": "kub",
-    "type": "KUBERNETES",
-    "namespace-prefix": "user-",
-    "publish-domain": "fakedomain.kub.example.com",
-    "cloudshell": {
-      "catalogId": "inseefrlab-helm-charts",
-      "packageName": "cloudshell"
-    }
-  },
-  {
-    "regionId": "marathon",
-    "type": "MARATHON",
-    "serverUrl": "",
-    "publish-domain": "fakedomain.marathon.example.com",
-    "namespace-prefix": "users",
-    "marathon-dns-suffix": "marathon.containerip.dcos.thisdcos.directory",
-    "serviceMonitoringURLPattern": "https://graphana.example.com/$appIdSlug",
-    "cloudshell": {
-      "catalogId": "internal",
-      "packageName": "shelly"
-    },
-    "auth": {
-      "token": "xxxxx"
-    }
-  }
+   {
+      "id":"eu-west-1",
+      "name":"eu-west-1",
+      "description": "Onyxia supports Marathon but you need to set the credentials to connect to the API.",
+      "services":{
+         "type":"MARATHON",
+         "namespacePrefix":"users",
+         "server":{
+            "URL":"https://marathon.example.com",
+            "auth":{
+               "token":"XYZ"
+            }
+         },
+         "expose":{
+            "domain":"example.example.com"
+         },
+         "monitoring":{
+            "URLPattern":"https://graphana.example.com/$appIdSlug"
+         },
+         "cloudshell":{
+            "catalogId":"internal",
+            "packageName":"shelly"
+         }
+      },
+      "data":{
+         "S3":{
+            "url":"https://minio.example.com"
+         }
+      },
+      "auth":{
+         "type":"openidconnect"
+      },
+      "location":{
+         "lat":48.8164,
+         "long":2.3174,
+         "name":"Paris (France)"
+      }
+   },
+   {
+      "id":"in-cluster",
+      "name":"In cluster",
+      "description": "For kubernetes, you can either set the credentials yourself or use the default in-cluster configuration.",
+      "services":{
+         "type":"KUBERNETES",
+         "namespacePrefix":"user-",
+         "expose":{
+            "domain":"example2.example.com"
+         },
+         "cloudshell":{
+            "catalogId":"inseefrlab-helm-charts-datascience",
+            "packageName":"cloudshell"
+         }
+      },
+      "data":{
+         "S3":{
+            "URL":"https://s3.example.com"
+         }
+      },
+      "auth":{
+         "type":"openidconnect"
+      },
+      "location":{
+         "name":"St. Ghislain (Belgium)",
+         "lat":50.8503,
+         "long":4.3517
+      }
+   }
 ]
 ```
 
