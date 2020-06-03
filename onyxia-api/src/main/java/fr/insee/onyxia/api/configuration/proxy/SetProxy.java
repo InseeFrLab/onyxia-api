@@ -15,11 +15,11 @@ public class SetProxy {
     @Value("${http.proxyPort}")
     private String httpProxyPort;
 
-    @Value("${http.noproxy}")
+    @Value("${http.noProxy}")
     private String noProxy;
 
-    @Value("${http.proxyUser}")
-    private String proxyUser;
+    @Value("${http.proxyUsername}")
+    private String proxyUsername;
 
     @Value("${http.proxyPassword}")
     private String proxyPassword;
@@ -27,10 +27,11 @@ public class SetProxy {
     @PostConstruct
     public void setProxy() {
         if (StringUtils.isNotEmpty(httpProxyHost)) {
-            System.out.println("Using proxy " + httpProxyHost + (httpProxyPort != null ? ":" + httpProxyPort : ""));
+            System.out.println("Using proxy host : "+httpProxyHost);
             System.setProperty("http.proxyHost", httpProxyHost);
             System.setProperty("https.proxyHost", httpProxyHost);
             if (StringUtils.isNotEmpty(httpProxyPort)) {
+                System.out.println("Using proxy port : "+httpProxyPort);
                 System.setProperty("http.proxyPort", httpProxyPort);
                 System.setProperty("https.proxyPort", httpProxyPort);
             }
@@ -38,10 +39,12 @@ public class SetProxy {
                 System.out.println("No proxy : " + noProxy);
                 System.setProperty("http.nonProxyHosts", noProxy);
             }
-            if (StringUtils.isNotEmpty(proxyUser) && StringUtils.isNotEmpty(proxyPassword)) {
-                System.out.println("Authenticated proxy");
-                System.setProperty("http.proxyUser", proxyUser);
-                System.setProperty("http.proxyPassword", proxyPassword);
+            if (StringUtils.isNotEmpty(proxyUsername)) {
+                System.out.println("Proxy username  : "+proxyUsername);
+                System.setProperty("http.proxyUser", proxyUsername);
+                if (StringUtils.isNotEmpty(proxyPassword)) {
+                    System.setProperty("http.proxyPassword", proxyPassword);
+                }
             }
         }
     }

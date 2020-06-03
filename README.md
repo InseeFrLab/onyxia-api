@@ -163,8 +163,8 @@ HTTP configuration
 | `http.proxyHost` | | Proxy hostname (e.g : proxy.example.com) |
 | `http.proxyPort` | 80 for `HTTP`, 443 for `HTTPS` | Proxy port |
 | `http.noProxy` | | Hosts that should not use the proxy (e.g : `localhost|host.example.com`) |
-| `http.proxyUser` | | login to authenticated http proxy |
-| `http.proxyPassword` | | password to authenticated http proxy |
+| `http.proxyUsername` | | Username if the proxy requires authentication |
+| `http.proxyPassword` | | Password if the proxy requires authentication |
 
 Other configurations
 | Key | Default | Description |
