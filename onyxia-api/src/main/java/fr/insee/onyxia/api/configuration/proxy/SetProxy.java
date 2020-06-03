@@ -18,19 +18,30 @@ public class SetProxy {
     @Value("${http.noproxy}")
     private String noProxy;
 
+    @Value("${http.proxyUser}")
+    private String proxyUser;
+
+    @Value("${http.proxyPassword}")
+    private String proxyPassword;
+
     @PostConstruct
     public void setProxy() {
         if (StringUtils.isNotEmpty(httpProxyHost)) {
-            System.out.println("Using proxy "+httpProxyHost+(httpProxyPort != null ? ":"+httpProxyPort : ""));
-            System.setProperty("http.proxyHost",httpProxyHost);
-            System.setProperty("https.proxyHost",httpProxyHost);
+            System.out.println("Using proxy " + httpProxyHost + (httpProxyPort != null ? ":" + httpProxyPort : ""));
+            System.setProperty("http.proxyHost", httpProxyHost);
+            System.setProperty("https.proxyHost", httpProxyHost);
             if (StringUtils.isNotEmpty(httpProxyPort)) {
-                System.setProperty("http.proxyPort",httpProxyPort);
-                System.setProperty("https.proxyPort",httpProxyPort);
+                System.setProperty("http.proxyPort", httpProxyPort);
+                System.setProperty("https.proxyPort", httpProxyPort);
             }
             if (StringUtils.isNotEmpty(noProxy)) {
-                System.out.println("No proxy : "+noProxy);
+                System.out.println("No proxy : " + noProxy);
                 System.setProperty("http.nonProxyHosts", noProxy);
+            }
+            if (StringUtils.isNotEmpty(proxyUser) && StringUtils.isNotEmpty(proxyPassword)) {
+                System.out.println("Authenticated proxy");
+                System.setProperty("http.proxyUser", proxyUser);
+                System.setProperty("http.proxyPassword", proxyPassword);
             }
         }
     }
