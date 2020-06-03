@@ -157,6 +157,15 @@ Catalogs configuration
 | `catalogs.configuration` | `classpath:catalogs.json` | Catalogs to use. Defaults to [catalogs.json](onyxia-api/src/main/resources/catalogs.json). `http://`, `https://` and `file:` schemes are supported |  
 | `catalogs.refresh.ms` | `300000` (5 minutes) | The rate at which the catalogs should be refreshed. `<= 0` means no refreshs after initial loading |
 
+HTTP configuration  
+| Key | Default | Description |
+| --------------------- | ------- | ------------------------------------------------------------------ |
+| `http.proxyHost` | | Proxy hostname (e.g : proxy.example.com) |
+| `http.proxyPort` | 80 for `HTTP`, 443 for `HTTPS` | Proxy port |
+| `http.noProxy` | | Hosts that should not use the proxy (e.g : `localhost|host.example.com`) |
+| `http.proxyUsername` | | Username if the proxy requires authentication |
+| `http.proxyPassword` | | Password if the proxy requires authentication |
+
 Other configurations
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |

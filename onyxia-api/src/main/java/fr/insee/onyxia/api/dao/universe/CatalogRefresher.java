@@ -5,14 +5,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.Timer;
 import java.util.TimerTask;
 
 @Service
-public class CatalogRefresher {
+public class CatalogRefresher implements ApplicationRunner {
 
     private final Logger logger = LoggerFactory.getLogger(CatalogRefresher.class);
 
@@ -26,11 +27,17 @@ public class CatalogRefresher {
     private long refreshTime;
 
     private void refresh() {
-        catalogs.getCatalogs().parallelStream().forEach(c -> catalogLoader.updateCatalog(c));
+        catalogs.getCatalogs().parallelStream().forEach(c -> {
+            try {
+                catalogLoader.updateCatalog(c);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
-    @PostConstruct
-    public void scheduleRefresher() {
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
         this.refresh();
         if (refreshTime > 0L) {
             Timer timer = new Timer();
@@ -44,5 +51,4 @@ public class CatalogRefresher {
             timer.scheduleAtFixedRate(timerTask, refreshTime, refreshTime);
         }
     }
-
 }
