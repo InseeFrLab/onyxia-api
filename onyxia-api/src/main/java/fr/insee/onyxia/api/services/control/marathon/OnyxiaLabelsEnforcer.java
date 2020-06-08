@@ -45,6 +45,8 @@ public class OnyxiaLabelsEnforcer implements AdmissionControllerMarathon {
             app.addLabel("ONYXIA_MONITORING", monitoringUrl);
         }
 
+        app.addLabel("ONYXIA_POST_INSTALL_INSTRUCTIONS", pkg.getPostInstallNotes());
+
         return true;
     }
 

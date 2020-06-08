@@ -398,6 +398,10 @@ public class MarathonAppsService implements AppsService {
             service.setMonitoring(monitoring);
         }
 
+        if (app.getLabels().containsKey("ONYXIA_POST_INSTALL_INSTRUCTIONS")) {
+            service.setPostInstallInstructions(app.getLabels().get("ONYXIA_POST_INSTALL_INSTRUCTIONS"));
+        }
+
         return service;
     }
 
