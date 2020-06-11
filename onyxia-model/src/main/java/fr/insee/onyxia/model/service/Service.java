@@ -21,6 +21,7 @@ public class Service {
     private List<Event> events = new ArrayList<>();
     private String subtitle;
     private Monitoring monitoring;
+    private String postInstallInstructions;
 
     private long startedAt;
 
@@ -160,6 +161,14 @@ public class Service {
 
     public void setMonitoring(Monitoring monitoring) {
         this.monitoring = monitoring;
+    }
+
+    public void setPostInstallInstructions(String postInstallInstructions) {
+        this.postInstallInstructions = postInstallInstructions;
+    }
+
+    public String getPostInstallInstructions() {
+        return postInstallInstructions;
     }
 
     public static enum ServiceStatus {
