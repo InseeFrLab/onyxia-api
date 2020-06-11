@@ -168,12 +168,22 @@ public class Region {
         @JsonProperty("URL")
         private String url;
 
+        private Monitoring monitoring;
+
         public void setUrl(String url) {
             this.url = url;
         }
 
         public String getUrl() {
             return url;
+        }
+
+        public void setMonitoring(Monitoring monitoring) {
+            this.monitoring = monitoring;
+        }
+
+        public Monitoring getMonitoring() {
+            return monitoring;
         }
     }
 

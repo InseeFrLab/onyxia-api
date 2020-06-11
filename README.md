@@ -130,7 +130,10 @@ A valid `JSON` is expected with a list of `region` :
       },
       "data":{
          "S3":{
-            "URL":"https://s3.example.com"
+            "URL":"https://s3.example.com",
+            "monitoring": {
+              "URLPattern": "https://graphana.s3.example.com/$bucketId"
+            }
          }
       },
       "auth":{
