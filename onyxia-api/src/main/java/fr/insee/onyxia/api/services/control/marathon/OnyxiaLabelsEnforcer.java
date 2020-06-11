@@ -7,6 +7,7 @@ import fr.insee.onyxia.model.catalog.UniversePackage;
 import fr.insee.onyxia.model.region.Region;
 import mesosphere.marathon.client.model.v2.App;
 import mesosphere.marathon.client.model.v2.Group;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -23,7 +24,13 @@ public class OnyxiaLabelsEnforcer implements AdmissionControllerMarathon {
             app.addLabel("ONYXIA_TITLE", onyxiaOptions.get("friendlyName"));
         }
 
-        app.addLabel("ONYXIA_SUBTITLE", pkg.getName());
+        if (group != null && StringUtils.isNotBlank(app.getId())) {
+            app.addLabel("ONYXIA_SUBTITLE", StringUtils.substringAfterLast(app.getId(),"/"));
+        }
+        else {
+            app.addLabel("ONYXIA_SUBTITLE", pkg.getName());
+        }
+
         app.addLabel("ONYXIA_SCM", pkg.getScm());
         app.addLabel("ONYXIA_DESCRIPTION", pkg.getDescription());
         if (!app.getLabels().containsKey("ONYXIA_URL") && app.getLabels().containsKey("HAPROXY_0_VHOST")) {
