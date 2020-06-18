@@ -1,5 +1,7 @@
 package fr.insee.onyxia.api.services.impl.kubernetes;
 
+import fr.insee.onyxia.api.configuration.kubernetes.KubernetesClientProvider;
+import fr.insee.onyxia.model.region.Region;
 import io.fabric8.kubernetes.api.model.DoneableNamespace;
 import io.fabric8.kubernetes.api.model.Namespace;
 import io.fabric8.kubernetes.api.model.rbac.DoneableRoleBinding;
@@ -15,11 +17,12 @@ import java.util.Map;
 public class KubernetesService {
 
     @Autowired
-    KubernetesClient kubClient;
+    private KubernetesClientProvider kubernetesClientProvider;
 
-    public void createNamespace(String namespaceId, Owner owner) {
+    public void createNamespace(Region region, String namespaceId, Owner owner) {
         // Label onyxia_owner is not resilient if the user has "namespace admin" role scoped to his namespace
         // as it this rolebinding allows him to modify onyxia_owner metadata
+        KubernetesClient kubClient = kubernetesClientProvider.getClientForRegion(region);
         DoneableNamespace namespaceToCreate = kubClient.namespaces().createNew().withNewMetadata().withName(namespaceId)
                 .addToLabels("onyxia_owner", owner.getId()).endMetadata();
 
@@ -36,7 +39,8 @@ public class KubernetesService {
         bindingToCreate.done();
     }
 
-    public List<Namespace> getNamespaces(Owner owner) {
+    public List<Namespace> getNamespaces(Region region, Owner owner) {
+        KubernetesClient kubClient = kubernetesClientProvider.getClientForRegion(region);
         return kubClient.namespaces().withLabel("onyxia_owner",owner.getId()).list().getItems();
     }
 

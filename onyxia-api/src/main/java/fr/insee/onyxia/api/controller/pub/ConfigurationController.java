@@ -16,7 +16,7 @@ import java.util.List;
 @RequestMapping("/public")
 public class ConfigurationController {
 
-    @Autowired
+    @Autowired(required = false)
     private BuildProperties build;
 
     @Autowired
@@ -26,8 +26,10 @@ public class ConfigurationController {
     public AppInfo configuration() {
         AppInfo appInfo = new AppInfo();
         BuildInfo buildInfo = new BuildInfo();
-        buildInfo.setVersion(build.getVersion());
-        buildInfo.setTimestamp(build.getTime().getEpochSecond());
+        if (build != null) {
+            buildInfo.setVersion(build.getVersion());
+            buildInfo.setTimestamp(build.getTime().getEpochSecond());
+        }
         appInfo.setBuild(buildInfo);
         appInfo.setRegions(regionsConfiguration.getResolvedRegions());
         return appInfo;

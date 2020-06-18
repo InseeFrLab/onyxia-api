@@ -58,18 +58,25 @@ public class Command {
         }
         String newCommand = command;
         newCommand = newCommand.concat(" ");
+        String kubeConfig = null;
         if (StringUtils.isNotEmpty(helmConfiguration.getApiserverUrl())) {
             newCommand = newCommand.concat(" --kube-apiserver="+helmConfiguration.getApiserverUrl()).concat(" ");
+            // Kubeconfig should be set to /dev/null to prevent mixing user provided configuration with pre-existing local kubeconfig (most likely re-using a cluster certificate from another cluster)
+            kubeConfig = "/dev/null";
         }
 
         if (StringUtils.isNotEmpty(helmConfiguration.getKubeToken())) {
             newCommand = newCommand.concat(" --kube-token="+helmConfiguration.getKubeToken()).concat(" ");
+            kubeConfig = "/dev/null";
         }
 
         if (StringUtils.isNotEmpty(helmConfiguration.getKubeConfig())) {
-            newCommand = newCommand.concat(" --kubeconfig="+ helmConfiguration.getKubeConfig()).concat(" ");
+            kubeConfig = helmConfiguration.getKubeConfig();
         }
 
+        if (kubeConfig != null) {
+            newCommand = newCommand.concat(" --kubeconfig="+kubeConfig).concat(" ");
+        }
 
         System.out.println(newCommand);
         return newCommand;

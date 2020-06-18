@@ -2,7 +2,9 @@ package fr.insee.onyxia.api.controller.api.kubernetes;
 
 import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.api.services.impl.kubernetes.KubernetesService;
+import fr.insee.onyxia.model.region.Region;
 import io.fabric8.kubernetes.api.model.Namespace;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,15 +28,15 @@ public class ClusterPermissionsController {
     private UserProvider userProvider;
 
     @GetMapping
-    public List<String> getNamespaces() {
+    public List<String> getNamespaces(@Parameter(hidden = true) Region region) {
         List<String> userNamespaces;
-        userNamespaces = kubernetesService.getNamespaces(getOwnerFromUser()).stream().map(namespace -> namespace.getMetadata().getName()).collect(Collectors.toList());
+        userNamespaces = kubernetesService.getNamespaces(region, getOwnerFromUser()).stream().map(namespace -> namespace.getMetadata().getName()).collect(Collectors.toList());
         return userNamespaces;
     }
 
     @PostMapping
-    public void createNamespace(@RequestBody CreateNamespaceRequest request) {
-        kubernetesService.createNamespace(request.getNamespaceName(), getOwnerFromUser());
+    public void createNamespace(@Parameter(hidden = true) Region region, @RequestBody CreateNamespaceRequest request) {
+        kubernetesService.createNamespace(region, request.getNamespaceName(), getOwnerFromUser());
     }
 
 
