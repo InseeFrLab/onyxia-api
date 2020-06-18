@@ -25,8 +25,8 @@ public class MarathonClientProvider {
                 MARATHON_AUTH_TOKEN =auth.getToken();
             }
             else if (!StringUtils.isBlank(auth.getUsername()) && !StringUtils.isBlank(auth.getPassword())) {
-                MARATHON_AUTH_BASIC_USERNAME =auth.getPassword();
-                MARATHON_AUTH_BASIC_PASSWORD =auth.getUsername();
+                MARATHON_AUTH_BASIC_USERNAME =auth.getUsername();
+                MARATHON_AUTH_BASIC_PASSWORD =auth.getPassword();
             }
         }
         if (MARATHON_URL == null || MARATHON_URL.isBlank()) {
