@@ -2,7 +2,7 @@ package fr.insee.onyxia.model.catalog;
 
 import java.util.List;
 
-public abstract class Catalog {
+public abstract class CatalogWrapper {
 
     private List<Package> packages;
 

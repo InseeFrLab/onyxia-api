@@ -2,13 +2,12 @@ package fr.insee.onyxia.api.configuration;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import fr.insee.onyxia.model.catalog.Catalog;
 import fr.insee.onyxia.model.catalog.CatalogStatus;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CatalogWrapper {
 
-    private Catalog catalog;
+    private fr.insee.onyxia.model.catalog.CatalogWrapper catalog;
     private String id;
     private String name;
     private String description;
@@ -33,14 +32,14 @@ public class CatalogWrapper {
     /**
      * @return the catalog
      */
-    public Catalog getCatalog() {
+    public fr.insee.onyxia.model.catalog.CatalogWrapper getCatalog() {
         return catalog;
     }
 
     /**
      * @param catalog the catalog to set
      */
-    public void setCatalog(Catalog catalog) {
+    public void setCatalog(fr.insee.onyxia.model.catalog.CatalogWrapper catalog) {
         this.catalog = catalog;
     }
 

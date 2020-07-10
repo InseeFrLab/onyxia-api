@@ -1,6 +1,7 @@
 package fr.insee.onyxia.api.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insee.onyxia.api.configuration.properties.CatalogsConfiguration;
 import fr.insee.onyxia.api.configuration.properties.RegionsConfiguration;
 import fr.insee.onyxia.model.region.Region;
 import org.slf4j.Logger;
@@ -27,25 +28,22 @@ public class CatalogsLoader {
     @Autowired
     private ObjectMapper mapper;
 
-    @Value("${catalogs.configuration}")
-    private String catalogsConf;
-
     @Autowired
     private CatalogFilter catalogFilter;
+
+    @Autowired
+    private CatalogsConfiguration catalogsConfiguration;
 
     private static Logger logger = LoggerFactory.getLogger(CatalogsLoader.class);
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
     public Catalogs catalogs() {
-        try (InputStream inputStream = resourceLoader.getResource(catalogsConf).getInputStream()) {
-            Catalogs catalogs = mapper.readValue(inputStream, Catalogs.class);
-            catalogs.setCatalogs(catalogFilter.filterCatalogs(catalogs.getCatalogs()));
-            return catalogs;
-        } catch (Exception e) {
-            logger.error("Error : Could not load catalogs !", e);
-        }
-        return new Catalogs();
+        Catalogs catalogs = new Catalogs();
+        catalogs.setCatalogs(catalogsConfiguration.getResolvedCatalogs());
+        catalogs.setCatalogs(catalogFilter.filterCatalogs(catalogs.getCatalogs()));
+        logger.info("Serving "+catalogs.getCatalogs().size()+" catalogs");
+        return catalogs;
     }
 
     @Service
