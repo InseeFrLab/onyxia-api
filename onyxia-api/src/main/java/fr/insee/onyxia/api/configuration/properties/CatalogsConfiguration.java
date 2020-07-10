@@ -2,7 +2,7 @@ package fr.insee.onyxia.api.configuration.properties;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.insee.onyxia.model.region.Region;
+import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -16,44 +16,40 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Configuration
-@PropertySource(value = "classpath:regions.json",factory = RegionsConfiguration.JsonLoader.class)
-@PropertySource(value = "classpath:regions-default.json",factory = RegionsConfiguration.JsonLoader.class,ignoreResourceNotFound = true)
+@PropertySource(value = "classpath:catalogs.json",factory = CatalogsConfiguration.JsonLoader.class)
+@PropertySource(value = "classpath:catalogs-default.json",factory = CatalogsConfiguration.JsonLoader.class,ignoreResourceNotFound = true)
 @ConfigurationProperties
-public class RegionsConfiguration {
+public class CatalogsConfiguration {
 
-    private String regions;
+    private String catalogs;
 
-    private List<Region> resolvedRegions;
+    private List<CatalogWrapper> resolvedCatalogs;
 
     @Autowired
     private ObjectMapper mapper;
 
     @PostConstruct
     public void load() throws Exception {
-        resolvedRegions = Arrays.asList(mapper.readValue(regions, Region[].class));
+        resolvedCatalogs = Arrays.asList(mapper.readValue(catalogs, CatalogWrapper[].class));
+        System.out.println("Serving "+resolvedCatalogs.size()+" catalogs");
     }
 
-    public Optional<Region> getRegionById(String regionId) {
-        return resolvedRegions.stream().filter(region -> region.getId().equals(regionId)).findFirst();
+    public List<CatalogWrapper> getResolvedCatalogs() {
+        return resolvedCatalogs;
     }
 
-    public Region getDefaultRegion() {
-        return resolvedRegions.get(0);
+    public String getCatalogs() {
+        return catalogs;
     }
 
-    public String getRegions() {
-        return regions;
+    public void setCatalogs(String catalogs) {
+        this.catalogs = catalogs;
     }
 
-    public void setRegions(String regions) {
-        this.regions = regions;
-    }
-
-    public List<Region> getResolvedRegions() {
-        return resolvedRegions;
+    public void setResolvedCatalogs(List<CatalogWrapper> resolvedCatalogs) {
+        this.resolvedCatalogs = resolvedCatalogs;
     }
 
     public static class JsonLoader implements PropertySourceFactory {
@@ -62,7 +58,7 @@ public class RegionsConfiguration {
         public org.springframework.core.env.PropertySource<?> createPropertySource(String name,
                                                                                    EncodedResource resource) throws IOException {
             JsonNode values = new ObjectMapper().readTree(resource.getInputStream());
-            return new MapPropertySource("regions-source", Map.of("regions",values.get("regions").toString()));
+            return new MapPropertySource("catalogs-source", Map.of("catalogs",values.get("catalogs").toString()));
         }
 
     }

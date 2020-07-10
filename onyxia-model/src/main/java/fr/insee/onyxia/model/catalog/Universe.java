@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Universe extends Catalog {
+public class Universe extends CatalogWrapper {
 
     public static final String TYPE_UNIVERSE = "universe";
 

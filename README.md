@@ -69,95 +69,15 @@ CORS configuration :
 | `cors.allowed_origins` | `*` | To indicate which origins are allowed by [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) |
 
 Regions configuration :
-
-The env variable that configures regions is `regions`.  
-A valid `JSON` is expected with a list of `region` :
-
-```JSON
-[
-   {
-      "id":"eu-west-1",
-      "name":"eu-west-1",
-      "description": "Onyxia supports Marathon but you need to set the credentials to connect to the API.",
-      "services":{
-         "type":"MARATHON",
-         "namespacePrefix":"users",
-         "server":{
-            "URL":"https://marathon.example.com",
-            "auth":{
-               "token":"XYZ"
-            }
-         },
-         "expose":{
-            "domain":"example.example.com"
-         },
-         "monitoring":{
-            "URLPattern":"https://graphana.example.com/$appIdSlug"
-         },
-         "cloudshell":{
-            "catalogId":"internal",
-            "packageName":"shelly"
-         }
-      },
-      "data":{
-         "S3":{
-            "url":"https://minio.example.com"
-         }
-      },
-      "auth":{
-         "type":"openidconnect"
-      },
-      "location":{
-         "lat":48.8164,
-         "long":2.3174,
-         "name":"Paris (France)"
-      }
-   },
-   {
-      "id":"in-cluster",
-      "name":"In cluster",
-      "description": "For kubernetes, you can either set the credentials yourself or use the default in-cluster configuration.",
-      "services":{
-         "type":"KUBERNETES",
-         "namespacePrefix":"user-",
-         "expose":{
-            "domain":"example2.example.com"
-         },
-         "cloudshell":{
-            "catalogId":"inseefrlab-helm-charts-datascience",
-            "packageName":"cloudshell"
-         }
-      },
-      "data":{
-         "S3":{
-            "URL":"https://s3.example.com",
-            "monitoring": {
-              "URLPattern": "https://graphana.s3.example.com/$bucketId"
-            }
-         }
-      },
-      "auth":{
-         "type":"openidconnect"
-      },
-      "location":{
-         "name":"St. Ghislain (Belgium)",
-         "lat":50.8503,
-         "long":4.3517
-      }
-   }
-]
-```
-
-when using docker, passing json as env can be done using :
-
-```shell
-docker run -p 8080:8080 --env "regions=$(<conf.json)" inseefrlab/onyxia-api
-```
-
-Catalogs configuration  
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
-| `catalogs.configuration` | `classpath:catalogs.json` | Catalogs to use. Defaults to [catalogs.json](onyxia-api/src/main/resources/catalogs.json). `http://`, `https://` and `file:` schemes are supported |  
+| `regions` | see [onyxia-api/src/main/resources/regions.json](onyxia-api/src/main/resources/regions.json) | List of regions. Each region can be of type `KUBERNETES` or `MARATHON`. Mixing is supported. For `KUBERNETES`, `in-cluster` configuration is possible |
+
+Catalogs configuration :  
+
+| Key | Default | Description |
+| --------------------- | ------- | ------------------------------------------------------------------ |
+| `catalogs` | see [onyxia-api/src/main/resources/catalogs.json](onyxia-api/src/main/resources/catalogs.json) | List of catalogs. Each catalog can be of type `universe` or `helm`. Mixing is supported. If there is no region of corresponding type then the catalog will be ignored |
 | `catalogs.refresh.ms` | `300000` (5 minutes) | The rate at which the catalogs should be refreshed. `<= 0` means no refreshs after initial loading |
 
 HTTP configuration  
