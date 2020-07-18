@@ -74,6 +74,7 @@ public class Region {
     public static class Services {
 
         private Service.ServiceType type;
+        private String network;
         private String namespacePrefix;
         private String marathonDnsSuffix;
         private Expose expose;
@@ -87,6 +88,14 @@ public class Region {
 
         public void setType(Service.ServiceType type) {
             this.type = type;
+        }
+
+        public String getNetwork() {
+            return network;
+        }
+
+        public void setNetwork(String network){
+            this.network = network;
         }
 
         public String getNamespacePrefix() {

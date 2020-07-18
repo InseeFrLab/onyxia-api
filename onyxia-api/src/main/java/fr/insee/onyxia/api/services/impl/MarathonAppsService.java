@@ -229,7 +229,7 @@ public class MarathonAppsService implements AppsService {
                     xGeneratedValues.put(name, getInternalDnsFromId(appId, region.getServices().getMarathonDnsSuffix()));
                 }
                 if (xGenerated.getType() == Property.XGenerated.XGeneratedType.ContainerNetworkName) {
-                    xGeneratedValues.put(name, "dcos");
+                    xGeneratedValues.put(name, region.getServices().getNetwork());
                 }
             });
         });

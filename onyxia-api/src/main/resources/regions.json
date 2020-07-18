@@ -9,12 +9,11 @@
       },
       "services": {
         "type": "KUBERNETES",
+        "network": "dcos",
         "namespacePrefix": "user-",
         "server": {
           "URL": "",
-          "auth" : {
-
-          }
+          "auth": {}
         },
         "expose": {
           "domain": "fakedomain.kub.example.com"
@@ -28,7 +27,7 @@
         }
       },
       "data": {
-        "S3" : {
+        "S3": {
           "URL": "https://minio.example.com",
           "monitoring": {
             "URLPattern": "https://graphana.minio.example.com/$bucketId"
@@ -38,9 +37,9 @@
       "auth": {
         "type": "openidconnect"
       },
-      "location" : {
-        "name" : "Paris",
-        "lat" : 48.8453225,
+      "location": {
+        "name": "Paris",
+        "lat": 48.8453225,
         "long": 2.3024401
       }
     }
