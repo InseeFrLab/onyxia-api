@@ -9,7 +9,7 @@
       },
       "services": {
         "type": "KUBERNETES",
-        "network": "dcos",
+        "network": "calico",
         "namespacePrefix": "user-",
         "server": {
           "URL": "",
