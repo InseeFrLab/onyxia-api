@@ -228,6 +228,9 @@ public class MarathonAppsService implements AppsService {
                 if (xGenerated.getType() == Property.XGenerated.XGeneratedType.InternalDNS) {
                     xGeneratedValues.put(name, getInternalDnsFromId(appId, region.getServices().getMarathonDnsSuffix()));
                 }
+                if (xGenerated.getType() == Property.XGenerated.XGeneratedType.ContainerNetworkName) {
+                    xGeneratedValues.put(name, region.getServices().getNetwork());
+                }
             });
         });
 

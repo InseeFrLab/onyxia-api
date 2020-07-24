@@ -182,8 +182,10 @@ public class Property {
         }
 
         public static enum XGeneratedType {
-            GroupID, AppID, RandomID,
-
+            GroupID, AppID, RandomID, 
+            
+            @JsonProperty("containerNetworkName")
+            ContainerNetworkName,
             @JsonProperty("internalDNS")
             @JsonAlias("internal-DNS")
             InternalDNS,
