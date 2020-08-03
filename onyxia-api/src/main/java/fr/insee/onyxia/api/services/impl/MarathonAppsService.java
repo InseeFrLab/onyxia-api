@@ -231,6 +231,9 @@ public class MarathonAppsService implements AppsService {
                 if (xGenerated.getType() == Property.XGenerated.XGeneratedType.ContainerNetworkName) {
                     xGeneratedValues.put(name, region.getServices().getNetwork());
                 }
+                if (xGenerated.getType() == Property.XGenerated.XGeneratedType.InitScript) {
+                    xGeneratedValues.put(name, region.getServices().getInitScript());
+                }
             });
         });
 
