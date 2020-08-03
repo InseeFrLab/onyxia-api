@@ -81,6 +81,7 @@ public class Region {
         private Server server;
         private Monitoring monitoring;
         private CloudshellConfiguration cloudshell;
+        private String initScript;
 
         public Service.ServiceType getType() {
             return type;
@@ -144,6 +145,14 @@ public class Region {
 
         public void setMonitoring(Monitoring monitoring) {
             this.monitoring = monitoring;
+        }
+
+        public String getInitScript() {
+            return initScript;
+        }
+
+        public void setInitScript(String initScript) {
+            this.initScript = initScript;
         }
     }
 

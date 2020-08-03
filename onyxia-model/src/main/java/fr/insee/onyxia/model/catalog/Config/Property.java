@@ -191,7 +191,9 @@ public class Property {
             InternalDNS,
             @JsonProperty("externalDNS")
             @JsonAlias("external-DNS")
-            ExternalDNS;
+            ExternalDNS,
+            @JsonProperty("initScript")
+            InitScript;
         }
     }
 
