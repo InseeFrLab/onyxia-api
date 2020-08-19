@@ -173,45 +173,45 @@
                 "default": false
               }
             }
-          }
-        },
-        "vault": {
-          "description": "Configuration of vault client",
-          "type": "object",
-          "properties": {
-            "token": {
-              "description": "token vault",
-              "type": "string",
-              "x-form": {
-                "value": "{{vault.VAULT_TOKEN}}"
-              }
-            },
-            "url": {
-              "description": "url of vault server",
-              "type": "string",
-              "x-form": {
-                "value": "{{vault.VAULT_ADDR}}"
-              }
-            }
-          }
-        },
-        "init": {
-            "description": "Init parameters",
+          },
+          "vault": {
+            "description": "Configuration of vault client",
             "type": "object",
             "properties": {
-                "global": {
-                    "type": "string",
-                    "description": "initialization script",
-                    "default": "",
-                    "x-form": {
-                        "hidden": true
-                    },
-                    "x-generated": {
-                        "type": "initScript",
-                        "scope": "shelly"
-                    }
+              "token": {
+                "description": "token vault",
+                "type": "string",
+                "x-form": {
+                  "value": "{{vault.VAULT_TOKEN}}"
                 }
-            } 
+              },
+              "url": {
+                "description": "url of vault server",
+                "type": "string",
+                "x-form": {
+                  "value": "{{vault.VAULT_ADDR}}"
+                }
+              }
+            }
+          },
+          "init": {
+              "description": "Init parameters",
+              "type": "object",
+              "properties": {
+                  "global": {
+                      "type": "string",
+                      "description": "initialization script",
+                      "default": "",
+                      "x-form": {
+                          "hidden": true
+                      },
+                      "x-generated": {
+                          "type": "initScript",
+                          "scope": "shelly"
+                      }
+                  }
+              } 
+          }
         },
         "required": ["service", "networking"]
       }
