@@ -33,7 +33,7 @@
         }
       },
       "marathon": {
-        "v2AppMustacheTemplate": "ewogICAgImlkIjogInt7c2VydmljZS5uYW1lfX0iLAogICAgImNwdXMiOiAwLjEsCiAgICAibWVtIjogNDA5NiwKICAgICJpbnN0YW5jZXMiOiAxLAogICAgImNtZCI6ICJiYXNoIC9tbnQvbWVzb3Mvc2FuZGJveC9vbnl4aWEtaW5pdC5zaCAmJiAvdXNyL3NiaW4vc3NoZCA7IC91c3IvYmluL25vZGUgL3Jvb3Qvd2Vic3NoMi9hcHAvaW5kZXguanMiLAogICAgImNvbnRhaW5lciI6IHsKICAgICAgICAgInR5cGUiOiAiRE9DS0VSIiwKICAgICAgICAgImRvY2tlciI6IHsKICAgICAgICAgICAgICJpbWFnZSI6ICJ7e3Jlc291cmNlLmFzc2V0cy5jb250YWluZXIuZG9ja2VyLnNoZWxseX19IiwKICAgICAgICAgICAgICJuZXR3b3JrIjogIkJSSURHRSIsCiAgICAgICAgICAgICAicG9ydE1hcHBpbmdzIjogWwogICAgICAgICAgICAgICAgeyAiY29udGFpbmVyUG9ydCI6IDIyMjIsICJob3N0UG9ydCI6IDAgfQogICAgICAgICAgICBdCiAgICAgICAgIH0KICAgICB9LAogICAgICJoZWFsdGhDaGVja3MiOiBbCiAgICAgIHsKICAgICAgICAicG9ydEluZGV4IjogMCwKICAgICAgICAicHJvdG9jb2wiOiAiTUVTT1NfVENQIiwKICAgICAgICAiZ3JhY2VQZXJpb2RTZWNvbmRzIjogMzAsCiAgICAgICAgImludGVydmFsU2Vjb25kcyI6IDYwLAogICAgICAgICJ0aW1lb3V0U2Vjb25kcyI6IDIwLAogICAgICAgICJtYXhDb25zZWN1dGl2ZUZhaWx1cmVzIjogMwogICAgICB9CiAgICBdLAogICAgImxhYmVscyI6IHsKICAgICAgIkhBUFJPWFlfR1JPVVAiOiJleHRlcm5hbCIsCiAgICAgICJIQVBST1hZXzBfVkhPU1QiOiJ7e25ldHdvcmtpbmcudmlydHVhbC1ob3N0fX0iLAogICAgICAiSEFQUk9YWV8wX0VOQUJMRUQiOiAidHJ1ZSIsCiAgICAgICJIQVBST1hZXzBfUkVESVJFQ1RfVE9fSFRUUFMiOiAie3tuZXR3b3JraW5nLmh0dHBzLXJlZGlyZWN0fX0iLAogICAgICAiTUFSQVRIT05fU0lOR0xFX0lOU1RBTkNFX0FQUCI6ICJ0cnVlIgogICAgfSwKICAgICJlbnYiOiB7CiAgICAgICAgIkFXU19BQ0NFU1NfS0VZX0lEIjogInt7czMuYWNjZXNzS2V5SWR9fSIsCiAgICAgICAgIkFXU19TRUNSRVRfQUNDRVNTX0tFWSI6ICJ7e3MzLnNlY3JldEFjY2Vzc0tleX19IiwKICAgICAgICAiQVdTX1NFU1NJT05fVE9LRU4iOiAie3tzMy5zZXNzaW9uVG9rZW59fSIsCiAgICAgICAgIkFXU19ERUZBVUxUX1JFR0lPTiI6ICJ7e3MzLmRlZmF1bHRSZWdpb259fSIsCiAgICAgICAgIkFXU19TM19FTkRQT0lOVCI6ICJ7e3MzLmVuZHBvaW50fX0iLAogICAgICAgICJBV1NfRVhQSVJBVElPTiI6ICJ7e3MzLmV4cGlyYXRpb259fSIsCiAgICAgICAgIkdJVF9VU0VSX05BTUUiOiAie3tnaXQubmFtZX19IiwKICAgICAgICAiR0lUX1VTRVJfTUFJTCI6ICJ7e2dpdC5lbWFpbH19IiwKICAgICAgICAiR0lUX0NSRURFTlRJQUxTX0NBQ0hFX0RVUkFUSU9OIjogInt7Z2l0LmNhY2hlfX0iICAgIAogICAgfSwKICAgICJmZXRjaCI6IFsKICAgICAgICB7CiAgICAgICAgICAidXJpIjogImh0dHBzOi8vZ2l0LmxhYi5zc3BjbG91ZC5mci9pbm5vdmF0aW9uL3BsYXRlZm9ybWUtb255eGlhL3NlcnZpY2VzLXJlc3NvdXJjZXMvLS9yYXcvbWFzdGVyL29ueXhpYS1pbml0LnNoIiwKICAgICAgICAgICJleHRyYWN0IjogZmFsc2UsCiAgICAgICAgICAiZXhlY3V0YWJsZSI6IHRydWUsCiAgICAgICAgICAiY2FjaGUiOiBmYWxzZSwKICAgICAgICAgICJkZXN0UGF0aCI6ICJvbnl4aWEtaW5pdC5zaCIKICAgICAgICB9CiAgICBdLAogICAgInVwZ3JhZGVTdHJhdGVneSI6ewogICAgICAibWluaW11bUhlYWx0aENhcGFjaXR5IjogMCwKICAgICAgIm1heGltdW1PdmVyQ2FwYWNpdHkiOiAwCiAgICB9Cn0K"
+        "v2AppMustacheTemplate": "ewogICAgImlkIjogInt7c2VydmljZS5uYW1lfX0iLAogICAgImNwdXMiOiAwLjEsCiAgICAibWVtIjogNDA5NiwKICAgICJpbnN0YW5jZXMiOiAxLAogICAgImNtZCI6ICJiYXNoIC9tbnQvbWVzb3Mvc2FuZGJveC9vbnl4aWEtaW5pdC5zaCAmJiAvdXNyL3NiaW4vc3NoZCA7IC91c3IvYmluL25vZGUgL3Jvb3Qvd2Vic3NoMi9hcHAvaW5kZXguanMiLAogICAgImNvbnRhaW5lciI6IHsKICAgICAgICAgInR5cGUiOiAiRE9DS0VSIiwKICAgICAgICAgImRvY2tlciI6IHsKICAgICAgICAgICAgICJpbWFnZSI6ICJ7e3Jlc291cmNlLmFzc2V0cy5jb250YWluZXIuZG9ja2VyLnNoZWxseX19IiwKICAgICAgICAgICAgICJuZXR3b3JrIjogIkJSSURHRSIsCiAgICAgICAgICAgICAicG9ydE1hcHBpbmdzIjogWwogICAgICAgICAgICAgICAgeyAiY29udGFpbmVyUG9ydCI6IDIyMjIsICJob3N0UG9ydCI6IDAgfQogICAgICAgICAgICBdCiAgICAgICAgIH0KICAgICB9LAogICAgICJoZWFsdGhDaGVja3MiOiBbCiAgICAgIHsKICAgICAgICAicG9ydEluZGV4IjogMCwKICAgICAgICAicHJvdG9jb2wiOiAiTUVTT1NfVENQIiwKICAgICAgICAiZ3JhY2VQZXJpb2RTZWNvbmRzIjogMzAsCiAgICAgICAgImludGVydmFsU2Vjb25kcyI6IDYwLAogICAgICAgICJ0aW1lb3V0U2Vjb25kcyI6IDIwLAogICAgICAgICJtYXhDb25zZWN1dGl2ZUZhaWx1cmVzIjogMwogICAgICB9CiAgICBdLAogICAgImxhYmVscyI6IHsKICAgICAgIkhBUFJPWFlfR1JPVVAiOiJleHRlcm5hbCIsCiAgICAgICJIQVBST1hZXzBfVkhPU1QiOiJ7e25ldHdvcmtpbmcudmlydHVhbC1ob3N0fX0iLAogICAgICAiSEFQUk9YWV8wX0VOQUJMRUQiOiAidHJ1ZSIsCiAgICAgICJIQVBST1hZXzBfUkVESVJFQ1RfVE9fSFRUUFMiOiAie3tuZXR3b3JraW5nLmh0dHBzLXJlZGlyZWN0fX0iLAogICAgICAiTUFSQVRIT05fU0lOR0xFX0lOU1RBTkNFX0FQUCI6ICJ0cnVlIgogICAgfSwKICAgICJlbnYiOiB7CiAgICAgICAgIkFXU19BQ0NFU1NfS0VZX0lEIjogInt7czMuYWNjZXNzS2V5SWR9fSIsCiAgICAgICAgIkFXU19TRUNSRVRfQUNDRVNTX0tFWSI6ICJ7e3MzLnNlY3JldEFjY2Vzc0tleX19IiwKICAgICAgICAiQVdTX1NFU1NJT05fVE9LRU4iOiAie3tzMy5zZXNzaW9uVG9rZW59fSIsCiAgICAgICAgIkFXU19ERUZBVUxUX1JFR0lPTiI6ICJ7e3MzLmRlZmF1bHRSZWdpb259fSIsCiAgICAgICAgIkFXU19TM19FTkRQT0lOVCI6ICJ7e3MzLmVuZHBvaW50fX0iLAogICAgICAgICJBV1NfRVhQSVJBVElPTiI6ICJ7e3MzLmV4cGlyYXRpb259fSIsCiAgICAgICAgIkdJVF9VU0VSX05BTUUiOiAie3tnaXQubmFtZX19IiwKICAgICAgICAiR0lUX1VTRVJfTUFJTCI6ICJ7e2dpdC5lbWFpbH19IiwKICAgICAgICAiR0lUX0NSRURFTlRJQUxTX0NBQ0hFX0RVUkFUSU9OIjogInt7Z2l0LmNhY2hlfX0iLAogICAgICAgICJWQVVMVF9BRERSIjogInt7dmF1bHQudXJsfX0iLAogICAgICAgICJWQVVMVF9UT0tFTiI6ICJ7e3ZhdWx0LnRva2VufX0iICAgIAogICAgfSwKICAgICJmZXRjaCI6IFsKICAgICAgewogICAgICAgICJ1cmkiOiAie3tpbml0Lmdsb2JhbH19IiwKICAgICAgICAiZXh0cmFjdCI6IGZhbHNlLAogICAgICAgICJleGVjdXRhYmxlIjogdHJ1ZSwKICAgICAgICAiY2FjaGUiOiBmYWxzZSwKICAgICAgICAiZGVzdFBhdGgiOiAib255eGlhLWluaXQuc2giCiAgICAgIH0KICAgIF0sCiAgICAidXBncmFkZVN0cmF0ZWd5Ijp7CiAgICAgICJtaW5pbXVtSGVhbHRoQ2FwYWNpdHkiOiAwLAogICAgICAibWF4aW11bU92ZXJDYXBhY2l0eSI6IDAKICAgIH0KfQ=="
       },
       "config": {
         "type": "object",
@@ -150,7 +150,7 @@
               }
             }
         },
-          "networking": {
+        "networking": {
             "description": "Networking-related configuration properties for Shelly.",
             "type": "object",
             "properties": {
@@ -174,6 +174,44 @@
               }
             }
           }
+        },
+        "vault": {
+          "description": "Configuration of vault client",
+          "type": "object",
+          "properties": {
+            "token": {
+              "description": "token vault",
+              "type": "string",
+              "x-form": {
+                "value": "{{vault.VAULT_TOKEN}}"
+              }
+            },
+            "url": {
+              "description": "url of vault server",
+              "type": "string",
+              "x-form": {
+                "value": "{{vault.VAULT_ADDR}}"
+              }
+            }
+          }
+        },
+        "init": {
+            "description": "Init parameters",
+            "type": "object",
+            "properties": {
+                "global": {
+                    "type": "string",
+                    "description": "initialization script",
+                    "default": "",
+                    "x-form": {
+                        "hidden": true
+                    },
+                    "x-generated": {
+                        "type": "initScript",
+                        "scope": "shelly"
+                    }
+                }
+            } 
         },
         "required": ["service", "networking"]
       }
