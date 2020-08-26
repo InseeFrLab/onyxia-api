@@ -74,6 +74,7 @@ public class Region {
     public static class Services {
 
         private Service.ServiceType type;
+        private boolean defaultIpProtection;
         private String network;
         private String namespacePrefix;
         private String marathonDnsSuffix;
@@ -91,6 +92,14 @@ public class Region {
             this.type = type;
         }
 
+        public boolean getDefaultIpProtection() {
+            return defaultIpProtection;
+        }
+
+        public void setDefaultIpProtection(boolean defaultIpProtection){
+            this.defaultIpProtection = defaultIpProtection;
+        }
+        
         public String getNetwork() {
             return network;
         }
