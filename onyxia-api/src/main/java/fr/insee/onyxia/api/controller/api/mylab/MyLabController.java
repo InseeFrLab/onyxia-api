@@ -8,7 +8,7 @@ import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.api.services.impl.MarathonAppsService;
 import fr.insee.onyxia.model.User;
-import fr.insee.onyxia.model.catalog.Package;
+import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.catalog.Universe;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
 import fr.insee.onyxia.model.dto.ServicesListing;
@@ -113,7 +113,7 @@ public class MyLabController {
             catalogId = requestDTO.getCatalogId();
         }
         CatalogWrapper catalog = catalogService.getCatalogById(catalogId);
-        Package pkg = catalog.getCatalog().getPackageByName(requestDTO.getPackageName());
+        Pkg pkg = catalog.getCatalog().getPackageByName(requestDTO.getPackageName());
         User user = userProvider.getUser();
         Map<String, Object> fusion = new HashMap<>();
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());

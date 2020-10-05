@@ -5,7 +5,7 @@ import fr.insee.onyxia.api.configuration.Catalogs;
 import fr.insee.onyxia.api.configuration.NotFoundException;
 import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.model.catalog.Config.Property;
-import fr.insee.onyxia.model.catalog.Package;
+import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.Service;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -45,8 +45,8 @@ public class CatalogController {
    }
 
    @GetMapping("{catalogId}/{packageName}")
-   public Package getPackage(@PathVariable String catalogId, @PathVariable String packageName) {
-      Package pkg = catalogService.getPackage(catalogId, packageName);
+   public Pkg getPackage(@PathVariable String catalogId, @PathVariable String packageName) {
+      Pkg pkg = catalogService.getPackage(catalogId, packageName);
       addCustomOnyxiaProperties(pkg);
       if (pkg == null) {
          throw new NotFoundException();
@@ -70,7 +70,7 @@ public class CatalogController {
       return false;
    }
 
-   private void addCustomOnyxiaProperties(Package pkg) {
+   private void addCustomOnyxiaProperties(Pkg pkg) {
       Map<String, Property> properties = pkg.getConfig().getProperties().getProperties();
       Property property = new Property();
       property.setDescription("Onyxia specific configuration");

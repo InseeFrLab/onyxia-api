@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class UniversePackage extends Package {
+public class UniversePackage extends Pkg {
 
 	String packagingVersion;
 	String name;

@@ -5,7 +5,7 @@ import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.api.services.impl.MarathonAppsService;
-import fr.insee.onyxia.model.catalog.Package;
+import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.Service;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -65,7 +65,7 @@ public class CloudShellController {
 		public static final String STATUS_UP = "UP", STATUS_LOADING = "LOADING", STATUS_DOWN = "DOWN";
 		private String status = STATUS_UP;
 		private String url = null;
-		private Package packageToDeploy = null;
+		private Pkg packageToDeploy = null;
 		private String catalogId;
 
 		public String getStatus() {
@@ -84,11 +84,11 @@ public class CloudShellController {
 			this.url = url;
 		}
 
-		public Package getPackageToDeploy() {
+		public Pkg getPackageToDeploy() {
 			return packageToDeploy;
 		}
 
-		public void setPackageToDeploy(Package packageToDeploy) {
+		public void setPackageToDeploy(Pkg packageToDeploy) {
 			this.packageToDeploy = packageToDeploy;
 		}
 

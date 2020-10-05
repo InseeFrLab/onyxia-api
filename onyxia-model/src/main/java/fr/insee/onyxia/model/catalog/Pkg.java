@@ -2,7 +2,7 @@ package fr.insee.onyxia.model.catalog;
 
 import fr.insee.onyxia.model.catalog.Config.Config;
 
-public class Package {
+public class Pkg {
     private String name;
     private String description;
     private String version;
@@ -24,7 +24,7 @@ public class Package {
         this.name = name;
     }
 
-    public Package name(String name) {
+    public Pkg name(String name) {
         this.name = name;
         return this;
     }
@@ -37,7 +37,7 @@ public class Package {
         this.description = description;
     }
 
-    public Package description(String description) {
+    public Pkg description(String description) {
         this.description = description;
         return this;
     }
@@ -50,7 +50,7 @@ public class Package {
         this.version = version;
     }
 
-    public Package version(String version) {
+    public Pkg version(String version) {
         this.version = version;
         return this;
     }

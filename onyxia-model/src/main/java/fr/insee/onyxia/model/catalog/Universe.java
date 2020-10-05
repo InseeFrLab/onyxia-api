@@ -13,7 +13,7 @@ public class Universe extends CatalogWrapper {
     public void readPackages(List<UniversePackage> packages) {
         // We can't directly use List<UniversePackage> as List<Package>.
         // That's beacause even if UniversePackage extends Package, List<UniversePackage>  does not extends List<Package>
-        this.setPackages(packages.stream().map(pkg -> (Package) pkg).collect(Collectors.toList()));
+        this.setPackages(packages.stream().map(pkg -> (Pkg) pkg).collect(Collectors.toList()));
     }
 
 }
