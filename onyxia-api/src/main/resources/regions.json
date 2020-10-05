@@ -12,10 +12,6 @@
         "network": "calico",
         "initScript": "https://git.lab.sspcloud.fr/innovation/plateforme-onyxia/services-ressources/-/raw/master/onyxia-init.sh",
         "namespacePrefix": "user-",
-        "server": {
-          "URL": "",
-          "auth": {}
-        },
         "expose": {
           "domain": "fakedomain.kub.example.com"
         },
