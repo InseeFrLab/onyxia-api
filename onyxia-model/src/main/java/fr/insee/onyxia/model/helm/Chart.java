@@ -2,7 +2,7 @@
 package fr.insee.onyxia.model.helm;
 
 import com.fasterxml.jackson.annotation.*;
-import fr.insee.onyxia.model.catalog.Package;
+import fr.insee.onyxia.model.catalog.Pkg;
 
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({ "apiVersion", "appVersion", "created", "description", "digest", "engine", "home", "icon",
         "keywords", "maintainers", "name", "sources", "urls", "version" })
-public class Chart extends Package {
+public class Chart extends Pkg {
 
     @JsonProperty("apiVersion")
     private String apiVersion;

@@ -6,10 +6,15 @@ import fr.insee.onyxia.api.configuration.kubernetes.HelmClientProvider;
 import fr.insee.onyxia.api.configuration.kubernetes.KubernetesClientProvider;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.control.AdmissionControllerHelm;
+import fr.insee.onyxia.api.services.control.commons.UrlGenerator;
 import fr.insee.onyxia.api.services.control.utils.PublishContext;
+import fr.insee.onyxia.api.services.control.xgenerated.XGeneratedContext;
+import fr.insee.onyxia.api.services.control.xgenerated.XGeneratedProcessor;
+import fr.insee.onyxia.api.services.control.xgenerated.XGeneratedProvider;
 import fr.insee.onyxia.api.services.impl.kubernetes.KubernetesService;
 import fr.insee.onyxia.model.User;
-import fr.insee.onyxia.model.catalog.Package;
+import fr.insee.onyxia.model.catalog.Config.Property;
+import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
 import fr.insee.onyxia.model.dto.ServicesListing;
 import fr.insee.onyxia.model.region.Region;
@@ -56,8 +61,8 @@ public class HelmAppsService implements AppsService {
     @Qualifier("helm")
     ObjectMapper mapperHelm;
 
-    @Autowired
-    private List<AdmissionControllerHelm> admissionControllers;
+    @Autowired(required = false)
+    private List<AdmissionControllerHelm> admissionControllers = new ArrayList<>();
 
     private SimpleDateFormat helmDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -69,19 +74,63 @@ public class HelmAppsService implements AppsService {
     @Autowired
     private HelmClientProvider helmClientProvider;
 
+    @Autowired
+    private XGeneratedProcessor xGeneratedProcessor;
+
+    @Autowired
+    private UrlGenerator urlGenerator;
+
     private HelmInstallService getHelmInstallService(Region region) {
         return helmClientProvider.getHelmInstallServiceForRegion(region);
     }
 
     @Override
-    public Collection<Object> installApp(Region region,CreateServiceDTO requestDTO, String catalogId, Package pkg,
+    public Collection<Object> installApp(Region region,CreateServiceDTO requestDTO, String catalogId, Pkg pkg,
             User user, Map<String, Object> fusion) throws IOException, TimeoutException, InterruptedException {
         Region.CloudshellConfiguration cloudshellConfiguration = region.getServices().getCloudshell();
         boolean isCloudshell =false;
         if (cloudshellConfiguration != null && catalogId.equals(cloudshellConfiguration.getCatalogId()) && pkg.getName().equals(cloudshellConfiguration.getPackageName())) {
             isCloudshell =  true;
         }
+
         PublishContext context = new PublishContext();
+
+        XGeneratedContext xGeneratedContext = xGeneratedProcessor.readContext(pkg);
+        XGeneratedProvider xGeneratedProvider = new XGeneratedProvider() {
+            @Override
+            public String getGroupId() {
+                return null;
+            }
+
+            @Override
+            public String getAppId(String scopeName, XGeneratedContext.Scope scope, Property.XGenerated xGenerated) {
+                return pkg.getName();
+            }
+
+            @Override
+            public String getExternalDns(String scopeName, XGeneratedContext.Scope scope, Property.XGenerated xGenerated) {
+                return urlGenerator.generateUrl(user.getIdep(), pkg.getName(),
+                        context.getGlobalContext().getRandomizedId(), "", region.getServices().getExpose().getDomain());
+            }
+
+            @Override
+            public String getInternalDns(String scopeName, XGeneratedContext.Scope scope, Property.XGenerated xGenerated) {
+                return "";
+            }
+
+            @Override
+            public String getNetworkName(String scopeName, XGeneratedContext.Scope scope, Property.XGenerated xGenerated) {
+                return region.getServices().getNetwork();
+            }
+
+            @Override
+            public String getInitScript(String scopeName, XGeneratedContext.Scope scope, Property.XGenerated xGenerated) {
+                return region.getServices().getInitScript();
+            }
+        };
+        Map<String,String> xGeneratedValues = xGeneratedProcessor.process(xGeneratedContext,xGeneratedProvider);
+        xGeneratedProcessor.injectIntoContext(fusion,xGeneratedValues);
+
         long nbInvalidations = admissionControllers.stream().map(controller -> controller.validateContract(region, pkg, fusion, user, context))
                 .filter(b -> !b).count();
         if (nbInvalidations > 0) {

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.model.catalog.Config.Config;
-import fr.insee.onyxia.model.catalog.Package;
+import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.catalog.Universe;
 import fr.insee.onyxia.model.helm.Chart;
 import fr.insee.onyxia.model.helm.Repository;
@@ -99,7 +99,7 @@ public class CatalogLoader {
             //helmService.repoUpdate();
     }
 
-    private void refreshPackage(Package pkg) throws IOException {
+    private void refreshPackage(Pkg pkg) throws IOException {
         if (!(pkg instanceof Chart)) {
             throw new IllegalArgumentException("Package should be of type Chart");
         }
