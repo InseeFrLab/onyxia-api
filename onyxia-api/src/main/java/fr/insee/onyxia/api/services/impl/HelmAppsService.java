@@ -61,8 +61,8 @@ public class HelmAppsService implements AppsService {
     @Qualifier("helm")
     ObjectMapper mapperHelm;
 
-    @Autowired
-    private List<AdmissionControllerHelm> admissionControllers;
+    @Autowired(required = false)
+    private List<AdmissionControllerHelm> admissionControllers = new ArrayList<>();
 
     private SimpleDateFormat helmDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
