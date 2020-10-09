@@ -1,7 +1,7 @@
 package fr.insee.onyxia.api.services;
 
 import fr.insee.onyxia.model.User;
-import fr.insee.onyxia.model.catalog.Package;
+import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
 import fr.insee.onyxia.model.dto.ServicesListing;
 import fr.insee.onyxia.model.region.Region;
@@ -23,7 +23,7 @@ public interface AppsService {
         CompletableFuture<ServicesListing> getUserServices(Region region,User user, String groupId)
                 throws IllegalAccessException,  IOException;
 
-        Collection<Object> installApp(Region region,CreateServiceDTO requestDTO, String catalogId, Package pkg,
+        Collection<Object> installApp(Region region,CreateServiceDTO requestDTO, String catalogId, Pkg pkg,
                         User user, Map<String, Object> fusion) throws Exception;
 
         Service getUserService(Region region,User user, String serviceId) throws Exception;
