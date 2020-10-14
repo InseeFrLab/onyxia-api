@@ -6,6 +6,7 @@ import org.zeroturnaround.exec.InvalidExitValueException;
 import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.ProcessResult;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +18,7 @@ import java.util.concurrent.TimeoutException;
 public class Command {
     public static ProcessResult executeAndGetResponseAsJson(HelmConfiguration helmConfiguration, String command)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        return new ProcessExecutor().environment(getEnv(helmConfiguration)).readOutput(true).commandSplit(addConfigToCommand(command,helmConfiguration) + " --output json").execute();
+        return new ProcessExecutor().environment(getEnv(helmConfiguration)).redirectError(System.err).readOutput(true).commandSplit(addConfigToCommand(command,helmConfiguration) + " --output json").execute();
     }
 
     public static ProcessResult executeAndGetResponseAsJson(String command)
@@ -27,7 +28,7 @@ public class Command {
 
     public static ProcessResult execute(HelmConfiguration helmConfiguration, String command)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        return new ProcessExecutor().environment(getEnv(helmConfiguration)).readOutput(true).commandSplit(addConfigToCommand(command, helmConfiguration)).execute();
+        return new ProcessExecutor().environment(getEnv(helmConfiguration)).redirectError(System.err).readOutput(true).commandSplit(addConfigToCommand(command, helmConfiguration)).execute();
     }
 
     public static ProcessResult execute(String command)
