@@ -21,7 +21,7 @@ public class KubernetesService {
 
     public void createNamespace(Region region, String namespaceId, Owner owner) {
         String username = owner.getId();
-        if (owner.getType() == Owner.OwnerType.USER) {
+        if (owner.getType() == Owner.OwnerType.USER && region.getServices().getUsernamePrefix() != null) {
             username = region.getServices().getUsernamePrefix()+username;
         }
         // Label onyxia_owner is not resilient if the user has "namespace admin" role scoped to his namespace
