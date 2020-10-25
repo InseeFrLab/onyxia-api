@@ -180,7 +180,7 @@ public class HelmAppsService implements AppsService {
 
     @Override
     public String getLogs(Region region,User user, String serviceId, String taskId) {
-        KubernetesClient client = kubernetesClientProvider.getClientForRegion(region);
+        KubernetesClient client = kubernetesClientProvider.getUserClient(region,user);
         return client.pods().inNamespace(determineNamespace(region, region.getServices().getNamespacePrefix(),user)).withName(taskId).getLog();
     }
 
@@ -218,7 +218,7 @@ public class HelmAppsService implements AppsService {
 
     private Service getHelmApp(Region region, User user, HelmLs release) {
         String manifest = getHelmInstallService().getManifest(getHelmConfiguration(region,user),release.getName(), release.getNamespace());
-        Service service = getServiceFromRelease(region, release, manifest);
+        Service service = getServiceFromRelease(region, release, manifest,user);
         service.setStatus(findAppStatus(release));
         try {
             service.setStartedAt(helmDateFormat.parse(release.getUpdated()).getTime());
@@ -252,8 +252,8 @@ public class HelmAppsService implements AppsService {
         }
     }
 
-    private Service getServiceFromRelease(Region region, HelmLs release, String manifest) {
-        KubernetesClient client = kubernetesClientProvider.getClientForRegion(region);
+    private Service getServiceFromRelease(Region region, HelmLs release, String manifest, User user) {
+        KubernetesClient client = kubernetesClientProvider.getUserClient(region,user);
         InputStream inputStream = new ByteArrayInputStream(manifest.getBytes(Charset.forName("UTF-8")));
         List<HasMetadata> hasMetadatas = client.load(inputStream).get();
         List<Ingress> ingresses = hasMetadatas.stream().filter(hasMetadata -> hasMetadata instanceof Ingress)

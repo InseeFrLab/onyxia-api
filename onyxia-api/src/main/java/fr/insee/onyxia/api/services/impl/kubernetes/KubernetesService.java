@@ -26,7 +26,7 @@ public class KubernetesService {
         }
         // Label onyxia_owner is not resilient if the user has "namespace admin" role scoped to his namespace
         // as it this rolebinding allows him to modify onyxia_owner metadata
-        KubernetesClient kubClient = kubernetesClientProvider.getClientForRegion(region);
+        KubernetesClient kubClient = kubernetesClientProvider.getRootClient(region);
         DoneableNamespace namespaceToCreate = kubClient.namespaces().createNew().withNewMetadata().withName(namespaceId)
                 .addToLabels("onyxia_owner", owner.getId()).endMetadata();
 
@@ -44,7 +44,7 @@ public class KubernetesService {
     }
 
     public List<Namespace> getNamespaces(Region region, Owner owner) {
-        KubernetesClient kubClient = kubernetesClientProvider.getClientForRegion(region);
+        KubernetesClient kubClient = kubernetesClientProvider.getRootClient(region);
         return kubClient.namespaces().withLabel("onyxia_owner",owner.getId()).list().getItems();
     }
 
