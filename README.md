@@ -63,10 +63,11 @@ Open id configuration
 | `keycloak.bearer-only` | `true` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
 | `keycloak.disable-trust-manager` | `false` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
 
-CORS configuration :
+Security configuration :
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
-| `cors.allowed_origins` | `*` | To indicate which origins are allowed by [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) |
+| `security.cors.allowed_origins` |  | To indicate which origins are allowed by [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) |
+| `security.strictmode` | `true` | Enforces some security measures. Helm / Kubectl commands will be done with user permissions. Requires helm `3.4.0+` |
 
 Regions configuration :
 | Key | Default | Description |

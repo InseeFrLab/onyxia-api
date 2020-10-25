@@ -1,10 +1,12 @@
 package fr.insee.onyxia.api.configuration.kubernetes;
 
+import fr.insee.onyxia.api.configuration.SecurityConfig;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.region.Region;
 import io.github.inseefrlab.helmwrapper.configuration.HelmConfiguration;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService;
 import io.github.inseefrlab.helmwrapper.service.HelmRepoService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -21,6 +23,9 @@ public class HelmClientProvider {
         return new HelmInstallService();
     }
 
+    @Autowired
+    private SecurityConfig securityConfig = new SecurityConfig();
+
 
     public HelmConfiguration getConfiguration(Region region, User user) {
         HelmConfiguration helmConfiguration = new HelmConfiguration();
@@ -36,7 +41,11 @@ public class HelmClientProvider {
         if (region.getServices().getUsernamePrefix() != null) {
             username = region.getServices().getUsernamePrefix()+username;
         }
-        helmConfiguration.setAsKubeUser(username);
+
+        if (securityConfig.isStrictmode()) {
+            helmConfiguration.setAsKubeUser(username);
+        }
+
         return helmConfiguration;
     }
 }

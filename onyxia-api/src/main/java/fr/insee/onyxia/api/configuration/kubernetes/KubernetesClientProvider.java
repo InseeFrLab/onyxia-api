@@ -1,5 +1,6 @@
 package fr.insee.onyxia.api.configuration.kubernetes;
 
+import fr.insee.onyxia.api.configuration.SecurityConfig;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.region.Region;
 import io.fabric8.kubernetes.client.Config;
@@ -13,6 +14,9 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class KubernetesClientProvider {
+
+    @Autowired
+    private SecurityConfig securityConfig;
 
     /**
      * This returns the root client which has extended permissions. Currently cluster-admin.
@@ -31,8 +35,12 @@ public class KubernetesClientProvider {
         if (region.getServices().getUsernamePrefix() != null) {
             username = region.getServices().getUsernamePrefix()+user.getIdep();
         }
-        config.setImpersonateUsername(username);
-        config.setImpersonateGroups(null);
+
+        if (securityConfig.isStrictmode()) {
+            config.setImpersonateUsername(username);
+            config.setImpersonateGroups(null);
+        }
+
         return new DefaultKubernetesClient(config);
     }
 

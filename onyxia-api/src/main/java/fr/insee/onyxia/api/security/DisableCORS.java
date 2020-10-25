@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class DisableCORS implements WebMvcConfigurer {
 
-    @Value("${cors.allowed_origins}")
+    @Value("${securityy.cors.allowed_origins}")
     private String corsAllowedOrigins;
 
     @Override
