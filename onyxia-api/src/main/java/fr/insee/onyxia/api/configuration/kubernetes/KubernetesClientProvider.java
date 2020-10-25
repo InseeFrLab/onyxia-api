@@ -32,6 +32,7 @@ public class KubernetesClientProvider {
             username = region.getServices().getUsernamePrefix()+user.getIdep();
         }
         config.setImpersonateUsername(username);
+        config.setImpersonateGroups(null);
         return new DefaultKubernetesClient(config);
     }
 
