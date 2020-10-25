@@ -20,6 +20,10 @@ public class KubernetesService {
     private KubernetesClientProvider kubernetesClientProvider;
 
     public void createNamespace(Region region, String namespaceId, Owner owner) {
+        String username = owner.getId();
+        if (owner.getType() == Owner.OwnerType.USER) {
+            username = region.getServices().getUsernamePrefix()+username;
+        }
         // Label onyxia_owner is not resilient if the user has "namespace admin" role scoped to his namespace
         // as it this rolebinding allows him to modify onyxia_owner metadata
         KubernetesClient kubClient = kubernetesClientProvider.getClientForRegion(region);
@@ -30,7 +34,7 @@ public class KubernetesService {
                 .withNewMetadata()
                 .withLabels(Map.of("createdby","onyxia"))
                 .withName("full_control_namespace").withNamespace(namespaceId).endMetadata()
-                .withSubjects(new SubjectBuilder().withKind(getSubjectKind(owner)).withName(owner.getId())
+                .withSubjects(new SubjectBuilder().withKind(getSubjectKind(owner)).withName(username)
                         .withApiGroup("rbac.authorization.k8s.io").withNamespace(namespaceId).build())
                 .withNewRoleRef().withApiGroup("rbac.authorization.k8s.io").withKind("ClusterRole").withName("cluster-admin").endRoleRef();
 

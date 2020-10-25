@@ -77,6 +77,7 @@ public class Region {
         private boolean defaultIpProtection;
         private String network;
         private String namespacePrefix;
+        private String usernamePrefix;
         private String marathonDnsSuffix;
         private Expose expose;
         private Server server;
@@ -114,6 +115,14 @@ public class Region {
 
         public void setNamespacePrefix(String namespacePrefix) {
             this.namespacePrefix = namespacePrefix;
+        }
+
+        public String getUsernamePrefix() {
+            return usernamePrefix;
+        }
+
+        public void setUsernamePrefix(String usernamePrefix) {
+            this.usernamePrefix = usernamePrefix;
         }
 
         public String getMarathonDnsSuffix() {
