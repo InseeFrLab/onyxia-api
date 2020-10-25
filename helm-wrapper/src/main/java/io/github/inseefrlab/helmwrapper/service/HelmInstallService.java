@@ -29,7 +29,7 @@ public class HelmInstallService {
 
     }
     public HelmInstaller installChart(HelmConfiguration configuration,String chart, String namespace, String name, boolean dryRun, File values,
-            Map<String, String> env,String asUser)
+            Map<String, String> env)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
         String command = "helm install ";
         if (name != null) {

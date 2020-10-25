@@ -81,8 +81,8 @@ public class HelmAppsService implements AppsService {
     @Autowired
     private UrlGenerator urlGenerator;
 
-    private HelmConfiguration getHelmConfiguration(Region region) {
-        return helmClientProvider.generateConfigurationForRegion(region);
+    private HelmConfiguration getHelmConfiguration(Region region, User user) {
+        return helmClientProvider.getConfiguration(region,user);
     }
 
     private HelmInstallService getHelmInstallService() {
@@ -145,12 +145,8 @@ public class HelmAppsService implements AppsService {
         mapperHelm.writeValue(values, fusion);
         String namespaceId = determineNamespace(region, region.getServices().getNamespacePrefix(), user);
         String name = isCloudshell ? "cloudshell" : null;
-        String kubernetesUser = user.getIdep();
-        if (region.getServices().getUsernamePrefix() != null) {
-            kubernetesUser = region.getServices().getUsernamePrefix() + kubernetesUser;
-        }
-        HelmInstaller res = getHelmInstallService().installChart(getHelmConfiguration(region),catalogId + "/" + pkg.getName(), namespaceId, name, requestDTO.isDryRun(),
-                values,null,kubernetesUser);
+        HelmInstaller res = getHelmInstallService().installChart(getHelmConfiguration(region,user),catalogId + "/" + pkg.getName(), namespaceId, name, requestDTO.isDryRun(),
+                values,null);
         values.delete();
         return List.of(res.getManifest());
     }
@@ -169,13 +165,13 @@ public class HelmAppsService implements AppsService {
         }
         List<HelmLs> installedCharts = null;
         try {
-            installedCharts = Arrays.asList(getHelmInstallService().listChartInstall(getHelmConfiguration(region),region.getServices().getNamespacePrefix() + user.getIdep()));
+            installedCharts = Arrays.asList(getHelmInstallService().listChartInstall(getHelmConfiguration(region,user),region.getServices().getNamespacePrefix() + user.getIdep()));
         } catch (Exception e) {
             return CompletableFuture.completedFuture(new ServicesListing());
         }
         List<Service> services = new ArrayList<>();
         for (HelmLs release : installedCharts) {
-            services.add(getHelmApp(region,release));
+            services.add(getHelmApp(region,user,release));
         }
         ServicesListing listing = new ServicesListing();
         listing.setApps(services);
@@ -193,8 +189,8 @@ public class HelmAppsService implements AppsService {
         if (serviceId.startsWith("/")) {
             serviceId = serviceId.substring(1);
         }
-        HelmLs result = getHelmInstallService().getAppById(getHelmConfiguration(region),serviceId, determineNamespace(region, region.getServices().getNamespacePrefix(),user));
-        return getHelmApp(region,result);
+        HelmLs result = getHelmInstallService().getAppById(getHelmConfiguration(region,user),serviceId, determineNamespace(region, region.getServices().getNamespacePrefix(),user));
+        return getHelmApp(region,user,result);
     }
 
     @Override
@@ -205,23 +201,23 @@ public class HelmAppsService implements AppsService {
         int status = 0;
         if (bulk) {
             // If bulk in kub we ignore the path and delete every helm release
-            HelmLs[] releases = getHelmInstallService().listChartInstall(getHelmConfiguration(region),namespace);
+            HelmLs[] releases = getHelmInstallService().listChartInstall(getHelmConfiguration(region,user),namespace);
             for (int i = 0; i <releases.length; i++){
-                status = Math.max(0,getHelmInstallService().uninstaller(getHelmConfiguration(region),releases[i].getName(),namespace));
+                status = Math.max(0,getHelmInstallService().uninstaller(getHelmConfiguration(region,user),releases[i].getName(),namespace));
             }
         }
         else {
             // Strip / if present
             String cannonicalPath = path.startsWith("/") ? path.substring(1) : path;
-            status = getHelmInstallService().uninstaller(getHelmConfiguration(region),cannonicalPath, namespace);
+            status = getHelmInstallService().uninstaller(getHelmConfiguration(region,user),cannonicalPath, namespace);
         }
 
         result.setSuccess(status == 0);
         return result;
     }
 
-    private Service getHelmApp(Region region, HelmLs release) {
-        String manifest = getHelmInstallService().getManifest(getHelmConfiguration(region),release.getName(), release.getNamespace());
+    private Service getHelmApp(Region region, User user, HelmLs release) {
+        String manifest = getHelmInstallService().getManifest(getHelmConfiguration(region,user),release.getName(), release.getNamespace());
         Service service = getServiceFromRelease(region, release, manifest);
         service.setStatus(findAppStatus(release));
         try {
@@ -234,7 +230,7 @@ public class HelmAppsService implements AppsService {
         service.setSubtitle(release.getChart());
         service.setType(Service.ServiceType.KUBERNETES);
         try {
-            String values = getHelmInstallService().getValues(getHelmConfiguration(region),release.getName(), release.getNamespace());
+            String values = getHelmInstallService().getValues(getHelmConfiguration(region,user),release.getName(), release.getNamespace());
             JsonNode node = new ObjectMapper().readTree(values);
             Map<String, String> result = new HashMap<>();
             node.fields().forEachRemaining(currentNode -> mapAppender(result, currentNode, new ArrayList<String>()));

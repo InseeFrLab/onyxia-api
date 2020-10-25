@@ -1,5 +1,6 @@
 package fr.insee.onyxia.api.configuration.kubernetes;
 
+import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.region.Region;
 import io.github.inseefrlab.helmwrapper.configuration.HelmConfiguration;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService;
@@ -21,7 +22,7 @@ public class HelmClientProvider {
     }
 
 
-    public HelmConfiguration generateConfigurationForRegion(Region region) {
+    public HelmConfiguration getConfiguration(Region region, User user) {
         HelmConfiguration helmConfiguration = new HelmConfiguration();
         if (region.getServices().getServer() != null) {
             Region.Auth auth = region.getServices().getServer().getAuth();
@@ -31,6 +32,11 @@ public class HelmClientProvider {
             helmConfiguration.setApiserverUrl(region.getServices().getServer().getUrl());
             helmConfiguration.setKubeConfig(null);
         }
+        String username = user.getIdep();
+        if (region.getServices().getUsernamePrefix() != null) {
+            username = region.getServices().getUsernamePrefix()+username;
+        }
+        helmConfiguration.setAsKubeUser(username);
         return helmConfiguration;
     }
 }
