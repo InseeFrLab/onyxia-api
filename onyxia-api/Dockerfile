@@ -1,6 +1,6 @@
 FROM curlimages/curl as build  
 RUN curl -o /tmp/kubectl -L https://storage.googleapis.com/kubernetes-release/release/v1.18.9/bin/linux/amd64/kubectl
-RUN curl -o /tmp/helm -L https://get.helm.sh/helm-v3.3.4-linux-amd64.tar.gz
+RUN curl -o /tmp/helm -L https://get.helm.sh/helm-v3.4.0-rc.1-linux-amd64.tar.gz
 RUN tar -xvzf /tmp/helm -C /tmp
 
 FROM openjdk:11-jre-slim
