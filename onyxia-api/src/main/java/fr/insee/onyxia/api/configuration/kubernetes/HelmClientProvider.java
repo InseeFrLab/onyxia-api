@@ -20,12 +20,8 @@ public class HelmClientProvider {
         return new HelmInstallService();
     }
 
-    public HelmInstallService getHelmInstallServiceForRegion(Region region) {
-        return new HelmInstallService(generateConfigurationForRegion(region));
-    }
 
-
-    private HelmConfiguration generateConfigurationForRegion(Region region) {
+    public HelmConfiguration generateConfigurationForRegion(Region region) {
         HelmConfiguration helmConfiguration = new HelmConfiguration();
         if (region.getServices().getServer() != null) {
             Region.Auth auth = region.getServices().getServer().getAuth();

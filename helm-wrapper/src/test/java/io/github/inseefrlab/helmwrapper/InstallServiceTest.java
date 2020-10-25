@@ -21,7 +21,7 @@ public class InstallServiceTest {
     @Test
     public void shouldListInstalls() throws Exception {
         HelmInstallService helmInstallService = new HelmInstallService();
-        HelmLs[] result = helmInstallService.listChartInstall(null);
+        HelmLs[] result = helmInstallService.listChartInstall(null, null);
         Assertions.assertEquals(1,result.length);
     }
 
@@ -30,8 +30,8 @@ public class InstallServiceTest {
         HelmConfiguration configuration = new HelmConfiguration();
         configuration.setApiserverUrl("https://invaliddomain");
         configuration.setKubeToken("");
-        HelmInstallService helmInstallService = new HelmInstallService(configuration);
-        Assertions.assertThrows(Exception.class,() -> {HelmLs[] result = helmInstallService.listChartInstall(null);});
+        HelmInstallService helmInstallService = new HelmInstallService();
+        Assertions.assertThrows(Exception.class,() -> {HelmLs[] result = helmInstallService.listChartInstall(null, null);});
     }
 
     @SpringBootApplication
