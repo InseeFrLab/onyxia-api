@@ -13,6 +13,7 @@
         "initScript": "https://git.lab.sspcloud.fr/innovation/plateforme-onyxia/services-ressources/-/raw/master/onyxia-init.sh",
         "namespacePrefix": "user-",
         "usernamePrefix": "oidc-",
+        "authenticationMode" : "impersonate",
         "expose": {
           "domain": "fakedomain.kub.example.com"
         },

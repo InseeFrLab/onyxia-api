@@ -67,7 +67,6 @@ Security configuration :
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
 | `security.cors.allowed_origins` |  | To indicate which origins are allowed by [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) |
-| `security.strictmode` | `true` | Enforces some security measures. Helm / Kubectl commands will be done with user permissions. Requires helm `3.4.0+` |
 
 Regions configuration :
 | Key | Default | Description |

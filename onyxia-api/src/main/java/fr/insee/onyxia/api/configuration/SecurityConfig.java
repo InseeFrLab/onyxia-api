@@ -6,19 +6,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SecurityConfig {
 
-    @Value("${security.strictmode}")
-    private boolean strictmode;
-
-    @Value("${security.cors.allowed_origins}")
+    @Value("${security.cors.allowed_origins:#{null}}")
     private String corsAllowedOrigins;
-
-    public boolean isStrictmode() {
-        return strictmode;
-    }
-
-    public void setStrictmode(boolean strictmode) {
-        this.strictmode = strictmode;
-    }
 
     public String getCorsAllowedOrigins() {
         return corsAllowedOrigins;

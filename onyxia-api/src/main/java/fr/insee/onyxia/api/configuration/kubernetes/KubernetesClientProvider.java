@@ -36,7 +36,7 @@ public class KubernetesClientProvider {
             username = region.getServices().getUsernamePrefix()+user.getIdep();
         }
 
-        if (securityConfig.isStrictmode()) {
+        if (region.getServices().getAuthenticationMode() == Region.Services.AuthenticationMode.IMPERSONATE) {
             config.setImpersonateUsername(username);
             config.setImpersonateGroups(null);
         }

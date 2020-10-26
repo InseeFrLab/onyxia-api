@@ -42,7 +42,7 @@ public class HelmClientProvider {
             username = region.getServices().getUsernamePrefix()+username;
         }
 
-        if (securityConfig.isStrictmode()) {
+        if (region.getServices().getAuthenticationMode() == Region.Services.AuthenticationMode.IMPERSONATE) {
             helmConfiguration.setAsKubeUser(username);
         }
 

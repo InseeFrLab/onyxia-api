@@ -1,5 +1,6 @@
 package fr.insee.onyxia.model.region;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.insee.onyxia.model.service.Service;
@@ -73,11 +74,19 @@ public class Region {
     @JsonIgnoreProperties(value={"server"},allowSetters = true)
     public static class Services {
 
+        public static enum AuthenticationMode {
+            @JsonProperty("impersonate")
+            IMPERSONATE,
+            @JsonProperty("admin")
+            ADMIN
+        }
+
         private Service.ServiceType type;
         private boolean defaultIpProtection;
         private String network;
         private String namespacePrefix;
         private String usernamePrefix;
+        private AuthenticationMode authenticationMode = AuthenticationMode.IMPERSONATE;
         private String marathonDnsSuffix;
         private Expose expose;
         private Server server;
@@ -171,6 +180,14 @@ public class Region {
 
         public void setInitScript(String initScript) {
             this.initScript = initScript;
+        }
+
+        public AuthenticationMode getAuthenticationMode() {
+            return authenticationMode;
+        }
+
+        public void setAuthenticationMode(AuthenticationMode authenticationMode) {
+            this.authenticationMode = authenticationMode;
         }
     }
 
