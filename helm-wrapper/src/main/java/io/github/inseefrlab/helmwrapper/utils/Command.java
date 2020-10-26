@@ -2,9 +2,12 @@ package io.github.inseefrlab.helmwrapper.utils;
 
 import io.github.inseefrlab.helmwrapper.configuration.HelmConfiguration;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zeroturnaround.exec.InvalidExitValueException;
 import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.ProcessResult;
+import org.zeroturnaround.exec.listener.ProcessListener;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,9 +19,26 @@ import java.util.concurrent.TimeoutException;
  * Executeur
  */
 public class Command {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(Command.class);
+
+    private static ProcessExecutor getProcessExecutor() {
+        ProcessExecutor processExecutor = new ProcessExecutor();
+        processExecutor.redirectError(System.err);
+        processExecutor.readOutput(true);
+        processExecutor.addListener(new ProcessListener() {
+            @Override
+            public void afterStart(Process process, ProcessExecutor executor) {
+                process.info().commandLine().ifPresent(cli -> LOGGER.info(cli));
+                super.afterStart(process, executor);
+            }
+        });
+        return processExecutor;
+    }
+
     public static ProcessResult executeAndGetResponseAsJson(HelmConfiguration helmConfiguration, String command)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        return new ProcessExecutor().environment(getEnv(helmConfiguration)).redirectError(System.err).readOutput(true).commandSplit(addConfigToCommand(command,helmConfiguration) + " --output json").execute();
+        return getProcessExecutor().environment(getEnv(helmConfiguration)).commandSplit(addConfigToCommand(command,helmConfiguration) + " --output json").execute();
     }
 
     public static ProcessResult executeAndGetResponseAsJson(String command)
@@ -28,7 +48,7 @@ public class Command {
 
     public static ProcessResult execute(HelmConfiguration helmConfiguration, String command)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        return new ProcessExecutor().environment(getEnv(helmConfiguration)).redirectError(System.err).readOutput(true).commandSplit(addConfigToCommand(command, helmConfiguration)).execute();
+        return getProcessExecutor().environment(getEnv(helmConfiguration)).commandSplit(addConfigToCommand(command, helmConfiguration)).execute();
     }
 
     public static ProcessResult execute(String command)
@@ -59,6 +79,9 @@ public class Command {
         }
         String newCommand = command;
         newCommand = newCommand.concat(" ");
+        if (helmConfiguration.getAsKubeUser() != null) {
+            newCommand = newCommand.concat(" --kube-as-user "+helmConfiguration.getAsKubeUser()+" ");
+        }
         String kubeConfig = null;
         if (StringUtils.isNotEmpty(helmConfiguration.getApiserverUrl())) {
             newCommand = newCommand.concat(" --kube-apiserver="+helmConfiguration.getApiserverUrl()).concat(" ");
@@ -79,7 +102,6 @@ public class Command {
             newCommand = newCommand.concat(" --kubeconfig="+kubeConfig).concat(" ");
         }
 
-        System.out.println(newCommand);
         return newCommand;
     }
 }

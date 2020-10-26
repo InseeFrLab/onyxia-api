@@ -5,6 +5,7 @@ public class HelmConfiguration {
     private String apiserverUrl;
     private String kubeToken;
     private String kubeConfig;
+    private String asKubeUser;
 
     public String getApiserverUrl() {
         return apiserverUrl;
@@ -28,5 +29,13 @@ public class HelmConfiguration {
 
     public void setKubeConfig(String kubeConfig) {
         this.kubeConfig = kubeConfig;
+    }
+
+    public String getAsKubeUser() {
+        return asKubeUser;
+    }
+
+    public void setAsKubeUser(String asKubeUser) {
+        this.asKubeUser = asKubeUser;
     }
 }

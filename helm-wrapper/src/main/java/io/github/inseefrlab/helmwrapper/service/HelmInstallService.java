@@ -24,27 +24,11 @@ import java.util.stream.Collectors;
 public class HelmInstallService {
 
     private final Logger logger = LoggerFactory.getLogger(HelmInstallService.class);
-    private HelmConfiguration configuration;
 
     public HelmInstallService() {
 
     }
-
-    public HelmInstallService(HelmConfiguration configuration) {
-        this.configuration = configuration;
-    }
-
-    public HelmInstaller installChart(String chart, String namespace, String name, Boolean dryRun, Map<String, String> env)
-            throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        return installChart(chart, namespace, name, dryRun, null, env);
-    }
-
-    public HelmInstaller installChart(String chart, String namespace, String name, boolean dryRun, File values)
-            throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        return installChart(chart, namespace, name, dryRun, values, null);
-    }
-
-    public HelmInstaller installChart(String chart, String namespace, String name, boolean dryRun, File values,
+    public HelmInstaller installChart(HelmConfiguration configuration,String chart, String namespace, String name, boolean dryRun, File values,
             Map<String, String> env)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
         String command = "helm install ";
@@ -69,12 +53,12 @@ public class HelmInstallService {
         return new ObjectMapper().readValue(res, HelmInstaller.class);
     }
 
-    public int uninstaller(String name, String namespace)
+    public int uninstaller(HelmConfiguration configuration, String name, String namespace)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
         return Command.execute(configuration,"helm uninstall " + name + " -n " + namespace).getExitValue();
     }
 
-    public HelmLs[] listChartInstall(String namespace) throws JsonMappingException, InvalidExitValueException,
+    public HelmLs[] listChartInstall(HelmConfiguration configuration, String namespace) throws JsonMappingException, InvalidExitValueException,
             JsonProcessingException, IOException, InterruptedException, TimeoutException {
         String cmd = "helm ls";
         if (namespace != null) {
@@ -84,7 +68,7 @@ public class HelmInstallService {
                 HelmLs[].class);
     }
 
-    public String getManifest(String id, String namespace) {
+    public String getManifest(HelmConfiguration configuration, String id, String namespace) {
         try {
             return Command.execute(configuration,"helm get manifest " + id + " --namespace " + namespace).getOutput().getString();
         } catch (IOException e) {
@@ -97,7 +81,7 @@ public class HelmInstallService {
         return "";
     }
 
-    public String getValues(String id, String namespace) {
+    public String getValues(HelmConfiguration configuration, String id, String namespace) {
         try {
             return Command.executeAndGetResponseAsJson(configuration,"helm get values " + id + " --namespace " + namespace).getOutput().getString();
         } catch (IOException e) {
@@ -125,7 +109,7 @@ public class HelmInstallService {
      * @return
      * @throws MultipleServiceFound
      */
-    public HelmLs getAppById(String appId, String namespace) throws MultipleServiceFound {
+    public HelmLs getAppById(HelmConfiguration configuration, String appId, String namespace) throws MultipleServiceFound {
         try {
             HelmLs[] result = new ObjectMapper()
                     .readValue(Command.executeAndGetResponseAsJson(configuration,"helm list --filter " + appId + " -n " + namespace)

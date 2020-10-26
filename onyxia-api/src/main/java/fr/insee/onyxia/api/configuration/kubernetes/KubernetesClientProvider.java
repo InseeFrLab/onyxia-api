@@ -1,5 +1,7 @@
 package fr.insee.onyxia.api.configuration.kubernetes;
 
+import fr.insee.onyxia.api.configuration.SecurityConfig;
+import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.region.Region;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
@@ -13,7 +15,36 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class KubernetesClientProvider {
 
-    public KubernetesClient getClientForRegion(Region region) {
+    @Autowired
+    private SecurityConfig securityConfig;
+
+    /**
+     * This returns the root client which has extended permissions. Currently cluster-admin.
+     * User calls should be done using the userClient which only has user permissions.
+     * @param region
+     * @return
+     */
+    public KubernetesClient getRootClient(Region region) {
+        Config config = getDefaultConfiguration(region).build();
+        return new DefaultKubernetesClient(config);
+    }
+
+    public KubernetesClient getUserClient(Region region, User user) {
+        Config config = getDefaultConfiguration(region).build();
+        String username = user.getIdep();
+        if (region.getServices().getUsernamePrefix() != null) {
+            username = region.getServices().getUsernamePrefix()+user.getIdep();
+        }
+
+        if (region.getServices().getAuthenticationMode() == Region.Services.AuthenticationMode.IMPERSONATE) {
+            config.setImpersonateUsername(username);
+            config.setImpersonateGroups(null);
+        }
+
+        return new DefaultKubernetesClient(config);
+    }
+
+    private ConfigBuilder getDefaultConfiguration(Region region) {
         ConfigBuilder configBuilder = new ConfigBuilder();
         if (region.getServices().getServer() != null && region.getServices().getServer().getUrl() != null) {
             configBuilder.withMasterUrl(region.getServices().getServer().getUrl() );
@@ -31,9 +62,6 @@ public class KubernetesClientProvider {
                 }
             }
         }
-
-        Config config = configBuilder.build();
-        KubernetesClient client = new DefaultKubernetesClient(config);
-        return client;
+        return configBuilder;
     }
 }

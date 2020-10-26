@@ -25,6 +25,7 @@ import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.networking.v1beta1.Ingress;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.github.inseefrlab.helmwrapper.configuration.HelmConfiguration;
 import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
 import io.github.inseefrlab.helmwrapper.model.HelmLs;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService;
@@ -80,8 +81,12 @@ public class HelmAppsService implements AppsService {
     @Autowired
     private UrlGenerator urlGenerator;
 
-    private HelmInstallService getHelmInstallService(Region region) {
-        return helmClientProvider.getHelmInstallServiceForRegion(region);
+    private HelmConfiguration getHelmConfiguration(Region region, User user) {
+        return helmClientProvider.getConfiguration(region,user);
+    }
+
+    private HelmInstallService getHelmInstallService() {
+        return helmClientProvider.defaultHelmInstallService();
     }
 
     @Override
@@ -140,8 +145,8 @@ public class HelmAppsService implements AppsService {
         mapperHelm.writeValue(values, fusion);
         String namespaceId = determineNamespace(region, region.getServices().getNamespacePrefix(), user);
         String name = isCloudshell ? "cloudshell" : null;
-        HelmInstaller res = getHelmInstallService(region).installChart(catalogId + "/" + pkg.getName(), namespaceId, name, requestDTO.isDryRun(),
-                values);
+        HelmInstaller res = getHelmInstallService().installChart(getHelmConfiguration(region,user),catalogId + "/" + pkg.getName(), namespaceId, name, requestDTO.isDryRun(),
+                values,null);
         values.delete();
         return List.of(res.getManifest());
     }
@@ -160,13 +165,13 @@ public class HelmAppsService implements AppsService {
         }
         List<HelmLs> installedCharts = null;
         try {
-            installedCharts = Arrays.asList(getHelmInstallService(region).listChartInstall(region.getServices().getNamespacePrefix() + user.getIdep()));
+            installedCharts = Arrays.asList(getHelmInstallService().listChartInstall(getHelmConfiguration(region,user),region.getServices().getNamespacePrefix() + user.getIdep()));
         } catch (Exception e) {
             return CompletableFuture.completedFuture(new ServicesListing());
         }
         List<Service> services = new ArrayList<>();
         for (HelmLs release : installedCharts) {
-            services.add(getHelmApp(region,release));
+            services.add(getHelmApp(region,user,release));
         }
         ServicesListing listing = new ServicesListing();
         listing.setApps(services);
@@ -175,7 +180,7 @@ public class HelmAppsService implements AppsService {
 
     @Override
     public String getLogs(Region region,User user, String serviceId, String taskId) {
-        KubernetesClient client = kubernetesClientProvider.getClientForRegion(region);
+        KubernetesClient client = kubernetesClientProvider.getUserClient(region,user);
         return client.pods().inNamespace(determineNamespace(region, region.getServices().getNamespacePrefix(),user)).withName(taskId).getLog();
     }
 
@@ -184,8 +189,8 @@ public class HelmAppsService implements AppsService {
         if (serviceId.startsWith("/")) {
             serviceId = serviceId.substring(1);
         }
-        HelmLs result = getHelmInstallService(region).getAppById(serviceId, determineNamespace(region, region.getServices().getNamespacePrefix(),user));
-        return getHelmApp(region,result);
+        HelmLs result = getHelmInstallService().getAppById(getHelmConfiguration(region,user),serviceId, determineNamespace(region, region.getServices().getNamespacePrefix(),user));
+        return getHelmApp(region,user,result);
     }
 
     @Override
@@ -193,28 +198,27 @@ public class HelmAppsService implements AppsService {
         final String namespace = determineNamespace(region, region.getServices().getNamespacePrefix(), user);
         UninstallService result = new UninstallService();
         result.setPath(path);
-        HelmInstallService helmService = getHelmInstallService(region);
         int status = 0;
         if (bulk) {
             // If bulk in kub we ignore the path and delete every helm release
-            HelmLs[] releases = getHelmInstallService(region).listChartInstall(namespace);
+            HelmLs[] releases = getHelmInstallService().listChartInstall(getHelmConfiguration(region,user),namespace);
             for (int i = 0; i <releases.length; i++){
-                status = Math.max(0,helmService.uninstaller(releases[i].getName(),namespace));
+                status = Math.max(0,getHelmInstallService().uninstaller(getHelmConfiguration(region,user),releases[i].getName(),namespace));
             }
         }
         else {
             // Strip / if present
             String cannonicalPath = path.startsWith("/") ? path.substring(1) : path;
-            status = getHelmInstallService(region).uninstaller(cannonicalPath, namespace);
+            status = getHelmInstallService().uninstaller(getHelmConfiguration(region,user),cannonicalPath, namespace);
         }
 
         result.setSuccess(status == 0);
         return result;
     }
 
-    private Service getHelmApp(Region region, HelmLs release) {
-        String manifest = getHelmInstallService(region).getManifest(release.getName(), release.getNamespace());
-        Service service = getServiceFromRelease(region, release, manifest);
+    private Service getHelmApp(Region region, User user, HelmLs release) {
+        String manifest = getHelmInstallService().getManifest(getHelmConfiguration(region,user),release.getName(), release.getNamespace());
+        Service service = getServiceFromRelease(region, release, manifest,user);
         service.setStatus(findAppStatus(release));
         try {
             service.setStartedAt(helmDateFormat.parse(release.getUpdated()).getTime());
@@ -226,7 +230,7 @@ public class HelmAppsService implements AppsService {
         service.setSubtitle(release.getChart());
         service.setType(Service.ServiceType.KUBERNETES);
         try {
-            String values = getHelmInstallService(region).getValues(release.getName(), release.getNamespace());
+            String values = getHelmInstallService().getValues(getHelmConfiguration(region,user),release.getName(), release.getNamespace());
             JsonNode node = new ObjectMapper().readTree(values);
             Map<String, String> result = new HashMap<>();
             node.fields().forEachRemaining(currentNode -> mapAppender(result, currentNode, new ArrayList<String>()));
@@ -248,8 +252,8 @@ public class HelmAppsService implements AppsService {
         }
     }
 
-    private Service getServiceFromRelease(Region region, HelmLs release, String manifest) {
-        KubernetesClient client = kubernetesClientProvider.getClientForRegion(region);
+    private Service getServiceFromRelease(Region region, HelmLs release, String manifest, User user) {
+        KubernetesClient client = kubernetesClientProvider.getUserClient(region,user);
         InputStream inputStream = new ByteArrayInputStream(manifest.getBytes(Charset.forName("UTF-8")));
         List<HasMetadata> hasMetadatas = client.load(inputStream).get();
         List<Ingress> ingresses = hasMetadatas.stream().filter(hasMetadata -> hasMetadata instanceof Ingress)

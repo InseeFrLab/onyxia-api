@@ -3,6 +3,9 @@ package fr.insee.onyxia.api.configuration.properties;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.model.region.Region;
+import fr.insee.onyxia.model.service.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -31,9 +34,22 @@ public class RegionsConfiguration {
     @Autowired
     private ObjectMapper mapper;
 
+    private static Logger LOGGER = LoggerFactory.getLogger(RegionsConfiguration.class);
+
     @PostConstruct
     public void load() throws Exception {
         resolvedRegions = Arrays.asList(mapper.readValue(regions, Region[].class));
+        resolvedRegions.forEach(region -> {
+            if (region.getServices().getType().equals(Service.ServiceType.KUBERNETES)) {
+                if (region.getServices().getAuthenticationMode().equals(Region.Services.AuthenticationMode.ADMIN)) {
+                    LOGGER.warn("Using admin authentication for region "+region.getId()+". This may cause a security risk.");
+                }
+
+                if (region.getServices().getAuthenticationMode().equals(Region.Services.AuthenticationMode.IMPERSONATE)) {
+                    LOGGER.info("Using impersonation authentication for region "+region.getId()+". Make sure you are using helm version 3.4.0+.");
+                }
+            }
+        });
     }
 
     public Optional<Region> getRegionById(String regionId) {
