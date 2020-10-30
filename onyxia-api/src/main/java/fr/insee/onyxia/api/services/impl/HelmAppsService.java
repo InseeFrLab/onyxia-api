@@ -30,6 +30,7 @@ import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
 import io.github.inseefrlab.helmwrapper.model.HelmLs;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService.MultipleServiceFound;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,7 +116,7 @@ public class HelmAppsService implements AppsService {
             @Override
             public String getExternalDns(String scopeName, XGeneratedContext.Scope scope, Property.XGenerated xGenerated) {
                 return urlGenerator.generateUrl(user.getIdep(), pkg.getName(),
-                        context.getGlobalContext().getRandomizedId(), "", region.getServices().getExpose().getDomain());
+                        context.getGlobalContext().getRandomizedId(), scopeName+(StringUtils.isNotBlank(xGenerated.getName()) ? "-"+xGenerated.getName() : ""), region.getServices().getExpose().getDomain());
             }
 
             @Override
