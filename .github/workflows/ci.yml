@@ -34,9 +34,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Download jar
+        id: download
         uses: actions/download-artifact@v2
         with:
           name: jar
+          path: onyxia-api/target
+      - name: "Echo download path"
+        run: echo ${{steps.download.outputs.download-path}}
       - name: Docker meta
         id: docker_meta
         uses: crazy-max/ghaction-docker-meta@v1.6.0
