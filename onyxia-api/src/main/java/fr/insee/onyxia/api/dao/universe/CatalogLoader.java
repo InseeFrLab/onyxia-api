@@ -57,7 +57,6 @@ public class CatalogLoader {
      */
     private void updateHelmRepository(CatalogWrapper cw) {
         try {
-            updateHelmRepo(cw);
             Reader reader = new InputStreamReader(resourceLoader.getResource(cw.getLocation()+"/index.yaml").getInputStream(),
                     "UTF-8");
             Repository repository = mapperHelm.readValue(reader, Repository.class);
@@ -73,12 +72,6 @@ public class CatalogLoader {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private void updateHelmRepo(CatalogWrapper cw) throws IOException, InterruptedException, TimeoutException {
-           logger.info(helmRepoService.addHelmRepo(cw.getLocation(),cw.getId()));
-            // Maybe not userfull add a repo automatically update ???
-            //helmService.repoUpdate();
     }
 
     private void refreshPackage(Pkg pkg) throws IOException {
