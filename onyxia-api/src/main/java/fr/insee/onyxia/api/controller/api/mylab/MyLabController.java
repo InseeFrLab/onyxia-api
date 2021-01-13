@@ -16,7 +16,6 @@ import fr.insee.onyxia.model.service.UninstallService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import mesosphere.marathon.client.MarathonException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,12 +87,12 @@ public class MyLabController {
 
     @PutMapping("/app")
     public Object publishService(@Parameter(hidden = true) Region region,@RequestBody CreateServiceDTO requestDTO)
-            throws JsonProcessingException, IOException, MarathonException, Exception {
+            throws JsonProcessingException, IOException, Exception {
         return publishApps(region, requestDTO);
     }
 
     private Collection<Object> publishApps(Region region, CreateServiceDTO requestDTO)
-            throws JsonProcessingException, IOException, MarathonException, Exception {
+            throws JsonProcessingException, IOException, Exception {
         String catalogId = "internal";
         if (requestDTO.getCatalogId() != null && requestDTO.getCatalogId().length() > 0) {
             catalogId = requestDTO.getCatalogId();
