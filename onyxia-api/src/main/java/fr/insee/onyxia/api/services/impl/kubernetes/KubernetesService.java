@@ -36,7 +36,7 @@ public class KubernetesService {
                 .withName("full_control_namespace").withNamespace(namespaceId).endMetadata()
                 .withSubjects(new SubjectBuilder().withKind(getSubjectKind(owner)).withName(username)
                         .withApiGroup("rbac.authorization.k8s.io").withNamespace(namespaceId).build())
-                .withNewRoleRef().withApiGroup("rbac.authorization.k8s.io").withKind("ClusterRole").withName("cluster-admin").endRoleRef();
+                .withNewRoleRef().withApiGroup("rbac.authorization.k8s.io").withKind("ClusterRole").withName("admin").endRoleRef();
 
         // TODO : create all in a single transaction if possible
         Namespace namespace = namespaceToCreate.done();
