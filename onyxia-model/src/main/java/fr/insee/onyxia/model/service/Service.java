@@ -176,7 +176,7 @@ public class Service {
     }
 
     public static enum ServiceType {
-        KUBERNETES,MARATHON
+        KUBERNETES
     }
 
     public static class Monitoring {

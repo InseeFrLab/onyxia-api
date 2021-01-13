@@ -1,42 +1,6 @@
 {
   "catalogs": [
     {
-      "id": "internal",
-      "name": "Internal",
-      "description": "Internal universe containing tools like the cloudshell",
-      "maintainer": "innovation@insee.fr",
-      "location": "classpath:universe-internal.json",
-      "status": "INTERNAL",
-      "type": "universe"
-    },
-    {
-      "id": "inseefrlab-datascience",
-      "name": "Datascience",
-      "description": "Services for datascientists. https://github.com/InseeFrLab/Universe-Datascience",
-      "maintainer": "innovation@insee.fr",
-      "location": "https://inseefrlab.github.io/Universe-Datascience/universe.json",
-      "status": "PROD",
-      "type": "universe"
-    },
-    {
-      "id": "inseefrlab-training",
-      "name": "Trainings",
-      "description": "Various trainings for datascientists. https://github.com/inseefrlab/universe-formations",
-      "maintainer": "innovation@insee.fr",
-      "location": "https://inseefrlab.github.io/Universe-Formations/universe.json ",
-      "status": "TEST",
-      "type": "universe"
-    },
-    {
-      "id": "inseefrlab-catalog-wip",
-      "name": "Datascience catalog WIP",
-      "description": "WIP for services for datascientists. https://github.com/InseeFrLab/Universe-Datascience branch Test",
-      "maintainer": "innovation@insee.fr",
-      "location": "https://inseefrlab.github.io/Universe-Datascience/universe-preview.json",
-      "status": "TEST",
-      "type": "universe"
-    },
-    {
       "id": "inseefrlab-helm-charts-datascience",
       "name": "Inseefrlab datascience",
       "description": "Services for datascientists. https://github.com/InseeFrLab/helm-charts-datascience",
