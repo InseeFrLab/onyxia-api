@@ -8,7 +8,6 @@ import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.Pkg;
-import fr.insee.onyxia.model.catalog.Universe;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
 import fr.insee.onyxia.model.dto.ServicesListing;
 import fr.insee.onyxia.model.region.Region;
