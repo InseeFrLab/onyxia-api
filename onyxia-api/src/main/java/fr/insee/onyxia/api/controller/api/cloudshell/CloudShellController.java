@@ -4,7 +4,6 @@ import fr.insee.onyxia.api.configuration.properties.RegionsConfiguration;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.api.services.UserProvider;
-import fr.insee.onyxia.api.services.impl.MarathonAppsService;
 import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.Service;
@@ -20,9 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @SecurityRequirement(name="auth")
 public class CloudShellController {
-
-	@Autowired
-	private MarathonAppsService marathonAppsService;
 
 	@Autowired
 	private AppsService helmAppsService;
@@ -44,9 +40,6 @@ public class CloudShellController {
 			Service service = null;
 			if (region.getServices().getType().equals(Service.ServiceType.KUBERNETES)) {
 				service = helmAppsService.getUserService(region, userProvider.getUser(),"cloudshell");
-			}
-			else {
-				service = marathonAppsService.getUserService(region, userProvider.getUser(),"cloudshell");
 			}
 			status.setStatus(CloudShellStatus.STATUS_UP);
 			service.getUrls().stream().findFirst().ifPresent(url -> status.setUrl(url));

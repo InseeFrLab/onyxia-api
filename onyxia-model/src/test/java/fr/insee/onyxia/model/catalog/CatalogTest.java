@@ -23,15 +23,6 @@ public class CatalogTest {
     private ResourceLoader resourceLoader;
 
     @Test
-    public void shouldReadUniverse() throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        InputStream inputStream = resourceLoader.getResource("classpath:universe.json").getInputStream();
-        Universe universe = mapper.readValue(inputStream, Universe.class);
-        assertEquals(1, universe.getPackages().size());
-    }
-
-    @Test
     public void shouldReadHelm() throws IOException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

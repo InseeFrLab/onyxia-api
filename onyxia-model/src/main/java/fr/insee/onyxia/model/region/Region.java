@@ -87,7 +87,6 @@ public class Region {
         private String namespacePrefix;
         private String usernamePrefix;
         private AuthenticationMode authenticationMode = AuthenticationMode.IMPERSONATE;
-        private String marathonDnsSuffix;
         private Expose expose;
         private Server server;
         private Monitoring monitoring;
@@ -132,14 +131,6 @@ public class Region {
 
         public void setUsernamePrefix(String usernamePrefix) {
             this.usernamePrefix = usernamePrefix;
-        }
-
-        public String getMarathonDnsSuffix() {
-            return marathonDnsSuffix;
-        }
-
-        public void setMarathonDnsSuffix(String marathonDnsSuffix) {
-            this.marathonDnsSuffix = marathonDnsSuffix;
         }
 
         public Expose getExpose() {

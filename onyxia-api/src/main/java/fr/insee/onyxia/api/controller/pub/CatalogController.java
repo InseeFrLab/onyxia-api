@@ -59,10 +59,6 @@ public class CatalogController {
          return true;
       }
 
-      if (catalog.getType().equalsIgnoreCase("UNIVERSE")) {
-         return region.getServices().getType().equals(Service.ServiceType.MARATHON);
-      }
-
       if (catalog.getType().equalsIgnoreCase("HELM")) {
          return region.getServices().getType().equals(Service.ServiceType.KUBERNETES);
       }

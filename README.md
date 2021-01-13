@@ -2,8 +2,8 @@
 
 This is the server part of the Onyxia datalab.  
 It interacts with your container orchestrator to deploy users services.  
-Onyxia supports both Mesos (using Marathon) and Kubernetes (using Helm).  
-Deployable services are listed and configured inside catalogs (Universe for Marathon, Helm charts for Helm).  
+Onyxia supports Kubernetes using Helm.  
+Deployable services are listed and configured inside catalogs.  
 Default catalogs are from InseeFrlab : [Universe datascience](https://github.com/InseeFrLab/Universe-Datascience) and [Inseefrlab helm charts](https://github.com/InseeFrLab/helm-charts) but more catalogs can be added.
 
 The opensourcing (and documentation) is still a work in progress, please be patient :)
@@ -66,19 +66,19 @@ Open id configuration
 Security configuration :
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
-| `security.cors.allowed_origins` |  | To indicate which origins are allowed by [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) |
+| `security.cors.allowed_origins` | | To indicate which origins are allowed by [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) |
 
 Regions configuration :
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
-| `regions` | see [onyxia-api/src/main/resources/regions.json](onyxia-api/src/main/resources/regions.json) | List of regions. Each region can be of type `KUBERNETES` or `MARATHON`. Mixing is supported. For `KUBERNETES`, `in-cluster` configuration is possible |
+| `regions` | see [onyxia-api/src/main/resources/regions.json](onyxia-api/src/main/resources/regions.json) | List of regions. |
 
-Catalogs configuration :  
+Catalogs configuration :
 
-| Key | Default | Description |
-| --------------------- | ------- | ------------------------------------------------------------------ |
-| `catalogs` | see [onyxia-api/src/main/resources/catalogs.json](onyxia-api/src/main/resources/catalogs.json) | List of catalogs. Each catalog can be of type `universe` or `helm`. Mixing is supported. If there is no region of corresponding type then the catalog will be ignored |
-| `catalogs.refresh.ms` | `300000` (5 minutes) | The rate at which the catalogs should be refreshed. `<= 0` means no refreshs after initial loading |
+| Key                   | Default                                                                                        | Description                                                                                                                                                           |
+| --------------------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `catalogs`            | see [onyxia-api/src/main/resources/catalogs.json](onyxia-api/src/main/resources/catalogs.json) | List of catalogs. Each catalog can be of type `universe` or `helm`. Mixing is supported. If there is no region of corresponding type then the catalog will be ignored |
+| `catalogs.refresh.ms` | `300000` (5 minutes)                                                                           | The rate at which the catalogs should be refreshed. `<= 0` means no refreshs after initial loading                                                                    |
 
 HTTP configuration  
 | Key | Default | Description |

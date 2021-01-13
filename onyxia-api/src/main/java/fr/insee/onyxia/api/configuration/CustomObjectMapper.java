@@ -7,10 +7,6 @@ import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import mesosphere.marathon.client.model.v2.ExternalVolume;
-import mesosphere.marathon.client.model.v2.LocalVolume;
-import mesosphere.marathon.client.model.v2.PersistentLocalVolume;
-import mesosphere.marathon.client.model.v2.Volume;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,10 +22,6 @@ public class CustomObjectMapper {
    public ObjectMapper objectMapper() {
        ObjectMapper mapper = new ObjectMapper();
        commonConfiguration(mapper);
-       SimpleModule module = new SimpleModule();
-       module.addDeserializer(Volume.class, new ItemDeserializer(mapper));
-       mapper.registerModule(module);
-
        return mapper;
    }
 
@@ -49,32 +41,5 @@ public class CustomObjectMapper {
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         mapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
         mapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
-    }
-
-    public class ItemDeserializer extends StdDeserializer<Volume> {
-
-       ObjectMapper mapper;
-
-        public ItemDeserializer(ObjectMapper mapper) {
-            this(mapper,null);
-        }
-
-        public ItemDeserializer(ObjectMapper mapper, Class<?> vc) {
-            super(vc);
-            this.mapper = mapper;
-        }
-
-        @Override
-        public Volume deserialize(JsonParser jp, DeserializationContext ctxt)
-                throws IOException, JsonProcessingException {
-            JsonNode node = jp.getCodec().readTree(jp);
-            if (node != null && node.has("external")) {
-                return mapper.treeToValue(node, ExternalVolume.class);
-            }
-            if (node != null && node.has("persistent")) {
-                return mapper.treeToValue(node, PersistentLocalVolume.class);
-            }
-            return mapper.treeToValue(node, LocalVolume.class);
-        }
     }
 }

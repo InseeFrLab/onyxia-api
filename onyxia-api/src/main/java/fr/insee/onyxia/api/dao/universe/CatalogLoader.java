@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.model.catalog.Config.Config;
 import fr.insee.onyxia.model.catalog.Pkg;
-import fr.insee.onyxia.model.catalog.Universe;
 import fr.insee.onyxia.model.helm.Chart;
 import fr.insee.onyxia.model.helm.Repository;
 import io.github.inseefrlab.helmwrapper.service.HelmRepoService;
@@ -47,26 +46,9 @@ public class CatalogLoader {
     public void updateCatalog(CatalogWrapper cw) {
         logger.info("updating catalog with id :" + cw.getId() + " and type " + cw.getType());
         switch (cw.getType()) {
-            case Universe.TYPE_UNIVERSE:
-                updateUniverse(cw);
-                break;
             case Repository.TYPE_HELM:
                 updateHelmRepository(cw);
                 break;
-        }
-    }
-
-    /**
-     * TODO : move this universe specific logic somewhere else ?
-     */
-    private void updateUniverse(CatalogWrapper cw) {
-        try {
-            Reader reader = new InputStreamReader(resourceLoader.getResource(cw.getLocation()).getInputStream(),
-                    "UTF-8");
-            cw.setCatalog(mapper.readValue(reader, Universe.class));
-            cw.setLastUpdateTime(System.currentTimeMillis());
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
