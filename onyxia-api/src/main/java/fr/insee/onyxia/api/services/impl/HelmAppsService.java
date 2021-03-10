@@ -259,11 +259,6 @@ public class HelmAppsService implements AppsService {
         List<HasMetadata> hasMetadatas = client.load(inputStream).get();
         List<Ingress> ingresses = hasMetadatas.stream().filter(hasMetadata -> hasMetadata instanceof Ingress)
                 .map(hasMetadata -> (Ingress) hasMetadata).collect(Collectors.toList());
-        // List<Service> services = hasMetadatas.stream().filter(hasMetadata ->
-        // hasMetadata instanceof Service).map(hasMetadata -> (Service)
-        // hasMetadata).collect(Collectors.toList());
-        List<Deployment> deployments = hasMetadatas.stream().filter(hasMetadata -> hasMetadata instanceof Deployment)
-                .map(hasMetadata -> (Deployment) hasMetadata).collect(Collectors.toList());
         Service service = new Service();
         List<String> urls = new ArrayList<>();
         for (Ingress ingress : ingresses) {
@@ -278,22 +273,9 @@ public class HelmAppsService implements AppsService {
             urls.addAll(listHost);
         }
         service.setUrls(urls);
-        Map<String, String> labels = deployments.get(0).getMetadata().getLabels();
-        service.setLogo(labels.get("ONYXIA_LOGO"));
-        service.setLabels(labels);
-        Map<String, Quantity> resources = deployments.get(0).getSpec().getTemplate().getSpec().getContainers().get(0)
-                .getResources().getLimits();
-        if (resources != null) {
 
-            if (resources.containsKey("memory")) {
-                service.setMem(Integer.valueOf(resources.get("memory").getAmount()));
-            }
 
-            if (resources.containsKey("cpu")) {
-                service.setCpus(Integer.valueOf(resources.get("cpu").getAmount()));
-            }
-        }
-        service.setInstances(deployments.get(0).getSpec().getReplicas());
+        service.setInstances(1);
 
         service.setTasks(client.pods().inNamespace(release.getNamespace()).withLabel("app.kubernetes.io/instance", release.getName()).list().getItems().stream().map(pod -> {
             Task task = new Task();

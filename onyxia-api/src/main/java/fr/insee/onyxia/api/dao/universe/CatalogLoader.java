@@ -95,7 +95,7 @@ public class CatalogLoader {
             TarArchiveEntry entry;
 
             while ((entry = tarIn.getNextTarEntry()) != null) {
-                if (entry.getName().endsWith("values.schema.json")) {
+                if (entry.getName().endsWith(chart.getName()+"/values.schema.json")) {
                     // TODO : mutualize objectmapper
                     ObjectMapper mapper = new ObjectMapper();
                     mapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, false);
