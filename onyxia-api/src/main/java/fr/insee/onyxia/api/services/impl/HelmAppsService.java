@@ -142,7 +142,7 @@ public class HelmAppsService implements AppsService {
         }
         File values = File.createTempFile("values", ".yaml");
         mapperHelm.writeValue(values, fusion);
-        String namespaceId = determineNamespace(region, region.getServices().getNamespacePrefix(), user);
+        String namespaceId = determineNamespace(region, user);
         String name = isCloudshell ? "cloudshell" : null;
         HelmInstaller res = getHelmInstallService().installChart(getHelmConfiguration(region,user),catalogId + "/" + pkg.getName(), namespaceId, name, requestDTO.isDryRun(),
                 values,null);
@@ -180,7 +180,7 @@ public class HelmAppsService implements AppsService {
     @Override
     public String getLogs(Region region,User user, String serviceId, String taskId) {
         KubernetesClient client = kubernetesClientProvider.getUserClient(region,user);
-        return client.pods().inNamespace(determineNamespace(region, region.getServices().getNamespacePrefix(),user)).withName(taskId).getLog();
+        return client.pods().inNamespace(determineNamespace(region,user)).withName(taskId).getLog();
     }
 
     @Override
@@ -188,13 +188,13 @@ public class HelmAppsService implements AppsService {
         if (serviceId.startsWith("/")) {
             serviceId = serviceId.substring(1);
         }
-        HelmLs result = getHelmInstallService().getAppById(getHelmConfiguration(region,user),serviceId, determineNamespace(region, region.getServices().getNamespacePrefix(),user));
+        HelmLs result = getHelmInstallService().getAppById(getHelmConfiguration(region,user),serviceId, determineNamespace(region,user));
         return getHelmApp(region,user,result);
     }
 
     @Override
     public UninstallService destroyService(Region region, User user, final String path, boolean bulk) throws Exception {
-        final String namespace = determineNamespace(region, region.getServices().getNamespacePrefix(), user);
+        final String namespace = determineNamespace(region, user);
         UninstallService result = new UninstallService();
         result.setPath(path);
         int status = 0;
@@ -307,17 +307,11 @@ public class HelmAppsService implements AppsService {
     }
 
     @NotNull
-    private String determineNamespace(Region region, String namespacePrefix,User user) {
+    private String determineNamespace(Region region, User user) {
         KubernetesService.Owner owner = new KubernetesService.Owner();
         owner.setId(user.getIdep());
         owner.setType(KubernetesService.Owner.OwnerType.USER);
-        String namespaceId = namespacePrefix + owner.getId();
-        // If namespace is not present, create it
-        if (kubernetesService.getNamespaces(region, owner).stream()
-                .filter(namespace -> namespace.getMetadata().getName().equalsIgnoreCase(namespaceId)).count() == 0) {
-            kubernetesService.createNamespace(region, namespaceId, owner);
-        }
-        return namespaceId;
+        return kubernetesService.createDefaultNamespace(region, owner);
     }
 
     private Service.ServiceStatus findAppStatus(HelmLs release) {

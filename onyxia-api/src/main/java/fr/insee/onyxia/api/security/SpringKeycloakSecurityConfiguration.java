@@ -30,6 +30,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 public class SpringKeycloakSecurityConfiguration {
    
@@ -54,7 +55,9 @@ public class SpringKeycloakSecurityConfiguration {
       public UserProvider getUserProvider() {
          return () -> {
             AccessToken token = getAccessToken();
+            List<String> groups = (List<String>) token.getOtherClaims().get("groups");
             User user = User.newInstance()
+                    .addGroups(groups)
             .setEmail(token.getEmail())
             .setNomComplet(token.getName())
             .setIdep(token.getPreferredUsername())

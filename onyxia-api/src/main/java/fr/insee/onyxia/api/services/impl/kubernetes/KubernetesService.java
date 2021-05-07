@@ -20,14 +20,43 @@ public class KubernetesService {
     @Autowired
     private KubernetesClientProvider kubernetesClientProvider;
 
-    public void createNamespace(Region region, String namespaceId, Owner owner) {
+    public String createDefaultNamespace(Region region, Owner owner) {
+        String namespaceId = getDefaultNamespace(region, owner);
+        return createNamespace(region, namespaceId, owner);
+    }
+
+    private String getNameFromOwner(Region region, Owner owner) {
         String username = owner.getId();
         if (owner.getType() == Owner.OwnerType.USER && region.getServices().getUsernamePrefix() != null) {
             username = region.getServices().getUsernamePrefix()+username;
         }
+        else if (owner.getType() == Owner.OwnerType.GROUP && region.getServices().getGroupPrefix() != null){
+            username = region.getServices().getGroupPrefix()+username;
+        }
+        return username;
+    }
+
+    private String getDefaultNamespace(Region region, Owner owner) {
+        if (owner.getType() == Owner.OwnerType.USER) {
+            return region.getServices().getNamespacePrefix()+owner.getId();
+        }
+        else {
+            return region.getServices().getGroupNamespacePrefix()+owner.getId();
+        }
+    }
+
+    private String createNamespace(Region region, String namespaceId, Owner owner) {
+        String name = getNameFromOwner(region, owner);
+
         // Label onyxia_owner is not resilient if the user has "namespace admin" role scoped to his namespace
         // as it this rolebinding allows him to modify onyxia_owner metadata
         KubernetesClient kubClient = kubernetesClientProvider.getRootClient(region);
+
+        if (getNamespaces(region, owner).stream()
+                .filter(namespace -> namespace.getMetadata().getName().equalsIgnoreCase(namespaceId)).count() != 0) {
+            return namespaceId;
+        }
+
         Namespace namespaceToCreate = kubClient.namespaces().create(new NamespaceBuilder().withNewMetadata().withName(namespaceId)
                 .addToLabels("onyxia_owner", owner.getId()).endMetadata().build());
 
@@ -35,11 +64,11 @@ public class KubernetesService {
                 .withNewMetadata()
                 .withLabels(Map.of("createdby","onyxia"))
                 .withName("full_control_namespace").withNamespace(namespaceId).endMetadata()
-                .withSubjects(new SubjectBuilder().withKind(getSubjectKind(owner)).withName(username)
+                .withSubjects(new SubjectBuilder().withKind(getSubjectKind(owner)).withName(name)
                         .withApiGroup("rbac.authorization.k8s.io").withNamespace(namespaceId).build())
                 .withNewRoleRef().withApiGroup("rbac.authorization.k8s.io").withKind("ClusterRole").withName("admin").endRoleRef().build());
 
-        // TODO : create all in a single transaction if possible
+        return namespaceId;
     }
 
     public List<Namespace> getNamespaces(Region region, Owner owner) {

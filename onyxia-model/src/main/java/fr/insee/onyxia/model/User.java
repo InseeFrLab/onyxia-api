@@ -1,6 +1,8 @@
 package fr.insee.onyxia.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class User implements Serializable {
    
@@ -11,6 +13,7 @@ public class User implements Serializable {
 	String sshPublicKey;
 	String password;
 	String ip;
+	List<String> groups = new ArrayList<>();
 
 	@Override
 	public int hashCode() {
@@ -90,7 +93,15 @@ public class User implements Serializable {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
+
+	public List<String> getGroups() {
+		return groups;
+	}
+
+	public void setGroups(List<String> groups) {
+		this.groups = groups;
+	}
+
 	public static Builder newInstance() {
 		return new Builder();
 	}
@@ -134,6 +145,16 @@ public class User implements Serializable {
 
 		public Builder setPassword(String password) {
 			u.password = password;
+			return this;
+		}
+
+		public Builder addGroup(String group) {
+			u.groups.add(group);
+			return this;
+		}
+
+		public Builder addGroups(List<String> groups) {
+			u.groups.addAll(groups);
 			return this;
 		}
 	}
