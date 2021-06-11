@@ -94,6 +94,19 @@ public class HelmInstallService {
         return "";
     }
 
+    public String getNotes(HelmConfiguration configuration, String id, String namespace) {
+        try {
+            return Command.executeAndGetResponseAsRaw(configuration,"helm get notes " + id + " --namespace " + namespace).getOutput().getString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
     private String buildEnvVar(Map<String, String> env) {
         if (env != null) {
             Set<String> envKeys = env.keySet();
