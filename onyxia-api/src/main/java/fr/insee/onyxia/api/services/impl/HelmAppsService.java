@@ -238,8 +238,8 @@ public class HelmAppsService implements AppsService {
             e.printStackTrace();
         }
         try {
-            String values = getHelmInstallService().getNotes(getHelmConfiguration(region,user),release.getName(), release.getNamespace());
-            service.setPostInstallInstructions(values);
+            String notes = getHelmInstallService().getNotes(getHelmConfiguration(region,user),release.getName(), release.getNamespace());
+            service.setPostInstallInstructions(notes);
         } catch (Exception e) {
             e.printStackTrace();
         }
