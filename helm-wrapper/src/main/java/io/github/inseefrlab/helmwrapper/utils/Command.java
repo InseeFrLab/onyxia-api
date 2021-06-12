@@ -46,6 +46,16 @@ public class Command {
         return executeAndGetResponseAsJson(null, command);
     }
 
+    public static ProcessResult executeAndGetResponseAsRaw(HelmConfiguration helmConfiguration, String command)
+            throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
+        return getProcessExecutor().environment(getEnv(helmConfiguration)).commandSplit(addConfigToCommand(command,helmConfiguration)).execute();
+    }
+
+    public static ProcessResult executeAndGetResponseAsRaw(String command)
+            throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
+        return executeAndGetResponseAsRaw(null, command);
+    }
+
     public static ProcessResult execute(HelmConfiguration helmConfiguration, String command)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
         return getProcessExecutor().environment(getEnv(helmConfiguration)).commandSplit(addConfigToCommand(command, helmConfiguration)).execute();
