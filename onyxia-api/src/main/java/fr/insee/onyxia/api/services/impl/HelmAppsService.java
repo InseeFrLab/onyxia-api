@@ -144,6 +144,9 @@ public class HelmAppsService implements AppsService {
         mapperHelm.writeValue(values, fusion);
         String namespaceId = determineNamespace(region, region.getServices().getNamespacePrefix(), user);
         String name = isCloudshell ? "cloudshell" : null;
+        if (name==null){
+            name = requestDTO.getName();
+        }
         HelmInstaller res = getHelmInstallService().installChart(getHelmConfiguration(region,user),catalogId + "/" + pkg.getName(), namespaceId, name, requestDTO.isDryRun(),
                 values,null);
         values.delete();

@@ -7,6 +7,7 @@ public class CreateServiceDTO {
 	String catalogId;
 	String packageName;
 	String packageVersion;
+	String name;
 	Object options;
 	boolean dryRun = false;
 
@@ -32,6 +33,14 @@ public class CreateServiceDTO {
 
 	public void setPackageVersion(String packageVersion) {
 		this.packageVersion = packageVersion;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public Object getOptions() {
