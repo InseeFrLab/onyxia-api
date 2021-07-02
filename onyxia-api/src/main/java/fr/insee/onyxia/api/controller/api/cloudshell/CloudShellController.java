@@ -5,6 +5,7 @@ import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.model.catalog.Pkg;
+import fr.insee.onyxia.model.project.Project;
 import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.Service;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -33,13 +34,13 @@ public class CloudShellController {
 	private RegionsConfiguration regionsConfiguration;
 
 	@GetMapping
-	public CloudShellStatus getCloudShellStatus(Region region) {
+	public CloudShellStatus getCloudShellStatus(Region region, Project project) {
 		CloudShellStatus status = new CloudShellStatus();
 		Region.CloudshellConfiguration cloudshellConfiguration = region.getServices().getCloudshell();
 		try {
 			Service service = null;
 			if (region.getServices().getType().equals(Service.ServiceType.KUBERNETES)) {
-				service = helmAppsService.getUserService(region, userProvider.getUser(),"cloudshell");
+				service = helmAppsService.getUserService(region, project, userProvider.getUser(),"cloudshell");
 			}
 			status.setStatus(CloudShellStatus.STATUS_UP);
 			service.getUrls().stream().findFirst().ifPresent(url -> status.setUrl(url));
