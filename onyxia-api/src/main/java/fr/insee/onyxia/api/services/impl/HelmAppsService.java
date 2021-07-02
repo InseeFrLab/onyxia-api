@@ -17,6 +17,7 @@ import fr.insee.onyxia.model.catalog.Config.Property;
 import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
 import fr.insee.onyxia.model.dto.ServicesListing;
+import fr.insee.onyxia.model.project.Project;
 import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.*;
 import io.fabric8.kubernetes.api.model.EventList;
@@ -89,8 +90,8 @@ public class HelmAppsService implements AppsService {
     }
 
     @Override
-    public Collection<Object> installApp(Region region,CreateServiceDTO requestDTO, String catalogId, Pkg pkg,
-            User user, Map<String, Object> fusion) throws IOException, TimeoutException, InterruptedException {
+    public Collection<Object> installApp(Region region, Project project, CreateServiceDTO requestDTO, String catalogId, Pkg pkg,
+                                         User user, Map<String, Object> fusion) throws IOException, TimeoutException, InterruptedException {
         Region.CloudshellConfiguration cloudshellConfiguration = region.getServices().getCloudshell();
         boolean isCloudshell =false;
         if (cloudshellConfiguration != null && catalogId.equals(cloudshellConfiguration.getCatalogId()) && pkg.getName().equals(cloudshellConfiguration.getPackageName())) {
@@ -142,7 +143,7 @@ public class HelmAppsService implements AppsService {
         }
         File values = File.createTempFile("values", ".yaml");
         mapperHelm.writeValue(values, fusion);
-        String namespaceId = determineNamespace(region, user);
+        String namespaceId = determineNamespace(region,project, user);
         String name = isCloudshell ? "cloudshell" : null;
         if (name==null){
             name = requestDTO.getName();
@@ -154,12 +155,12 @@ public class HelmAppsService implements AppsService {
     }
 
     @Override
-    public CompletableFuture<ServicesListing> getUserServices(Region region,User user) throws IOException, IllegalAccessException {
-        return getUserServices(region, user, null);
+    public CompletableFuture<ServicesListing> getUserServices(Region region,Project project,User user) throws IOException, IllegalAccessException {
+        return getUserServices(region, project, user, null);
     }
 
     @Override
-    public CompletableFuture<ServicesListing> getUserServices(Region region,User user, String groupId)
+    public CompletableFuture<ServicesListing> getUserServices(Region region,Project project,User user, String groupId)
             throws IOException, IllegalAccessException {
         if (groupId != null) {
             LOGGER.debug("STUB : group listing is currently not supported on helm");
@@ -167,7 +168,7 @@ public class HelmAppsService implements AppsService {
         }
         List<HelmLs> installedCharts = null;
         try {
-            installedCharts = Arrays.asList(getHelmInstallService().listChartInstall(getHelmConfiguration(region,user),region.getServices().getNamespacePrefix() + user.getIdep()));
+            installedCharts = Arrays.asList(getHelmInstallService().listChartInstall(getHelmConfiguration(region,user),project.getNamespace()));
         } catch (Exception e) {
             return CompletableFuture.completedFuture(new ServicesListing());
         }
@@ -181,23 +182,23 @@ public class HelmAppsService implements AppsService {
     }
 
     @Override
-    public String getLogs(Region region,User user, String serviceId, String taskId) {
+    public String getLogs(Region region,Project project,User user, String serviceId, String taskId) {
         KubernetesClient client = kubernetesClientProvider.getUserClient(region,user);
-        return client.pods().inNamespace(determineNamespace(region,user)).withName(taskId).getLog();
+        return client.pods().inNamespace(determineNamespace(region,project,user)).withName(taskId).getLog();
     }
 
     @Override
-    public Service getUserService(Region region, User user, String serviceId) throws MultipleServiceFound, ParseException {
+    public Service getUserService(Region region, Project project,User user, String serviceId) throws MultipleServiceFound, ParseException {
         if (serviceId.startsWith("/")) {
             serviceId = serviceId.substring(1);
         }
-        HelmLs result = getHelmInstallService().getAppById(getHelmConfiguration(region,user),serviceId, determineNamespace(region,user));
+        HelmLs result = getHelmInstallService().getAppById(getHelmConfiguration(region,user),serviceId, determineNamespace(region,project, user));
         return getHelmApp(region,user,result);
     }
 
     @Override
-    public UninstallService destroyService(Region region, User user, final String path, boolean bulk) throws Exception {
-        final String namespace = determineNamespace(region, user);
+    public UninstallService destroyService(Region region,Project project, User user, final String path, boolean bulk) throws Exception {
+        final String namespace = determineNamespace(region, project, user);
         UninstallService result = new UninstallService();
         result.setPath(path);
         int status = 0;
@@ -315,11 +316,16 @@ public class HelmAppsService implements AppsService {
     }
 
     @NotNull
-    private String determineNamespace(Region region, User user) {
+    private String determineNamespace(Region region,Project project, User user) {
+        if (project.getGroup() != null) {
+            // For groups, onboarding is done separatly
+            return project.getNamespace();
+        }
+        // TODO : in the future, user onboarding may be done separatly as well
         KubernetesService.Owner owner = new KubernetesService.Owner();
         owner.setId(user.getIdep());
         owner.setType(KubernetesService.Owner.OwnerType.USER);
-        return kubernetesService.createDefaultNamespace(region, owner);
+        return kubernetesService.createNamespace(region, project.getNamespace(), owner);
     }
 
     private Service.ServiceStatus findAppStatus(HelmLs release) {

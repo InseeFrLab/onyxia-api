@@ -25,27 +25,7 @@ public class KubernetesService {
         return createNamespace(region, namespaceId, owner);
     }
 
-    private String getNameFromOwner(Region region, Owner owner) {
-        String username = owner.getId();
-        if (owner.getType() == Owner.OwnerType.USER && region.getServices().getUsernamePrefix() != null) {
-            username = region.getServices().getUsernamePrefix()+username;
-        }
-        else if (owner.getType() == Owner.OwnerType.GROUP && region.getServices().getGroupPrefix() != null){
-            username = region.getServices().getGroupPrefix()+username;
-        }
-        return username;
-    }
-
-    private String getDefaultNamespace(Region region, Owner owner) {
-        if (owner.getType() == Owner.OwnerType.USER) {
-            return region.getServices().getNamespacePrefix()+owner.getId();
-        }
-        else {
-            return region.getServices().getGroupNamespacePrefix()+owner.getId();
-        }
-    }
-
-    private String createNamespace(Region region, String namespaceId, Owner owner) {
+    public String createNamespace(Region region, String namespaceId, Owner owner) {
         String name = getNameFromOwner(region, owner);
 
         // Label onyxia_owner is not resilient if the user has "namespace admin" role scoped to his namespace
@@ -70,6 +50,28 @@ public class KubernetesService {
 
         return namespaceId;
     }
+
+    private String getNameFromOwner(Region region, Owner owner) {
+        String username = owner.getId();
+        if (owner.getType() == Owner.OwnerType.USER && region.getServices().getUsernamePrefix() != null) {
+            username = region.getServices().getUsernamePrefix()+username;
+        }
+        else if (owner.getType() == Owner.OwnerType.GROUP && region.getServices().getGroupPrefix() != null){
+            username = region.getServices().getGroupPrefix()+username;
+        }
+        return username;
+    }
+
+    private String getDefaultNamespace(Region region, Owner owner) {
+        if (owner.getType() == Owner.OwnerType.USER) {
+            return region.getServices().getNamespacePrefix()+owner.getId();
+        }
+        else {
+            return region.getServices().getGroupNamespacePrefix()+owner.getId();
+        }
+    }
+
+
 
     public List<Namespace> getNamespaces(Region region, Owner owner) {
         KubernetesClient kubClient = kubernetesClientProvider.getRootClient(region);

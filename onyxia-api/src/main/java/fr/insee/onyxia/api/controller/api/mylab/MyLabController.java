@@ -10,6 +10,7 @@ import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
 import fr.insee.onyxia.model.dto.ServicesListing;
+import fr.insee.onyxia.model.project.Project;
 import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.Service;
 import fr.insee.onyxia.model.service.UninstallService;
@@ -45,12 +46,12 @@ public class MyLabController {
     private final Logger logger = LoggerFactory.getLogger(MyLabController.class);
 
     @GetMapping("/services")
-    public ServicesListing getMyServices(@Parameter(hidden = true) Region region, @RequestParam(required = false) String groupId) throws Exception {
+    public ServicesListing getMyServices(@Parameter(hidden = true) Region region, @Parameter(hidden=true) Project project, @RequestParam(required = false) String groupId) throws Exception {
         User user = userProvider.getUser();
         ServicesListing dto = new ServicesListing();
         List<CompletableFuture<ServicesListing>> futures = new ArrayList<>();
         if (region.getServices().getType().equals(Service.ServiceType.KUBERNETES)) {
-            futures.add(helmAppsService.getUserServices(region,user,groupId));
+            futures.add(helmAppsService.getUserServices(region,project,user,groupId));
         }
         for (var future : futures) {
             ServicesListing listing = future.get();
@@ -61,37 +62,37 @@ public class MyLabController {
     }
 
     @GetMapping("/app")
-    public @ResponseBody Service getApp(@Parameter(hidden = true) Region region,@RequestParam("serviceId") String serviceId) throws Exception {
+    public @ResponseBody Service getApp(@Parameter(hidden = true) Region region,@Parameter(hidden=true) Project project, @RequestParam("serviceId") String serviceId) throws Exception {
         if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
-            return helmAppsService.getUserService(region,userProvider.getUser(), serviceId);
+            return helmAppsService.getUserService(region,project,userProvider.getUser(), serviceId);
         }
         return null;
     }
 
     @GetMapping("/app/logs")
-    public @ResponseBody String getLogs( @Parameter(hidden = true) Region region, @RequestParam("serviceId") String serviceId,
+    public @ResponseBody String getLogs( @Parameter(hidden = true) Region region, @Parameter(hidden=true) Project project, @RequestParam("serviceId") String serviceId,
                                         @RequestParam("taskId") String taskId) throws Exception {
         if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
-            return helmAppsService.getLogs(region, userProvider.getUser(),serviceId, taskId);
+            return helmAppsService.getLogs(region, project,userProvider.getUser(),serviceId, taskId);
         }
         return null;
     }
 
     @DeleteMapping("/app")
-    public UninstallService destroyApp(@Parameter(hidden = true) Region region,@RequestParam(value = "path", required = false) String path,@RequestParam(value = "bulk", required = false) boolean bulk) throws Exception {
+    public UninstallService destroyApp(@Parameter(hidden = true) Region region, @Parameter(hidden=true) Project project, @RequestParam(value = "path", required = false) String path,@RequestParam(value = "bulk", required = false) boolean bulk) throws Exception {
         if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
-            return helmAppsService.destroyService(region, userProvider.getUser(), path, bulk);
+            return helmAppsService.destroyService(region, project, userProvider.getUser(), path, bulk);
         }
         return null;
     }
 
     @PutMapping("/app")
-    public Object publishService(@Parameter(hidden = true) Region region,@RequestBody CreateServiceDTO requestDTO)
+    public Object publishService(@Parameter(hidden = true) Region region, @Parameter(hidden=true) Project project,@RequestBody CreateServiceDTO requestDTO)
             throws JsonProcessingException, IOException, Exception {
-        return publishApps(region, requestDTO);
+        return publishApps(region, project, requestDTO);
     }
 
-    private Collection<Object> publishApps(Region region, CreateServiceDTO requestDTO)
+    private Collection<Object> publishApps(Region region, Project project, CreateServiceDTO requestDTO)
             throws JsonProcessingException, IOException, Exception {
         String catalogId = "internal";
         if (requestDTO.getCatalogId() != null && requestDTO.getCatalogId().length() > 0) {
@@ -102,7 +103,7 @@ public class MyLabController {
         User user = userProvider.getUser();
         Map<String, Object> fusion = new HashMap<>();
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
-        return helmAppsService.installApp(region,requestDTO, catalogId, pkg, user, fusion);
+        return helmAppsService.installApp(region,project,requestDTO, catalogId, pkg, user, fusion);
     }
 
 

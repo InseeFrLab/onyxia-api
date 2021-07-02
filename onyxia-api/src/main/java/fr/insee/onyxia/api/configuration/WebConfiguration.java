@@ -1,5 +1,6 @@
 package fr.insee.onyxia.api.configuration;
 
+import fr.insee.onyxia.api.controller.api.utils.ProjectResolver;
 import fr.insee.onyxia.api.controller.api.utils.RegionResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -14,9 +15,13 @@ public class WebConfiguration implements WebMvcConfigurer {
     @Autowired
     RegionResolver regionResolver;
 
+    @Autowired
+    ProjectResolver projectResolver;
+
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
         argumentResolvers.add(regionResolver);
+        argumentResolvers.add(projectResolver);
     }
 
 }
