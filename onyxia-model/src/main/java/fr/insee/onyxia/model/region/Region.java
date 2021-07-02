@@ -1,6 +1,5 @@
 package fr.insee.onyxia.model.region;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.insee.onyxia.model.service.Service;
@@ -84,8 +83,10 @@ public class Region {
         private Service.ServiceType type;
         private boolean defaultIpProtection;
         private String network;
-        private String namespacePrefix;
+        private String namespacePrefix = "user-";
+        private String groupNamespacePrefix = "projet-";
         private String usernamePrefix;
+        private String groupPrefix;
         private AuthenticationMode authenticationMode = AuthenticationMode.IMPERSONATE;
         private Expose expose;
         private Server server;
@@ -179,6 +180,22 @@ public class Region {
 
         public void setAuthenticationMode(AuthenticationMode authenticationMode) {
             this.authenticationMode = authenticationMode;
+        }
+
+        public void setGroupNamespacePrefix(String groupNamespacePrefix) {
+            this.groupNamespacePrefix = groupNamespacePrefix;
+        }
+
+        public String getGroupNamespacePrefix() {
+            return groupNamespacePrefix;
+        }
+
+        public void setGroupPrefix(String groupPrefix) {
+            this.groupPrefix = groupPrefix;
+        }
+
+        public String getGroupPrefix() {
+            return groupPrefix;
         }
     }
 
