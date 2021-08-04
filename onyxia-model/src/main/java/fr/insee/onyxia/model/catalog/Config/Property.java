@@ -19,7 +19,7 @@ public class Property {
     int sliderMin;
     int sliderMax;
     int sliderStep;
-    int sliderUnit;
+    String sliderUnit;
     SliderRef sliderRef;
     Hidden hidden;
 
