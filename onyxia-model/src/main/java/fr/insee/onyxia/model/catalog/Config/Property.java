@@ -185,7 +185,7 @@ public class Property {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class SliderRed {
+    public static class SliderRef {
         String sliderId;
         String sliderPos;
 
@@ -227,7 +227,7 @@ public class Property {
             this.path = path;
         }
     }
-    
+
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class XForm {
 
