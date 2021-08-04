@@ -107,11 +107,11 @@ public class Property {
     }
 
 
-    public int getSliderUnit() {
+    public String getSliderUnit() {
         return sliderUnit;
     }
 
-    public void setSliderUnit(int sliderUnit) {
+    public void setSliderUnit(String sliderUnit) {
         this.sliderUnit = sliderUnit;
     }
 
