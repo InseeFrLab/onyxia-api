@@ -15,6 +15,14 @@ public class Property {
     Object defaut;
     Media media;
     String minimum;
+    String render;
+    String sliderMin;
+    String sliderMax;
+    String sliderStep;
+    String sliderUnit;
+    SliderRef sliderRef;
+    Hidden hidden;
+
     @JsonProperty("enum")
     Object enumeration;
     Map<String, Property> properties;
@@ -63,6 +71,64 @@ public class Property {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getRender() {
+        return render;
+    }
+
+    public void setRender(String render) {
+        this.render = render;
+    }
+
+    public String getSliderMin() {
+        return sliderMin;
+    }
+
+    public void setSliderMin(String sliderMin) {
+        this.sliderMin = sliderMin;
+    }
+
+    public String getSliderMax() {
+        return sliderMax;
+    }
+
+    public void setSliderMax(String sliderMax) {
+        this.sliderMax = sliderMax;
+    }
+
+
+    public String getSliderStep() {
+        return sliderStep;
+    }
+
+    public void setSliderStep(String sliderStep) {
+        this.sliderStep = sliderStep;
+    }
+
+
+    public String getSliderUnit() {
+        return sliderUnit;
+    }
+
+    public void setSliderUnit(String sliderUnit) {
+        this.sliderUnit = sliderUnit;
+    }
+
+    public SliderRef getSliderRef() {
+        return sliderRef;
+    }
+
+    public void setSliderRef(SliderRef sliderRef) {
+        this.sliderRef = sliderRef;
+    }
+
+    public Hidden getHidden() {
+        return hidden;
+    }
+
+    public void setHidden(Hidden hidden) {
+        this.hidden = hidden;
     }
 
     public Media getMedia() {
@@ -118,6 +184,50 @@ public class Property {
         }
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class SliderRed {
+        String sliderId;
+        String sliderPos;
+
+        public String getSliderId() {
+            return sliderId;
+        }
+
+        public void setSliderId(String sliderId) {
+            this.sliderId = sliderId;
+        }
+
+        public String getSliderPos() {
+            return sliderPos;
+        }
+
+        public void setSliderPos(String sliderPos) {
+            this.sliderPos = sliderPos;
+        }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class Hidden {
+        String value;
+        String path;
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        public String getPath() {
+            return path;
+        }
+
+        public void setPath(String path) {
+            this.path = path;
+        }
+    }
+    
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class XForm {
 
