@@ -16,9 +16,9 @@ public class Property {
     Media media;
     String minimum;
     String render;
-    int sliderMin;
-    int sliderMax;
-    int sliderStep;
+    Integer sliderMin;
+    Integer sliderMax;
+    Integer sliderStep;
     String sliderUnit;
     SliderRef sliderRef;
     Hidden hidden;
@@ -81,28 +81,28 @@ public class Property {
         this.render = render;
     }
 
-    public int getSliderMin() {
+    public Integer getSliderMin() {
         return sliderMin;
     }
 
-    public void setSliderMin(int sliderMin) {
+    public void setSliderMin(Integer sliderMin) {
         this.sliderMin = sliderMin;
     }
 
-    public int getSliderMax() {
+    public Integer getSliderMax() {
         return sliderMax;
     }
 
-    public void setSliderMax(int sliderMax) {
+    public void setSliderMax(Integer sliderMax) {
         this.sliderMax = sliderMax;
     }
 
 
-    public int getSliderStep() {
+    public Integer getSliderStep() {
         return sliderStep;
     }
 
-    public void setSliderStep(int sliderStep) {
+    public void setSliderStep(Integer sliderStep) {
         this.sliderStep = sliderStep;
     }
 
