@@ -16,10 +16,10 @@ public class Property {
     Media media;
     String minimum;
     String render;
-    String sliderMin;
-    String sliderMax;
-    String sliderStep;
-    String sliderUnit;
+    int sliderMin;
+    int sliderMax;
+    int sliderStep;
+    int sliderUnit;
     SliderRef sliderRef;
     Hidden hidden;
 
@@ -81,37 +81,37 @@ public class Property {
         this.render = render;
     }
 
-    public String getSliderMin() {
+    public int getSliderMin() {
         return sliderMin;
     }
 
-    public void setSliderMin(String sliderMin) {
+    public void setSliderMin(int sliderMin) {
         this.sliderMin = sliderMin;
     }
 
-    public String getSliderMax() {
+    public int getSliderMax() {
         return sliderMax;
     }
 
-    public void setSliderMax(String sliderMax) {
+    public void setSliderMax(int sliderMax) {
         this.sliderMax = sliderMax;
     }
 
 
-    public String getSliderStep() {
+    public int getSliderStep() {
         return sliderStep;
     }
 
-    public void setSliderStep(String sliderStep) {
+    public void setSliderStep(int sliderStep) {
         this.sliderStep = sliderStep;
     }
 
 
-    public String getSliderUnit() {
+    public int getSliderUnit() {
         return sliderUnit;
     }
 
-    public void setSliderUnit(String sliderUnit) {
+    public void setSliderUnit(int sliderUnit) {
         this.sliderUnit = sliderUnit;
     }
 
@@ -208,14 +208,14 @@ public class Property {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Hidden {
-        String value;
+        Object value;
         String path;
 
-        public String getValue() {
+        public Object getValue() {
             return value;
         }
 
-        public void setValue(String value) {
+        public void setValue(Object value) {
             this.value = value;
         }
 
