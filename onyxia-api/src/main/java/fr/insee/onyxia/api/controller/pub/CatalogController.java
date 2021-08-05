@@ -79,6 +79,15 @@ public class CatalogController {
       customName.setDefaut(pkg.getName());
       customName.setTitle("Custom name");
       onyxiaProperties.put("friendlyName", customName);
+      Property owner = new Property();
+      owner.setType("string");
+      owner.setDescription("Owner of the chart");
+      owner.setDefaut("owner");
+      owner.setTitle("Owner");
+      XForm xform = new XForm();
+      xform.setValue("{{user.idep}}");
+      owner.setXform(xform);
+      onyxiaProperties.put("owner", owner);
       property.setProperties(onyxiaProperties);
 
       properties.put("onyxia",property);
