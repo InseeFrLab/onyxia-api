@@ -5,6 +5,7 @@ import fr.insee.onyxia.api.configuration.Catalogs;
 import fr.insee.onyxia.api.configuration.NotFoundException;
 import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.model.catalog.Config.Property;
+import fr.insee.onyxia.model.catalog.Config.Property.XForm;
 import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.Service;
@@ -79,6 +80,15 @@ public class CatalogController {
       customName.setDefaut(pkg.getName());
       customName.setTitle("Custom name");
       onyxiaProperties.put("friendlyName", customName);
+      Property owner = new Property();
+      owner.setType("string");
+      owner.setDescription("Owner of the chart");
+      owner.setDefaut("owner");
+      owner.setTitle("Owner");
+      XForm xform = new XForm();
+      xform.setValue("{{user.idep}}");
+      owner.setXform(xform);
+      onyxiaProperties.put("owner", owner);
       property.setProperties(onyxiaProperties);
 
       properties.put("onyxia",property);
