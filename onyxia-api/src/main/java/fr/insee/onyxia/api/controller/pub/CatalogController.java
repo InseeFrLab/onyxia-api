@@ -90,6 +90,14 @@ public class CatalogController {
       xform.setHidden(true);
       owner.setXform(xform);
       onyxiaProperties.put("owner", owner);
+
+      Property share = new Property();
+      share.setType("boolean");
+      share.setDescription("Enable share for this service");
+      share.setDefaut(false);
+      share.setTitle("Share");
+      onyxiaProperties.put("share", share);
+
       property.setProperties(onyxiaProperties);
 
       properties.put("onyxia",property);
