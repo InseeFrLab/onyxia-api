@@ -87,6 +87,7 @@ public class CatalogController {
       owner.setTitle("Owner");
       XForm xform = new XForm();
       xform.setValue("{{user.idep}}");
+      xform.setHidden(true);
       owner.setXform(xform);
       onyxiaProperties.put("owner", owner);
       property.setProperties(onyxiaProperties);
