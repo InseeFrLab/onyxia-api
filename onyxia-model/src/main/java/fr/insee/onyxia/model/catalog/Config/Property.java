@@ -20,7 +20,9 @@ public class Property {
     Integer sliderMax;
     Integer sliderStep;
     String sliderUnit;
-    SliderRef sliderRef;
+    String sliderExtremity;
+    String sliderExtremitySemantic;
+    String sliderRangeId;
     Hidden hidden;
 
     @JsonProperty("enum")
@@ -115,14 +117,30 @@ public class Property {
         this.sliderUnit = sliderUnit;
     }
 
-    public SliderRef getSliderRef() {
-        return sliderRef;
+    public String getSliderExtremity() {
+        return sliderExtremity;
     }
 
-    public void setSliderRef(SliderRef sliderRef) {
-        this.sliderRef = sliderRef;
+    public void setSliderExtremity(String sliderExtremity) {
+        this.sliderExtremity = sliderExtremity;
     }
 
+    public String getSliderExtremitySemantic() {
+        return sliderExtremitySemantic;
+    }
+
+    public void setSliderExtremitySemantic(String sliderExtremitySemantic) {
+        this.sliderExtremitySemantic = sliderExtremitySemantic;
+    }
+
+    public String getSliderRangeId() {
+        return sliderRangeId;
+    }
+
+    public void setSliderRangeId(String sliderRangeId) {
+        this.sliderRangeId = sliderRangeId;
+    }
+    
     public Hidden getHidden() {
         return hidden;
     }
@@ -181,28 +199,6 @@ public class Property {
 
         public void setType(String type) {
             this.type = type;
-        }
-    }
-
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class SliderRef {
-        String sliderId;
-        String sliderPos;
-
-        public String getSliderId() {
-            return sliderId;
-        }
-
-        public void setSliderId(String sliderId) {
-            this.sliderId = sliderId;
-        }
-
-        public String getSliderPos() {
-            return sliderPos;
-        }
-
-        public void setSliderPos(String sliderPos) {
-            this.sliderPos = sliderPos;
         }
     }
 
