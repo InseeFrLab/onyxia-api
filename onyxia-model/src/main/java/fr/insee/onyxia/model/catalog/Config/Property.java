@@ -11,8 +11,10 @@ public class Property {
     String type;
     String description;
     String title;
+    
     @JsonProperty("default")
     Object defaut;
+    String pattern;
     Media media;
     String minimum;
     String render;
@@ -73,6 +75,14 @@ public class Property {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getPattern() {
+        return pattern;
+    }
+
+    public void setPattern(String pattern) {
+        this.pattern = pattern;
     }
 
     public String getRender() {
