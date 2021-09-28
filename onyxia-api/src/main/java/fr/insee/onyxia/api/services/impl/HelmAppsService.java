@@ -312,6 +312,9 @@ public class HelmAppsService implements AppsService {
 
     @NotNull
     private String determineNamespace(Region region,Project project, User user) {
+        if (region.getServices().isSingleNamespace()) {
+            return kubernetesService.getCurrentNamespace(region);
+        }
         if (project.getGroup() != null) {
             // For groups, onboarding is done separatly
             return project.getNamespace();

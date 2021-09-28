@@ -25,6 +25,10 @@ public class KubernetesService {
         return createNamespace(region, namespaceId, owner);
     }
 
+    public String getCurrentNamespace(Region region) {
+        return kubernetesClientProvider.getRootClient(region).getNamespace();
+    }
+
     public String createNamespace(Region region, String namespaceId, Owner owner) {
         String name = getNameFromOwner(region, owner);
 
