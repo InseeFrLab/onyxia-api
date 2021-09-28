@@ -8,6 +8,5 @@ public interface XGeneratedProvider {
     public String getAppId(String scopeName, XGeneratedContext.Scope scope, Property.XGenerated xGenerated);
     public String getExternalDns(String scopeName, XGeneratedContext.Scope scope, Property.XGenerated xGenerated);
     public String getInternalDns(String scopeName, XGeneratedContext.Scope scope, Property.XGenerated xGenerated);
-    public String getNetworkName(String scopeName, XGeneratedContext.Scope scope, Property.XGenerated xGenerated);
     public String getInitScript(String scopeName, XGeneratedContext.Scope scope, Property.XGenerated xGenerated);
 }

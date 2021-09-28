@@ -82,7 +82,7 @@ public class Region {
 
         private Service.ServiceType type;
         private boolean defaultIpProtection;
-        private String network;
+        private boolean singleNamespace = true;
         private String namespacePrefix = "user-";
         private String groupNamespacePrefix = "projet-";
         private String usernamePrefix;
@@ -93,6 +93,14 @@ public class Region {
         private Monitoring monitoring;
         private CloudshellConfiguration cloudshell;
         private String initScript;
+
+        public boolean isSingleNamespace() {
+            return singleNamespace;
+        }
+
+        public void setSingleNamespace(boolean singleNamespace) {
+            this.singleNamespace = singleNamespace;
+        }
 
         public Service.ServiceType getType() {
             return type;
@@ -108,14 +116,6 @@ public class Region {
 
         public void setDefaultIpProtection(boolean defaultIpProtection){
             this.defaultIpProtection = defaultIpProtection;
-        }
-        
-        public String getNetwork() {
-            return network;
-        }
-
-        public void setNetwork(String network){
-            this.network = network;
         }
 
         public String getNamespacePrefix() {

@@ -124,11 +124,6 @@ public class HelmAppsService implements AppsService {
             }
 
             @Override
-            public String getNetworkName(String scopeName, XGeneratedContext.Scope scope, Property.XGenerated xGenerated) {
-                return region.getServices().getNetwork();
-            }
-
-            @Override
             public String getInitScript(String scopeName, XGeneratedContext.Scope scope, Property.XGenerated xGenerated) {
                 return region.getServices().getInitScript();
             }
@@ -317,6 +312,9 @@ public class HelmAppsService implements AppsService {
 
     @NotNull
     private String determineNamespace(Region region,Project project, User user) {
+        if (region.getServices().isSingleNamespace()) {
+            return kubernetesService.getCurrentNamespace(region);
+        }
         if (project.getGroup() != null) {
             // For groups, onboarding is done separatly
             return project.getNamespace();
