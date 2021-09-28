@@ -29,14 +29,16 @@ public class OnyxiaUserProvider {
         Project userProject = getUserProject(region, user);
         user.getProjects().add(userProject);
 
-        userProvider.getUser().getGroups().stream().forEach(group -> {
-            Project project = new Project();
-            project.setId(region.getServices().getGroupNamespacePrefix()+group);
-            project.setGroup(group);
-            project.setBucket(region.getServices().getGroupNamespacePrefix()+group);
-            project.setNamespace(region.getServices().getGroupNamespacePrefix()+group);
-            user.getProjects().add(project);
-        });
+        if (!region.getServices().isSingleNamespace()) {
+            userProvider.getUser().getGroups().stream().forEach(group -> {
+                Project project = new Project();
+                project.setId(region.getServices().getGroupNamespacePrefix()+group);
+                project.setGroup(group);
+                project.setBucket(region.getServices().getGroupNamespacePrefix()+group);
+                project.setNamespace(region.getServices().getGroupNamespacePrefix()+group);
+                user.getProjects().add(project);
+            });
+        }
 
         return user;
     }
