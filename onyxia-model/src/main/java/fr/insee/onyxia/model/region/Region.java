@@ -82,7 +82,6 @@ public class Region {
 
         private Service.ServiceType type;
         private boolean defaultIpProtection;
-        private String network;
         private String namespacePrefix = "user-";
         private String groupNamespacePrefix = "projet-";
         private String usernamePrefix;
@@ -108,14 +107,6 @@ public class Region {
 
         public void setDefaultIpProtection(boolean defaultIpProtection){
             this.defaultIpProtection = defaultIpProtection;
-        }
-        
-        public String getNetwork() {
-            return network;
-        }
-
-        public void setNetwork(String network){
-            this.network = network;
         }
 
         public String getNamespacePrefix() {

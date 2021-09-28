@@ -124,11 +124,6 @@ public class HelmAppsService implements AppsService {
             }
 
             @Override
-            public String getNetworkName(String scopeName, XGeneratedContext.Scope scope, Property.XGenerated xGenerated) {
-                return region.getServices().getNetwork();
-            }
-
-            @Override
             public String getInitScript(String scopeName, XGeneratedContext.Scope scope, Property.XGenerated xGenerated) {
                 return region.getServices().getInitScript();
             }

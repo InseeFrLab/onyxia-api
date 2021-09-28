@@ -28,9 +28,6 @@ public class XGeneratedIterator {
                 if (xGenerated.getType() == Property.XGenerated.XGeneratedType.InternalDNS) {
                     xGeneratedValues.put(name, xGeneratedProvider.getInternalDns(scopeName,scope,xGenerated));
                 }
-                if (xGenerated.getType() == Property.XGenerated.XGeneratedType.ContainerNetworkName) {
-                    xGeneratedValues.put(name, xGeneratedProvider.getNetworkName(scopeName,scope,xGenerated));
-                }
                 if (xGenerated.getType() == Property.XGenerated.XGeneratedType.InitScript) {
                     xGeneratedValues.put(name, xGeneratedProvider.getInitScript(scopeName,scope,xGenerated));
                 }
