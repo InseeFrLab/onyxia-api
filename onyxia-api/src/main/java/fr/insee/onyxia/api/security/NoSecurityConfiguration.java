@@ -41,7 +41,7 @@ public class NoSecurityConfiguration extends WebSecurityConfigurerAdapter {
          User user = User.newInstance()
          .setEmail("toto@tld.fr")
          .setNomComplet("John doe")
-         .setIdep("XXXXXX")
+         .setIdep("default")
                  .setIp(httpRequestUtils.getClientIpAddressIfServletRequestExist(((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()))
                  .build();
          return user;
