@@ -56,6 +56,9 @@ public class SpringKeycloakSecurityConfiguration {
          return () -> {
             AccessToken token = getAccessToken();
             List<String> groups = (List<String>) token.getOtherClaims().get("groups");
+            if (groups == null) {
+               groups = new ArrayList<String>();
+            }
             User user = User.newInstance()
                     .addGroups(groups)
             .setEmail(token.getEmail())
