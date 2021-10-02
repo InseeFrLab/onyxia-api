@@ -21,6 +21,8 @@ public class Chart extends Pkg {
     private String created;
     @JsonProperty("description")
     private String description;
+    @JsonProperty("type")
+    private String type;
     @JsonProperty("digest")
     private String digest;
     @JsonProperty("engine")
@@ -83,6 +85,16 @@ public class Chart extends Pkg {
     @JsonProperty("description")
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @JsonProperty("type")
+    public String getType() {
+        return type;
+    }
+
+    @JsonProperty("type")
+    public void setType(String type) {
+        this.type = type;
     }
 
     @JsonProperty("digest")
