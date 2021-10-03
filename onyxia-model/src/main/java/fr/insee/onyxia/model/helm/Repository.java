@@ -1,18 +1,13 @@
 
 package fr.insee.onyxia.model.helm;
 
+import com.fasterxml.jackson.annotation.*;
+import fr.insee.onyxia.model.catalog.CatalogWrapper;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import fr.insee.onyxia.model.catalog.CatalogWrapper;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Repository extends CatalogWrapper {
@@ -58,6 +53,6 @@ public class Repository extends CatalogWrapper {
 
     @JsonProperty("entries")
     public void setEntries(Map<String, List<Chart>> entries) {
-        setPackages(entries.values().stream().map(charts -> charts.get(0)).collect(Collectors.toList()));
+        setPackages(entries.values().stream().map(charts -> charts.get(0)).filter(chart -> "application".equalsIgnoreCase(chart.getType())).collect(Collectors.toList()));
     }
 }
