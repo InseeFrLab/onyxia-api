@@ -68,14 +68,14 @@ public class KubernetesService {
                 .withNewRoleRef().withApiGroup("rbac.authorization.k8s.io").withKind("ClusterRole").withName("admin").endRoleRef().build());
 
         if (region.getServices().getQuotas().isEnabled()) {
-            applyQuotas(region, namespaceId, kubClient);
+            Quota defaultQuota = region.getServices().getQuotas().getDefaultQuota();
+            applyQuotas(namespaceId, kubClient, defaultQuota, !region.getServices().getQuotas().isAllowUserModification());
         }
 
         return namespaceId;
     }
 
-    private void applyQuotas(Region region, String namespaceId, KubernetesClient kubClient) {
-        Quota defaultQuota = region.getServices().getQuotas().getDefaultQuota();
+    private void applyQuotas(String namespaceId, KubernetesClient kubClient, Quota inputQuota, boolean overrideExisting) {
         ResourceQuotaBuilder resourceQuotaBuilder = new ResourceQuotaBuilder();
         resourceQuotaBuilder.withNewMetadata()
                 .withLabels(Map.of("createdby","onyxia"))
@@ -83,7 +83,7 @@ public class KubernetesService {
                 .withNamespace(namespaceId)
                 .endMetadata();
 
-        Map<String, String> quotasToApply = defaultQuota.asMap();
+        Map<String, String> quotasToApply = inputQuota.asMap();
 
         if (quotasToApply.entrySet().stream().filter(e -> e.getValue() != null).count() == 0) {
             return;
@@ -95,7 +95,7 @@ public class KubernetesService {
         resourceQuotaBuilderSpecNested.endSpec();
 
         ResourceQuota quota = resourceQuotaBuilder.build();
-        if (!region.getServices().getQuotas().isAllowUserModification()) {
+        if (overrideExisting) {
             kubClient.resourceQuotas().inNamespace(namespaceId).createOrReplace(quota);
         }
         else {
@@ -136,6 +136,12 @@ public class KubernetesService {
     public List<Namespace> getNamespaces(Region region, Owner owner) {
         KubernetesClient kubClient = kubernetesClientProvider.getRootClient(region);
         return kubClient.namespaces().withLabel("onyxia_owner",owner.getId()).list().getItems();
+    }
+
+    public void applyQuota(Region region, Project project, User user, Quota quota) {
+        KubernetesClient kubClient = kubernetesClientProvider.getRootClient(region);
+        String namespace = determineNamespaceAndCreateIfNeeded(region, project, user);
+        applyQuotas(namespace, kubClient, quota, true);
     }
 
     public ResourceQuota getOnyxiaQuota(Region region, Project project, User user) {

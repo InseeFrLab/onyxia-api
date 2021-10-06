@@ -13,9 +13,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -51,6 +50,23 @@ public class QuotaController {
         quotaUsage.setUsage(usage);
 
         return quotaUsage;
+    }
+
+    @PostMapping
+    public void applyQuota(@Parameter(hidden = true) Region region, @Parameter(hidden=true) Project project, @RequestBody Quota quota) throws IllegalAccessException {
+        if (!region.getServices().getQuotas().isAllowUserModification()) {
+            throw new AccessDeniedException("User modification is not allowed on this installation");
+        }
+        kubernetesService.applyQuota(region, project, userProvider.getUser(), quota);
+    }
+
+    @PostMapping
+    @RequestMapping("/reset")
+    public void resetQuota(@Parameter(hidden = true) Region region, @Parameter(hidden=true) Project project) throws IllegalAccessException {
+        if (!region.getServices().getQuotas().isAllowUserModification()) {
+            throw new AccessDeniedException("User modification is not allowed on this installation");
+        }
+        kubernetesService.applyQuota(region, project, userProvider.getUser(), region.getServices().getQuotas().getDefaultQuota());
     }
 
     private void mapKubQuotaToQuota(Map<String, Quantity> resourceQuota, Quota quota) {
