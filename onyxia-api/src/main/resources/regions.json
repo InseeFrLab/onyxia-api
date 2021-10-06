@@ -16,7 +16,7 @@
         "groupNamespacePrefix": "projet-",
         "authenticationMode" : "admin",
         "quotas": {
-          "enabled": true,
+          "enabled": false,
           "allowUserModification": true,
           "default": {
             "requests.memory": "10Gi",

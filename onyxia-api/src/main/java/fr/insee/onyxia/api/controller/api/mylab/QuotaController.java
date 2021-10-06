@@ -36,6 +36,7 @@ public class QuotaController {
 
     @GetMapping
     public QuotaUsage getQuota(@Parameter(hidden = true) Region region, @Parameter(hidden=true) Project project) {
+        checkQuotaIsEnabled(region);
         ResourceQuota resourceQuota = kubernetesService.getOnyxiaQuota(region, project, userProvider.getUser());
         if (resourceQuota == null) {
             return null;
@@ -54,19 +55,32 @@ public class QuotaController {
 
     @PostMapping
     public void applyQuota(@Parameter(hidden = true) Region region, @Parameter(hidden=true) Project project, @RequestBody Quota quota) throws IllegalAccessException {
-        if (!region.getServices().getQuotas().isAllowUserModification()) {
-            throw new AccessDeniedException("User modification is not allowed on this installation");
-        }
+        checkQuotaIsEnabled(region);
+        checkQuotaModificationIsAllowed(region);
         kubernetesService.applyQuota(region, project, userProvider.getUser(), quota);
     }
 
     @PostMapping
     @RequestMapping("/reset")
     public void resetQuota(@Parameter(hidden = true) Region region, @Parameter(hidden=true) Project project) throws IllegalAccessException {
+        checkQuotaIsEnabled(region);
+        checkQuotaModificationIsAllowed(region);
         if (!region.getServices().getQuotas().isAllowUserModification()) {
             throw new AccessDeniedException("User modification is not allowed on this installation");
         }
         kubernetesService.applyQuota(region, project, userProvider.getUser(), region.getServices().getQuotas().getDefaultQuota());
+    }
+
+    private void checkQuotaIsEnabled(Region region) {
+        if (!region.getServices().getQuotas().isEnabled()) {
+            throw new AccessDeniedException("Quotas are not active on this installation");
+        }
+    }
+
+    private void checkQuotaModificationIsAllowed(Region region) {
+        if (!region.getServices().getQuotas().isAllowUserModification()) {
+            throw new AccessDeniedException("User modification is not allowed on this installation");
+        }
     }
 
     private void mapKubQuotaToQuota(Map<String, Quantity> resourceQuota, Quota quota) {
