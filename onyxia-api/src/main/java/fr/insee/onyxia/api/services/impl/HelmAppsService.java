@@ -280,16 +280,22 @@ public class HelmAppsService implements AppsService {
         service.setInstances(1);
 
         service.setTasks(client.pods().inNamespace(release.getNamespace()).withLabel("app.kubernetes.io/instance", release.getName()).list().getItems().stream().map(pod -> {
-            Task task = new Task();
-            task.setId(pod.getMetadata().getName());
+            Task currentTask = new Task();
+            currentTask.setId(pod.getMetadata().getName());
             TaskStatus status = new TaskStatus();
             status.setStatus(pod.getStatus().getPhase());
             status.setReason(pod.getStatus().getContainerStatuses().stream()
                     .filter(cstatus -> cstatus.getState().getWaiting() != null)
                     .map(cstatus -> cstatus.getState().getWaiting().getReason())
             .findFirst().orElse(null));
-            task.setStatus(status);
-            return task;
+            pod.getStatus().getContainerStatuses().forEach(c -> {
+                Container container = new Container();
+                container.setName(c.getName());
+                container.setReady(c.getReady());
+                currentTask.getContainers().add(container);
+            });
+            currentTask.setStatus(status);
+            return currentTask;
         }).collect(Collectors.toList()));
 
         EventList eventList = client.v1().events().inNamespace(release.getNamespace()).list();
