@@ -10,7 +10,7 @@ public class Region {
     private String name;
     private String description;
     private Location location;
-    private Services services;
+    private Services services = new Services();
     private OnyxiaAPI onyxiaAPI;
     private Data data;
 
@@ -94,7 +94,7 @@ public class Region {
         private Monitoring monitoring;
         private CloudshellConfiguration cloudshell;
         private String initScript;
-        private Quotas quotas;
+        private Quotas quotas = new Quotas();
 
         public static class Quotas {
             private boolean enabled = false;
