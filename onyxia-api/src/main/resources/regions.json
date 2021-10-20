@@ -15,6 +15,18 @@
         "usernamePrefix": "oidc-",
         "groupNamespacePrefix": "projet-",
         "authenticationMode" : "admin",
+        "quotas": {
+          "enabled": false,
+          "allowUserModification": true,
+          "default": {
+            "requests.memory": "10Gi",
+            "requests.cpu": "10",
+            "limits.memory": "10Gi",
+            "limits.cpu": "10",
+            "requests.storage": "100Gi",
+            "count/pods": "50"
+          }
+        },
         "expose": {
           "domain": "fakedomain.kub.example.com"
         },

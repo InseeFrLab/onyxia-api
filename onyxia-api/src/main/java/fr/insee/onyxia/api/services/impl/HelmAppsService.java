@@ -30,7 +30,6 @@ import io.github.inseefrlab.helmwrapper.model.HelmLs;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService.MultipleServiceFound;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,7 +137,7 @@ public class HelmAppsService implements AppsService {
         }
         File values = File.createTempFile("values", ".yaml");
         mapperHelm.writeValue(values, fusion);
-        String namespaceId = determineNamespace(region,project, user);
+        String namespaceId = kubernetesService.determineNamespaceAndCreateIfNeeded(region,project, user);
         String name = isCloudshell ? "cloudshell" : null;
         if (name==null){
             name = requestDTO.getName();
@@ -179,7 +178,7 @@ public class HelmAppsService implements AppsService {
     @Override
     public String getLogs(Region region,Project project,User user, String serviceId, String taskId) {
         KubernetesClient client = kubernetesClientProvider.getUserClient(region,user);
-        return client.pods().inNamespace(determineNamespace(region,project,user)).withName(taskId).getLog();
+        return client.pods().inNamespace(kubernetesService.determineNamespaceAndCreateIfNeeded(region,project,user)).withName(taskId).getLog();
     }
 
     @Override
@@ -187,13 +186,13 @@ public class HelmAppsService implements AppsService {
         if (serviceId.startsWith("/")) {
             serviceId = serviceId.substring(1);
         }
-        HelmLs result = getHelmInstallService().getAppById(getHelmConfiguration(region,user),serviceId, determineNamespace(region,project, user));
+        HelmLs result = getHelmInstallService().getAppById(getHelmConfiguration(region,user),serviceId, kubernetesService.determineNamespaceAndCreateIfNeeded(region,project, user));
         return getHelmApp(region,user,result);
     }
 
     @Override
     public UninstallService destroyService(Region region,Project project, User user, final String path, boolean bulk) throws Exception {
-        final String namespace = determineNamespace(region, project, user);
+        final String namespace = kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
         UninstallService result = new UninstallService();
         result.setPath(path);
         int status = 0;
@@ -316,21 +315,7 @@ public class HelmAppsService implements AppsService {
         return service;
     }
 
-    @NotNull
-    private String determineNamespace(Region region,Project project, User user) {
-        if (region.getServices().isSingleNamespace()) {
-            return kubernetesService.getCurrentNamespace(region);
-        }
-        if (project.getGroup() != null) {
-            // For groups, onboarding is done separatly
-            return project.getNamespace();
-        }
-        // TODO : in the future, user onboarding may be done separatly as well
-        KubernetesService.Owner owner = new KubernetesService.Owner();
-        owner.setId(user.getIdep());
-        owner.setType(KubernetesService.Owner.OwnerType.USER);
-        return kubernetesService.createNamespace(region, project.getNamespace(), owner);
-    }
+
 
     private Service.ServiceStatus findAppStatus(HelmLs release) {
         if (release.getStatus().equals("deployed")) {

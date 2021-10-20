@@ -3,6 +3,7 @@ package fr.insee.onyxia.model.region;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.insee.onyxia.model.service.Service;
+import fr.insee.onyxia.model.service.quota.Quota;
 
 public class Region {
     private String id;
@@ -93,6 +94,38 @@ public class Region {
         private Monitoring monitoring;
         private CloudshellConfiguration cloudshell;
         private String initScript;
+        private Quotas quotas;
+
+        public static class Quotas {
+            private boolean enabled = true;
+            private boolean allowUserModification = true;
+            @JsonProperty("default")
+            private Quota defaultQuota;
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
+            }
+
+            public boolean isAllowUserModification() {
+                return allowUserModification;
+            }
+
+            public void setAllowUserModification(boolean allowUserModification) {
+                this.allowUserModification = allowUserModification;
+            }
+
+            public Quota getDefaultQuota() {
+                return defaultQuota;
+            }
+
+            public void setDefaultQuota(Quota defaultQuota) {
+                this.defaultQuota = defaultQuota;
+            }
+        }
 
         public boolean isSingleNamespace() {
             return singleNamespace;
@@ -196,6 +229,14 @@ public class Region {
 
         public String getGroupPrefix() {
             return groupPrefix;
+        }
+
+        public Quotas getQuotas() {
+            return quotas;
+        }
+
+        public void setQuotas(Quotas quotas) {
+            this.quotas = quotas;
         }
     }
 
