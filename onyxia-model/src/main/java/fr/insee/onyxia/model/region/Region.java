@@ -97,7 +97,7 @@ public class Region {
         private Quotas quotas;
 
         public static class Quotas {
-            private boolean enabled = true;
+            private boolean enabled = false;
             private boolean allowUserModification = true;
             @JsonProperty("default")
             private Quota defaultQuota;
