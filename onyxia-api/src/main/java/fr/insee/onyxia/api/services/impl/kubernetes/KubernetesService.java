@@ -34,14 +34,15 @@ public class KubernetesService {
         if (region.getServices().isSingleNamespace()) {
             return getCurrentNamespace(region);
         }
-        if (project.getGroup() != null) {
-            // For groups, onboarding is done separatly
-            return project.getNamespace();
-        }
-        // TODO : in the future, user onboarding may be done separatly as well
         KubernetesService.Owner owner = new KubernetesService.Owner();
-        owner.setId(user.getIdep());
-        owner.setType(KubernetesService.Owner.OwnerType.USER);
+        if (project.getGroup() != null) {
+            owner.setId(project.getGroup());
+            owner.setType(Owner.OwnerType.GROUP);
+        }
+        else {
+            owner.setId(user.getIdep());
+            owner.setType(KubernetesService.Owner.OwnerType.USER);
+        }
         return createNamespace(region, project.getNamespace(), owner);
     }
 
@@ -52,8 +53,6 @@ public class KubernetesService {
     public String createNamespace(Region region, String namespaceId, Owner owner) {
         String name = getNameFromOwner(region, owner);
 
-        // Label onyxia_owner is not resilient if the user has "namespace admin" role scoped to his namespace
-        // as it this rolebinding allows him to modify onyxia_owner metadata
         KubernetesClient kubClient = kubernetesClientProvider.getRootClient(region);
 
         Namespace namespaceToCreate = kubClient.namespaces().createOrReplace(new NamespaceBuilder().withNewMetadata().withName(namespaceId)
@@ -67,7 +66,8 @@ public class KubernetesService {
                         .withApiGroup("rbac.authorization.k8s.io").withNamespace(namespaceId).build())
                 .withNewRoleRef().withApiGroup("rbac.authorization.k8s.io").withKind("ClusterRole").withName("admin").endRoleRef().build());
 
-        if (region.getServices().getQuotas().isEnabled()) {
+        // Currently, no quotas for groups
+        if (owner.getType() == Owner.OwnerType.USER && region.getServices().getQuotas().isEnabled()) {
             Quota defaultQuota = region.getServices().getQuotas().getDefaultQuota();
             applyQuotas(namespaceId, kubClient, defaultQuota, !region.getServices().getQuotas().isAllowUserModification());
         }
