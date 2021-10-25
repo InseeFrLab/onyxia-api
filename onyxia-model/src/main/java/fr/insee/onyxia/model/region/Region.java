@@ -82,7 +82,6 @@ public class Region {
         }
 
         private Service.ServiceType type;
-        private boolean defaultIpProtection;
         private boolean singleNamespace = true;
         private String namespacePrefix = "user-";
         private String groupNamespacePrefix = "projet-";
@@ -95,6 +94,28 @@ public class Region {
         private CloudshellConfiguration cloudshell;
         private String initScript;
         private Quotas quotas = new Quotas();
+        private DefaultConfiguration defaultConfiguration = new DefaultConfiguration();
+
+        public static class DefaultConfiguration {
+            private boolean IPProtection = true;
+            private boolean networkPolicy = true;
+
+            public void setIPProtection(boolean IPProtection) {
+                this.IPProtection = IPProtection;
+            }
+
+            public boolean isIPProtection() {
+                return IPProtection;
+            }
+
+            public void setNetworkPolicy(boolean networkPolicy) {
+                this.networkPolicy = networkPolicy;
+            }
+
+            public boolean isNetworkPolicy() {
+                return networkPolicy;
+            }
+        }
 
         public static class Quotas {
             private boolean enabled = false;
@@ -141,14 +162,6 @@ public class Region {
 
         public void setType(Service.ServiceType type) {
             this.type = type;
-        }
-
-        public boolean getDefaultIpProtection() {
-            return defaultIpProtection;
-        }
-
-        public void setDefaultIpProtection(boolean defaultIpProtection){
-            this.defaultIpProtection = defaultIpProtection;
         }
 
         public String getNamespacePrefix() {
