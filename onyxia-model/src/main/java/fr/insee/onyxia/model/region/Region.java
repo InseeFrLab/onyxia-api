@@ -148,6 +148,14 @@ public class Region {
             }
         }
 
+        public DefaultConfiguration getDefaultConfiguration() {
+            return defaultConfiguration;
+        }
+
+        public void setDefaultConfiguration(DefaultConfiguration defaultConfiguration) {
+            this.defaultConfiguration = defaultConfiguration;
+        }
+
         public boolean isSingleNamespace() {
             return singleNamespace;
         }
