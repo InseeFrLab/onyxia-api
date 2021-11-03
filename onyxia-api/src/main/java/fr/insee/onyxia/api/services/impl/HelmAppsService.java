@@ -91,11 +91,6 @@ public class HelmAppsService implements AppsService {
     @Override
     public Collection<Object> installApp(Region region, Project project, CreateServiceDTO requestDTO, String catalogId, Pkg pkg,
                                          User user, Map<String, Object> fusion) throws IOException, TimeoutException, InterruptedException {
-        Region.CloudshellConfiguration cloudshellConfiguration = region.getServices().getCloudshell();
-        boolean isCloudshell =false;
-        if (cloudshellConfiguration != null && catalogId.equals(cloudshellConfiguration.getCatalogId()) && pkg.getName().equals(cloudshellConfiguration.getPackageName())) {
-            isCloudshell =  true;
-        }
 
         PublishContext context = new PublishContext();
 
@@ -138,11 +133,7 @@ public class HelmAppsService implements AppsService {
         File values = File.createTempFile("values", ".yaml");
         mapperHelm.writeValue(values, fusion);
         String namespaceId = kubernetesService.determineNamespaceAndCreateIfNeeded(region,project, user);
-        String name = isCloudshell ? "cloudshell" : null;
-        if (name==null){
-            name = requestDTO.getName();
-        }
-        HelmInstaller res = getHelmInstallService().installChart(getHelmConfiguration(region,user),catalogId + "/" + pkg.getName(), namespaceId, name, requestDTO.isDryRun(),
+        HelmInstaller res = getHelmInstallService().installChart(getHelmConfiguration(region,user),catalogId + "/" + pkg.getName(), namespaceId, requestDTO.getName(), requestDTO.isDryRun(),
                 values,null);
         values.delete();
         return List.of(res.getManifest());

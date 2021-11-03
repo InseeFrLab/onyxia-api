@@ -40,7 +40,7 @@ public class CloudShellController {
 		try {
 			Service service = null;
 			if (region.getServices().getType().equals(Service.ServiceType.KUBERNETES)) {
-				service = helmAppsService.getUserService(region, project, userProvider.getUser(),"cloudshell");
+				service = helmAppsService.getUserService(region, project, userProvider.getUser(),cloudshellConfiguration.getPackageName()+"*");
 			}
 			status.setStatus(CloudShellStatus.STATUS_UP);
 			service.getUrls().stream().findFirst().ifPresent(url -> status.setUrl(url));
