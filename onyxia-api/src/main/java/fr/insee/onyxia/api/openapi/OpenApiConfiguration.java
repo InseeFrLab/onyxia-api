@@ -5,6 +5,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.OAuthFlow;
 import io.swagger.v3.oas.models.security.OAuthFlows;
+import io.swagger.v3.oas.models.security.Scopes;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,10 +35,11 @@ public class OpenApiConfiguration {
     public OpenAPI customOpenAPIKeycloak() {
         final OpenAPI openapi = createOpenAPI();
         openapi.components(new Components().addSecuritySchemes(SCHEMEKEYCLOAK, new SecurityScheme()
-                .type(SecurityScheme.Type.OAUTH2).in(SecurityScheme.In.HEADER).description("Authentification keycloak")
+                .type(SecurityScheme.Type.OAUTH2).description("Authentification keycloak")
                 .flows(new OAuthFlows().authorizationCode(new OAuthFlow()
                         .authorizationUrl(keycloakUrl + "/realms/" + realmName + "/protocol/openid-connect/auth")
                         .tokenUrl(keycloakUrl + "/realms/" + realmName + "/protocol/openid-connect/token")
+                                .scopes(new Scopes())
                 .refreshUrl(keycloakUrl + "/realms/" + realmName + "/protocol/openid-connect/token")))));
         return openapi;
     }
@@ -52,7 +54,7 @@ public class OpenApiConfiguration {
     private OpenAPI createOpenAPI() {
         logger.info("surcharge de la configuration swagger");
         final OpenAPI openapi = new OpenAPI()
-                .info(new Info().title("Onyxia-api").description("Swagger onyxia-api"));
+                .info(new Info().version("snapshot").title("Onyxia-api").description("Swagger onyxia-api"));
         return openapi;
     }
 }
