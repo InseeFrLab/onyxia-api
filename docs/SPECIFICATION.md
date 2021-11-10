@@ -32,7 +32,10 @@ The concepts terminology is the following:
 This endpoints specification is covered in the Open API Specification document accessible in the `/api/` endpoint. In this documentation we go into further detail with explanation of utility and backend processes.
 
 ### Headers
-For authenticated requests the headers `ONYXIA-REGION` and `ONYXIA-PROJECT` should be set (besides the `Authorization` header). `ONYXIA-PROJECT` will inform the API if you are requesting information for the User or for one of the Projects he belongs to.
+For authenticated requests the headers, besides the `Authorization` header, the `ONYXIA-REGION` and `ONYXIA-PROJECT` can be set:
+- `ONYXIA-REGION`: defines which region the API should do requests to, defaults to the first region in the API configuration.
+- `ONYXIA-PROJECT`: defines the namespace (Project) for the request, defaults to the user's personal project.
+
 
 ### User
 
