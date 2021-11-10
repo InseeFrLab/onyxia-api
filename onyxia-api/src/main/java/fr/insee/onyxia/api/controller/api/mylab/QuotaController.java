@@ -60,8 +60,7 @@ public class QuotaController {
         kubernetesService.applyQuota(region, project, userProvider.getUser(), quota);
     }
 
-    @PostMapping
-    @RequestMapping("/reset")
+    @PostMapping("/reset")
     public void resetQuota(@Parameter(hidden = true) Region region, @Parameter(hidden=true) Project project) throws IllegalAccessException {
         checkQuotaIsEnabled(region);
         checkQuotaModificationIsAllowed(region);
