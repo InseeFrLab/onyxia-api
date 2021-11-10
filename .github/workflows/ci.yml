@@ -5,14 +5,12 @@ on:
   #- cron: "0 10 * * *" # everyday at 10am
   push:
     branches:
-      - "master"
+      - "**"
     paths-ignore:
       - 'docs/**'
     tags:
       - "*"
   pull_request:
-    branches:
-      - "master"
     paths-ignore:
       - 'docs/**'
 
