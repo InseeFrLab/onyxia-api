@@ -11,6 +11,8 @@ import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.Service;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,6 +31,10 @@ public class CatalogController {
    @Autowired
    private CatalogService catalogService;
 
+   @Operation(
+      summary = "List available catalogs and packages for installing.",
+      description = "List available catalogs and packages for installing in the first Region configuration of this Onyxia API."
+   )
    @GetMapping
    public Catalogs getCatalogs(@Parameter(hidden = true) Region region) {
       Catalogs filteredCatalogs = new Catalogs();
@@ -36,6 +42,18 @@ public class CatalogController {
       return filteredCatalogs;
    }
 
+   @Operation(
+      summary = "List available packages for installing given a catalog.",
+      description = "List available packages for installing given a catalog with detailed information on the packages including: descriptions, sources, and configuration options.",
+      parameters = {
+         @Parameter(
+            required = true,
+            name = "catalogId",
+            description = "Unique ID of the enabled catalog for this Onyxia API.",
+            in = ParameterIn.PATH
+         )
+      }
+   )
    @GetMapping("{catalogId}")
    public CatalogWrapper getCatalogById(@PathVariable String catalogId) {
       CatalogWrapper wrapper = catalogService.getCatalogById(catalogId);
@@ -45,6 +63,24 @@ public class CatalogController {
       return wrapper;
    }
 
+   @Operation(
+      summary = "Get a service package information from a specific catalog.",
+      description = "Get a service package information from a specific catalog, with detailed information on the package including: descriptions, sources, and configuration options.",
+      parameters = {
+         @Parameter(
+            required = true,
+            name = "catalogId",
+            description = "Unique ID of the enabled catalog for this Onyxia API.",
+            in = ParameterIn.PATH
+         ),
+         @Parameter(
+            required = true,
+            name = "packageName",
+            description = "Unique name of the package from the selected catalog.",
+            in = ParameterIn.PATH
+         )
+      }
+   )
    @GetMapping("{catalogId}/{packageName}")
    public Pkg getPackage(@PathVariable String catalogId, @PathVariable String packageName) {
       Pkg pkg = catalogService.getPackage(catalogId, packageName);

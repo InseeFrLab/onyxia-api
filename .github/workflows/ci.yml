@@ -6,9 +6,13 @@ on:
   push:
     branches:
       - "**"
+    paths-ignore:
+      - 'docs/**'
     tags:
       - "*"
   pull_request:
+    paths-ignore:
+      - 'docs/**'
 
 jobs:
   build:
