@@ -7,6 +7,7 @@ public class Project {
     private String bucket;
     private String namespace;
     private String name;
+    private String vaultTopDir;
 
     public String getId() {
         return id;
@@ -49,5 +50,13 @@ public class Project {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getVaultTopDir() {
+        return vaultTopDir;
+    }
+
+    public void setVaultTopDir(String vaultTopDir) {
+        this.vaultTopDir = vaultTopDir;
     }
 }
