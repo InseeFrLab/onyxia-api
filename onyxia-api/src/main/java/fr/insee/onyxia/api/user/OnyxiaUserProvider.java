@@ -34,6 +34,7 @@ public class OnyxiaUserProvider {
                 Project project = new Project();
                 project.setId(region.getServices().getGroupNamespacePrefix()+group);
                 project.setGroup(group);
+                project.setVaultTopDir(region.getServices().getGroupNamespacePrefix()+group);
                 project.setBucket(region.getServices().getGroupNamespacePrefix()+group);
                 project.setNamespace(region.getServices().getGroupNamespacePrefix()+group);
                 user.getProjects().add(project);
@@ -48,14 +49,16 @@ public class OnyxiaUserProvider {
         if (region.getServices().isSingleNamespace()) {
             userProject.setId("single-project");
             userProject.setGroup(null);
-            userProject.setBucket(region.getServices().getNamespacePrefix()+user.getUser().getIdep());
+            userProject.setVaultTopDir(user.getUser().getIdep());
+            userProject.setBucket(user.getUser().getIdep());
             userProject.setNamespace(kubernetesService.getCurrentNamespace(region));
             userProject.setName("Single namespace, single project");
         }
         else {
             userProject.setId(region.getServices().getNamespacePrefix()+user.getUser().getIdep());
             userProject.setGroup(null);
-            userProject.setBucket(region.getServices().getNamespacePrefix()+user.getUser().getIdep());
+            userProject.setVaultTopDir(user.getUser().getIdep());
+            userProject.setBucket(user.getUser().getIdep());
             userProject.setNamespace(region.getServices().getNamespacePrefix()+user.getUser().getIdep());
             userProject.setName(user.getUser().getIdep()+" personal project");
         }
