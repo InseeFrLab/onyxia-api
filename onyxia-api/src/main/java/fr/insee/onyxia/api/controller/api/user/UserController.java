@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Tag(name = "User",description = "Personal data")
-@RequestMapping("/user")
+@RequestMapping({"/api/user", "/user"})
 @RestController
 @SecurityRequirement(name="auth")
 public class UserController {

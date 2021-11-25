@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Tag(name = "My lab", description = "My services")
-@RequestMapping("/my-lab/quota")
+@RequestMapping({"/api/my-lab/quota", "/my-lab/quota"})
 @RestController
 @SecurityRequirement(name = "auth")
 public class QuotaController {
