@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @Tag(name="Public", description = "Information endpoints")
-@RequestMapping("/public")
+@RequestMapping(value={"/api/public", "/public"})
 public class ConfigurationController {
 
     @Autowired(required = false)

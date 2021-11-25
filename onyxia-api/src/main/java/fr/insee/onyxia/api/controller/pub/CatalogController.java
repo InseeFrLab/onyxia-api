@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Tag(name = "Public")
-@RequestMapping("/public/catalog")
+@RequestMapping(value={"/api/public/catalog", "/public/catalog"})
 @RestController
 public class CatalogController {
 

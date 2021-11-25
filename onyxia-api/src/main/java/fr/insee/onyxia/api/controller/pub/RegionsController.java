@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @Tag(name = "Public")
-@RequestMapping("/public/regions")
+@RequestMapping(value={"/api/public/regions", "/public/regions"})
 @RestController
 public class RegionsController {
 

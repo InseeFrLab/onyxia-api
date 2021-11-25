@@ -30,7 +30,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 @Tag(name = "My lab", description = "My services")
-@RequestMapping("/my-lab")
+@RequestMapping(value={"/api/my-lab", "/my-lab"})
 @RestController
 @SecurityRequirement(name = "auth")
 public class MyLabController {
