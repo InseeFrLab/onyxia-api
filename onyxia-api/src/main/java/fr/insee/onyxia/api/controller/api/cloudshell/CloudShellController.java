@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Cloud Shell", description = "Cloud shell")
-@RequestMapping("/cloudshell")
+@RequestMapping({"/api/cloudshell", "/cloudshell"})
 @RestController
 @SecurityRequirement(name="auth")
 public class CloudShellController {

@@ -12,7 +12,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 @RestController
 @Tag(name = "Public")
-@RequestMapping("/public")
+@RequestMapping({"/api/public", "/public"})
 public class IPController {
 
     @Autowired

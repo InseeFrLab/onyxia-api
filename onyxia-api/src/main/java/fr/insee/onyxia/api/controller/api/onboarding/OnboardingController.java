@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Onboarding", description = "Onboarding related services")
-@RequestMapping("/onboarding")
+@RequestMapping({"/api/onboarding", "/onboarding"})
 @RestController
 @SecurityRequirement(name = "auth")
 public class OnboardingController {
