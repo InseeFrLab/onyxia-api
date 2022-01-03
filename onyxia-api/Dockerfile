@@ -1,9 +1,9 @@
 FROM curlimages/curl as build  
-RUN curl -o /tmp/kubectl -L https://storage.googleapis.com/kubernetes-release/release/v1.22.2/bin/linux/amd64/kubectl
-RUN curl -o /tmp/helm -L https://get.helm.sh/helm-v3.7.0-linux-amd64.tar.gz
+RUN curl -o /tmp/kubectl -L https://storage.googleapis.com/kubernetes-release/release/v1.22.5/bin/linux/amd64/kubectl
+RUN curl -o /tmp/helm -L https://get.helm.sh/helm-v3.7.2-linux-amd64.tar.gz
 RUN tar -xvzf /tmp/helm -C /tmp
 
-FROM openjdk:11-jre-slim
+FROM openjdk:17
 COPY --from=build /tmp/kubectl /usr/local/bin/kubectl
 RUN chmod +x /usr/local/bin/kubectl
 COPY --from=build /tmp/linux-amd64/helm /usr/local/bin/helm

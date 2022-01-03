@@ -46,17 +46,6 @@ public class CatalogsLoader {
         return catalogs;
     }
 
-    @Service
-    public class CatalogFilter {
 
-        @Autowired
-        private RegionsConfiguration regionsConfiguration;
-
-        private Logger logger = LoggerFactory.getLogger(CatalogFilter.class);
-
-        public List<CatalogWrapper> filterCatalogs(List<CatalogWrapper> catalogs) {
-            return catalogs;
-        }
-    }
 
 }
