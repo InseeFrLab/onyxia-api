@@ -85,8 +85,10 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
          .authorizeRequests().antMatchers(HttpMethod.OPTIONS).permitAll()
          // configuration pour Swagger
          .antMatchers("/","/swagger-ui**","/swagger-ui/**", "/v2/api-docs","/v3/api-docs","/v3/api-docs/*","/csrf",  "/webjars/**", "/swagger-resources/**", "/actuator/**", "/actuator").permitAll()
+         .antMatchers("/api","/api/swagger-ui**","/api/swagger-ui/**", "/api/v2/api-docs","/api/v3/api-docs","/api/v3/api-docs/*","/api/csrf",  "/api/webjars/**", "/api/swagger-resources/**", "/api/actuator/**", "/api/actuator").permitAll()
          // configuration pour public
          .antMatchers("/public/**").permitAll()
+         .antMatchers("/api/public/**").permitAll()
          .anyRequest().authenticated()
          ;
       }
