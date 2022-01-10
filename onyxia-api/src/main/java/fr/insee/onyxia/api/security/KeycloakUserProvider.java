@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
+@ConditionalOnProperty(name = "authentication.mode", havingValue = "openidconnect")
 public class KeycloakUserProvider {
 
     @Autowired
