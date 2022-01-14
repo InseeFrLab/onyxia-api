@@ -35,17 +35,6 @@ public class NoSecurityConfiguration extends WebSecurityConfigurerAdapter {
        web.ignoring().antMatchers("/**");
    }
 
-   @Bean
-   public UserProvider getUserProvider() {
-      return () -> {
-         User user = User.newInstance()
-         .setEmail("toto@tld.fr")
-         .setNomComplet("John doe")
-         .setIdep("default")
-                 .setIp(httpRequestUtils.getClientIpAddressIfServletRequestExist(((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()))
-                 .build();
-         return user;
-      };
-   }
+
 
 }
