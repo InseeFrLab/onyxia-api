@@ -44,7 +44,14 @@
       },
       "data": {
         "S3": {
-          "URL": "https://minio.example.com",
+          "endpointS3": "https://s3.amazonaws.com",
+          "endpointSTS": "https://sts.amazonaws.com",
+          "region": "us-east-1",
+          "roleARN" : "",
+          "roleSessionName" : "",
+          "bucketPrefix": "",
+          "groupBucketPrefix": "",
+          "bucketClaim": "preferred_username",
           "monitoring": {
             "URLPattern": "https://graphana.minio.example.com/$bucketId"
           }

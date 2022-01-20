@@ -288,17 +288,79 @@ public class Region {
     }
 
     public static class S3 {
-        @JsonProperty("URL")
-        private String url;
+        private String endpointS3;
+        private String endpointSTS;
+        private String region;
+        private String roleARN;
+        private String roleSessionName;
+        private String bucketPrefix;
+        private String groupBucketPrefix;
+        private String bucketClaim;
 
         private Monitoring monitoring;
 
-        public void setUrl(String url) {
-            this.url = url;
+        public String getEndpointS3() {
+            return endpointS3;
         }
 
-        public String getUrl() {
-            return url;
+        public void setEndpointS3(String endpointS3) {
+            this.endpointS3 = endpointS3;
+        }
+
+        public String getEndpointSTS() {
+            return endpointSTS;
+        }
+
+        public void setEndpointSTS(String endpointSTS) {
+            this.endpointSTS = endpointSTS;
+        }
+
+        public String getRegion() {
+            return region;
+        }
+
+        public void setRegion(String region) {
+            this.region = region;
+        }
+
+        public String getRoleARN() {
+            return roleARN;
+        }
+
+        public void setRoleARN(String roleARN) {
+            this.roleARN = roleARN;
+        }
+
+        public String getRoleSessionName() {
+            return roleSessionName;
+        }
+
+        public void setRoleSessionName(String roleSessionName) {
+            this.roleSessionName = roleSessionName;
+        }
+
+        public String getBucketPrefix() {
+            return bucketPrefix;
+        }
+
+        public void setBucketPrefix(String bucketPrefix) {
+            this.bucketPrefix = bucketPrefix;
+        }
+
+        public String getGroupBucketPrefix() {
+            return groupBucketPrefix;
+        }
+
+        public void setGroupBucketPrefix(String groupBucketPrefix) {
+            this.groupBucketPrefix = groupBucketPrefix;
+        }
+
+        public String getBucketClaim() {
+            return bucketClaim;
+        }
+
+        public void setBucketClaim(String bucketClaim) {
+            this.bucketClaim = bucketClaim;
         }
 
         public void setMonitoring(Monitoring monitoring) {
