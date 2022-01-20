@@ -50,6 +50,7 @@ public class KeycloakUserProvider {
                     .setIp(httpRequestUtils.getClientIpAddressIfServletRequestExist(((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()))
                     .build();
             user.getAttributes().putAll(token.getOtherClaims());
+            user.getAttributes().put("sub",token.getSubject());
             return user;
         };
     }
