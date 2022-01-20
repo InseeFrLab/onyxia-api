@@ -49,6 +49,7 @@ public class KeycloakUserProvider {
                     .setIdep(token.getPreferredUsername())
                     .setIp(httpRequestUtils.getClientIpAddressIfServletRequestExist(((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()))
                     .build();
+            user.getAttributes().putAll(token.getOtherClaims());
             return user;
         };
     }
