@@ -3,7 +3,7 @@ RUN curl -o /tmp/kubectl -L https://storage.googleapis.com/kubernetes-release/re
 RUN curl -o /tmp/helm -L https://get.helm.sh/helm-v3.7.2-linux-amd64.tar.gz
 RUN tar -xvzf /tmp/helm -C /tmp
 
-FROM openjdk:17
+FROM eclipse-temurin:17-jre
 COPY --from=build /tmp/kubectl /usr/local/bin/kubectl
 COPY --from=build /tmp/linux-amd64/helm /usr/local/bin/helm
 COPY target/*.jar app.jar
