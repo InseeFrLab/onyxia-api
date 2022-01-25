@@ -5,8 +5,12 @@ RUN tar -xvzf /tmp/helm -C /tmp
 
 FROM openjdk:17
 COPY --from=build /tmp/kubectl /usr/local/bin/kubectl
-RUN chmod +x /usr/local/bin/kubectl
 COPY --from=build /tmp/linux-amd64/helm /usr/local/bin/helm
-RUN chmod +x /usr/local/bin/helm
 COPY target/*.jar app.jar
+RUN chmod +x /usr/local/bin/kubectl && \
+    chmod +x /usr/local/bin/helm && \
+    groupadd --gid 101 --system onyxia && \
+    useradd --system --uid 101 --create-home --home-dir /var/cache/onyxia --shell /sbin/nologin --gid onyxia --comment onyxia onyxia
+# Equivalent to 'USER onyxia', see: https://github.com/InseeFrLab/onyxia-api/pull/116
+USER 101
 ENTRYPOINT ["java","-jar","/app.jar"]
