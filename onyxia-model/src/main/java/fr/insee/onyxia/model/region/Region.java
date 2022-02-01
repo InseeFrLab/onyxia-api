@@ -295,7 +295,7 @@ public class Region {
         private String roleSessionName;
         private String bucketPrefix;
         private String groupBucketPrefix;
-        private String bucketClaim;
+        private String bucketClaim = "preferred_username";
 
         private Monitoring monitoring;
 
