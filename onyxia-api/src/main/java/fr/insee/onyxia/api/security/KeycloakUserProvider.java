@@ -51,7 +51,7 @@ public class KeycloakUserProvider {
                     .build();
             user.getAttributes().putAll(token.getOtherClaims());
             user.getAttributes().put("sub",token.getSubject());
-            user.getAttributes().put("preferred_username", token.getPreferredUsername())
+            user.getAttributes().put("preferred_username", token.getPreferredUsername());
             return user;
         };
     }
