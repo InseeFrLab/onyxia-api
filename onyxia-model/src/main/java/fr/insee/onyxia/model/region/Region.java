@@ -288,8 +288,9 @@ public class Region {
     }
 
     public static class S3 {
-        private String endpointS3;
-        private String endpointSTS;
+        private String type;
+        @JsonProperty("URL")
+        private String url;
         private String region;
         private String roleARN;
         private String roleSessionName;
@@ -299,20 +300,20 @@ public class Region {
 
         private Monitoring monitoring;
 
-        public String getEndpointS3() {
-            return endpointS3;
+        public String getType() {
+            return type;
         }
 
-        public void setEndpointS3(String endpointS3) {
-            this.endpointS3 = endpointS3;
+        public void setType(String type) {
+            this.type = type;
         }
 
-        public String getEndpointSTS() {
-            return endpointSTS;
+        public String getUrl() {
+            return url;
         }
 
-        public void setEndpointSTS(String endpointSTS) {
-            this.endpointSTS = endpointSTS;
+        public void setUrl(String url) {
+            this.url = url;
         }
 
         public String getRegion() {

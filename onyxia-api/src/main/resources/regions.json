@@ -44,8 +44,8 @@
       },
       "data": {
         "S3": {
-          "endpointS3": "https://s3.amazonaws.com",
-          "endpointSTS": "https://sts.amazonaws.com",
+          "type": "amazon",
+          "url": "",
           "region": "us-east-1",
           "roleARN" : "",
           "roleSessionName" : "",
