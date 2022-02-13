@@ -286,7 +286,7 @@ public class Region {
             this.s3 = s3;
         }
     }
-
+    
     public static class S3 {
         private String type;
         @JsonProperty("URL")
@@ -297,7 +297,7 @@ public class Region {
         private String bucketPrefix;
         private String groupBucketPrefix;
         private String bucketClaim = "preferred_username";
-
+        private KeycloakParams keycloakParams;
         private Monitoring monitoring;
 
         public String getType() {
@@ -371,8 +371,55 @@ public class Region {
         public Monitoring getMonitoring() {
             return monitoring;
         }
-    }
 
+        public void setKeycloakParams(KeycloakParams keycloakParams) {
+            this.keycloakParams = keycloakParams;
+        }
+
+        public KeycloakParams getKeycloakParams() {
+            return keycloakParams;
+        }
+    }
+    
+    public static class KeycloakParams {
+        @JsonProperty("URL")
+        private String url;
+        private String clientId;
+        private String realm;
+        private long defaultDurationSeconds;
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
+
+        public String getClientId() {
+            return clientId;
+        }
+
+        public void setUClientId(String clientId) {
+            this.clientId = clientId;
+        }
+
+        public String getRealm() {
+            return realm;
+        }
+
+        public void setRealm(String realm) {
+            this.realm = realm;
+        }
+
+        public long getDefaultDurationSeconds(){
+            return defaultDurationSeconds;
+        }
+
+        public void setDefaultDurationSeconds(long defaultDurationSeconds) {
+            this.defaultDurationSeconds = defaultDurationSeconds;
+        }       
+    }
     public static class Expose {
         private String domain;
 
