@@ -297,6 +297,7 @@ public class Region {
         private String bucketPrefix;
         private String groupBucketPrefix;
         private String bucketClaim = "preferred_username";
+        private long defaultDurationSeconds;
         private KeycloakParams keycloakParams;
         private Monitoring monitoring;
 
@@ -364,6 +365,14 @@ public class Region {
             this.bucketClaim = bucketClaim;
         }
 
+        public long getDefaultDurationSeconds(){
+            return defaultDurationSeconds;
+        }
+
+        public void setDefaultDurationSeconds(long defaultDurationSeconds) {
+            this.defaultDurationSeconds = defaultDurationSeconds;
+        }
+        
         public void setMonitoring(Monitoring monitoring) {
             this.monitoring = monitoring;
         }
@@ -386,7 +395,7 @@ public class Region {
         private String url;
         private String clientId;
         private String realm;
-        private long defaultDurationSeconds;
+        
 
         public String getUrl() {
             return url;
@@ -411,14 +420,7 @@ public class Region {
         public void setRealm(String realm) {
             this.realm = realm;
         }
-
-        public long getDefaultDurationSeconds(){
-            return defaultDurationSeconds;
-        }
-
-        public void setDefaultDurationSeconds(long defaultDurationSeconds) {
-            this.defaultDurationSeconds = defaultDurationSeconds;
-        }       
+     
     }
     public static class Expose {
         private String domain;
