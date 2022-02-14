@@ -25,7 +25,7 @@ public class S3Controller {
     @PostMapping
     public void createBucket(String awsRegion, String accessKey, String secretKey, String sessionToken, String bucketName) {
         software.amazon.awssdk.regions.Region region = software.amazon.awssdk.regions.Region.of(awsRegion);
-        AwsCredentials creds = AwsSessionCredentials.create("","","");
+        AwsCredentials creds = AwsSessionCredentials.create(accessKey,secretKey,sessionToken);
         try (S3Client s3 = S3Client.builder()
                 .region(region)
                 .credentialsProvider(StaticCredentialsProvider.create(creds))
