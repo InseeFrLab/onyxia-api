@@ -37,7 +37,13 @@ public class S3Controller {
                 throw new RuntimeException("Bucket creation failed "+response.statusText());
             }
             // Apply CORS
-            CORSRule rule = CORSRule.builder().allowedHeaders("*").allowedMethods("GET,PUT,POST,DELETE,HEAD").allowedOrigins("*").build();
+            List<String> allowedMethods = new ArrayList<>();
+            allowedMethods.add("GET");
+            allowedMethods.add("POST");
+            allowedMethods.add("PUT");
+            allowedMethods.add("DELETE");
+            allowedMethods.add("HEAD");
+            CORSRule rule = CORSRule.builder().allowedHeaders("*").allowedMethods(allowedMethods).allowedOrigins("*").build();
             CORSConfiguration corsConfig = CORSConfiguration.builder().corsRules(rule).build();
             SdkHttpResponse corsResponse = s3.putBucketCors(PutBucketCorsRequest.builder().bucket(bucketName).corsConfiguration(corsConfig).build()).sdkHttpResponse();
             if (!corsResponse.isSuccessful()) {
