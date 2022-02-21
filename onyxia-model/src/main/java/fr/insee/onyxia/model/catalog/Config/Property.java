@@ -34,6 +34,10 @@ public class Property {
     @JsonProperty("x-form")
     private XForm xform;
 
+
+    @JsonProperty("x-security")
+    private XSecurity xsecurity;
+
     @JsonProperty("x-generated")
     private XGenerated xGenerated;
 
@@ -43,6 +47,14 @@ public class Property {
 
     public void setXform(XForm xform) {
         this.xform = xform;
+    }
+
+    public XSecurity getXsecurity() {
+        return xsecurity;
+    }
+
+    public void setXsecurity(XSecurity xsecurity) {
+        this.xsecurity = xsecurity;
     }
 
     public Map<String, Property> getProperties() {
@@ -232,6 +244,21 @@ public class Property {
         public void setPath(String path) {
             this.path = path;
         }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class XSecurity {
+
+        String pattern;
+
+        public String getPattern() {
+            return pattern;
+        }
+
+        public void setPattern(String pattern) {
+            this.pattern = pattern;
+        }
+
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
