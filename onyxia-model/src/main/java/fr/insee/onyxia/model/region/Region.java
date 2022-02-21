@@ -93,6 +93,7 @@ public class Region {
         private Monitoring monitoring;
         private CloudshellConfiguration cloudshell;
         private String initScript;
+        private String allowedURIPattern="^https://";
         private Quotas quotas = new Quotas();
         private DefaultConfiguration defaultConfiguration = new DefaultConfiguration();
 
@@ -228,6 +229,14 @@ public class Region {
             this.initScript = initScript;
         }
 
+        public String getAllowedURIPattern() {
+            return allowedURIPattern;
+        }
+
+        public void setAllowedURIPattern(String allowedURIPattern) {
+            this.allowedURIPattern = allowedURIPattern;
+        }
+        
         public AuthenticationMode getAuthenticationMode() {
             return authenticationMode;
         }
