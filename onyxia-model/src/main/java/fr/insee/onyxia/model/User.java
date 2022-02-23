@@ -1,10 +1,12 @@
 package fr.insee.onyxia.model;
 
-import fr.insee.onyxia.model.project.Project;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class User implements Serializable {
    
@@ -14,8 +16,18 @@ public class User implements Serializable {
 	String nomComplet;
 	String password;
 	String ip;
+	@JsonIgnore
+	Map<String, Object> attributes = new HashMap<>();
 	List<String> groups = new ArrayList<>();
 
+
+	public Map<String, Object> getAttributes() {
+		return attributes;
+	}
+
+	public void setAttributes(Map<String, Object> attributes) {
+		this.attributes = attributes;
+	}
 
 	@Override
 	public int hashCode() {

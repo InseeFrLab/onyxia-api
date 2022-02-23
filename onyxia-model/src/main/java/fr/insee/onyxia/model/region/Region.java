@@ -93,6 +93,7 @@ public class Region {
         private Monitoring monitoring;
         private CloudshellConfiguration cloudshell;
         private String initScript;
+        private String allowedURIPattern="^https://";
         private Quotas quotas = new Quotas();
         private DefaultConfiguration defaultConfiguration = new DefaultConfiguration();
 
@@ -228,6 +229,14 @@ public class Region {
             this.initScript = initScript;
         }
 
+        public String getAllowedURIPattern() {
+            return allowedURIPattern;
+        }
+
+        public void setAllowedURIPattern(String allowedURIPattern) {
+            this.allowedURIPattern = allowedURIPattern;
+        }
+        
         public AuthenticationMode getAuthenticationMode() {
             return authenticationMode;
         }
@@ -286,21 +295,93 @@ public class Region {
             this.s3 = s3;
         }
     }
-
+    
     public static class S3 {
+        private String type;
         @JsonProperty("URL")
         private String url;
-
+        private String region;
+        private String roleARN;
+        private String roleSessionName;
+        private String bucketPrefix;
+        private String groupBucketPrefix;
+        private String bucketClaim = "preferred_username";
+        private long defaultDurationSeconds;
+        private KeycloakParams keycloakParams;
         private Monitoring monitoring;
 
-        public void setUrl(String url) {
-            this.url = url;
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
         }
 
         public String getUrl() {
             return url;
         }
 
+        public void setUrl(String url) {
+            this.url = url;
+        }
+
+        public String getRegion() {
+            return region;
+        }
+
+        public void setRegion(String region) {
+            this.region = region;
+        }
+
+        public String getRoleARN() {
+            return roleARN;
+        }
+
+        public void setRoleARN(String roleARN) {
+            this.roleARN = roleARN;
+        }
+
+        public String getRoleSessionName() {
+            return roleSessionName;
+        }
+
+        public void setRoleSessionName(String roleSessionName) {
+            this.roleSessionName = roleSessionName;
+        }
+
+        public String getBucketPrefix() {
+            return bucketPrefix;
+        }
+
+        public void setBucketPrefix(String bucketPrefix) {
+            this.bucketPrefix = bucketPrefix;
+        }
+
+        public String getGroupBucketPrefix() {
+            return groupBucketPrefix;
+        }
+
+        public void setGroupBucketPrefix(String groupBucketPrefix) {
+            this.groupBucketPrefix = groupBucketPrefix;
+        }
+
+        public String getBucketClaim() {
+            return bucketClaim;
+        }
+
+        public void setBucketClaim(String bucketClaim) {
+            this.bucketClaim = bucketClaim;
+        }
+
+        public long getDefaultDurationSeconds(){
+            return defaultDurationSeconds;
+        }
+
+        public void setDefaultDurationSeconds(long defaultDurationSeconds) {
+            this.defaultDurationSeconds = defaultDurationSeconds;
+        }
+        
         public void setMonitoring(Monitoring monitoring) {
             this.monitoring = monitoring;
         }
@@ -308,8 +389,48 @@ public class Region {
         public Monitoring getMonitoring() {
             return monitoring;
         }
-    }
 
+        public void setKeycloakParams(KeycloakParams keycloakParams) {
+            this.keycloakParams = keycloakParams;
+        }
+
+        public KeycloakParams getKeycloakParams() {
+            return keycloakParams;
+        }
+    }
+    
+    public static class KeycloakParams {
+        @JsonProperty("URL")
+        private String url;
+        private String clientId;
+        private String realm;
+        
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
+
+        public String getClientId() {
+            return clientId;
+        }
+
+        public void setUClientId(String clientId) {
+            this.clientId = clientId;
+        }
+
+        public String getRealm() {
+            return realm;
+        }
+
+        public void setRealm(String realm) {
+            this.realm = realm;
+        }
+     
+    }
     public static class Expose {
         private String domain;
 
