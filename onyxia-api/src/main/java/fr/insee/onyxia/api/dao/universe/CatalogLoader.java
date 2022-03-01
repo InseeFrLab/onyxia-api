@@ -62,7 +62,7 @@ public class CatalogLoader {
             Repository repository = mapperHelm.readValue(reader, Repository.class);
             repository.getPackages().parallelStream().forEach(pkg -> {
                 try {
-                    refreshPackage(pkg);
+                    refreshPackage(cw, pkg);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -74,14 +74,15 @@ public class CatalogLoader {
         }
     }
 
-    private void refreshPackage(Pkg pkg) throws IOException {
+    private void refreshPackage(CatalogWrapper cw, Pkg pkg) throws IOException {
         if (!(pkg instanceof Chart)) {
             throw new IllegalArgumentException("Package should be of type Chart");
         }
 
         Chart chart = (Chart) pkg;
         // TODO : support multiple urls
-        InputStream inputStream = resourceLoader.getResource(chart.getUrls().stream().findFirst().get())
+        InputStream inputStream = resourceLoader.getResource(cw.getLocation()+"/index.yaml")
+                .createRelative(chart.getUrls().stream().findFirst().get())
                 .getInputStream();
         extractDataFromTgz(inputStream, chart);
 
