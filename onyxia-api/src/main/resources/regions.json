@@ -43,19 +43,7 @@
         }
       },
       "data": {
-        "S3": {
-          "type": "amazon",
-          "url": "",
-          "region": "us-east-1",
-          "roleARN" : "",
-          "roleSessionName" : "",
-          "bucketPrefix": "",
-          "groupBucketPrefix": "",
-          "bucketClaim": "preferred_username",
-          "monitoring": {
-            "URLPattern": "https://graphana.minio.example.com/$bucketId"
-          }
-        }
+       
       },
       "auth": {
         "type": "openidconnect"
