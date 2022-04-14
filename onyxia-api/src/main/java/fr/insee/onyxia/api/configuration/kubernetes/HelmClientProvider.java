@@ -48,8 +48,6 @@ public class HelmClientProvider {
 	}
 
 	if (region.getServices().getAuthenticationMode() == Region.Services.AuthenticationMode.USER) {
-	    helmConfiguration.setKubeConfig(null);
-	    helmConfiguration.setApiserverUrl(region.getServices().getServer().getUrl());
 	    helmConfiguration.setKubeToken((String) user.getAttributes().get("access_token"));
 	}
 
