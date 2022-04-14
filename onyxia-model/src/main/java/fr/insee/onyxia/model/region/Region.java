@@ -2,6 +2,7 @@ package fr.insee.onyxia.model.region;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import fr.insee.onyxia.model.service.Service;
 import fr.insee.onyxia.model.service.quota.Quota;
 
@@ -15,549 +16,549 @@ public class Region {
     private Data data;
 
     public String getId() {
-        return id;
+	return id;
     }
 
     public void setId(String id) {
-        this.id = id;
+	this.id = id;
     }
 
     public String getName() {
-        return name;
+	return name;
     }
 
     public void setName(String name) {
-        this.name = name;
+	this.name = name;
     }
 
     public String getDescription() {
-        return description;
+	return description;
     }
 
     public void setDescription(String description) {
-        this.description = description;
+	this.description = description;
     }
 
     public Location getLocation() {
-        return location;
+	return location;
     }
 
     public void setLocation(Location location) {
-        this.location = location;
+	this.location = location;
     }
 
     public Services getServices() {
-        return services;
+	return services;
     }
 
     public void setServices(Services services) {
-        this.services = services;
+	this.services = services;
     }
 
-
     public Data getData() {
-        return data;
+	return data;
     }
 
     public void setData(Data data) {
-        this.data = data;
+	this.data = data;
     }
 
     public OnyxiaAPI getOnyxiaAPI() {
-        return onyxiaAPI;
+	return onyxiaAPI;
     }
 
     public void setOnyxiaAPI(OnyxiaAPI onyxiaAPI) {
-        this.onyxiaAPI = onyxiaAPI;
+	this.onyxiaAPI = onyxiaAPI;
     }
 
-    @JsonIgnoreProperties(value={"server"},allowSetters = true)
+    @JsonIgnoreProperties(value = { "server" }, allowSetters = true)
     public static class Services {
 
-        public static enum AuthenticationMode {
-            @JsonProperty("impersonate")
-            IMPERSONATE,
-            @JsonProperty("admin")
-            ADMIN
-        }
+	public static enum AuthenticationMode {
+	    @JsonProperty("impersonate")
+	    IMPERSONATE,
+	    @JsonProperty("admin")
+	    ADMIN,
+	    @JsonProperty("user")
+	    USER
+	}
 
-        private Service.ServiceType type;
-        private boolean singleNamespace = true;
-        private String namespacePrefix = "user-";
-        private String groupNamespacePrefix = "projet-";
-        private String usernamePrefix;
-        private String groupPrefix;
-        private AuthenticationMode authenticationMode = AuthenticationMode.IMPERSONATE;
-        private Expose expose;
-        private Server server;
-        private Monitoring monitoring;
-        private CloudshellConfiguration cloudshell;
-        private String initScript;
-        private String allowedURIPattern="^https://";
-        private Quotas quotas = new Quotas();
-        private DefaultConfiguration defaultConfiguration = new DefaultConfiguration();
+	private Service.ServiceType type;
+	private boolean singleNamespace = true;
+	private String namespacePrefix = "user-";
+	private String groupNamespacePrefix = "projet-";
+	private String usernamePrefix;
+	private String groupPrefix;
+	private AuthenticationMode authenticationMode = AuthenticationMode.IMPERSONATE;
+	private Expose expose;
+	private Server server;
+	private Monitoring monitoring;
+	private CloudshellConfiguration cloudshell;
+	private String initScript;
+	private String allowedURIPattern = "^https://";
+	private Quotas quotas = new Quotas();
+	private DefaultConfiguration defaultConfiguration = new DefaultConfiguration();
 
-        public static class DefaultConfiguration {
-            private boolean IPProtection = true;
-            private boolean networkPolicy = true;
+	public static class DefaultConfiguration {
+	    private boolean IPProtection = true;
+	    private boolean networkPolicy = true;
 
-            public void setIPProtection(boolean IPProtection) {
-                this.IPProtection = IPProtection;
-            }
+	    public void setIPProtection(boolean IPProtection) {
+		this.IPProtection = IPProtection;
+	    }
 
-            public boolean isIPProtection() {
-                return IPProtection;
-            }
+	    public boolean isIPProtection() {
+		return IPProtection;
+	    }
 
-            public void setNetworkPolicy(boolean networkPolicy) {
-                this.networkPolicy = networkPolicy;
-            }
+	    public void setNetworkPolicy(boolean networkPolicy) {
+		this.networkPolicy = networkPolicy;
+	    }
 
-            public boolean isNetworkPolicy() {
-                return networkPolicy;
-            }
-        }
+	    public boolean isNetworkPolicy() {
+		return networkPolicy;
+	    }
+	}
 
-        public static class Quotas {
-            private boolean enabled = false;
-            private boolean allowUserModification = true;
-            @JsonProperty("default")
-            private Quota defaultQuota;
+	public static class Quotas {
+	    private boolean enabled = false;
+	    private boolean allowUserModification = true;
+	    @JsonProperty("default")
+	    private Quota defaultQuota;
 
-            public boolean isEnabled() {
-                return enabled;
-            }
+	    public boolean isEnabled() {
+		return enabled;
+	    }
 
-            public void setEnabled(boolean enabled) {
-                this.enabled = enabled;
-            }
+	    public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	    }
 
-            public boolean isAllowUserModification() {
-                return allowUserModification;
-            }
+	    public boolean isAllowUserModification() {
+		return allowUserModification;
+	    }
 
-            public void setAllowUserModification(boolean allowUserModification) {
-                this.allowUserModification = allowUserModification;
-            }
+	    public void setAllowUserModification(boolean allowUserModification) {
+		this.allowUserModification = allowUserModification;
+	    }
 
-            public Quota getDefaultQuota() {
-                return defaultQuota;
-            }
+	    public Quota getDefaultQuota() {
+		return defaultQuota;
+	    }
 
-            public void setDefaultQuota(Quota defaultQuota) {
-                this.defaultQuota = defaultQuota;
-            }
-        }
+	    public void setDefaultQuota(Quota defaultQuota) {
+		this.defaultQuota = defaultQuota;
+	    }
+	}
 
-        public DefaultConfiguration getDefaultConfiguration() {
-            return defaultConfiguration;
-        }
+	public DefaultConfiguration getDefaultConfiguration() {
+	    return defaultConfiguration;
+	}
 
-        public void setDefaultConfiguration(DefaultConfiguration defaultConfiguration) {
-            this.defaultConfiguration = defaultConfiguration;
-        }
+	public void setDefaultConfiguration(DefaultConfiguration defaultConfiguration) {
+	    this.defaultConfiguration = defaultConfiguration;
+	}
 
-        public boolean isSingleNamespace() {
-            return singleNamespace;
-        }
+	public boolean isSingleNamespace() {
+	    return singleNamespace;
+	}
 
-        public void setSingleNamespace(boolean singleNamespace) {
-            this.singleNamespace = singleNamespace;
-        }
+	public void setSingleNamespace(boolean singleNamespace) {
+	    this.singleNamespace = singleNamespace;
+	}
 
-        public Service.ServiceType getType() {
-            return type;
-        }
+	public Service.ServiceType getType() {
+	    return type;
+	}
 
-        public void setType(Service.ServiceType type) {
-            this.type = type;
-        }
+	public void setType(Service.ServiceType type) {
+	    this.type = type;
+	}
 
-        public String getNamespacePrefix() {
-            return namespacePrefix;
-        }
+	public String getNamespacePrefix() {
+	    return namespacePrefix;
+	}
 
-        public void setNamespacePrefix(String namespacePrefix) {
-            this.namespacePrefix = namespacePrefix;
-        }
+	public void setNamespacePrefix(String namespacePrefix) {
+	    this.namespacePrefix = namespacePrefix;
+	}
 
-        public String getUsernamePrefix() {
-            return usernamePrefix;
-        }
+	public String getUsernamePrefix() {
+	    return usernamePrefix;
+	}
 
-        public void setUsernamePrefix(String usernamePrefix) {
-            this.usernamePrefix = usernamePrefix;
-        }
+	public void setUsernamePrefix(String usernamePrefix) {
+	    this.usernamePrefix = usernamePrefix;
+	}
 
-        public Expose getExpose() {
-            return expose;
-        }
+	public Expose getExpose() {
+	    return expose;
+	}
 
-        public void setExpose(Expose expose) {
-            this.expose = expose;
-        }
+	public void setExpose(Expose expose) {
+	    this.expose = expose;
+	}
 
-        public Server getServer() {
-            return server;
-        }
+	public Server getServer() {
+	    return server;
+	}
 
-        public void setServer(Server server) {
-            this.server = server;
-        }
+	public void setServer(Server server) {
+	    this.server = server;
+	}
 
-        public CloudshellConfiguration getCloudshell() {
-            return cloudshell;
-        }
+	public CloudshellConfiguration getCloudshell() {
+	    return cloudshell;
+	}
 
-        public void setCloudshell(CloudshellConfiguration cloudshell) {
-            this.cloudshell = cloudshell;
-        }
+	public void setCloudshell(CloudshellConfiguration cloudshell) {
+	    this.cloudshell = cloudshell;
+	}
 
-        public Monitoring getMonitoring() {
-            return monitoring;
-        }
+	public Monitoring getMonitoring() {
+	    return monitoring;
+	}
 
-        public void setMonitoring(Monitoring monitoring) {
-            this.monitoring = monitoring;
-        }
+	public void setMonitoring(Monitoring monitoring) {
+	    this.monitoring = monitoring;
+	}
 
-        public String getInitScript() {
-            return initScript;
-        }
+	public String getInitScript() {
+	    return initScript;
+	}
 
-        public void setInitScript(String initScript) {
-            this.initScript = initScript;
-        }
+	public void setInitScript(String initScript) {
+	    this.initScript = initScript;
+	}
 
-        public String getAllowedURIPattern() {
-            return allowedURIPattern;
-        }
+	public String getAllowedURIPattern() {
+	    return allowedURIPattern;
+	}
 
-        public void setAllowedURIPattern(String allowedURIPattern) {
-            this.allowedURIPattern = allowedURIPattern;
-        }
-        
-        public AuthenticationMode getAuthenticationMode() {
-            return authenticationMode;
-        }
+	public void setAllowedURIPattern(String allowedURIPattern) {
+	    this.allowedURIPattern = allowedURIPattern;
+	}
 
-        public void setAuthenticationMode(AuthenticationMode authenticationMode) {
-            this.authenticationMode = authenticationMode;
-        }
+	public AuthenticationMode getAuthenticationMode() {
+	    return authenticationMode;
+	}
 
-        public void setGroupNamespacePrefix(String groupNamespacePrefix) {
-            this.groupNamespacePrefix = groupNamespacePrefix;
-        }
+	public void setAuthenticationMode(AuthenticationMode authenticationMode) {
+	    this.authenticationMode = authenticationMode;
+	}
 
-        public String getGroupNamespacePrefix() {
-            return groupNamespacePrefix;
-        }
+	public void setGroupNamespacePrefix(String groupNamespacePrefix) {
+	    this.groupNamespacePrefix = groupNamespacePrefix;
+	}
 
-        public void setGroupPrefix(String groupPrefix) {
-            this.groupPrefix = groupPrefix;
-        }
+	public String getGroupNamespacePrefix() {
+	    return groupNamespacePrefix;
+	}
 
-        public String getGroupPrefix() {
-            return groupPrefix;
-        }
+	public void setGroupPrefix(String groupPrefix) {
+	    this.groupPrefix = groupPrefix;
+	}
 
-        public Quotas getQuotas() {
-            return quotas;
-        }
+	public String getGroupPrefix() {
+	    return groupPrefix;
+	}
 
-        public void setQuotas(Quotas quotas) {
-            this.quotas = quotas;
-        }
+	public Quotas getQuotas() {
+	    return quotas;
+	}
+
+	public void setQuotas(Quotas quotas) {
+	    this.quotas = quotas;
+	}
     }
 
     public static class Monitoring {
-        @JsonProperty("URLPattern")
-        private String urlPattern;
+	@JsonProperty("URLPattern")
+	private String urlPattern;
 
-        public void setUrlPattern(String urlPattern) {
-            this.urlPattern = urlPattern;
-        }
+	public void setUrlPattern(String urlPattern) {
+	    this.urlPattern = urlPattern;
+	}
 
-        public String getUrlPattern() {
-            return urlPattern;
-        }
+	public String getUrlPattern() {
+	    return urlPattern;
+	}
     }
 
     public static class Data {
-        @JsonProperty("S3")
-        private S3 s3;
+	@JsonProperty("S3")
+	private S3 s3;
 
-        public S3 getS3() {
-            return s3;
-        }
+	public S3 getS3() {
+	    return s3;
+	}
 
-        public void setS3(S3 s3) {
-            this.s3 = s3;
-        }
+	public void setS3(S3 s3) {
+	    this.s3 = s3;
+	}
     }
-    
+
     public static class S3 {
-        private String type;
-        @JsonProperty("URL")
-        private String url;
-        private String region;
-        private String roleARN;
-        private String roleSessionName;
-        private String bucketPrefix;
-        private String groupBucketPrefix;
-        private String bucketClaim = "preferred_username";
-        private long defaultDurationSeconds;
-        private KeycloakParams keycloakParams;
-        private Monitoring monitoring;
+	private String type;
+	@JsonProperty("URL")
+	private String url;
+	private String region;
+	private String roleARN;
+	private String roleSessionName;
+	private String bucketPrefix;
+	private String groupBucketPrefix;
+	private String bucketClaim = "preferred_username";
+	private long defaultDurationSeconds;
+	private KeycloakParams keycloakParams;
+	private Monitoring monitoring;
 
-        public String getType() {
-            return type;
-        }
+	public String getType() {
+	    return type;
+	}
 
-        public void setType(String type) {
-            this.type = type;
-        }
+	public void setType(String type) {
+	    this.type = type;
+	}
 
-        public String getUrl() {
-            return url;
-        }
+	public String getUrl() {
+	    return url;
+	}
 
-        public void setUrl(String url) {
-            this.url = url;
-        }
+	public void setUrl(String url) {
+	    this.url = url;
+	}
 
-        public String getRegion() {
-            return region;
-        }
+	public String getRegion() {
+	    return region;
+	}
 
-        public void setRegion(String region) {
-            this.region = region;
-        }
+	public void setRegion(String region) {
+	    this.region = region;
+	}
 
-        public String getRoleARN() {
-            return roleARN;
-        }
+	public String getRoleARN() {
+	    return roleARN;
+	}
 
-        public void setRoleARN(String roleARN) {
-            this.roleARN = roleARN;
-        }
+	public void setRoleARN(String roleARN) {
+	    this.roleARN = roleARN;
+	}
 
-        public String getRoleSessionName() {
-            return roleSessionName;
-        }
+	public String getRoleSessionName() {
+	    return roleSessionName;
+	}
 
-        public void setRoleSessionName(String roleSessionName) {
-            this.roleSessionName = roleSessionName;
-        }
+	public void setRoleSessionName(String roleSessionName) {
+	    this.roleSessionName = roleSessionName;
+	}
 
-        public String getBucketPrefix() {
-            return bucketPrefix;
-        }
+	public String getBucketPrefix() {
+	    return bucketPrefix;
+	}
 
-        public void setBucketPrefix(String bucketPrefix) {
-            this.bucketPrefix = bucketPrefix;
-        }
+	public void setBucketPrefix(String bucketPrefix) {
+	    this.bucketPrefix = bucketPrefix;
+	}
 
-        public String getGroupBucketPrefix() {
-            return groupBucketPrefix;
-        }
+	public String getGroupBucketPrefix() {
+	    return groupBucketPrefix;
+	}
 
-        public void setGroupBucketPrefix(String groupBucketPrefix) {
-            this.groupBucketPrefix = groupBucketPrefix;
-        }
+	public void setGroupBucketPrefix(String groupBucketPrefix) {
+	    this.groupBucketPrefix = groupBucketPrefix;
+	}
 
-        public String getBucketClaim() {
-            return bucketClaim;
-        }
+	public String getBucketClaim() {
+	    return bucketClaim;
+	}
 
-        public void setBucketClaim(String bucketClaim) {
-            this.bucketClaim = bucketClaim;
-        }
+	public void setBucketClaim(String bucketClaim) {
+	    this.bucketClaim = bucketClaim;
+	}
 
-        public long getDefaultDurationSeconds(){
-            return defaultDurationSeconds;
-        }
+	public long getDefaultDurationSeconds() {
+	    return defaultDurationSeconds;
+	}
 
-        public void setDefaultDurationSeconds(long defaultDurationSeconds) {
-            this.defaultDurationSeconds = defaultDurationSeconds;
-        }
-        
-        public void setMonitoring(Monitoring monitoring) {
-            this.monitoring = monitoring;
-        }
+	public void setDefaultDurationSeconds(long defaultDurationSeconds) {
+	    this.defaultDurationSeconds = defaultDurationSeconds;
+	}
 
-        public Monitoring getMonitoring() {
-            return monitoring;
-        }
+	public void setMonitoring(Monitoring monitoring) {
+	    this.monitoring = monitoring;
+	}
 
-        public void setKeycloakParams(KeycloakParams keycloakParams) {
-            this.keycloakParams = keycloakParams;
-        }
+	public Monitoring getMonitoring() {
+	    return monitoring;
+	}
 
-        public KeycloakParams getKeycloakParams() {
-            return keycloakParams;
-        }
+	public void setKeycloakParams(KeycloakParams keycloakParams) {
+	    this.keycloakParams = keycloakParams;
+	}
+
+	public KeycloakParams getKeycloakParams() {
+	    return keycloakParams;
+	}
     }
-    
+
     public static class KeycloakParams {
-        @JsonProperty("URL")
-        private String url;
-        private String clientId;
-        private String realm;
-        
+	@JsonProperty("URL")
+	private String url;
+	private String clientId;
+	private String realm;
 
-        public String getUrl() {
-            return url;
-        }
+	public String getUrl() {
+	    return url;
+	}
 
-        public void setUrl(String url) {
-            this.url = url;
-        }
+	public void setUrl(String url) {
+	    this.url = url;
+	}
 
-        public String getClientId() {
-            return clientId;
-        }
+	public String getClientId() {
+	    return clientId;
+	}
 
-        public void setUClientId(String clientId) {
-            this.clientId = clientId;
-        }
+	public void setUClientId(String clientId) {
+	    this.clientId = clientId;
+	}
 
-        public String getRealm() {
-            return realm;
-        }
+	public String getRealm() {
+	    return realm;
+	}
 
-        public void setRealm(String realm) {
-            this.realm = realm;
-        }
-     
+	public void setRealm(String realm) {
+	    this.realm = realm;
+	}
+
     }
+
     public static class Expose {
-        private String domain;
+	private String domain;
 
-        public void setDomain(String domain) {
-            this.domain = domain;
-        }
+	public void setDomain(String domain) {
+	    this.domain = domain;
+	}
 
-        public String getDomain() {
-            return domain;
-        }
+	public String getDomain() {
+	    return domain;
+	}
     }
 
     public static class Server {
 
-        @JsonProperty("URL")
-        private String url;
-        private Auth auth;
+	@JsonProperty("URL")
+	private String url;
+	private Auth auth;
 
-        public String getUrl() {
-            return url;
-        }
+	public String getUrl() {
+	    return url;
+	}
 
-        public void setUrl(String url) {
-            this.url = url;
-        }
+	public void setUrl(String url) {
+	    this.url = url;
+	}
 
-        public Auth getAuth() {
-            return auth;
-        }
+	public Auth getAuth() {
+	    return auth;
+	}
 
-        public void setAuth(Auth auth) {
-            this.auth = auth;
-        }
+	public void setAuth(Auth auth) {
+	    this.auth = auth;
+	}
     }
 
     public static class OnyxiaAPI {
-        private String baseURL;
+	private String baseURL;
 
-        public String getBaseURL() {
-            return baseURL;
-        }
+	public String getBaseURL() {
+	    return baseURL;
+	}
 
-        public void setBaseURL(String baseURL) {
-            this.baseURL = baseURL;
-        }
+	public void setBaseURL(String baseURL) {
+	    this.baseURL = baseURL;
+	}
     }
 
     public static class Location {
 
-        private double lat;
-        @JsonProperty("long")
-        private double longitude;
-        private String name;
+	private double lat;
+	@JsonProperty("long")
+	private double longitude;
+	private String name;
 
+	public void setLat(double lat) {
+	    this.lat = lat;
+	}
 
-        public void setLat(double lat) {
-            this.lat = lat;
-        }
+	public void setLongitude(double longitude) {
+	    this.longitude = longitude;
+	}
 
-        public void setLongitude(double longitude) {
-            this.longitude = longitude;
-        }
+	public double getLat() {
+	    return lat;
+	}
 
-        public double getLat() {
-            return lat;
-        }
+	public double getLongitude() {
+	    return longitude;
+	}
 
-        public double getLongitude() {
-            return longitude;
-        }
+	public void setName(String name) {
+	    this.name = name;
+	}
 
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
+	public String getName() {
+	    return name;
+	}
     }
 
     public static class CloudshellConfiguration {
 
-        private String catalogId, packageName;
+	private String catalogId, packageName;
 
-        public String getCatalogId() {
-            return catalogId;
-        }
+	public String getCatalogId() {
+	    return catalogId;
+	}
 
-        public void setCatalogId(String catalogId) {
-            this.catalogId = catalogId;
-        }
+	public void setCatalogId(String catalogId) {
+	    this.catalogId = catalogId;
+	}
 
-        public String getPackageName() {
-            return packageName;
-        }
+	public String getPackageName() {
+	    return packageName;
+	}
 
-        public void setPackageName(String packageName) {
-            this.packageName = packageName;
-        }
+	public void setPackageName(String packageName) {
+	    this.packageName = packageName;
+	}
     }
 
     public static class Auth {
-        private String token;
-        private String username, password;
+	private String token;
+	private String username, password;
 
-        public String getToken() {
-            return token;
-        }
+	public String getToken() {
+	    return token;
+	}
 
-        public void setToken(String token) {
-            this.token = token;
-        }
+	public void setToken(String token) {
+	    this.token = token;
+	}
 
-        public String getUsername() {
-            return username;
-        }
+	public String getUsername() {
+	    return username;
+	}
 
-        public void setUsername(String username) {
-            this.username = username;
-        }
+	public void setUsername(String username) {
+	    this.username = username;
+	}
 
-        public String getPassword() {
-            return password;
-        }
+	public String getPassword() {
+	    return password;
+	}
 
-        public void setPassword(String password) {
-            this.password = password;
-        }
+	public void setPassword(String password) {
+	    this.password = password;
+	}
     }
 }

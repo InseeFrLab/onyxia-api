@@ -1,8 +1,10 @@
 package fr.insee.onyxia.api.security;
 
-import fr.insee.onyxia.api.services.UserProvider;
-import fr.insee.onyxia.api.services.utils.HttpRequestUtils;
-import fr.insee.onyxia.model.User;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.representations.AccessToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +17,9 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
+import fr.insee.onyxia.api.services.UserProvider;
+import fr.insee.onyxia.api.services.utils.HttpRequestUtils;
+import fr.insee.onyxia.model.User;
 
 @Configuration
 @ConditionalOnProperty(name = "authentication.mode", havingValue = "openidconnect")
@@ -29,30 +31,40 @@ public class KeycloakUserProvider {
     @Bean
     @Scope(scopeName = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
     public AccessToken getAccessToken() {
-        HttpServletRequest httpRequest = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        KeycloakSecurityContext securityContext = (KeycloakSecurityContext) httpRequest.getAttribute(KeycloakSecurityContext.class.getName());
-        return securityContext.getToken();
+	final HttpServletRequest httpRequest = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+	final KeycloakSecurityContext securityContext = (KeycloakSecurityContext) httpRequest.getAttribute(KeycloakSecurityContext.class.getName());
+	return securityContext.getToken();
+    }
+
+    @Bean
+    @Scope(scopeName = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.NO)
+    public String getAccessTokenString() {
+	final HttpServletRequest httpRequest = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+	final KeycloakSecurityContext securityContext = (KeycloakSecurityContext) httpRequest.getAttribute(KeycloakSecurityContext.class.getName());
+	return securityContext.getTokenString();
     }
 
     @Bean
     public UserProvider getUserProvider() {
-        return () -> {
-            AccessToken token = getAccessToken();
-            List<String> groups = (List<String>) token.getOtherClaims().get("groups");
-            if (groups == null) {
-                groups = new ArrayList<String>();
-            }
-            User user = User.newInstance()
-                    .addGroups(groups)
-                    .setEmail(token.getEmail())
-                    .setNomComplet(token.getName())
-                    .setIdep(token.getPreferredUsername())
-                    .setIp(httpRequestUtils.getClientIpAddressIfServletRequestExist(((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()))
-                    .build();
-            user.getAttributes().putAll(token.getOtherClaims());
-            user.getAttributes().put("sub",token.getSubject());
-            user.getAttributes().put("preferred_username", token.getPreferredUsername());
-            return user;
-        };
+	return () -> {
+	    final AccessToken token = getAccessToken();
+	    final String tokenString = getAccessTokenString();
+	    List<String> groups = (List<String>) token.getOtherClaims().get("groups");
+	    if (groups == null) {
+		groups = new ArrayList<>();
+	    }
+	    final User user = User.newInstance()
+		    .addGroups(groups)
+		    .setEmail(token.getEmail())
+		    .setNomComplet(token.getName())
+		    .setIdep(token.getPreferredUsername())
+		    .setIp(httpRequestUtils.getClientIpAddressIfServletRequestExist(((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()))
+		    .build();
+	    user.getAttributes().putAll(token.getOtherClaims());
+	    user.getAttributes().put("sub",token.getSubject());
+	    user.getAttributes().put("preferred_username", token.getPreferredUsername());
+	    user.getAttributes().put("access_token",tokenString);
+	    return user;
+	};
     }
 }
