@@ -6,6 +6,8 @@ Onyxia supports Kubernetes using Helm.
 Deployable services are listed and configured inside catalogs.  
 Default catalogs are from InseeFrlab : [Universe datascience](https://github.com/InseeFrLab/Universe-Datascience) and [Inseefrlab helm charts](https://github.com/InseeFrLab/helm-charts) but more catalogs can be added.
 
+Onyxia API can handle several "regions" at the same time which correspond to a set of Onyxia services with its own configuration. See [Region configuration](docs/region-configuration.md) to learn how to set up a region.
+
 The opensourcing (and documentation) is still a work in progress, please be patient :)
 
 ## Quick start
