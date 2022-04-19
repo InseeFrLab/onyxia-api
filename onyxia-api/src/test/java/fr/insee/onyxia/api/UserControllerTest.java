@@ -6,8 +6,13 @@ import fr.insee.onyxia.api.configuration.SecurityConfig;
 import fr.insee.onyxia.api.configuration.properties.RegionsConfiguration;
 import fr.insee.onyxia.api.controller.api.user.UserController;
 import fr.insee.onyxia.api.services.utils.HttpRequestUtils;
+import fr.insee.onyxia.api.user.OnyxiaUserProvider;
+import fr.insee.onyxia.model.OnyxiaUser;
 import fr.insee.onyxia.model.User;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -37,6 +42,16 @@ public class UserControllerTest extends BaseTest {
    @MockBean
    private SecurityConfig securityConfig;
 
+   @MockBean
+   private OnyxiaUserProvider onyxiaUserProvider;
+
+   @BeforeEach
+   public void setUp() {
+      User user = new User();
+      user.setIdep("XXXXXX");
+      Mockito.when(onyxiaUserProvider.getUser()).thenReturn(new OnyxiaUser(user));
+   }
+
    @Test
    public void shouldReturnUserInfo() throws Exception {
       MvcResult result = this.mockMvc.perform(get("/user/info"))
@@ -45,7 +60,7 @@ public class UserControllerTest extends BaseTest {
       .andReturn();
 
       User user = mapper.readValue(result.getResponse().getContentAsString(), User.class);
-      assertEquals(user.getIdep(), "XXXXXX");
+      assertEquals("XXXXXX", user.getIdep());
    }
 
 }
