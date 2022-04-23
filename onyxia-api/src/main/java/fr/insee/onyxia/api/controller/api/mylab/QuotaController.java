@@ -1,6 +1,5 @@
 package fr.insee.onyxia.api.controller.api.mylab;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.api.services.impl.kubernetes.KubernetesService;
 import fr.insee.onyxia.model.project.Project;
@@ -34,9 +33,6 @@ public class QuotaController {
     @Autowired
     private UserProvider userProvider;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     @Operation(
         summary = "Obtain the quota for a namespace.",
         description = "Obtain both the quota limit for a namespace and the current quota usage, if quota limits are enabled on Onyxia.",
@@ -55,9 +51,9 @@ public class QuotaController {
         }
     )
     @GetMapping
-    public QuotaUsage getQuota(@Parameter(hidden = true) Region region, @Parameter(hidden=true) Project project) {
+    public QuotaUsage getQuota(@Parameter(hidden = true) Region region, @Parameter(hidden = true) Project project) {
         checkQuotaIsEnabled(region);
-        ResourceQuota resourceQuota = kubernetesService.getOnyxiaQuota(region, project, userProvider.getUser());
+        ResourceQuota resourceQuota = kubernetesService.getOnyxiaQuota(region, project, userProvider.getUser(region));
         if (resourceQuota == null) {
             return null;
         }
@@ -94,7 +90,7 @@ public class QuotaController {
     public void applyQuota(@Parameter(hidden = true) Region region, @Parameter(hidden=true) Project project, @RequestBody Quota quota) throws IllegalAccessException {
         checkQuotaIsEnabled(region);
         checkQuotaModificationIsAllowed(region);
-        kubernetesService.applyQuota(region, project, userProvider.getUser(), quota);
+        kubernetesService.applyQuota(region, project, userProvider.getUser(region), quota);
     }
 
     @Operation(
@@ -115,13 +111,14 @@ public class QuotaController {
         }
     )
     @PostMapping("/reset")
-    public void resetQuota(@Parameter(hidden = true) Region region, @Parameter(hidden=true) Project project) throws IllegalAccessException {
+    public void resetQuota(@Parameter(hidden = true) Region region, @Parameter(hidden=true) Project project) {
         checkQuotaIsEnabled(region);
         checkQuotaModificationIsAllowed(region);
         if (!region.getServices().getQuotas().isAllowUserModification()) {
             throw new AccessDeniedException("User modification is not allowed on this installation");
         }
-        kubernetesService.applyQuota(region, project, userProvider.getUser(), region.getServices().getQuotas().getDefaultQuota());
+        kubernetesService.applyQuota(region, project, userProvider.getUser(region),
+                region.getServices().getQuotas().getDefaultQuota());
     }
 
     private void checkQuotaIsEnabled(Region region) {

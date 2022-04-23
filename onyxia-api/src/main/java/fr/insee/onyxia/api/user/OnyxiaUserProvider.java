@@ -1,6 +1,5 @@
 package fr.insee.onyxia.api.user;
 
-import fr.insee.onyxia.api.configuration.properties.RegionsConfiguration;
 import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.api.services.impl.kubernetes.KubernetesService;
 import fr.insee.onyxia.model.OnyxiaUser;
@@ -17,20 +16,16 @@ public class OnyxiaUserProvider {
     private UserProvider userProvider;
 
     @Autowired
-    private RegionsConfiguration regionsConfiguration;
-
-    @Autowired
     private KubernetesService kubernetesService; // TODO : cleanup
 
-    public OnyxiaUser getUser() {
-        Region region = regionsConfiguration.getDefaultRegion();
-        OnyxiaUser user = new OnyxiaUser(userProvider.getUser());
+    public OnyxiaUser getUser(Region region) {
+        OnyxiaUser user = new OnyxiaUser(userProvider.getUser(region));
 
         Project userProject = getUserProject(region, user);
         user.getProjects().add(userProject);
 
         if (!region.getServices().isSingleNamespace()) {
-            userProvider.getUser().getGroups().stream().forEach(group -> {
+            userProvider.getUser(region).getGroups().stream().forEach(group -> {
                 Project project = new Project();
                 project.setId(region.getServices().getGroupNamespacePrefix()+group);
                 project.setGroup(group);

@@ -34,17 +34,16 @@ public class OnboardingController {
             owner.setType(KubernetesService.Owner.OwnerType.GROUP);
         }
         else {
-            owner.setId(userProvider.getUser().getIdep());
+            owner.setId(userProvider.getUser(region).getIdep());
             owner.setType(KubernetesService.Owner.OwnerType.USER);
         }
         kubernetesService.createDefaultNamespace(region, owner);
     }
 
     private void checkPermissions(Region region, OnboardingRequest request) throws AccessDeniedException {
-        if (request.getGroup() != null) {
-            if (!userProvider.getUser().getGroups().contains(request.getGroup())) {
-                throw new AccessDeniedException("User does not belong to group "+request.getGroup());
-            }
+        if (request.getGroup() != null
+                && !userProvider.getUser(region).getGroups().contains(request.getGroup())) {
+            throw new AccessDeniedException("User does not belong to group " + request.getGroup());
         }
     }
 

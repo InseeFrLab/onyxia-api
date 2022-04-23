@@ -2,7 +2,6 @@ package fr.insee.onyxia.api.controller.api.mylab;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
-import fr.insee.onyxia.api.configuration.properties.RegionsConfiguration;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.api.services.UserProvider;
@@ -20,8 +19,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,11 +39,6 @@ public class MyLabController {
 
     @Autowired
     private CatalogService catalogService;
-
-    @Autowired
-    private RegionsConfiguration regionsConfiguration;
-
-    private final Logger logger = LoggerFactory.getLogger(MyLabController.class);
 
     @Operation(
         summary = "List the services installed in a namespace.",
@@ -75,7 +67,7 @@ public class MyLabController {
     )
     @GetMapping("/services")
     public ServicesListing getMyServices(@Parameter(hidden = true) Region region, @Parameter(hidden=true) Project project, @RequestParam(required = false) String groupId) throws Exception {
-        User user = userProvider.getUser();
+        User user = userProvider.getUser(region);
         ServicesListing dto = new ServicesListing();
         List<CompletableFuture<ServicesListing>> futures = new ArrayList<>();
         if (region.getServices().getType().equals(Service.ServiceType.KUBERNETES)) {
@@ -116,7 +108,7 @@ public class MyLabController {
     @GetMapping("/app")
     public @ResponseBody Service getApp(@Parameter(hidden = true) Region region,@Parameter(hidden=true) Project project, @RequestParam("serviceId") String serviceId) throws Exception {
         if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
-            return helmAppsService.getUserService(region,project,userProvider.getUser(), serviceId);
+            return helmAppsService.getUserService(region, project, userProvider.getUser(region), serviceId);
         }
         return null;
     }
@@ -153,9 +145,9 @@ public class MyLabController {
     )
     @GetMapping("/app/logs")
     public @ResponseBody String getLogs( @Parameter(hidden = true) Region region, @Parameter(hidden=true) Project project, @RequestParam("serviceId") String serviceId,
-                                        @RequestParam("taskId") String taskId) throws Exception {
+                                        @RequestParam("taskId") String taskId) {
         if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
-            return helmAppsService.getLogs(region, project,userProvider.getUser(),serviceId, taskId);
+            return helmAppsService.getLogs(region, project,userProvider.getUser(region),serviceId, taskId);
         }
         return null;
     }
@@ -193,7 +185,7 @@ public class MyLabController {
     @DeleteMapping("/app")
     public UninstallService destroyApp(@Parameter(hidden = true) Region region, @Parameter(hidden=true) Project project, @RequestParam(value = "path", required = false) String path,@RequestParam(value = "bulk", required = false) boolean bulk) throws Exception {
         if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
-            return helmAppsService.destroyService(region, project, userProvider.getUser(), path, bulk);
+            return helmAppsService.destroyService(region, project, userProvider.getUser(region), path, bulk);
         }
         return null;
     }
@@ -223,14 +215,14 @@ public class MyLabController {
     }
 
     private Collection<Object> publishApps(Region region, Project project, CreateServiceDTO requestDTO)
-            throws JsonProcessingException, IOException, Exception {
+            throws Exception {
         String catalogId = "internal";
         if (requestDTO.getCatalogId() != null && requestDTO.getCatalogId().length() > 0) {
             catalogId = requestDTO.getCatalogId();
         }
         CatalogWrapper catalog = catalogService.getCatalogById(catalogId);
         Pkg pkg = catalog.getCatalog().getPackageByName(requestDTO.getPackageName());
-        User user = userProvider.getUser();
+        User user = userProvider.getUser(region);
         Map<String, Object> fusion = new HashMap<>();
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
         return helmAppsService.installApp(region,project,requestDTO, catalogId, pkg, user, fusion);
