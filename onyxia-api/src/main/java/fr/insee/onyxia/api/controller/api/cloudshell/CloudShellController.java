@@ -1,6 +1,5 @@
 package fr.insee.onyxia.api.controller.api.cloudshell;
 
-import fr.insee.onyxia.api.configuration.properties.RegionsConfiguration;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.api.services.UserProvider;
@@ -10,6 +9,8 @@ import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.Service;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,20 +31,19 @@ public class CloudShellController {
 	@Autowired
 	private CatalogService catalogService;
 
-	@Autowired
-	private RegionsConfiguration regionsConfiguration;
-
 	@GetMapping
 	public CloudShellStatus getCloudShellStatus(Region region, Project project) {
 		CloudShellStatus status = new CloudShellStatus();
 		Region.CloudshellConfiguration cloudshellConfiguration = region.getServices().getCloudshell();
 		try {
-			Service service = null;
 			if (region.getServices().getType().equals(Service.ServiceType.KUBERNETES)) {
-				service = helmAppsService.getUserService(region, project, userProvider.getUser(),cloudshellConfiguration.getPackageName()+"*");
+				Service service = helmAppsService.getUserService(region, project, userProvider.getUser(region),
+						cloudshellConfiguration.getPackageName() + "*");
+				status.setStatus(CloudShellStatus.STATUS_UP);
+				service.getUrls().stream().findFirst().ifPresent(status::setUrl);
+			} else {
+				throw new NotImplementedException("Cloudshell is only supported for Kubernetes service provider");
 			}
-			status.setStatus(CloudShellStatus.STATUS_UP);
-			service.getUrls().stream().findFirst().ifPresent(url -> status.setUrl(url));
 		} catch (Exception e) {
 			status.setStatus(CloudShellStatus.STATUS_DOWN);
 			status.setPackageToDeploy(catalogService.getPackage(cloudshellConfiguration.getCatalogId(),cloudshellConfiguration.getPackageName()));

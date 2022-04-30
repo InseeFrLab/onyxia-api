@@ -7,6 +7,7 @@
       "onyxiaAPI": {
         "baseURL": ""
       },
+      "includedGroupPattern": ".*_Onyxia",
       "services": {
         "type": "KUBERNETES",
         "initScript": "https://git.lab.sspcloud.fr/innovation/plateforme-onyxia/services-ressources/-/raw/master/onyxia-init.sh",

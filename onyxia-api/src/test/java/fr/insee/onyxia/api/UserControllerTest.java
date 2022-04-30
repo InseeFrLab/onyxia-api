@@ -20,9 +20,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.List;
 
 @WebMvcTest(UserController.class)
 public class UserControllerTest extends BaseTest {
@@ -49,7 +53,8 @@ public class UserControllerTest extends BaseTest {
    public void setUp() {
       User user = new User();
       user.setIdep("XXXXXX");
-      Mockito.when(onyxiaUserProvider.getUser()).thenReturn(new OnyxiaUser(user));
+      user.setGroups(List.of("toto", "tata"));
+      Mockito.when(onyxiaUserProvider.getUser(any())).thenReturn(new OnyxiaUser(user));
    }
 
    @Test
@@ -61,6 +66,7 @@ public class UserControllerTest extends BaseTest {
 
       User user = mapper.readValue(result.getResponse().getContentAsString(), User.class);
       assertEquals("XXXXXX", user.getIdep());
+      assertTrue(user.getGroups().containsAll(List.of("toto", "tata")));
    }
 
 }

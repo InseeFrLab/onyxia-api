@@ -1,9 +1,10 @@
 package fr.insee.onyxia.api.controller.api.utils;
 
-import fr.insee.onyxia.api.configuration.properties.RegionsConfiguration;
 import fr.insee.onyxia.api.user.OnyxiaUserProvider;
 import fr.insee.onyxia.model.OnyxiaUser;
 import fr.insee.onyxia.model.project.Project;
+import fr.insee.onyxia.model.region.Region;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
@@ -23,7 +24,7 @@ public class ProjectResolver implements HandlerMethodArgumentResolver {
     private HttpServletRequest request;
 
     @Autowired
-    private RegionsConfiguration regionsConfiguration;
+    private RegionResolver regionResolver;
 
     private OnyxiaUserProvider userProvider;
 
@@ -35,7 +36,8 @@ public class ProjectResolver implements HandlerMethodArgumentResolver {
     @Override
     public Object resolveArgument(MethodParameter methodParameter, ModelAndViewContainer modelAndViewContainer, NativeWebRequest nativeWebRequest, WebDataBinderFactory webDataBinderFactory) throws Exception {
         String project = nativeWebRequest.getHeader("ONYXIA-PROJECT");
-        OnyxiaUser user = userProvider.getUser();
+        OnyxiaUser user = userProvider.getUser((Region) regionResolver.resolveArgument(methodParameter,
+                modelAndViewContainer, nativeWebRequest, webDataBinderFactory));
 
         if (StringUtils.isBlank(project)) {
             return user.getProjects().get(0);

@@ -3,6 +3,8 @@ package fr.insee.onyxia.api.security;
 import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.api.services.utils.HttpRequestUtils;
 import fr.insee.onyxia.model.User;
+import fr.insee.onyxia.model.region.Region;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
@@ -19,14 +21,12 @@ public class NoSecurityUserProvider {
 
     @Bean
     public UserProvider getUserProvider() {
-        return () -> {
-            User user = User.newInstance()
-                    .setEmail("toto@tld.fr")
-                    .setNomComplet("John doe")
-                    .setIdep("default")
-                    .setIp(httpRequestUtils.getClientIpAddressIfServletRequestExist(((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()))
-                    .build();
-            return user;
-        };
+        return (Region region) -> User.newInstance()
+                .setEmail("toto@tld.fr")
+                .setNomComplet("John doe")
+                .setIdep("default")
+                .setIp(httpRequestUtils.getClientIpAddressIfServletRequestExist(
+                        ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()))
+                .build();
     }
 }
