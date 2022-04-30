@@ -51,7 +51,7 @@ Users can work on Onyxia as a User or as a Group to which they belong. Each user
 | `cloudshell` | | Define the catalog and package name where to fetch the cloudshell in the helm catalog. | {catalogId: "inseefrlab-helm-charts-datascience", packageName: "cloudshell"} |
 | `initScript` | | Define where to fetch a script that will be launched on some service on startup. | "https://inseefrlab.github.io/onyxia/onyxia-init.sh" |
 | `allowedURIPattern` | "^https://" | Init scripts set by the user have to respect this pattern. | |
-| `server` | | Define configuration of the services provider API server, this value is not served on the API as it contains credentials for the API. | See [server properties](###server-properties) |
+| `server` | | Define configuration of the services provider API server | See [server properties](###server-properties) |
 | `quotas` | | Properties setting quotas on how much resource a user can get on the services provider. | See [Quotas properties](###quotas-properties) |
 | `defaultConfiguration` | | Default configuration on services that a user can override. For client purpose only. | See [Default Configuration](###default-configuration-properties) |
 
@@ -61,8 +61,10 @@ These properties define how to reach the **service provider API**.
 
 | Key | Description | Example |
 | --------------------- | ------------------------------------------------------------------ | ---- |
-| `URL` | URL of the service provider API | "api.kub.sspcloud.fr" |
-| `auth` | Credentials for the service provider API. | {token: "ey...", password : "pwd", username: "admin"} |
+| `auth` | Credentials for the service provider API. This value is never served by the API. | {token: "ey...", password : "pwd", username: "admin"} |
+| `privateUrl` | URL of the service provider API that will override the use of the internal API url if provided. This value is never served by the API. | "api.kub.sspcloud.fr" |
+| `publicUrl` | URL of the service provider API that can be fetched and used by Onyxia user. | "api.kub.sspcloud.fr" |
+| `keycloakParams` | | Configuration of the keycloak service that the Onyxia user can use to get an access token on the service provider. It defines the keycloak realm, clientId, and Url. | {realm: "sspcloud", clientId: "onyxia", URL: "https://auth.lab.sspcloud.fr/auth"} |
 
 ### Quotas properties
 

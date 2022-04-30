@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import fr.insee.onyxia.api.configuration.SecurityConfig;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.region.Region;
+import fr.insee.onyxia.model.region.Server;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
@@ -58,15 +59,15 @@ public class KubernetesClientProvider {
     private ConfigBuilder getDefaultConfiguration(Region region) {
 	final ConfigBuilder configBuilder = new ConfigBuilder();
 	if (region.getServices().getServer() != null
-		&& region.getServices().getServer().getUrl() != null) {
+		&& region.getServices().getServer().getPrivateUrl() != null) {
 	    configBuilder.withMasterUrl(region.getServices()
 		    .getServer()
-		    .getUrl());
+		    .getPrivateUrl());
 	}
 
 	if (region.getServices()
 		.getServer() != null) {
-	    final Region.Auth auth = region.getServices()
+	    final Server.Auth auth = region.getServices()
 		    .getServer()
 		    .getAuth();
 	    if (auth != null) {

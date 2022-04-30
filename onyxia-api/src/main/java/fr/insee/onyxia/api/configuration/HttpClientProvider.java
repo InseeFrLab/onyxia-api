@@ -1,6 +1,7 @@
 package fr.insee.onyxia.api.configuration;
 
 import fr.insee.onyxia.model.region.Region;
+import fr.insee.onyxia.model.region.Server;
 import okhttp3.*;
 import okhttp3.logging.HttpLoggingInterceptor;
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +28,7 @@ public class HttpClientProvider {
                 Request request = chain.request();
                 Request newRequest = request;
 
-                Region.Auth auth = region.getServices().getServer().getAuth();
+                Server.Auth auth = region.getServices().getServer().getAuth();
 
                 if (auth != null && auth.getToken() != null) {
                     newRequest = newRequest.newBuilder()

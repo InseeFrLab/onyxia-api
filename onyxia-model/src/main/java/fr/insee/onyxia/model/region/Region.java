@@ -1,6 +1,5 @@
 package fr.insee.onyxia.model.region;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import fr.insee.onyxia.model.service.Service;
@@ -89,10 +88,9 @@ public class Region {
 	this.onyxiaAPI = onyxiaAPI;
     }
 
-    @JsonIgnoreProperties(value = { "server" }, allowSetters = true)
     public static class Services {
 
-	public static enum AuthenticationMode {
+	public enum AuthenticationMode {
 	    @JsonProperty("impersonate")
 	    IMPERSONATE,
 	    @JsonProperty("admin")
@@ -419,37 +417,6 @@ public class Region {
 	}
     }
 
-    public static class KeycloakParams {
-	@JsonProperty("URL")
-	private String url;
-	private String clientId;
-	private String realm;
-
-	public String getUrl() {
-	    return url;
-	}
-
-	public void setUrl(String url) {
-	    this.url = url;
-	}
-
-	public String getClientId() {
-	    return clientId;
-	}
-
-	public void setUClientId(String clientId) {
-	    this.clientId = clientId;
-	}
-
-	public String getRealm() {
-	    return realm;
-	}
-
-	public void setRealm(String realm) {
-	    this.realm = realm;
-	}
-
-    }
 
     public static class Expose {
 	private String domain;
@@ -463,28 +430,6 @@ public class Region {
 	}
     }
 
-    public static class Server {
-
-	@JsonProperty("URL")
-	private String url;
-	private Auth auth;
-
-	public String getUrl() {
-	    return url;
-	}
-
-	public void setUrl(String url) {
-	    this.url = url;
-	}
-
-	public Auth getAuth() {
-	    return auth;
-	}
-
-	public void setAuth(Auth auth) {
-	    this.auth = auth;
-	}
-    }
 
     public static class OnyxiaAPI {
 	private String baseURL;
@@ -550,33 +495,5 @@ public class Region {
 	    this.packageName = packageName;
 	}
     }
-
-    public static class Auth {
-	private String token;
-	private String username, password;
-
-	public String getToken() {
-	    return token;
-	}
-
-	public void setToken(String token) {
-	    this.token = token;
-	}
-
-	public String getUsername() {
-	    return username;
-	}
-
-	public void setUsername(String username) {
-	    this.username = username;
-	}
-
-	public String getPassword() {
-	    return password;
-	}
-
-	public void setPassword(String password) {
-	    this.password = password;
-	}
-    }
 }
+

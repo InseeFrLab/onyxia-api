@@ -12,6 +12,14 @@
         "type": "KUBERNETES",
         "initScript": "https://git.lab.sspcloud.fr/innovation/plateforme-onyxia/services-ressources/-/raw/master/onyxia-init.sh",
         "singleNamespace": true,
+        "server": {
+          "publicUrl": "api.fakedomain.kub.example.com",
+          "keycloakParams": {
+            "URL":"https://keycloak.demo.insee.io/auth",
+            "realm":"onyxia-demo",
+            "clientId":"onyxia-client"
+          }
+        },
         "namespacePrefix": "user-",
         "usernamePrefix": "oidc-",
         "groupNamespacePrefix": "projet-",
