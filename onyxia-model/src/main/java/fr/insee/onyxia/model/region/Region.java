@@ -6,6 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.insee.onyxia.model.service.Service;
 import fr.insee.onyxia.model.service.quota.Quota;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Region {
     private String id;
     private String name;
@@ -120,6 +123,7 @@ public class Region {
 	public static class DefaultConfiguration {
 	    private boolean IPProtection = true;
 	    private boolean networkPolicy = true;
+		private List<Object> from = new ArrayList<>();
 
 	    public void setIPProtection(boolean IPProtection) {
 		this.IPProtection = IPProtection;
@@ -135,6 +139,14 @@ public class Region {
 
 	    public boolean isNetworkPolicy() {
 		return networkPolicy;
+	    }
+
+	    public void setFrom(List<Object> from) {
+		this.from = from;
+	    }
+
+	    public List<Object> getFrom() {
+		return from;
 	    }
 	}
 
