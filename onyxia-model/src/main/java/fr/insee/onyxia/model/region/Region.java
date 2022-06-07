@@ -123,7 +123,8 @@ public class Region {
 	public static class DefaultConfiguration {
 	    private boolean IPProtection = true;
 	    private boolean networkPolicy = true;
-		private List<Object> from = new ArrayList<>();
+	    private List<Object> from = new ArrayList<>();
+	    private Kafka kafka = new Kafka();
 
 	    public void setIPProtection(boolean IPProtection) {
 		this.IPProtection = IPProtection;
@@ -147,6 +148,34 @@ public class Region {
 
 	    public List<Object> getFrom() {
 		return from;
+	    }
+
+	    public Kafka getKafka() {
+		return kafka;
+	    }
+
+	    public void setKafka(Kafka kafka) {
+		this.kafka = kafka;
+	    }
+
+	    public static class Kafka {
+		@JsonProperty("URL")
+		private String url;
+		private String topicName;
+		public String getUrl() {
+			return url;
+		}
+
+		public void setUrl(String url) {
+			this.url = url;
+		}
+		public String getTopicName() {
+			return topicName;
+		}
+
+		public void setTopicName(String topicName) {
+			this.topicName = topicName;
+		}
 	    }
 	}
 
