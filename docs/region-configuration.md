@@ -89,6 +89,7 @@ A quota follows the kubernetes model which is composed of:
 | --------------------- | ------- | ------------------------------------------------------------------ |
 | `IPProtection` | true | Whether or not the default behavior of the reverse-proxy serving the service is to block request from an ip other than the one from which it has been created. For client purpose only. |
 | `networkPolicy` | true | Whether or not services can be reached by pods outside of the current namespace. For client purpose only. |
+| `from` | NA | List of allowed source (kubernetes network policies format for from) to reach user http services. Used to allow ingress access to users services |
 
 ## Data properties
 
