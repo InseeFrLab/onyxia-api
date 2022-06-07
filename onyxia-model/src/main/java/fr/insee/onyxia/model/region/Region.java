@@ -304,8 +304,19 @@ public class Region {
     }
 
     public static class Data {
+
+	private Atlas atlas;
+
 	@JsonProperty("S3")
 	private S3 s3;
+
+	public Atlas getAtlas() {
+	    return atlas;
+	}
+
+	public void setAtlas(Atlas atlas) {
+	    this.atlas = atlas;
+	}
 
 	public S3 getS3() {
 	    return s3;
@@ -315,6 +326,32 @@ public class Region {
 	    this.s3 = s3;
 	}
     }
+
+    public static class Atlas {
+
+	@JsonProperty("URL")
+	private String url;
+
+	private KeycloakParams keycloakParams;
+
+
+	public String getUrl() {
+	    return url;
+	}
+
+	public void setUrl(String url) {
+	    this.url = url;
+	}
+
+	public void setKeycloakParams(KeycloakParams keycloakParams) {
+	    this.keycloakParams = keycloakParams;
+	}
+
+	public KeycloakParams getKeycloakParams() {
+	    return keycloakParams;
+	}
+    }
+
 
     public static class S3 {
 	private String type;

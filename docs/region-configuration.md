@@ -8,6 +8,7 @@
     - [Default configuration properties](#default-configuration-properties)
   - [Data properties](#data-properties)
     - [S3](#s3)
+    - [atlas](#atlas)
 
 A **region** is the configuration of an independant set of Onyxia services. Thus multiple configuration accessing different services can be plugged on a single Onyxia instance.
 
@@ -114,3 +115,14 @@ All these properties which configure the access to the storage are intended for 
 | `defaultDurationSeconds` | | Maximum time to live of the S3 access key | 86400 |
 | `keycloakParams` | | Configuration of the keycloak service used to get an access token on the S3 service. It defines the keycloak realm, clientId, and Url. | {realm: "sspcloud", clientId: "onyxia", URL: "https://auth.lab.sspcloud.fr/auth"} |
 | `monitoring` | | Defines the URL pattern of the monitoring service of each bucket. | "https://monitoring.sspcloud.fr/$BUCKET_ID" |
+
+### atlas
+
+Atlas is a data management tool.
+
+It can be used to add additionnal feature to the file explorer to transform it into a data explorer
+
+| Key | Default | Description | Example |
+| --------------------- | ------- | ------------------------------------------------------------------ | ---- |
+| `URL` | | URL of the atlas service for the region. | "https://atlas.change.me" |
+| `keycloakParams` | | Configuration of the keycloak service used to get an access token on the S3 service. It defines the keycloak realm, clientId, and Url. | {realm: "sspcloud", clientId: "atlas", URL: "https://auth.change.me/auth"} |
