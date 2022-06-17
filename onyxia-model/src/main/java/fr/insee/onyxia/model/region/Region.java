@@ -124,6 +124,8 @@ public class Region {
 	    private boolean IPProtection = true;
 	    private boolean networkPolicy = true;
 	    private List<Object> from = new ArrayList<>();
+		private List<Object> tolerations = new ArrayList<>();
+		private Object nodeSelector;
 	    private Kafka kafka = new Kafka();
 
 	    public void setIPProtection(boolean IPProtection) {
@@ -149,6 +151,22 @@ public class Region {
 	    public List<Object> getFrom() {
 		return from;
 	    }
+
+	    public void setTolerations(List<Object> tolerations) {
+		this.tolerations = tolerations;
+	    }
+
+	    public List<Object> getTolerations() {
+		return tolerations;
+	    }
+
+		public void setNodeSelector (Object nodeSelector){
+			this.nodeSelector = nodeSelector;
+		}
+
+		public Object getNodeSelector(){
+			return nodeSelector;
+		}
 
 	    public Kafka getKafka() {
 		return kafka;
