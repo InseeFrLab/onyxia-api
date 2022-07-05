@@ -17,6 +17,7 @@ public class CatalogWrapper {
     private long lastUpdateTime;
     private String scm;
     private String type;
+    private List<String> excludedCharts = new ArrayList<>();
 
     /**
      * @return the type
@@ -106,5 +107,13 @@ public class CatalogWrapper {
     public void setLastUpdateTime(long lastUpdateTime) {
         this.lastUpdateTime = lastUpdateTime;
     }
+
+	public void setExcludedCharts(List<String> excludedCharts) {
+		this.excludedCharts = excludedCharts;
+	}
+
+	public List<String> getExcludedCharts() {
+		return excludedCharts;
+	}
 
 }
