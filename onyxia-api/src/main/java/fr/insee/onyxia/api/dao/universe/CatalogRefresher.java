@@ -9,11 +9,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 @Service
 public class CatalogRefresher implements ApplicationRunner {
@@ -35,8 +37,18 @@ public class CatalogRefresher implements ApplicationRunner {
     private void refresh() {
         catalogs.getCatalogs().stream().forEach(c -> {
             try {
-                logger.info(helmRepoService.addHelmRepo(c.getLocation(),c.getId()));
+                logger.info(helmRepoService.addHelmRepo(c.getLocation(), c.getId()));
                 catalogLoader.updateCatalog(c);
+                if (c.getCatalog() != null && !CollectionUtils.isEmpty(c.getCatalog().getPackages())) {
+                    c.getCatalog().setPackages(c.getCatalog().getPackages().stream().filter(pkg -> {
+                        if (c.getExcludedCharts().contains(pkg.getName())) {
+                            logger.info("Ignoring chart " + pkg.getName() + " in catalog " + c.getName());
+                            return false;
+                        }
+                        return true;
+                    }).collect(Collectors.toList()));
+                }
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
