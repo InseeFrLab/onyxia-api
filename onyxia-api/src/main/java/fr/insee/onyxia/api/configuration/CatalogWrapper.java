@@ -1,8 +1,10 @@
 package fr.insee.onyxia.api.configuration;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import fr.insee.onyxia.model.catalog.CatalogStatus;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CatalogWrapper {
@@ -108,12 +110,12 @@ public class CatalogWrapper {
         this.lastUpdateTime = lastUpdateTime;
     }
 
-	public void setExcludedCharts(List<String> excludedCharts) {
-		this.excludedCharts = excludedCharts;
-	}
+    public List<String> getExcludedCharts() {
+        return excludedCharts;
+    }
 
-	public List<String> getExcludedCharts() {
-		return excludedCharts;
-	}
+    public void setExcludedCharts(List<String> excludedCharts) {
+        this.excludedCharts = excludedCharts;
+    }
 
 }
