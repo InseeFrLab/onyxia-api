@@ -54,20 +54,15 @@ import static java.util.stream.Collectors.joining;
 @Qualifier("Helm")
 public class HelmAppsService implements AppsService {
 
-    @Autowired
-    private KubernetesService kubernetesService;
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(HelmAppsService.class);
     @Autowired
     @Qualifier("helm")
     ObjectMapper mapperHelm;
-
+    @Autowired
+    private KubernetesService kubernetesService;
     @Autowired(required = false)
     private List<AdmissionControllerHelm> admissionControllers = new ArrayList<>();
-
     private SimpleDateFormat helmDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(HelmAppsService.class);
-
     @Autowired
     private KubernetesClientProvider kubernetesClientProvider;
 
@@ -81,7 +76,7 @@ public class HelmAppsService implements AppsService {
     private UrlGenerator urlGenerator;
 
     private HelmConfiguration getHelmConfiguration(Region region, User user) {
-        return helmClientProvider.getConfiguration(region,user);
+        return helmClientProvider.getConfiguration(region, user);
     }
 
     private HelmInstallService getHelmInstallService() {
@@ -109,7 +104,7 @@ public class HelmAppsService implements AppsService {
             @Override
             public String getExternalDns(String scopeName, XGeneratedContext.Scope scope, Property.XGenerated xGenerated) {
                 return urlGenerator.generateUrl(user.getIdep(), pkg.getName(),
-                        context.getGlobalContext().getRandomizedId(), scopeName+(StringUtils.isNotBlank(xGenerated.getName()) ? "-"+xGenerated.getName() : ""), region.getServices().getExpose().getDomain());
+                        context.getGlobalContext().getRandomizedId(), scopeName + (StringUtils.isNotBlank(xGenerated.getName()) ? "-" + xGenerated.getName() : ""), region.getServices().getExpose().getDomain());
             }
 
             @Override
@@ -122,8 +117,8 @@ public class HelmAppsService implements AppsService {
                 return region.getServices().getInitScript();
             }
         };
-        Map<String,String> xGeneratedValues = xGeneratedProcessor.process(xGeneratedContext,xGeneratedProvider);
-        xGeneratedProcessor.injectIntoContext(fusion,xGeneratedValues);
+        Map<String, String> xGeneratedValues = xGeneratedProcessor.process(xGeneratedContext, xGeneratedProvider);
+        xGeneratedProcessor.injectIntoContext(fusion, xGeneratedValues);
 
         long nbInvalidations = admissionControllers.stream().map(controller -> controller.validateContract(region, pkg, fusion, user, context))
                 .filter(b -> !b).count();
@@ -132,20 +127,20 @@ public class HelmAppsService implements AppsService {
         }
         File values = File.createTempFile("values", ".yaml");
         mapperHelm.writeValue(values, fusion);
-        String namespaceId = kubernetesService.determineNamespaceAndCreateIfNeeded(region,project, user);
-        HelmInstaller res = getHelmInstallService().installChart(getHelmConfiguration(region,user),catalogId + "/" + pkg.getName(), namespaceId, requestDTO.getName(), requestDTO.isDryRun(),
-                values,null);
+        String namespaceId = kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
+        HelmInstaller res = getHelmInstallService().installChart(getHelmConfiguration(region, user), catalogId + "/" + pkg.getName(), namespaceId, requestDTO.getName(), requestDTO.isDryRun(),
+                values, null);
         values.delete();
         return List.of(res.getManifest());
     }
 
     @Override
-    public CompletableFuture<ServicesListing> getUserServices(Region region,Project project,User user) throws IOException, IllegalAccessException {
+    public CompletableFuture<ServicesListing> getUserServices(Region region, Project project, User user) throws IOException, IllegalAccessException {
         return getUserServices(region, project, user, null);
     }
 
     @Override
-    public CompletableFuture<ServicesListing> getUserServices(Region region,Project project,User user, String groupId)
+    public CompletableFuture<ServicesListing> getUserServices(Region region, Project project, User user, String groupId)
             throws IOException, IllegalAccessException {
         if (groupId != null) {
             LOGGER.debug("STUB : group listing is currently not supported on helm");
@@ -153,13 +148,13 @@ public class HelmAppsService implements AppsService {
         }
         List<HelmLs> installedCharts = null;
         try {
-            installedCharts = Arrays.asList(getHelmInstallService().listChartInstall(getHelmConfiguration(region,user),project.getNamespace()));
+            installedCharts = Arrays.asList(getHelmInstallService().listChartInstall(getHelmConfiguration(region, user), project.getNamespace()));
         } catch (Exception e) {
             return CompletableFuture.completedFuture(new ServicesListing());
         }
         List<Service> services = new ArrayList<>();
         for (HelmLs release : installedCharts) {
-            services.add(getHelmApp(region,user,release));
+            services.add(getHelmApp(region, user, release));
         }
         ServicesListing listing = new ServicesListing();
         listing.setApps(services);
@@ -167,37 +162,36 @@ public class HelmAppsService implements AppsService {
     }
 
     @Override
-    public String getLogs(Region region,Project project,User user, String serviceId, String taskId) {
-        KubernetesClient client = kubernetesClientProvider.getUserClient(region,user);
-        return client.pods().inNamespace(kubernetesService.determineNamespaceAndCreateIfNeeded(region,project,user)).withName(taskId).getLog();
+    public String getLogs(Region region, Project project, User user, String serviceId, String taskId) {
+        KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
+        return client.pods().inNamespace(kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user)).withName(taskId).getLog();
     }
 
     @Override
-    public Service getUserService(Region region, Project project,User user, String serviceId) throws MultipleServiceFound, ParseException {
+    public Service getUserService(Region region, Project project, User user, String serviceId) throws MultipleServiceFound, ParseException {
         if (serviceId.startsWith("/")) {
             serviceId = serviceId.substring(1);
         }
-        HelmLs result = getHelmInstallService().getAppById(getHelmConfiguration(region,user),serviceId, kubernetesService.determineNamespaceAndCreateIfNeeded(region,project, user));
-        return getHelmApp(region,user,result);
+        HelmLs result = getHelmInstallService().getAppById(getHelmConfiguration(region, user), serviceId, kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user));
+        return getHelmApp(region, user, result);
     }
 
     @Override
-    public UninstallService destroyService(Region region,Project project, User user, final String path, boolean bulk) throws Exception {
+    public UninstallService destroyService(Region region, Project project, User user, final String path, boolean bulk) throws Exception {
         final String namespace = kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
         UninstallService result = new UninstallService();
         result.setPath(path);
         int status = 0;
         if (bulk) {
             // If bulk in kub we ignore the path and delete every helm release
-            HelmLs[] releases = getHelmInstallService().listChartInstall(getHelmConfiguration(region,user),namespace);
-            for (int i = 0; i <releases.length; i++){
-                status = Math.max(0,getHelmInstallService().uninstaller(getHelmConfiguration(region,user),releases[i].getName(),namespace));
+            HelmLs[] releases = getHelmInstallService().listChartInstall(getHelmConfiguration(region, user), namespace);
+            for (int i = 0; i < releases.length; i++) {
+                status = Math.max(0, getHelmInstallService().uninstaller(getHelmConfiguration(region, user), releases[i].getName(), namespace));
             }
-        }
-        else {
+        } else {
             // Strip / if present
             String cannonicalPath = path.startsWith("/") ? path.substring(1) : path;
-            status = getHelmInstallService().uninstaller(getHelmConfiguration(region,user),cannonicalPath, namespace);
+            status = getHelmInstallService().uninstaller(getHelmConfiguration(region, user), cannonicalPath, namespace);
         }
 
         result.setSuccess(status == 0);
@@ -205,8 +199,8 @@ public class HelmAppsService implements AppsService {
     }
 
     private Service getHelmApp(Region region, User user, HelmLs release) {
-        String manifest = getHelmInstallService().getManifest(getHelmConfiguration(region,user),release.getName(), release.getNamespace());
-        Service service = getServiceFromRelease(region, release, manifest,user);
+        String manifest = getHelmInstallService().getManifest(getHelmConfiguration(region, user), release.getName(), release.getNamespace());
+        Service service = getServiceFromRelease(region, release, manifest, user);
         service.setStatus(findAppStatus(release));
         try {
             service.setStartedAt(helmDateFormat.parse(release.getUpdated()).getTime());
@@ -218,7 +212,7 @@ public class HelmAppsService implements AppsService {
         service.setSubtitle(release.getChart());
         service.setType(Service.ServiceType.KUBERNETES);
         try {
-            String values = getHelmInstallService().getValues(getHelmConfiguration(region,user),release.getName(), release.getNamespace());
+            String values = getHelmInstallService().getValues(getHelmConfiguration(region, user), release.getName(), release.getNamespace());
             JsonNode node = new ObjectMapper().readTree(values);
             Map<String, String> result = new HashMap<>();
             node.fields().forEachRemaining(currentNode -> mapAppender(result, currentNode, new ArrayList<String>()));
@@ -227,7 +221,7 @@ public class HelmAppsService implements AppsService {
             e.printStackTrace();
         }
         try {
-            String notes = getHelmInstallService().getNotes(getHelmConfiguration(region,user),release.getName(), release.getNamespace());
+            String notes = getHelmInstallService().getNotes(getHelmConfiguration(region, user), release.getName(), release.getNamespace());
             service.setPostInstallInstructions(notes);
         } catch (Exception e) {
             e.printStackTrace();
@@ -246,7 +240,7 @@ public class HelmAppsService implements AppsService {
     }
 
     private Service getServiceFromRelease(Region region, HelmLs release, String manifest, User user) {
-        KubernetesClient client = kubernetesClientProvider.getUserClient(region,user);
+        KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
         InputStream inputStream = new ByteArrayInputStream(manifest.getBytes(Charset.forName("UTF-8")));
         List<HasMetadata> hasMetadatas = client.load(inputStream).get();
         List<Ingress> ingresses = hasMetadatas.stream().filter(hasMetadata -> hasMetadata instanceof Ingress)
@@ -263,9 +257,8 @@ public class HelmAppsService implements AppsService {
                     return host;
                 }).collect(Collectors.toList());
                 urls.addAll(listHost);
-            }
-            catch (Exception e) {
-                System.out.println("Warning : could not read urls from ingress "+ingress.getFullResourceName());
+            } catch (Exception e) {
+                System.out.println("Warning : could not read urls from ingress " + ingress.getFullResourceName());
             }
         }
         service.setUrls(urls);
@@ -281,7 +274,7 @@ public class HelmAppsService implements AppsService {
             status.setReason(pod.getStatus().getContainerStatuses().stream()
                     .filter(cstatus -> cstatus.getState().getWaiting() != null)
                     .map(cstatus -> cstatus.getState().getWaiting().getReason())
-            .findFirst().orElse(null));
+                    .findFirst().orElse(null));
             pod.getStatus().getContainerStatuses().forEach(c -> {
                 Container container = new Container();
                 container.setName(c.getName());
@@ -293,14 +286,13 @@ public class HelmAppsService implements AppsService {
         }).collect(Collectors.toList()));
 
         EventList eventList = client.v1().events().inNamespace(release.getNamespace()).list();
-        List<Event> events = eventList.getItems().stream().filter(event -> event.getInvolvedObject().getName().contains(release.getName())).map(event -> {
+        List<Event> events = eventList.getItems().stream().filter(event -> event.getInvolvedObject() != null && event.getInvolvedObject().getName() != null && event.getInvolvedObject().getName().contains(release.getName())).map(event -> {
             Event newEvent = new Event();
             newEvent.setMessage(event.getMessage());
             try {
                 // TODO : use kubernetes time format instead of helm
                 newEvent.setTimestamp(helmDateFormat.parse(event.getEventTime().getTime()).getTime());
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
 
             }
             return newEvent;
@@ -309,7 +301,6 @@ public class HelmAppsService implements AppsService {
 
         return service;
     }
-
 
 
     private Service.ServiceStatus findAppStatus(HelmLs release) {
