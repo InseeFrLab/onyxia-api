@@ -6,6 +6,7 @@ import fr.insee.onyxia.api.configuration.NotFoundException;
 import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.model.catalog.Config.Property;
 import fr.insee.onyxia.model.catalog.Config.Property.XForm;
+import fr.insee.onyxia.model.catalog.Config.Property.XOnyxia;
 import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.Service;
@@ -125,6 +126,10 @@ public class CatalogController {
       xform.setValue("{{user.idep}}");
       xform.setHidden(true);
       owner.setXform(xform);
+      XOnyxia xonyxia = new XOnyxia();
+      xonyxia.setOverwriteDefaultWith("{{user.idep}}");
+      xonyxia.setHidden(true);
+      owner.setXonyxia(xonyxia);
       onyxiaProperties.put("owner", owner);
 
       Property share = new Property();
