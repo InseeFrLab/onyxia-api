@@ -41,12 +41,23 @@ public class Property {
     @JsonProperty("x-generated")
     private XGenerated xGenerated;
 
+    @JsonProperty("x-onyxia")
+    private XOnyxia xonyxia;
+
     public XForm getXform() {
         return xform;
     }
 
     public void setXform(XForm xform) {
         this.xform = xform;
+    }
+
+    public XOnyxia getXonyxia() {
+        return xonyxia;
+    }
+
+    public void setXonyxia(XOnyxia xonyxia) {
+        this.xonyxia = xonyxia;
     }
 
     public XSecurity getXsecurity() {
@@ -290,6 +301,38 @@ public class Property {
 
         public void setValue(String value) {
             this.value = value;
+        }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class XOnyxia {
+
+        boolean hidden = false;
+        boolean readonly = false;
+        String overwriteDefaultWith;
+
+        public boolean isHidden() {
+            return hidden;
+        }
+
+        public void setHidden(boolean hidden) {
+            this.hidden = hidden;
+        }
+
+        public boolean isReadonly() {
+            return readonly;
+        }
+
+        public void setReadonly(boolean readonly) {
+            this.readonly = readonly;
+        }
+
+        public String getOverwriteDefaultWith() {
+            return overwriteDefaultWith;
+        }
+
+        public void setOverwriteDefaultWith(String overwriteDefaultWith) {
+            this.overwriteDefaultWith = overwriteDefaultWith;
         }
     }
 
