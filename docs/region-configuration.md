@@ -92,6 +92,7 @@ A quota follows the kubernetes model which is composed of:
 | `from` | NA | List of allowed source (kubernetes network policies format for from) to reach user http services. Used to allow ingress access to users services |
 | `nodeSelector` | NA | This node selector can be injected in a service to restrain on which node it can be launched  |
 | `tolerations` | NA | This node selector can be injected in a service to force it to run on nodes with this taint |
+| `startupProbe` | NA | This startup probe can be injected in a service. It can help you in environment with slow network to specify a long duration before killing a container |
 | `kafka` | | See [Kafka](####kafka) |
 
 #### kafka

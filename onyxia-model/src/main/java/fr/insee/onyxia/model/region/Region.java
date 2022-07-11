@@ -126,6 +126,7 @@ public class Region {
 	    private List<Object> from = new ArrayList<>();
 		private List<Object> tolerations = new ArrayList<>();
 		private Object nodeSelector;
+		private Object startupProbe;
 	    private Kafka kafka = new Kafka();
 
 	    public void setIPProtection(boolean IPProtection) {
@@ -166,6 +167,14 @@ public class Region {
 
 		public Object getNodeSelector(){
 			return nodeSelector;
+		}
+
+		public void setStartupProbe (Object startupProbe){
+			this.startupProbe = startupProbe;
+		}
+
+		public Object getStartupProbe(){
+			return startupProbe;
 		}
 
 	    public Kafka getKafka() {
