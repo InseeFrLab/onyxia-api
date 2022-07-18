@@ -19,6 +19,7 @@ public class Region {
     private Services services = new Services();
     private OnyxiaAPI onyxiaAPI;
     private Data data;
+	private Vault vault;
 
     public String getId() {
 	return id;
@@ -82,6 +83,14 @@ public class Region {
 
     public void setData(Data data) {
 	this.data = data;
+    }
+
+    public Vault getVault() {
+	return vault;
+    }
+
+    public void setVault(Vault vault) {
+	this.vault = vault;
     }
 
     public OnyxiaAPI getOnyxiaAPI() {
@@ -420,6 +429,30 @@ public class Region {
 	}
     }
 
+    public static class Vault {
+
+	@JsonProperty("URL")
+	private String url;
+
+	private KeycloakParams keycloakParams;
+
+
+	public String getUrl() {
+	    return url;
+	}
+
+	public void setUrl(String url) {
+	    this.url = url;
+	}
+
+	public void setKeycloakParams(KeycloakParams keycloakParams) {
+	    this.keycloakParams = keycloakParams;
+	}
+
+	public KeycloakParams getKeycloakParams() {
+	    return keycloakParams;
+	}
+    }
 
     public static class S3 {
 	private String type;
