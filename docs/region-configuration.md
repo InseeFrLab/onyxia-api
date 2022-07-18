@@ -9,6 +9,7 @@
   - [Data properties](#data-properties)
     - [S3](#s3)
     - [atlas](#atlas)
+  - [Vault properties](#vault-properties)
 
 A **region** is the configuration of an independant set of Onyxia services. Thus multiple configuration accessing different services can be plugged on a single Onyxia instance.
 
@@ -31,6 +32,7 @@ See [regions.json](/onyxia-api/src/main/resources/regions.json) for a complete e
 | `onyxiaAPI` | Contains the base url of an onyxia api | {baseURL: "http://localhost:8080"} |
 | `services` | Configuration of Onyxia services provider platform | See [Service](##services-properties) |
 | `data` | Configuration of the S3 Object Storage | See [S3](#data-properties) |
+| `vault` | Configuration of the Vault API | See [vault](#vault-properties) |
 
 ## Services properties
 
@@ -141,3 +143,12 @@ It can be used to add additionnal feature to the file explorer to transform it i
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
 | `URL` | | URL of the atlas service for the region. | "https://atlas.change.me" |
 | `keycloakParams` | | Configuration of the keycloak service used to get an access token on the S3 service. It defines the keycloak realm, clientId, and Url. | {realm: "sspcloud", clientId: "atlas", URL: "https://auth.change.me/auth"} |
+
+## Vault properties
+
+It can be used to add additionnal feature to Onyxia. It helps user to keep their secret safe.
+
+| Key | Default | Description | Example |
+| --------------------- | ------- | ------------------------------------------------------------------ | ---- |
+| `URL` | | URL of the atlas service for the region. | "https://vault.change.me" |
+| `keycloakParams` | | Configuration of the keycloak service used to get an access token on the S3 service. It defines the keycloak realm, clientId, and Url. | {realm: "sspcloud", clientId: "vault", URL: "https://auth.change.me/auth"} |
