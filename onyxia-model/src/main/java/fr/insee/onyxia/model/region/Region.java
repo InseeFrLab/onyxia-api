@@ -128,6 +128,7 @@ public class Region {
 	private String allowedURIPattern = "^https://";
 	private Quotas quotas = new Quotas();
 	private DefaultConfiguration defaultConfiguration = new DefaultConfiguration();
+	private K8sPublicEndpoint k8sPublicEndpoint = new K8sPublicEndpoint();
 
 	public static class DefaultConfiguration {
 	    private boolean IPProtection = true;
@@ -358,6 +359,14 @@ public class Region {
 	    return groupPrefix;
 	}
 
+	public K8sPublicEndpoint getK8sPublicEndpoint() {
+	    return k8sPublicEndpoint;
+	}
+
+	public void setK8sPublicEndpoint(K8sPublicEndpoint k8sPublicEndpoint) {
+	    this.k8sPublicEndpoint = k8sPublicEndpoint;
+	}
+
 	public Quotas getQuotas() {
 	    return quotas;
 	}
@@ -430,6 +439,31 @@ public class Region {
     }
 
     public static class Vault {
+
+	@JsonProperty("URL")
+	private String url;
+
+	private KeycloakParams keycloakParams;
+
+
+	public String getUrl() {
+	    return url;
+	}
+
+	public void setUrl(String url) {
+	    this.url = url;
+	}
+
+	public void setKeycloakParams(KeycloakParams keycloakParams) {
+	    this.keycloakParams = keycloakParams;
+	}
+
+	public KeycloakParams getKeycloakParams() {
+	    return keycloakParams;
+	}
+    }
+
+    public static class K8sPublicEndpoint {
 
 	@JsonProperty("URL")
 	private String url;
