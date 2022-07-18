@@ -55,6 +55,7 @@ Users can work on Onyxia as a User or as a Group to which they belong. Each user
 | `initScript` | | Define where to fetch a script that will be launched on some service on startup. | "https://inseefrlab.github.io/onyxia/onyxia-init.sh" |
 | `allowedURIPattern` | "^https://" | Init scripts set by the user have to respect this pattern. | |
 | `server` | | Define configuration of the services provider API server, this value is not served on the API as it contains credentials for the API. | See [server properties](###server-properties) |
+| `k8sPublicEndpoint` | | Define external access to kubernetes API if available. It helps Onyxia users to directly connect to kubernetes outside the datalab | See [server properties](###k8sPublicEndpoint-properties) |
 | `quotas` | | Properties setting quotas on how much resource a user can get on the services provider. | See [Quotas properties](###quotas-properties) |
 | `defaultConfiguration` | | Default configuration on services that a user can override. For client purpose only. | See [Default Configuration](###default-configuration-properties) |
 
@@ -66,6 +67,15 @@ These properties define how to reach the **service provider API**.
 | --------------------- | ------------------------------------------------------------------ | ---- |
 | `URL` | URL of the service provider API | "api.kub.sspcloud.fr" |
 | `auth` | Credentials for the service provider API. | {token: "ey...", password : "pwd", username: "admin"} |
+
+### K8sPublicEndpoint properties
+
+It can be used to add additionnal feature to Onyxia. It helps Onyxia users to directly connect to kubernetes outside the datalab.
+
+| Key | Default | Description | Example |
+| --------------------- | ------- | ------------------------------------------------------------------ | ---- |
+| `URL` | | public URL of the kubernetes API of the region. | "https://vault.change.me" |
+| `keycloakParams` | | Configuration of the keycloak service used to get an access token on the kubernetes api. It defines the keycloak realm, clientId, and Url. | {realm: "sspcloud", clientId: "kubernetes", URL: "https://auth.change.me/auth"} |
 
 ### Quotas properties
 
@@ -151,4 +161,5 @@ It can be used to add additionnal feature to Onyxia. It helps user to keep their
 | Key | Default | Description | Example |
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
 | `URL` | | URL of the atlas service for the region. | "https://vault.change.me" |
-| `keycloakParams` | | Configuration of the keycloak service used to get an access token on the S3 service. It defines the keycloak realm, clientId, and Url. | {realm: "sspcloud", clientId: "vault", URL: "https://auth.change.me/auth"} |
+| `keycloakParams` | | Configuration of the keycloak service used to get an access token on the vault service. It defines the keycloak realm, clientId, and Url. | {realm: "sspcloud", clientId: "vault", URL: "https://auth.change.me/auth"} |
+
