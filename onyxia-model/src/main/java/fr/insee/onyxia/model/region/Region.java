@@ -442,6 +442,8 @@ public class Region {
 
 	@JsonProperty("URL")
 	private String url;
+	private String kvEngine;
+	private String role;
 
 	private KeycloakParams keycloakParams;
 
@@ -452,6 +454,22 @@ public class Region {
 
 	public void setUrl(String url) {
 	    this.url = url;
+	}
+
+	public String getKvEngine() {
+	    return kvEngine;
+	}
+
+	public void setKvEngine(String kvEngine) {
+	    this.kvEngine = kvEngine;
+	}
+
+	public String getRole() {
+	    return role;
+	}
+
+	public void setRole(String role) {
+	    this.role = role;
 	}
 
 	public void setKeycloakParams(KeycloakParams keycloakParams) {
