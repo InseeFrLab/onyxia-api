@@ -161,5 +161,7 @@ It can be used to add additionnal feature to Onyxia. It helps user to keep their
 | Key | Default | Description | Example |
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
 | `URL` | | URL of the atlas service for the region. | "https://vault.change.me" |
+| `kvEngine` | | mount point of the kv engine. | "onyxia-kv" |
+| `role` | | role of the user in vault | "onyxia-user" |
 | `keycloakParams` | | Configuration of the keycloak service used to get an access token on the vault service. It defines the keycloak realm, clientId, and Url. | {realm: "sspcloud", clientId: "vault", URL: "https://auth.change.me/auth"} |
 
