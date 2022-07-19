@@ -20,6 +20,7 @@ public class CatalogWrapper {
     private String scm;
     private String type;
     private List<String> excludedCharts = new ArrayList<>();
+    private List<String> highlightedCharts = new ArrayList<>();
 
     /**
      * @return the type
@@ -118,4 +119,11 @@ public class CatalogWrapper {
         this.excludedCharts = excludedCharts;
     }
 
+    public List<String> getHighlightedCharts() {
+        return highlightedCharts;
+    }
+
+    public void setHighlightedCharts(List<String> highlightedCharts) {
+        this.highlightedCharts = highlightedCharts;
+    }
 }
