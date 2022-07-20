@@ -27,20 +27,21 @@ public class SetProxy {
     @PostConstruct
     public void setProxy() {
         if (StringUtils.isNotEmpty(httpProxyHost)) {
-            System.out.println("Using proxy host : "+httpProxyHost);
+            System.out.println("Using proxy host : " + httpProxyHost);
             System.setProperty("http.proxyHost", httpProxyHost);
             System.setProperty("https.proxyHost", httpProxyHost);
             if (StringUtils.isNotEmpty(httpProxyPort)) {
-                System.out.println("Using proxy port : "+httpProxyPort);
+                System.out.println("Using proxy port : " + httpProxyPort);
                 System.setProperty("http.proxyPort", httpProxyPort);
                 System.setProperty("https.proxyPort", httpProxyPort);
             }
             if (StringUtils.isNotEmpty(noProxy)) {
                 System.out.println("No proxy : " + noProxy);
-                System.setProperty("http.nonProxyHosts", noProxy);
+                System.setProperty("http.nonProxyHosts", noProxy.replaceAll("\\|", ","));
+                System.setProperty("no_proxy", noProxy);
             }
             if (StringUtils.isNotEmpty(proxyUsername)) {
-                System.out.println("Proxy username  : "+proxyUsername);
+                System.out.println("Proxy username  : " + proxyUsername);
                 System.setProperty("http.proxyUser", proxyUsername);
                 if (StringUtils.isNotEmpty(proxyPassword)) {
                     System.setProperty("http.proxyPassword", proxyPassword);

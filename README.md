@@ -4,9 +4,11 @@ This is the server part of the Onyxia datalab.
 It interacts with your container orchestrator to deploy users services.  
 Onyxia supports Kubernetes using Helm.  
 Deployable services are listed and configured inside catalogs.  
-Default catalogs are from InseeFrlab : [Universe datascience](https://github.com/InseeFrLab/Universe-Datascience) and [Inseefrlab helm charts](https://github.com/InseeFrLab/helm-charts) but more catalogs can be added.
+Default catalogs are from InseeFrlab : [Universe datascience](https://github.com/InseeFrLab/Universe-Datascience)
+and [Inseefrlab helm charts](https://github.com/InseeFrLab/helm-charts) but more catalogs can be added.
 
-Onyxia API can handle several "regions" at the same time which correspond to a set of Onyxia services with its own configuration. See [Region configuration](docs/region-configuration.md) to learn how to set up a region.
+Onyxia API can handle several "regions" at the same time which correspond to a set of Onyxia services with its own
+configuration. See [Region configuration](docs/region-configuration.md) to learn how to set up a region.
 
 The opensourcing (and documentation) is still a work in progress, please be patient :)
 
@@ -45,7 +47,8 @@ If you use it in other ways, we would love to hear from you :)
 
 ## Configuration
 
-Main configuration file is [onyxia-api/src/main/resources/application.properties](onyxia-api/src/main/resources/application.properties).  
+Main configuration file
+is [onyxia-api/src/main/resources/application.properties](onyxia-api/src/main/resources/application.properties).  
 Each variable can be overriden using environment variables.
 
 Authentication configuration
@@ -55,25 +58,38 @@ Authentication configuration
 
 Open id configuration  
 | Key | Default | Description |
-| -------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `keycloak.realm` | | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
-| `keycloak.resource` | | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
-| `keycloak.auth-server-url` | | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
-| `keycloak.ssl-required` | `external` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
-| `keycloak.public-client` | `true` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
-| `keycloak.enable-basic-auth` | `true` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
-| `keycloak.bearer-only` | `true` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
-| `keycloak.disable-trust-manager` | `false` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
+| -------------------------------- | ---------- |
+----------------------------------------------------------------------------------------------------------------------------------------
+
+|
+| `keycloak.realm` | |
+See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
+| `keycloak.resource` | |
+See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
+| `keycloak.auth-server-url` | |
+See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
+| `keycloak.ssl-required` | `external` |
+See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
+| `keycloak.public-client` | `true` |
+See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
+| `keycloak.enable-basic-auth` | `true` |
+See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
+| `keycloak.bearer-only` | `true` |
+See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
+| `keycloak.disable-trust-manager` | `false` |
+See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
 
 Security configuration :
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
-| `security.cors.allowed_origins` | | To indicate which origins are allowed by [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) |
+| `security.cors.allowed_origins` | | To indicate which origins are allowed
+by [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) |
 
 Regions configuration :
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
-| `regions` | see [onyxia-api/src/main/resources/regions.json](onyxia-api/src/main/resources/regions.json) | List of regions. |
+| `regions` | see [onyxia-api/src/main/resources/regions.json](onyxia-api/src/main/resources/regions.json) | List of
+regions. |
 
 Catalogs configuration :
 
@@ -87,7 +103,7 @@ HTTP configuration
 | --------------------- | ------- | ------------------------------------------------------------------ |
 | `http.proxyHost` | | Proxy hostname (e.g : proxy.example.com) |
 | `http.proxyPort` | 80 for `HTTP`, 443 for `HTTPS` | Proxy port |
-| `http.noProxy` | | Hosts that should not use the proxy (e.g : `localhost|host.example.com`) |
+| `http.noProxy` | | Hosts that should not use the proxy (e.g : `localhost,host.example.com`) |
 | `http.proxyUsername` | | Username if the proxy requires authentication |
 | `http.proxyPassword` | | Password if the proxy requires authentication |
 
@@ -95,12 +111,14 @@ Other configurations
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
 | `springdoc.swagger-ui.path` | `/` | Open API (swagger) UI path |
-|`springdoc.swagger-ui.oauth.clientId`|``|clientid use by swagger to authenticate the user, in general the same which is use by onyxia-ui is ok.|
+|`springdoc.swagger-ui.oauth.clientId`|``|clientid use by swagger to authenticate the user, in general the same which is
+use by onyxia-ui is ok.|
 
 ## Onyxia Universe package format extension
 
 Onyxia extends the official Universe format (see https://github.com/mesosphere/universe) to enhance it.  
-This format extension is **fully interoperable** with the official Universe format meaning **Onyxia works with any Universe** and **Universes using Onyxia's extension should be usable in other apps**.
+This format extension is **fully interoperable** with the official Universe format meaning **Onyxia works with any
+Universe** and **Universes using Onyxia's extension should be usable in other apps**.
 
 The specification is defined [here](docs/specification/README.md).
 
