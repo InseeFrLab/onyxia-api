@@ -38,7 +38,6 @@ public class SetProxy {
             if (StringUtils.isNotEmpty(noProxy)) {
                 System.out.println("No proxy : " + noProxy);
                 System.setProperty("http.nonProxyHosts", noProxy.replaceAll(",", "\\|"));
-                System.setProperty("no_proxy", noProxy);
             }
             if (StringUtils.isNotEmpty(proxyUsername)) {
                 System.out.println("Proxy username  : " + proxyUsername);
