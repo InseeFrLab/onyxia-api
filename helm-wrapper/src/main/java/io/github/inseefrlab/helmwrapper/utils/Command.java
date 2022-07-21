@@ -75,8 +75,8 @@ public class Command {
             env.put("HTTPS_PROXY", System.getProperty("https.proxyHost") + (System.getProperty("https.proxyPort") != null ? ":" + System.getProperty("https.proxyPort") : ""));
         }
 
-        if (System.getProperty("noProxy") != null) {
-            env.put("NO_PROXY", System.getProperty("noProxy"));
+        if (System.getProperty("http.noProxy") != null) {
+            env.put("NO_PROXY", System.getProperty("http.noProxy"));
         }
 
         return env;
