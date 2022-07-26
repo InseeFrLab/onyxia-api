@@ -4,11 +4,9 @@ This is the server part of the Onyxia datalab.
 It interacts with your container orchestrator to deploy users services.  
 Onyxia supports Kubernetes using Helm.  
 Deployable services are listed and configured inside catalogs.  
-Default catalogs are from InseeFrlab : [Universe datascience](https://github.com/InseeFrLab/Universe-Datascience)
-and [Inseefrlab helm charts](https://github.com/InseeFrLab/helm-charts) but more catalogs can be added.
+Default catalogs are from InseeFrlab : [Universe datascience](https://github.com/InseeFrLab/Universe-Datascience) and [Inseefrlab helm charts](https://github.com/InseeFrLab/helm-charts) but more catalogs can be added.
 
-Onyxia API can handle several "regions" at the same time which correspond to a set of Onyxia services with its own
-configuration. See [Region configuration](docs/region-configuration.md) to learn how to set up a region.
+Onyxia API can handle several "regions" at the same time. Each "region" corresponds to a set of Onyxia services with their own configurations. See [Region configuration](docs/region-configuration.md) to learn how to set up a region.
 
 The opensourcing (and documentation) is still a work in progress, please be patient :)
 
@@ -30,14 +28,14 @@ mvn spring-boot:run
 
 ### Using Helm
 
-A [helm](helm.sh) package is available at [inseefrlab](https://github.com/InseeFrLab/helm-charts)
+The [Onyxia helm chart](https://github.com/InseeFrLab/helm-charts/tree/master/charts/onyxia) is available at [inseefrlab](https://github.com/InseeFrLab/helm-charts)
 
 ```
 helm repo add inseefrlab https://inseefrlab.github.io/helm-charts
 helm install inseefrlab/onyxia
 ```
 
-Note that this installs both the API and the [UI](https://github.com/inseefrlab/onyxia-ui)
+Note that this installs both the [API](https://github.com/InseeFrLab/onyxia-api) and the [UI](https://github.com/inseefrlab/onyxia-ui)
 
 ## Usage
 
@@ -47,14 +45,13 @@ If you use it in other ways, we would love to hear from you :)
 
 ## Configuration
 
-Main configuration file
-is [onyxia-api/src/main/resources/application.properties](onyxia-api/src/main/resources/application.properties).  
-Each variable can be overriden using environment variables.
+Main configuration file is [onyxia-api/src/main/resources/application.properties](onyxia-api/src/main/resources/application.properties).  
+Each variable can be overridden using environment variables.
 
 Authentication configuration
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
-| `authentication.mode` | `none` | Supported modes are : `none` , `openidconnect` (must be configured) |
+| `authentication.mode` | `none` | Supported modes are : `none`, `openidconnect` (must be configured) |
 
 Open id configuration  
 | Key | Default | Description |
@@ -88,9 +85,9 @@ Catalogs configuration :
 HTTP configuration  
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
-| `http.proxyHost` | | Proxy hostname (e.g : `proxy.example.com`) |
-| `http.proxyPort` | 80 for `HTTP` , 443 for `HTTPS` | Proxy port |
-| `http.noProxy` | | Hosts that should not use the proxy (e.g : `localhost,host.example.com` ) |
+| `http.proxyHost` | | Proxy hostname (e.g : proxy.example.com) |
+| `http.proxyPort` | 80 for `HTTP`, 443 for `HTTPS` | Proxy port |
+| `http.noProxy` | | Hosts that should not use the proxy (e.g : `localhost,host.example.com`) |
 | `http.proxyUsername` | | Username if the proxy requires authentication |
 | `http.proxyPassword` | | Password if the proxy requires authentication |
 
@@ -98,7 +95,7 @@ Other configurations
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
 | `springdoc.swagger-ui.path` | `/` | Open API (swagger) UI path |
-| `springdoc.swagger-ui.oauth.clientId` |``|clientid use by swagger to authenticate the user, in general the same which is use by onyxia-ui is ok.|
+| `springdoc.swagger-ui.oauth.clientId` | `` | clientid used by swagger to authenticate the user, in general the same which is used by onyxia-ui is ok. |
 
 ## Onyxia Universe package format extension
 
