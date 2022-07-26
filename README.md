@@ -54,56 +54,43 @@ Each variable can be overriden using environment variables.
 Authentication configuration
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
-| `authentication.mode` | `none` | Supported modes are : `none`, `openidconnect` (must be configured) |
+| `authentication.mode` | `none` | Supported modes are : `none` , `openidconnect` (must be configured) |
 
 Open id configuration  
 | Key | Default | Description |
-| -------------------------------- | ---------- |
-----------------------------------------------------------------------------------------------------------------------------------------
-
-|
-| `keycloak.realm` | |
-See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
-| `keycloak.resource` | |
-See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
-| `keycloak.auth-server-url` | |
-See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
-| `keycloak.ssl-required` | `external` |
-See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
-| `keycloak.public-client` | `true` |
-See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
-| `keycloak.enable-basic-auth` | `true` |
-See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
-| `keycloak.bearer-only` | `true` |
-See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
-| `keycloak.disable-trust-manager` | `false` |
-See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
+| -------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `keycloak.realm` | | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
+| `keycloak.resource` | | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
+| `keycloak.auth-server-url` | | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
+| `keycloak.ssl-required` | `external` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
+| `keycloak.public-client` | `true` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
+| `keycloak.enable-basic-auth` | `true` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
+| `keycloak.bearer-only` | `true` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
+| `keycloak.disable-trust-manager` | `false` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
 
 Security configuration :
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
-| `security.cors.allowed_origins` | | To indicate which origins are allowed
-by [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) |
+| `security.cors.allowed_origins` | | To indicate which origins are allowed by [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) |
 
 Regions configuration :
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
-| `regions` | see [onyxia-api/src/main/resources/regions.json](onyxia-api/src/main/resources/regions.json) | List of
-regions. |
+| `regions` | see [onyxia-api/src/main/resources/regions.json](onyxia-api/src/main/resources/regions.json) | List of regions. |
 
 Catalogs configuration :
 
-| Key                   | Default                                                                                        | Description                                                                                                                                                           |
+| Key | Default | Description |
 | --------------------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `catalogs`            | see [onyxia-api/src/main/resources/catalogs.json](onyxia-api/src/main/resources/catalogs.json) | List of catalogs. Each catalog can be of type `universe` or `helm`. Mixing is supported. If there is no region of corresponding type then the catalog will be ignored |
-| `catalogs.refresh.ms` | `300000` (5 minutes)                                                                           | The rate at which the catalogs should be refreshed. `<= 0` means no refreshs after initial loading                                                                    |
+| `catalogs` | see [onyxia-api/src/main/resources/catalogs.json](onyxia-api/src/main/resources/catalogs.json) | List of catalogs. Each catalog can be of type `universe` or `helm`. Mixing is supported. If there is no region of corresponding type then the catalog will be ignored |
+| `catalogs.refresh.ms` | `300000` (5 minutes) | The rate at which the catalogs should be refreshed. `<= 0` means no refreshs after initial loading |
 
 HTTP configuration  
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
-| `http.proxyHost` | | Proxy hostname (e.g : proxy.example.com) |
-| `http.proxyPort` | 80 for `HTTP`, 443 for `HTTPS` | Proxy port |
-| `http.noProxy` | | Hosts that should not use the proxy (e.g : `localhost,host.example.com`) |
+| `http.proxyHost` | | Proxy hostname (e.g : `proxy.example.com`) |
+| `http.proxyPort` | 80 for `HTTP` , 443 for `HTTPS` | Proxy port |
+| `http.noProxy` | | Hosts that should not use the proxy (e.g : `localhost,host.example.com` ) |
 | `http.proxyUsername` | | Username if the proxy requires authentication |
 | `http.proxyPassword` | | Password if the proxy requires authentication |
 
@@ -111,14 +98,12 @@ Other configurations
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
 | `springdoc.swagger-ui.path` | `/` | Open API (swagger) UI path |
-|`springdoc.swagger-ui.oauth.clientId`|``|clientid use by swagger to authenticate the user, in general the same which is
-use by onyxia-ui is ok.|
+| `springdoc.swagger-ui.oauth.clientId` |``|clientid use by swagger to authenticate the user, in general the same which is use by onyxia-ui is ok.|
 
 ## Onyxia Universe package format extension
 
 Onyxia extends the official Universe format (see https://github.com/mesosphere/universe) to enhance it.  
-This format extension is **fully interoperable** with the official Universe format meaning **Onyxia works with any
-Universe** and **Universes using Onyxia's extension should be usable in other apps**.
+This format extension is **fully interoperable** with the official Universe format meaning **Onyxia works with any Universe** and **Universes using Onyxia's extension should be usable in other apps**.
 
 The specification is defined [here](docs/specification/README.md).
 
