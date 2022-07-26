@@ -1,15 +1,13 @@
-FROM curlimages/curl as build  
-RUN curl -o /tmp/kubectl -L https://storage.googleapis.com/kubernetes-release/release/v1.23.5/bin/linux/amd64/kubectl
-RUN curl -o /tmp/helm -L https://get.helm.sh/helm-v3.8.1-linux-amd64.tar.gz
-RUN tar -xvzf /tmp/helm -C /tmp
-
 FROM eclipse-temurin:17-jre
-COPY --from=build /tmp/kubectl /usr/local/bin/kubectl
-COPY --from=build /tmp/linux-amd64/helm /usr/local/bin/helm
+# Install kubectl
+RUN apt-get update && apt-get install -y apt-transport-https gnupg2
+RUN curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+RUN echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee -a /etc/apt/sources.list.d/kubernetes.list
+RUN apt-get update && apt-get install -y kubectl
+# Install helm
+RUN curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 COPY target/*.jar app.jar
-RUN chmod +x /usr/local/bin/kubectl && \
-    chmod +x /usr/local/bin/helm && \
-    groupadd --gid 101 --system onyxia && \
+RUN groupadd --gid 101 --system onyxia && \
     useradd --system --uid 101 --create-home --home-dir /var/cache/onyxia --shell /sbin/nologin --gid onyxia --comment onyxia onyxia
 # Equivalent to 'USER onyxia', see: https://github.com/InseeFrLab/onyxia-api/pull/116
 USER 101
