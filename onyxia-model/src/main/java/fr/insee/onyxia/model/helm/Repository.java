@@ -53,6 +53,7 @@ public class Repository extends CatalogWrapper {
 
     @JsonProperty("entries")
     public void setEntries(Map<String, List<Chart>> entries) {
+        super.setEntries(entries);
         setPackages(entries.values().stream().map(charts -> charts.get(0)).filter(chart -> "application".equalsIgnoreCase(chart.getType())).collect(Collectors.toList()));
     }
 }

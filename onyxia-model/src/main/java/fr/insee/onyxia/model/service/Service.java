@@ -11,17 +11,20 @@ public class Service {
     private int instances;
     private double cpus;
     private double mem;
-    private ServiceStatus status = ServiceStatus.RUNNING;
+    private String status;
     private ServiceType type;
     private List<String> urls;
     private List<String> internalUrls;
-    private String logo;
     private Map<String, String> env = new HashMap<>();
     private List<Task> tasks = new ArrayList<>();
     private List<Event> events = new ArrayList<>();
     private String subtitle;
     private Monitoring monitoring;
     private String postInstallInstructions;
+    private String namespace;
+    private String revision;
+    private String updated;
+    private String appVersion;
 
     private long startedAt;
 
@@ -83,11 +86,11 @@ public class Service {
         this.startedAt = startedAt;
     }
 
-    public ServiceStatus getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(ServiceStatus status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 
@@ -105,14 +108,6 @@ public class Service {
 
     public void setUrls(List<String> urls) {
         this.urls = urls;
-    }
-
-    public String getLogo() {
-        return logo;
-    }
-
-    public void setLogo(String logo) {
-        this.logo = logo;
     }
 
     public Map<String, String> getEnv() {
@@ -161,6 +156,38 @@ public class Service {
 
     public void setMonitoring(Monitoring monitoring) {
         this.monitoring = monitoring;
+    }
+
+    public String getNamespace() {
+        return namespace;
+    }
+
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
+    }
+
+    public String getRevision() {
+        return revision;
+    }
+
+    public void setRevision(String revision) {
+        this.revision = revision;
+    }
+
+    public String getUpdated() {
+        return updated;
+    }
+
+    public void setUpdated(String updated) {
+        this.updated = updated;
+    }
+
+    public String getAppVersion() {
+        return appVersion;
+    }
+
+    public void setAppVersion(String appVersion) {
+        this.appVersion = appVersion;
     }
 
     public void setPostInstallInstructions(String postInstallInstructions) {
