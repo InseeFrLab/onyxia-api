@@ -128,7 +128,7 @@ public class HelmAppsService implements AppsService {
         File values = File.createTempFile("values", ".yaml");
         mapperHelm.writeValue(values, fusion);
         String namespaceId = kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
-        HelmInstaller res = getHelmInstallService().installChart(getHelmConfiguration(region, user), catalogId + "/" + pkg.getName(), namespaceId, requestDTO.getName(), requestDTO.isDryRun(),
+        HelmInstaller res = getHelmInstallService().installChart(getHelmConfiguration(region, user), catalogId + "/" + pkg.getName(), namespaceId, requestDTO.getName(), requestDTO.getPackageVersion(), requestDTO.isDryRun(),
                 values, null);
         values.delete();
         return List.of(res.getManifest());
@@ -201,7 +201,6 @@ public class HelmAppsService implements AppsService {
     private Service getHelmApp(Region region, User user, HelmLs release) {
         String manifest = getHelmInstallService().getManifest(getHelmConfiguration(region, user), release.getName(), release.getNamespace());
         Service service = getServiceFromRelease(region, release, manifest, user);
-        service.setStatus(findAppStatus(release));
         try {
             service.setStartedAt(helmDateFormat.parse(release.getUpdated()).getTime());
         } catch (ParseException e) {
@@ -211,6 +210,12 @@ public class HelmAppsService implements AppsService {
         service.setName(release.getName());
         service.setSubtitle(release.getChart());
         service.setType(Service.ServiceType.KUBERNETES);
+        service.setName(release.getName());
+        service.setNamespace(release.getNamespace());
+        service.setRevision(release.getRevision());
+        service.setStatus(release.getStatus());
+        service.setUpdated(release.getUpdated());
+        service.setAppVersion(release.getAppVersion());
         try {
             String values = getHelmInstallService().getValues(getHelmConfiguration(region, user), release.getName(), release.getNamespace());
             JsonNode node = new ObjectMapper().readTree(values);
@@ -301,17 +306,4 @@ public class HelmAppsService implements AppsService {
 
         return service;
     }
-
-
-    private Service.ServiceStatus findAppStatus(HelmLs release) {
-        if (release.getStatus().equals("deployed")) {
-            return Service.ServiceStatus.RUNNING;
-        } else if (release.getStatus().equals("pending")) {
-            return Service.ServiceStatus.DEPLOYING;
-        } else {
-            return Service.ServiceStatus.STOPPED;
-        }
-    }
-
-
 }

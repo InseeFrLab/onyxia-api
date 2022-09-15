@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 @Service
 public class CatalogLoader {
@@ -60,13 +61,17 @@ public class CatalogLoader {
             Reader reader = new InputStreamReader(resourceLoader.getResource(cw.getLocation()+"/index.yaml").getInputStream(),
                     "UTF-8");
             Repository repository = mapperHelm.readValue(reader, Repository.class);
-            repository.getPackages().parallelStream().forEach(pkg -> {
-                try {
-                    refreshPackage(cw, pkg);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            repository.getEntries().values().parallelStream().forEach(entry -> {
+                entry.parallelStream().forEach(pkg -> {
+                    try {
+                        refreshPackage(cw, pkg);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
             });
+            repository.setPackages(repository.getEntries().values().stream().map(charts -> charts.get(0))
+                    .filter(chart -> "application".equalsIgnoreCase(chart.getType())).collect(Collectors.toList()));
             cw.setCatalog(repository);
             cw.setLastUpdateTime(System.currentTimeMillis());
         } catch (Exception e) {

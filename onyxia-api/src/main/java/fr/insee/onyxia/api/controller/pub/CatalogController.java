@@ -7,6 +7,7 @@ import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.model.catalog.Config.Property;
 import fr.insee.onyxia.model.catalog.Config.Property.XForm;
 import fr.insee.onyxia.model.catalog.Config.Property.XOnyxia;
+import fr.insee.onyxia.model.helm.Chart;
 import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.Service;
@@ -21,11 +22,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 @Tag(name = "Public")
-@RequestMapping(value={"/api/public/catalog", "/public/catalog"})
+@RequestMapping(value={"/api/public/catalog", "/public/catalog", "/api/public/catalogs", "/public/catalogs"})
 @RestController
 public class CatalogController {
 
@@ -90,6 +92,62 @@ public class CatalogController {
          throw new NotFoundException();
       }
       return pkg;
+   }
+
+   @Operation(
+      summary = "Get a helm chart from a specific catalog by version.",
+      description = "Get a helm chart from a specific catalog by version, with detailed information on the package including: descriptions, sources, and configuration options.",
+      parameters = {
+         @Parameter(
+            required = true,
+            name = "catalogId",
+            description = "Unique ID of the enabled catalog for this Onyxia API.",
+            in = ParameterIn.PATH
+         ),
+         @Parameter(
+            required = true,
+            name = "chartName",
+            description = "Unique name of the chart from the selected catalog.",
+            in = ParameterIn.PATH
+         ),
+         @Parameter(
+            required = true,
+            name = "version",
+            description = "Version of the chart",
+            in = ParameterIn.PATH
+         )
+      }
+   )
+   @GetMapping("{catalogId}/charts/{chartName}/versions/{version}")
+   public Chart getChartByVersion(@PathVariable String catalogId, @PathVariable String chartName, @PathVariable String version) {
+      Chart chart = catalogService.getChartByVersion(catalogId, chartName, version).orElseThrow(NotFoundException::new);
+      addCustomOnyxiaProperties(chart);
+      return chart;
+   }
+
+   @Operation(
+      summary = "Get all versions of a chart from a specific catalog.",
+      description = "Get all versions of a chart from a specific catalog, with detailed information on the package including: descriptions, sources, and configuration options.",
+      parameters = {
+         @Parameter(
+            required = true,
+            name = "catalogId",
+            description = "Unique ID of the enabled catalog for this Onyxia API.",
+            in = ParameterIn.PATH
+         ),
+         @Parameter(
+            required = true,
+            name = "chartName",
+            description = "Unique name of the chart from the selected catalog.",
+            in = ParameterIn.PATH
+         )
+      }
+   )
+   @GetMapping("{catalogId}/charts/{chartName}")
+   public List<Chart> getCharts(@PathVariable String catalogId, @PathVariable String chartName) {
+      List<Chart> charts = catalogService.getCharts(catalogId, chartName).orElseThrow(NotFoundException::new);
+      charts.stream().forEach(this::addCustomOnyxiaProperties);
+      return charts;
    }
 
    private boolean isCatalogEnabled(Region region, CatalogWrapper catalog) {
