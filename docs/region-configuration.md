@@ -13,9 +13,9 @@
 
 A **region** is the configuration of an independant set of Onyxia services. Thus multiple configuration accessing different services can be plugged on a single Onyxia instance.
 
-A region mainly defines **Onyxia service provider** on which are runned the users, groups and global services and how users can interact with it. It also defines a **S3 object storage** and how "buckets" are provided to users.
+A region mainly defines **Onyxia service provider** on which are run the users, groups and global services and how users can interact with it. It also defines a **S3 object storage** and how "buckets" are provided to users.
 
-Most of the configuration of an Onyxia clients comes from the region that can be accessed as json via /public/configuration or /public/regions.
+Most of the configuration of an Onyxia client comes from the region that can be accessed as json via /public/configuration or /public/regions.
 
 See [regions.json](/onyxia-api/src/main/resources/regions.json) for a complete example of regions configuration.
 
@@ -36,7 +36,7 @@ See [regions.json](/onyxia-api/src/main/resources/regions.json) for a complete e
 
 ## Services properties
 
-The onyxia service plateform is a Kubernetes cluster but Onyxia is meant to be extendable to other type of platform if necessary.
+The onyxia service plateform is a Kubernetes cluster but Onyxia is meant to be extendable to other types of platform if necessary.
 
 Users can work on Onyxia as a User or as a Group to which they belong. Each user and group can have its own **namespace** which is an isolated space of Kubernetes.
 
