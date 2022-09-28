@@ -643,6 +643,7 @@ public class Region {
 
     public static class Expose {
 	private String domain;
+	private String ingressClassName;
 
 	public void setDomain(String domain) {
 	    this.domain = domain;
@@ -650,6 +651,14 @@ public class Region {
 
 	public String getDomain() {
 	    return domain;
+	}
+
+	public void setIngressClassName(String ingressClassName) {
+	    this.ingressClassName = ingressClassName;
+	}
+
+	public String getIngressClassName() {
+	    return ingressClassName;
 	}
     }
 
