@@ -49,7 +49,7 @@ Users can work on Onyxia as a User or as a Group to which they belong. Each user
 | `usernamePrefix` | | If set, the Kubernetes user corresponding to the Onyxia user is named usernamePrefix + userId on impersonation mode, otherwise it is identified only as userId | "user-" |
 | `groupPrefix` | | not used | |
 | `authenticationMode` | IMPERSONATE | IMPERSONATE or ADMIN : on ADMIN mode Onyxia uses its admin account on the services provider, with IMPERSONATE mode Onyxia request the API as the user (helm option --kube-as-user) but is only available if the helm version used is above 3.4.0 | |
-| `expose` | | When users request to expose their service, only subdomain of this object domain are allowed | {domain: "kub.sspcloud.fr"} |
+| `expose` | | When users request to expose their service, only subdomain of this object domain are allowed | See [Expose properties](###expose-properties) |
 | `monitoring` | | Define the URL pattern of the monitoring service that is to be launch with each service. Only for client purpose. | {URLPattern: "https://$NAMESPACE-$INSTANCE.mymonitoring.sspcloud.fr"} |
 | `cloudshell` | | Define the catalog and package name where to fetch the cloudshell in the helm catalog. | {catalogId: "inseefrlab-helm-charts-datascience", packageName: "cloudshell"} |
 | `initScript` | | Define where to fetch a script that will be launched on some service on startup. | "https://inseefrlab.github.io/onyxia/onyxia-init.sh" |
@@ -94,6 +94,16 @@ A quota follows the kubernetes model which is composed of:
 "limits.cpu"
 "requests.storage"
 "count/pods"
+
+### Expose properties
+
+ with **expose**.
+
+| Key | Default | Description |
+| --------------------- | ------- | ------------------------------------------------------------------ |
+| `domain` | | When users request to expose their service, only subdomain of this object will be created. |
+| `ingressClassName` | '' | Ingress Class Name : usefull if you want to use a specific ingress controller in stead of a default one |
+
 
 ### Default configuration properties
 
