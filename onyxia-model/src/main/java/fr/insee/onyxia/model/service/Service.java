@@ -5,29 +5,54 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "")
 public class Service {
 
-    private String id, name;
+    @Schema(description = "")
+    private String id;
+    @Schema(description = "")
+    private String name;
+    @Schema(description = "")
     private int instances;
+    @Schema(description = "")
     private double cpus;
+    @Schema(description = "")
     private double mem;
+    @Schema(description = "")
     private String status;
+    @Schema(description = "")
     private ServiceType type;
+    @Schema(description = "")
     private List<String> urls;
+    @Schema(description = "")
     private List<String> internalUrls;
+    @Schema(description = "")
     private Map<String, String> env = new HashMap<>();
+    @Schema(description = "")
     private List<Task> tasks = new ArrayList<>();
+    @Schema(description = "")
     private List<Event> events = new ArrayList<>();
+    @Schema(description = "")
     private String subtitle;
+    @Schema(description = "")
     private Monitoring monitoring;
+    @Schema(description = "")
     private String postInstallInstructions;
+    @Schema(description = "")
     private String namespace;
+    @Schema(description = "")
     private String revision;
+    @Schema(description = "")
     private String updated;
+    @Schema(description = "")
     private String appVersion;
 
+    @Schema(description = "")
     private long startedAt;
 
+    @Schema(description = "")
     private Map<String,String> labels;
 
     public String getId() {
@@ -198,14 +223,17 @@ public class Service {
         return postInstallInstructions;
     }
 
+	@Schema(description = "Cloudshell data and health")
     public static enum ServiceStatus {
         DEPLOYING, RUNNING, STOPPED;
     }
 
+	@Schema(description = "Cloudshell data and health")
     public static enum ServiceType {
         KUBERNETES
     }
 
+	@Schema(description = "Cloudshell data and health")
     public static class Monitoring {
         private String url;
 

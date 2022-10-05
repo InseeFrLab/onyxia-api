@@ -1,11 +1,17 @@
 package fr.insee.onyxia.model.catalog;
 
 import fr.insee.onyxia.model.catalog.Config.Config;
+import io.swagger.v3.oas.annotations.media.Schema;
 
+@Schema(description = "")
 public class Pkg {
+    @Schema(description = "")
     private String name;
+    @Schema(description = "")
     private String description;
+    @Schema(description = "")
     private String version;
+    @Schema(description = "")
     private Config config;
 
     public void setConfig(Config config) {

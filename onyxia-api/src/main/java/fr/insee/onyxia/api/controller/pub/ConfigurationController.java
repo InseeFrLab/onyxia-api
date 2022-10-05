@@ -4,6 +4,8 @@ import fr.insee.onyxia.api.configuration.properties.RegionsConfiguration;
 import fr.insee.onyxia.model.region.Region;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,6 +42,7 @@ public class ConfigurationController {
         return appInfo;
     }
 
+	@Schema(description = "Cloudshell data and health")
     public class AppInfo {
 
 
@@ -64,8 +67,11 @@ public class ConfigurationController {
         }
     }
 
+    @Schema(description = "")
     public class BuildInfo {
+        @Schema(description = "")
         private String version;
+        @Schema(description = "")
         private long timestamp;
 
         public void setTimestamp(long timestamp) {

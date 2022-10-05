@@ -9,6 +9,8 @@ import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.Service;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +34,7 @@ public class CloudShellController {
 	private CatalogService catalogService;
 
 	@GetMapping
-	public CloudShellStatus getCloudShellStatus(Region region, Project project) {
+	public CloudShellStatus getCloudShellStatus(@Parameter(hidden = true) Region region, @Parameter(hidden = true) Project project) {
 		CloudShellStatus status = new CloudShellStatus();
 		Region.CloudshellConfiguration cloudshellConfiguration = region.getServices().getCloudshell();
 		try {
@@ -54,12 +56,17 @@ public class CloudShellController {
 		return status;
 	}
 
+	@Schema(description = "Cloudshell data and health")
 	public static class CloudShellStatus {
 
 		public static final String STATUS_UP = "UP", STATUS_LOADING = "LOADING", STATUS_DOWN = "DOWN";
+		@Schema(description = "Status of the connexion to the cloudshell")
 		private String status = STATUS_UP;
+		@Schema(description = "URL of the cloudshell")
 		private String url = null;
+		@Schema(description = "?")
 		private Pkg packageToDeploy = null;
+		@Schema(description = "?")
 		private String catalogId;
 
 		public String getStatus() {

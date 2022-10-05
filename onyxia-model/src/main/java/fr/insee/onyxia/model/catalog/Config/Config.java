@@ -1,16 +1,20 @@
 package fr.insee.onyxia.model.catalog.Config;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Config
  */
+@Schema(description = "")
 public class Config {
 
+    @Schema(description = "")
     private String type;
+    @Schema(description = "")
     private Category properties;
+    @Schema(description = "")
     private List<String> required = null;
 
     public String getType() {
