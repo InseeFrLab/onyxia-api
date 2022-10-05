@@ -48,7 +48,8 @@ public class Service {
     private String updated;
     @Schema(description = "Version of the app. Often non relevant")
     private String appVersion;
-
+    @Schema(description = "Chart name and version ")
+    private String chart;
     @Schema(description = "This should be removed in v1.0 ")
     private long startedAt;
 
@@ -205,6 +206,14 @@ public class Service {
 
     public void setUpdated(String updated) {
         this.updated = updated;
+    }
+
+    public String getChart() {
+        return chart;
+    }
+
+    public void setChart(String chart) {
+        this.chart = chart;
     }
 
     public String getAppVersion() {
