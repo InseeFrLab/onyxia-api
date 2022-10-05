@@ -8,9 +8,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "A set of packages and charts coming from a same endpoint")
 public abstract class CatalogWrapper {
 
-    @Schema(description = "")
+    @Schema(description = "This should be removed in v1.0")
     private List<Pkg> packages;
-    @Schema(description = "")
+    @Schema(description = "This entries are those from a standard helm repository")
     private Map<String, List<Chart>> entries;
     /**
      * @return the packages
