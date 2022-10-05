@@ -215,6 +215,7 @@ public class HelmAppsService implements AppsService {
         service.setRevision(release.getRevision());
         service.setStatus(release.getStatus());
         service.setUpdated(release.getUpdated());
+        service.setChart(release.getChart());
         service.setAppVersion(release.getAppVersion());
         try {
             String values = getHelmInstallService().getValues(getHelmConfiguration(region, user), release.getName(), release.getNamespace());
