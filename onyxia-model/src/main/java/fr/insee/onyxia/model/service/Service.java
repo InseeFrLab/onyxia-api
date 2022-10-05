@@ -10,46 +10,46 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "")
 public class Service {
 
-    @Schema(description = "")
+    @Schema(description = "This is the name of the chart helm. This should be removed in v1.0")
     private String id;
-    @Schema(description = "")
+    @Schema(description = "This is the name of the chart helm.")
     private String name;
-    @Schema(description = "")
+    @Schema(description = "This is fixed to 1. This should be removed in v1.0")
     private int instances;
-    @Schema(description = "")
+    @Schema(description = "This is fixed to 0. This should be removed in v1.0")
     private double cpus;
-    @Schema(description = "")
+    @Schema(description = "This is fixed to 0. This should be removed in v1.0")
     private double mem;
-    @Schema(description = "")
+    @Schema(description = "State of the release (can be: unknown, deployed, uninstalled, superseded, failed, uninstalling, pending-install, pending-upgrade or pending-rollback)")
     private String status;
-    @Schema(description = "")
+    @Schema(description = "Fixed to kubernetes. This should be removed in v1.0")
     private ServiceType type;
-    @Schema(description = "")
+    @Schema(description = "Urls are coming from ingress object")
     private List<String> urls;
-    @Schema(description = "")
+    @Schema(description = "This should be removed in v1.0")
     private List<String> internalUrls;
-    @Schema(description = "")
+    @Schema(description = "Contains helm get values. This should be re-ingeneer in v1.0")
     private Map<String, String> env = new HashMap<>();
-    @Schema(description = "")
+    @Schema(description = "Task represents pods running. This should be re-ingeneer in v1.0")
     private List<Task> tasks = new ArrayList<>();
-    @Schema(description = "")
+    @Schema(description = "This should be re-ingeneer in v1.0")
     private List<Event> events = new ArrayList<>();
-    @Schema(description = "")
+    @Schema(description = "This should be removed in v1.0")
     private String subtitle;
-    @Schema(description = "")
+    @Schema(description = "This should be removed in v1.0")
     private Monitoring monitoring;
-    @Schema(description = "")
+    @Schema(description = "Contains helm get notes.")
     private String postInstallInstructions;
-    @Schema(description = "")
+    @Schema(description = "Namespace of the helm release")
     private String namespace;
-    @Schema(description = "")
+    @Schema(description = "Version of the helm release")
     private String revision;
-    @Schema(description = "")
+    @Schema(description = "Last updated time")
     private String updated;
-    @Schema(description = "")
+    @Schema(description = "Version of the app. Often non relevant")
     private String appVersion;
 
-    @Schema(description = "")
+    @Schema(description = "This should be removed in v1.0 ")
     private long startedAt;
 
     @Schema(description = "")
