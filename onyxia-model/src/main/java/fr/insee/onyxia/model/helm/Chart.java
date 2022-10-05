@@ -3,6 +3,7 @@ package fr.insee.onyxia.model.helm;
 
 import com.fasterxml.jackson.annotation.*;
 import fr.insee.onyxia.model.catalog.Pkg;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.HashMap;
 import java.util.List;
@@ -11,36 +12,66 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({ "apiVersion", "appVersion", "created", "description", "digest", "engine", "home", "icon",
         "keywords", "maintainers", "name", "sources", "urls", "version" })
+@Schema(description = "Cloudshell data and health")
 public class Chart extends Pkg {
 
+    @Schema(description = "")
     @JsonProperty("apiVersion")
     private String apiVersion;
+
+    @Schema(description = "")
     @JsonProperty("appVersion")
     private String appVersion;
+
+    @Schema(description = "")
     @JsonProperty("created")
     private String created;
+
+    @Schema(description = "")
     @JsonProperty("description")
     private String description;
+
+    @Schema(description = "")
     @JsonProperty("type")
     private String type;
+
+    @Schema(description = "")
     @JsonProperty("digest")
     private String digest;
+
+    @Schema(description = "")
     @JsonProperty("engine")
     private String engine;
+
+    @Schema(description = "")
     @JsonProperty("home")
     private String home;
+
+    @Schema(description = "")
     @JsonProperty("icon")
     private String icon;
+
+    @Schema(description = "")
     @JsonProperty("keywords")
     private List<String> keywords = null;
+
+    @Schema(description = "")
     @JsonProperty("maintainers")
     private List<Maintainer> maintainers = null;
+
+    @Schema(description = "")
     @JsonProperty("name")
     private String name;
+
+    @Schema(description = "")
     @JsonProperty("sources")
     private List<String> sources = null;
+
+    @Schema(description = "")
     @JsonProperty("urls")
     private List<String> urls = null;
+
+    @Schema(description = "")
     @JsonProperty("version")
     private String version;
 

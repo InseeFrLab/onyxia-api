@@ -5,20 +5,32 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import fr.insee.onyxia.model.service.Service;
 import fr.insee.onyxia.model.service.quota.Quota;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Schema(description = "")
 public class Region {
+    @Schema(description = "")
     private String id;
+    @Schema(description = "")
     private String name;
+    @Schema(description = "")
     private String description;
+    @Schema(description = "")
     private String includedGroupPattern;
+    @Schema(description = "")
     private String excludedGroupPattern;
+    @Schema(description = "")
     private Location location;
+    @Schema(description = "")
     private Services services = new Services();
+    @Schema(description = "")
     private OnyxiaAPI onyxiaAPI;
+    @Schema(description = "")
     private Data data;
+    @Schema(description = "")
 	private Vault vault;
 
     public String getId() {
@@ -389,6 +401,7 @@ public class Region {
 	}
     }
 
+	@Schema(description = "Cloudshell data and health")
     public static class Data {
 
 	private Atlas atlas;
@@ -413,6 +426,7 @@ public class Region {
 	}
     }
 
+	@Schema(description = "Cloudshell data and health")
     public static class Atlas {
 
 	@JsonProperty("URL")
@@ -438,6 +452,7 @@ public class Region {
 	}
     }
 
+	@Schema(description = "Cloudshell data and health")
     public static class Vault {
 
 	@JsonProperty("URL")
@@ -506,6 +521,7 @@ public class Region {
 	}
     }
 
+	@Schema(description = "Cloudshell data and health")
     public static class S3 {
 	private String type;
 	@JsonProperty("URL")
@@ -686,6 +702,7 @@ public class Region {
     }
 
     public static class OnyxiaAPI {
+	@Schema(description = "Cloudshell data and health")
 	private String baseURL;
 
 	public String getBaseURL() {
@@ -697,6 +714,7 @@ public class Region {
 	}
     }
 
+	@Schema(description = "Cloudshell data and health")
     public static class Location {
 
 	private double lat;

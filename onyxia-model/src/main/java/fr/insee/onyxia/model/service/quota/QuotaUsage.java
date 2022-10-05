@@ -1,8 +1,13 @@
 package fr.insee.onyxia.model.service.quota;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "")
 public class QuotaUsage {
 
+    @Schema(description = "")
     private Quota spec;
+    @Schema(description = "")
     private Quota usage;
 
     public Quota getSpec() {

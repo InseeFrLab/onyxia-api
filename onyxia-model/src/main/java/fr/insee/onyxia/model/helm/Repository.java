@@ -3,6 +3,7 @@ package fr.insee.onyxia.model.helm;
 
 import com.fasterxml.jackson.annotation.*;
 import fr.insee.onyxia.model.catalog.CatalogWrapper;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +16,9 @@ public class Repository extends CatalogWrapper {
     public static final String TYPE_HELM = "helm";
 
     @JsonProperty("apiVersion")
+    @Schema(description = "")
     private String apiVersion;
+    @Schema(description = "")
     @JsonProperty("generated")
     private String generated;
     @JsonIgnore

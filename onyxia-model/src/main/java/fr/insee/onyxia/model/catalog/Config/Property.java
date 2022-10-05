@@ -4,44 +4,69 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Schema(description = "Cloudshell data and health")
 public class Property {
+    @Schema(description = "")
     String type;
+    @Schema(description = "")
     String description;
+    @Schema(description = "")
     String title;
     
+    @Schema(description = "")
     @JsonProperty("default")
     Object defaut;
+    @Schema(description = "")
     String pattern;
+    @Schema(description = "")
     Media media;
+    @Schema(description = "")
     String minimum;
+    @Schema(description = "")
     String render;
+    @Schema(description = "")
     Integer sliderMin;
+    @Schema(description = "")
     Integer sliderMax;
+    @Schema(description = "")
     Integer sliderStep;
+    @Schema(description = "")
     String sliderUnit;
+    @Schema(description = "")
     String sliderExtremity;
+    @Schema(description = "")
     String sliderExtremitySemantic;
+    @Schema(description = "")
     String sliderRangeId;
+    @Schema(description = "")
     Hidden hidden;
 
     @JsonProperty("enum")
+    @Schema(description = "")
     Object enumeration;
+    @Schema(description = "")
     Map<String, Property> properties;
 
     @JsonProperty("x-form")
+    @Schema(description = "")
     private XForm xform;
 
 
     @JsonProperty("x-security")
+    @Schema(description = "")
     private XSecurity xsecurity;
 
     @JsonProperty("x-generated")
+    @Schema(description = "")
     private XGenerated xGenerated;
 
     @JsonProperty("x-onyxia")
+    @Schema(description = "")
     private XOnyxia xonyxia;
 
     public XForm getXform() {
@@ -223,6 +248,7 @@ public class Property {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
+    @Schema(description = "Cloudshell data and health")
     public static class Media {
         String type;
 
@@ -236,6 +262,7 @@ public class Property {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
+    @Schema(description = "Cloudshell data and health")
     public static class Hidden {
         Object value;
         String path;

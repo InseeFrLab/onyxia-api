@@ -2,26 +2,35 @@ package fr.insee.onyxia.model.service.quota;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.HashMap;
 import java.util.Map;
 
+@Schema(description = "In the namespace en suivant les notations kubernetes https://kubernetes.io/docs/concepts/policy/resource-quotas/ . Si laissé vide pas de changement stays untouched")
 public class Quota {
 
     @JsonProperty("requests.memory")
+    @Schema(description = "Across all pods in a non-terminal state, the sum of memory requests cannot exceed this value.")
     private String memoryRequests;
 
+    @Schema(description = "Across all pods in a non-terminal state, the sum of CPU requests cannot exceed this value.")
     @JsonProperty("requests.cpu")
     private String cpuRequests;
 
+    @Schema(description = "Across all pods in a non-terminal state, the sum of memory limits cannot exceed this value.")
     @JsonProperty("limits.memory")
     private String memoryLimits;
 
+    @Schema(description = "Across all pods in a non-terminal state, the sum of CPU limits cannot exceed this value.")
     @JsonProperty("limits.cpu")
     private String cpuLimits;
 
+    @Schema(description = "Across all persistent volume claims, the sum of storage requests cannot exceed this value.")
     @JsonProperty("requests.storage")
     private String storageRequests;
 
+    @Schema(description = "The number of pod in the namespace cannot exceed this value.")
     @JsonProperty("count/pods")
     private Integer podsCount;
 

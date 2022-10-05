@@ -2,22 +2,32 @@ package fr.insee.onyxia.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Schema(description = "")
 public class User implements Serializable {
    
 	private static final long serialVersionUID = 2663796098930599255L;
+	@Schema(description = "")
 	String email;
+	@Schema(description = "")
 	String idep;
+	@Schema(description = "")
 	String nomComplet;
+	@Schema(description = "")
 	String password;
+	@Schema(description = "")
 	String ip;
 	@JsonIgnore
+	@Schema(description = "")
 	Map<String, Object> attributes = new HashMap<>();
+	@Schema(description = "")
 	List<String> groups = new ArrayList<>();
 
 
