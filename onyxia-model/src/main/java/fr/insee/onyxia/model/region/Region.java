@@ -141,6 +141,7 @@ public class Region {
 	private Quotas quotas = new Quotas();
 	private DefaultConfiguration defaultConfiguration = new DefaultConfiguration();
 	private K8sPublicEndpoint k8sPublicEndpoint = new K8sPublicEndpoint();
+	private CustomInitScript customInitScript = new CustomInitScript();
 
 	public static class DefaultConfiguration {
 	    private boolean IPProtection = true;
@@ -265,6 +266,14 @@ public class Region {
 
 	public void setDefaultConfiguration(DefaultConfiguration defaultConfiguration) {
 	    this.defaultConfiguration = defaultConfiguration;
+	}
+
+	public CustomInitScript getCustomInitScript() {
+	    return customInitScript;
+	}
+
+	public void setCustomInitScript(CustomInitScript customInitScript) {
+	    this.customInitScript = customInitScript;
 	}
 
 	public boolean isSingleNamespace() {
@@ -518,6 +527,30 @@ public class Region {
 
 	public KeycloakParams getKeycloakParams() {
 	    return keycloakParams;
+	}
+    }
+
+    public static class CustomInitScript {
+
+	@JsonProperty("URL")
+	private String url;
+	private String checksum;
+
+
+	public String getUrl() {
+	    return url;
+	}
+
+	public void setUrl(String url) {
+	    this.url = url;
+	}
+
+	public String getChecksum() {
+	    return checksum;
+	}
+
+	public void setChecksum(String checksum) {
+	    this.checksum = checksum;
 	}
     }
 

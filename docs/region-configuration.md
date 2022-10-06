@@ -6,6 +6,7 @@
     - [Server properties](#server-properties)
     - [Quotas properties](#quotas-properties)
     - [Default configuration properties](#default-configuration-properties)
+    - [CustomInitScript properties](#custom-init-script-properties)
   - [Data properties](#data-properties)
     - [S3](#s3)
     - [atlas](#atlas)
@@ -58,6 +59,16 @@ Users can work on Onyxia as a User or as a Group to which they belong. Each user
 | `k8sPublicEndpoint` | | Define external access to kubernetes API if available. It helps Onyxia users to directly connect to kubernetes outside the datalab | See [server properties](###k8sPublicEndpoint-properties) |
 | `quotas` | | Properties setting quotas on how much resource a user can get on the services provider. | See [Quotas properties](###quotas-properties) |
 | `defaultConfiguration` | | Default configuration on services that a user can override. For client purpose only. | See [Default Configuration](###default-configuration-properties) |
+| `customInitScript` | | This can be use to customize user environnement using a regional script executed by some users pods. | See [CustomInitScript](###custom-init-script-properties) |
+
+### CustomInitScript properties
+
+These properties define how to reach the **service provider API**.
+
+| Key | Description | Example |
+| --------------------- | ------------------------------------------------------------------ | ---- |
+| `URL` | URL of the init script | "api.kub.sspcloud.fr" |
+| `checksum` | checksum of the init script |  |
 
 ### Server properties
 
