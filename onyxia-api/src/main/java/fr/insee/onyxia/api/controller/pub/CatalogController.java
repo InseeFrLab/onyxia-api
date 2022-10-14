@@ -178,7 +178,7 @@ public class CatalogController {
       Property userDefinedValues = new Property();
       userDefinedValues.setType("string");
       userDefinedValues.setDescription("Values defined by the end user");
-      userDefinedValues.setDefaut(pkg.getName());
+      userDefinedValues.setDefaut("");
       userDefinedValues.setTitle("User defined values");
       onyxiaProperties.put("userDefinedValues", userDefinedValues);      
       Property owner = new Property();
