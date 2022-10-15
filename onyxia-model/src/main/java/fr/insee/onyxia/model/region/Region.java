@@ -1,14 +1,14 @@
 package fr.insee.onyxia.model.region;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import fr.insee.onyxia.model.service.Service;
 import fr.insee.onyxia.model.service.quota.Quota;
 import io.swagger.v3.oas.annotations.media.Schema;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Schema(description = "")
 public class Region {
@@ -31,7 +31,13 @@ public class Region {
     @Schema(description = "")
     private Data data;
     @Schema(description = "")
-	private Vault vault;
+    private Vault vault;
+    @Schema(description = "")
+    private ProxyConfiguration proxyConfiguration;
+    @Schema(description = "")
+    private PackageManagerConfiguration packageManagerConfiguration;
+    @Schema(description = "")
+    private CustomCAAuthoritiesConfiguration;
 
     public String getId() {
 	return id;
@@ -58,19 +64,19 @@ public class Region {
     }
 
     public String getIncludedGroupPattern(){
-        return includedGroupPattern;
+	return includedGroupPattern;
     }
 
     public void setIncludedGroupPattern(String includedGroupPattern){
-        this.includedGroupPattern = includedGroupPattern;
+	this.includedGroupPattern = includedGroupPattern;
     }
 
     public String getExcludedGroupPattern(){
-        return excludedGroupPattern;
+	return excludedGroupPattern;
     }
 
     public void setExcludedGroupPattern(String excludedGroupPattern){
-        this.excludedGroupPattern = excludedGroupPattern;
+	this.excludedGroupPattern = excludedGroupPattern;
     }
 
     public Location getLocation() {
@@ -147,9 +153,9 @@ public class Region {
 	    private boolean IPProtection = true;
 	    private boolean networkPolicy = true;
 	    private List<Object> from = new ArrayList<>();
-		private List<Object> tolerations = new ArrayList<>();
-		private Object nodeSelector;
-		private Object startupProbe;
+	    private List<Object> tolerations = new ArrayList<>();
+	    private Object nodeSelector;
+	    private Object startupProbe;
 	    private Kafka kafka = new Kafka();
 
 	    public void setIPProtection(boolean IPProtection) {
@@ -184,21 +190,21 @@ public class Region {
 		return tolerations;
 	    }
 
-		public void setNodeSelector (Object nodeSelector){
-			this.nodeSelector = nodeSelector;
-		}
+	    public void setNodeSelector (Object nodeSelector){
+		this.nodeSelector = nodeSelector;
+	    }
 
-		public Object getNodeSelector(){
-			return nodeSelector;
-		}
+	    public Object getNodeSelector(){
+		return nodeSelector;
+	    }
 
-		public void setStartupProbe (Object startupProbe){
-			this.startupProbe = startupProbe;
-		}
+	    public void setStartupProbe (Object startupProbe){
+		this.startupProbe = startupProbe;
+	    }
 
-		public Object getStartupProbe(){
-			return startupProbe;
-		}
+	    public Object getStartupProbe(){
+		return startupProbe;
+	    }
 
 	    public Kafka getKafka() {
 		return kafka;
@@ -213,18 +219,18 @@ public class Region {
 		private String url;
 		private String topicName;
 		public String getUrl() {
-			return url;
+		    return url;
 		}
 
 		public void setUrl(String url) {
-			this.url = url;
+		    this.url = url;
 		}
 		public String getTopicName() {
-			return topicName;
+		    return topicName;
 		}
 
 		public void setTopicName(String topicName) {
-			this.topicName = topicName;
+		    this.topicName = topicName;
 		}
 	    }
 	}
@@ -410,7 +416,7 @@ public class Region {
 	}
     }
 
-	@Schema(description = "Cloudshell data and health")
+    @Schema(description = "Cloudshell data and health")
     public static class Data {
 
 	private Atlas atlas;
@@ -435,7 +441,7 @@ public class Region {
 	}
     }
 
-	@Schema(description = "Cloudshell data and health")
+    @Schema(description = "Cloudshell data and health")
     public static class Atlas {
 
 	@JsonProperty("URL")
@@ -461,7 +467,7 @@ public class Region {
 	}
     }
 
-	@Schema(description = "Cloudshell data and health")
+    @Schema(description = "Cloudshell data and health")
     public static class Vault {
 
 	@JsonProperty("URL")
@@ -554,7 +560,7 @@ public class Region {
 	}
     }
 
-	@Schema(description = "Cloudshell data and health")
+    @Schema(description = "Cloudshell data and health")
     public static class S3 {
 	private String type;
 	@JsonProperty("URL")
@@ -747,7 +753,76 @@ public class Region {
 	}
     }
 
-	@Schema(description = "Cloudshell data and health")
+    public static class ProxyConfiguration {
+	@Schema(description = "httpProxyUrl to inject in helm values")
+	private String httpProxyUrl;
+	@Schema(description = "httpsProxyUrl to inject in helm values")
+	private String httpsProxyUrl;
+	@Schema(description = "noProxy to inject in helm values")
+	private String noProxy;
+
+	public String getHttpProxyUrl() {
+	    return httpProxyUrl;
+	}
+	public void setHttpProxyUrl(String httpProxyUrl) {
+	    this.httpProxyUrl = httpProxyUrl;
+	}
+	public String getHttpsProxyUrl() {
+	    return httpsProxyUrl;
+	}
+	public void setHttpsProxyUrl(String httpsProxyUrl) {
+	    this.httpsProxyUrl = httpsProxyUrl;
+	}
+	public String getNoProxy() {
+	    return noProxy;
+	}
+	public void setNoProxy(String noProxy) {
+	    this.noProxy = noProxy;
+	}
+
+    }
+
+    public static class CustomCAAuthoritiesConfiguration {
+
+	@Schema(description = "List of link to crt to add in container as custom authorities")
+	private final List<String> crtsUrl = new ArrayList<>();
+
+	public List<String> getCrtsUrl() {
+	    return crtsUrl;
+	}
+
+    }
+
+    public static class PackageManagerConfiguration {
+	@Schema(description = "httpProxyUrl to inject in helm values")
+	private String cranProxyUrl;
+	@Schema(description = "httpProxyUrl to inject in helm values")
+	private String condaProxyUrl;
+	@Schema(description = "httpProxyUrl to inject in helm values")
+	private String pypiProxyUrl;
+
+	public String getCranProxyUrl() {
+	    return cranProxyUrl;
+	}
+	public void setCranProxyUrl(String cranProxyUrl) {
+	    this.cranProxyUrl = cranProxyUrl;
+	}
+	public String getCondaProxyUrl() {
+	    return condaProxyUrl;
+	}
+	public void setCondaProxyUrl(String condaProxyUrl) {
+	    this.condaProxyUrl = condaProxyUrl;
+	}
+	public String getPypiProxyUrl() {
+	    return pypiProxyUrl;
+	}
+	public void setPypiProxyUrl(String pypiProxyUrl) {
+	    this.pypiProxyUrl = pypiProxyUrl;
+	}
+
+    }
+
+    @Schema(description = "Cloudshell data and health")
     public static class Location {
 
 	private double lat;
