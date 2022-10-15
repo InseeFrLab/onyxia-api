@@ -37,7 +37,7 @@ public class Region {
     @Schema(description = "")
     private PackageManagerConfiguration packageManagerConfiguration;
     @Schema(description = "")
-    private CustomCAAuthoritiesConfiguration;
+    private CustomCAAuthoritiesConfiguration customCAAuthoritiesConfiguration;
 
     public String getId() {
 	return id;
@@ -785,10 +785,14 @@ public class Region {
     public static class CustomCAAuthoritiesConfiguration {
 
 	@Schema(description = "List of link to crt to add in container as custom authorities")
-	private final List<String> crtsUrl = new ArrayList<>();
+	private List<String> crtsUrl = new ArrayList<>();
 
 	public List<String> getCrtsUrl() {
 	    return crtsUrl;
+	}
+
+	public void setCrtsUrl(List<String> crtsUrl) {
+	    this.crtsUrl = crtsUrl;
 	}
 
     }
