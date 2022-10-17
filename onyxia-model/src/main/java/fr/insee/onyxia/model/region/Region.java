@@ -784,15 +784,15 @@ public class Region {
 
     public static class CustomCAAuthoritiesConfiguration {
 
-	@Schema(description = "List of link to crt to add in container as custom authorities")
-	private List<String> crtsUrl = new ArrayList<>();
+	@Schema(description = "List of crt encoded in base64")
+	private List<String> crts = new ArrayList<>();
 
-	public List<String> getCrtsUrl() {
-	    return crtsUrl;
+	public List<String> getCrts() {
+	    return crts;
 	}
 
-	public void setCrtsUrl(List<String> crtsUrl) {
-	    this.crtsUrl = crtsUrl;
+	public void setCrts(List<String> crts) {
+	    this.crts = crts;
 	}
 
     }

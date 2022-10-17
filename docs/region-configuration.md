@@ -186,3 +186,40 @@ It can be used to add additionnal feature to Onyxia. It helps user to keep their
 | `role` | | role of the user in vault | "onyxia-user" |
 | `keycloakParams` | | Configuration of the keycloak service used to get an access token on the vault service. It defines the keycloak realm, clientId, and Url. | {realm: "sspcloud", clientId: "vault", URL: "https://auth.change.me/auth"} |
 
+## ProxyConfiguration properties
+
+It can be used to inject proxyConfiguration in the services, if the helm chart in catalog allow it you can bind this value to helm chart value to override for example HTTP_PROXY, HTTPS_PROXY and NO_PROXY en variable in the pod launched.
+
+| Key | Default | Description | Example |
+| --------------------- | ------- | ------------------------------------------------------------------ | ---- |
+| `httpProxyUrl` | | url of the enterprise proxy for the region for http. | "http://proxy.enterprise.com:8080" |
+| `httpsProxyUrl` | | url of the enterprise proxy for the region for https. | "http://proxy.enterprise.com:8080" |
+| `noProxy` | | enterprise local domain that should not take proxy comma separated | "corporate.com" |
+
+## ProxyConfiguration properties
+
+It can be used to inject proxyConfiguration in the services, if the helm chart in catalog allow it you can bind this value to helm chart value to override for example HTTP_PROXY, HTTPS_PROXY and NO_PROXY en variable in the pod launched.
+
+| Key | Default | Description | Example |
+| --------------------- | ------- | ------------------------------------------------------------------ | ---- |
+| `httpProxyUrl` | | url of the enterprise proxy for the region for http. | "http://proxy.enterprise.com:8080" |
+| `httpsProxyUrl` | | url of the enterprise proxy for the region for https. | "http://proxy.enterprise.com:8080" |
+| `noProxy` | | enterprise local domain that should not take proxy comma separated | "corporate.com" |
+
+## PackageManagerConfiguration properties
+
+It can be used to inject PackageManagerConfiguration in the services, if the helm chart in catalog allow it you can bind this value to helm chart value to override for example the cran, pypi and conda repository to reach some repository in local network.
+
+| Key | Default | Description | Example |
+| --------------------- | ------- | ------------------------------------------------------------------ | ---- |
+| `cranProxyUrl` | | url of enterprise local cran repo. | "https://cranProxy" |
+| `condaProxyUrl` | | url of enterprise local conda repo. | "https://condaProxyUrl" |
+| `pypiProxyUrl` | | eurl of enterprise local pypi repo|"https://pypiProxyUrl" |
+
+## CustomCAAuthoritiesConfiguration properties
+
+It can be used to inject CustomCAAuthorities in the services, if the helm chart in catalog allow it you can bind this value to helm chart value to add some authorities in the pod.
+
+| Key | Default | Description | Example |
+| --------------------- | ------- | ------------------------------------------------------------------ | ---- |
+| `crts` | | List of encodedbase64 crt. | "LS0tLSBCRUdJTiBDRVJUSUZJQ0FURS0tLS0KTUlJQ1VEQ0NBZG9DQkRhTTF0WXdEUVlKS29aSWh2Y05BUUVFQlFBd2dZOHhDekFKQmdOVkJBWVRBbFZUTVJNd01JSUNDREFhQmdrcWhraUc5dzBCQlFNd0RRUUlJZll5QUVGS2FFRUNBUVVFZ2dIb3pkbWdHejd6YkMxbWNKMnJjTkFRRUVCUUF3Z1k4eEN6QUpCZ05WQkFZVEFsVlRNUk13TUlJQ0NEQWFCZ2txaGtpRzlsVlRNUk13TUlJQ0NEQWFCZ2txaGtpRzl3MEJCUU13RFFRSUlmWXdEUVlKS29aSWh2Y05BUUVFQlFBd2dZOHhDekFraUc5dzBCQlFNd0RRUUlJZll5QUVGS2FFRUNBUVVFZ2dIb3pkbWdHejd3Z1k4eEN6QUpCZ05WQkFZVEFsVlRNUk13TUlJQ0NEQWFCZ2txaGtpRzl3MEJCUU13RFFRSUlmWXlBRUZLYUVFQ0FRVUVnZ0hvemRtZ0d6N3piQzFtY0oycmNOQVFFRUJRQXdnWTh4Q3pBSkJnTlZCQVlUQWxWVE1SCi0tLS1FTkQgQ0VSVElGSUNBVEUtLS0t" |
