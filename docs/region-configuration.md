@@ -196,9 +196,9 @@ It can be used to inject proxyConfiguration in the services, if the helm chart i
 | `httpsProxyUrl` | | url of the enterprise proxy for the region for https. | "http://proxy.enterprise.com:8080" |
 | `noProxy` | | enterprise local domain that should not take proxy comma separated | "corporate.com" |
 
-## ProxyConfiguration properties
+## ProxyInjection properties
 
-It can be used to inject proxyConfiguration in the services, if the helm chart in catalog allow it you can bind this value to helm chart value to override for example HTTP_PROXY, HTTPS_PROXY and NO_PROXY en variable in the pod launched.
+It can be used to inject proxy settings in the services, if the helm chart in catalog allow it you can bind this value to helm chart value to override for example HTTP_PROXY, HTTPS_PROXY and NO_PROXY en variable in the pod launched.
 
 | Key | Default | Description | Example |
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
@@ -206,9 +206,9 @@ It can be used to inject proxyConfiguration in the services, if the helm chart i
 | `httpsProxyUrl` | | url of the enterprise proxy for the region for https. | "http://proxy.enterprise.com:8080" |
 | `noProxy` | | enterprise local domain that should not take proxy comma separated | "corporate.com" |
 
-## PackageManagerConfiguration properties
+## PackageRepositoryInjection properties
 
-It can be used to inject PackageManagerConfiguration in the services, if the helm chart in catalog allow it you can bind this value to helm chart value to override for example the cran, pypi and conda repository to reach some repository in local network.
+It can be used to inject Package repository in the services, if the helm chart in catalog allow it you can bind this value to helm chart value to override for example the cran, pypi and conda repository to reach some local entreprise repository on the network.
 
 | Key | Default | Description | Example |
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
@@ -216,9 +216,9 @@ It can be used to inject PackageManagerConfiguration in the services, if the hel
 | `condaProxyUrl` | | url of enterprise local conda repo. | "https://condaProxyUrl" |
 | `pypiProxyUrl` | | eurl of enterprise local pypi repo|"https://pypiProxyUrl" |
 
-## CustomCAAuthoritiesConfiguration properties
+## CertificateAuthorityInjection properties
 
-It can be used to inject CustomCAAuthorities in the services, if the helm chart in catalog allow it you can bind this value to helm chart value to add some authorities in the pod.
+It can be used to inject CertificateAuthority in the services, if the helm chart in catalog allow it you can bind this value to helm chart value to add some certificate authorities in the pod.
 
 | Key | Default | Description | Example |
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |

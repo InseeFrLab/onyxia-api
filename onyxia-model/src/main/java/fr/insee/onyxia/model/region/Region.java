@@ -33,11 +33,11 @@ public class Region {
     @Schema(description = "")
     private Vault vault;
     @Schema(description = "")
-    private ProxyConfiguration proxyConfiguration;
+    private ProxyInjection proxyInjection;
     @Schema(description = "")
-    private PackageManagerConfiguration packageManagerConfiguration;
+    private PackageRepositoryInjection packageRepositoryInjection;
     @Schema(description = "")
-    private CustomCAAuthoritiesConfiguration customCAAuthoritiesConfiguration;
+    private CertificateAuthorityInjection certificateAuthorityInjection;
 
     public String getId() {
 	return id;
@@ -105,6 +105,31 @@ public class Region {
 
     public Vault getVault() {
 	return vault;
+    }
+
+
+    public ProxyInjection getProxyInjection() {
+	return proxyInjection;
+    }
+
+    public void setProxyInjection(ProxyInjection proxyInjection) {
+	this.proxyInjection = proxyInjection;
+    }
+
+    public PackageRepositoryInjection getPackageRepositoryInjection() {
+	return packageRepositoryInjection;
+    }
+
+    public void setPackageRepositoryInjection(PackageRepositoryInjection packageRepositoryInjection) {
+	this.packageRepositoryInjection = packageRepositoryInjection;
+    }
+
+    public CertificateAuthorityInjection getCertificateAuthorityInjection() {
+	return certificateAuthorityInjection;
+    }
+
+    public void setCertificateAuthorityInjection(CertificateAuthorityInjection  certificateAuthorityInjection) {
+	this.certificateAuthorityInjection = certificateAuthorityInjection;
     }
 
     public void setVault(Vault vault) {
@@ -467,7 +492,7 @@ public class Region {
 	}
     }
 
-    @Schema(description = "Cloudshell data and health")
+    @Schema(description = "Vault Configuration")
     public static class Vault {
 
 	@JsonProperty("URL")
@@ -753,7 +778,7 @@ public class Region {
 	}
     }
 
-    public static class ProxyConfiguration {
+    public static class ProxyInjection {
 	@Schema(description = "httpProxyUrl to inject in helm values")
 	private String httpProxyUrl;
 	@Schema(description = "httpsProxyUrl to inject in helm values")
@@ -782,7 +807,7 @@ public class Region {
 
     }
 
-    public static class CustomCAAuthoritiesConfiguration {
+    public static class CertificateAuthorityInjection {
 
 	@Schema(description = "List of crt encoded in base64")
 	private List<String> crts = new ArrayList<>();
@@ -795,9 +820,10 @@ public class Region {
 	    this.crts = crts;
 	}
 
+
     }
 
-    public static class PackageManagerConfiguration {
+    public static class PackageRepositoryInjection {
 	@Schema(description = "httpProxyUrl to inject in helm values")
 	private String cranProxyUrl;
 	@Schema(description = "httpProxyUrl to inject in helm values")
