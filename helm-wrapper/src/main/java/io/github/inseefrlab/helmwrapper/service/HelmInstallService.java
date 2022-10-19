@@ -7,6 +7,8 @@ import io.github.inseefrlab.helmwrapper.configuration.HelmConfiguration;
 import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
 import io.github.inseefrlab.helmwrapper.model.HelmLs;
 import io.github.inseefrlab.helmwrapper.utils.Command;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeroturnaround.exec.InvalidExitValueException;
@@ -28,10 +30,10 @@ public class HelmInstallService {
     public HelmInstallService() {
 
     }
-    public HelmInstaller installChart(HelmConfiguration configuration,String chart, String namespace, String name, boolean dryRun, File values,
-            Map<String, String> env)
+    public HelmInstaller installChart(HelmConfiguration configuration,String chart, String namespace, String name, String version,
+          boolean dryRun, File values, Map<String, String> env)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        String command = "helm install ";
+        String command = "helm upgrade --install ";
         if (name != null) {
             command = command.concat(name+ " ");
         }
@@ -40,6 +42,9 @@ public class HelmInstallService {
         }
         command = command.concat(chart+" ");
         command = command.concat("-n "+namespace);
+        if (StringUtils.isNotBlank(version)) {
+            command = command.concat(" --version " + version);
+        }
         if (values != null) {
             command = command.concat(" -f " + values.getAbsolutePath());
         }

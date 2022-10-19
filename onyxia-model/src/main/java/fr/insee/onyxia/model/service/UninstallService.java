@@ -1,10 +1,15 @@
 package fr.insee.onyxia.model.service;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "")
 public class UninstallService {
 
+    @Schema(description = "")
     private String path;
 
 
+    @Schema(description = "")
     private Boolean success;
 
     public String getPath() {

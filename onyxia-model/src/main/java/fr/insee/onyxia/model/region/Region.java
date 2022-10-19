@@ -5,20 +5,32 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import fr.insee.onyxia.model.service.Service;
 import fr.insee.onyxia.model.service.quota.Quota;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Schema(description = "")
 public class Region {
+    @Schema(description = "")
     private String id;
+    @Schema(description = "")
     private String name;
+    @Schema(description = "")
     private String description;
+    @Schema(description = "")
     private String includedGroupPattern;
+    @Schema(description = "")
     private String excludedGroupPattern;
+    @Schema(description = "")
     private Location location;
+    @Schema(description = "")
     private Services services = new Services();
+    @Schema(description = "")
     private OnyxiaAPI onyxiaAPI;
+    @Schema(description = "")
     private Data data;
+    @Schema(description = "")
 	private Vault vault;
 
     public String getId() {
@@ -129,6 +141,7 @@ public class Region {
 	private Quotas quotas = new Quotas();
 	private DefaultConfiguration defaultConfiguration = new DefaultConfiguration();
 	private K8sPublicEndpoint k8sPublicEndpoint = new K8sPublicEndpoint();
+	private CustomInitScript customInitScript = new CustomInitScript();
 
 	public static class DefaultConfiguration {
 	    private boolean IPProtection = true;
@@ -253,6 +266,14 @@ public class Region {
 
 	public void setDefaultConfiguration(DefaultConfiguration defaultConfiguration) {
 	    this.defaultConfiguration = defaultConfiguration;
+	}
+
+	public CustomInitScript getCustomInitScript() {
+	    return customInitScript;
+	}
+
+	public void setCustomInitScript(CustomInitScript customInitScript) {
+	    this.customInitScript = customInitScript;
 	}
 
 	public boolean isSingleNamespace() {
@@ -389,6 +410,7 @@ public class Region {
 	}
     }
 
+	@Schema(description = "Cloudshell data and health")
     public static class Data {
 
 	private Atlas atlas;
@@ -413,6 +435,7 @@ public class Region {
 	}
     }
 
+	@Schema(description = "Cloudshell data and health")
     public static class Atlas {
 
 	@JsonProperty("URL")
@@ -438,6 +461,7 @@ public class Region {
 	}
     }
 
+	@Schema(description = "Cloudshell data and health")
     public static class Vault {
 
 	@JsonProperty("URL")
@@ -506,6 +530,31 @@ public class Region {
 	}
     }
 
+    public static class CustomInitScript {
+
+	@JsonProperty("URL")
+	private String url;
+	private String checksum;
+
+
+	public String getUrl() {
+	    return url;
+	}
+
+	public void setUrl(String url) {
+	    this.url = url;
+	}
+
+	public String getChecksum() {
+	    return checksum;
+	}
+
+	public void setChecksum(String checksum) {
+	    this.checksum = checksum;
+	}
+    }
+
+	@Schema(description = "Cloudshell data and health")
     public static class S3 {
 	private String type;
 	@JsonProperty("URL")
@@ -643,6 +692,7 @@ public class Region {
 
     public static class Expose {
 	private String domain;
+	private String ingressClassName;
 
 	public void setDomain(String domain) {
 	    this.domain = domain;
@@ -650,6 +700,14 @@ public class Region {
 
 	public String getDomain() {
 	    return domain;
+	}
+
+	public void setIngressClassName(String ingressClassName) {
+	    this.ingressClassName = ingressClassName;
+	}
+
+	public String getIngressClassName() {
+	    return ingressClassName;
 	}
     }
 
@@ -677,6 +735,7 @@ public class Region {
     }
 
     public static class OnyxiaAPI {
+	@Schema(description = "Cloudshell data and health")
 	private String baseURL;
 
 	public String getBaseURL() {
@@ -688,6 +747,7 @@ public class Region {
 	}
     }
 
+	@Schema(description = "Cloudshell data and health")
     public static class Location {
 
 	private double lat;

@@ -6,14 +6,21 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 /**
  * Properties
- */
+ */	
+@Schema(description = "")
 public class Category {
 
+	@Schema(description = "")
 	Map<String, Property> properties = new HashMap<>();
+	@Schema(description = "")
 	String description;
+	@Schema(description = "")
 	String type;
+	@Schema(description = "")
 	String[] required;
 
 	public String getDescription() {

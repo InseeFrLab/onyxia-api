@@ -6,6 +6,7 @@
     - [Server properties](#server-properties)
     - [Quotas properties](#quotas-properties)
     - [Default configuration properties](#default-configuration-properties)
+    - [CustomInitScript properties](#custom-init-script-properties)
   - [Data properties](#data-properties)
     - [S3](#s3)
     - [atlas](#atlas)
@@ -13,9 +14,9 @@
 
 A **region** is the configuration of an independant set of Onyxia services. Thus multiple configuration accessing different services can be plugged on a single Onyxia instance.
 
-A region mainly defines **Onyxia service provider** on which are runned the users, groups and global services and how users can interact with it. It also defines a **S3 object storage** and how "buckets" are provided to users.
+A region mainly defines **Onyxia service provider** on which are run the users, groups and global services and how users can interact with it. It also defines a **S3 object storage** and how "buckets" are provided to users.
 
-Most of the configuration of an Onyxia clients comes from the region that can be accessed as json via /public/configuration or /public/regions.
+Most of the configuration of an Onyxia client comes from the region that can be accessed as json via /public/configuration or /public/regions.
 
 See [regions.json](/onyxia-api/src/main/resources/regions.json) for a complete example of regions configuration.
 
@@ -36,7 +37,7 @@ See [regions.json](/onyxia-api/src/main/resources/regions.json) for a complete e
 
 ## Services properties
 
-The onyxia service plateform is a Kubernetes cluster but Onyxia is meant to be extendable to other type of platform if necessary.
+The onyxia service plateform is a Kubernetes cluster but Onyxia is meant to be extendable to other types of platform if necessary.
 
 Users can work on Onyxia as a User or as a Group to which they belong. Each user and group can have its own **namespace** which is an isolated space of Kubernetes.
 
@@ -49,7 +50,7 @@ Users can work on Onyxia as a User or as a Group to which they belong. Each user
 | `usernamePrefix` | | If set, the Kubernetes user corresponding to the Onyxia user is named usernamePrefix + userId on impersonation mode, otherwise it is identified only as userId | "user-" |
 | `groupPrefix` | | not used | |
 | `authenticationMode` | IMPERSONATE | IMPERSONATE or ADMIN : on ADMIN mode Onyxia uses its admin account on the services provider, with IMPERSONATE mode Onyxia request the API as the user (helm option --kube-as-user) but is only available if the helm version used is above 3.4.0 | |
-| `expose` | | When users request to expose their service, only subdomain of this object domain are allowed | {domain: "kub.sspcloud.fr"} |
+| `expose` | | When users request to expose their service, only subdomain of this object domain are allowed | See [Expose properties](###expose-properties) |
 | `monitoring` | | Define the URL pattern of the monitoring service that is to be launch with each service. Only for client purpose. | {URLPattern: "https://$NAMESPACE-$INSTANCE.mymonitoring.sspcloud.fr"} |
 | `cloudshell` | | Define the catalog and package name where to fetch the cloudshell in the helm catalog. | {catalogId: "inseefrlab-helm-charts-datascience", packageName: "cloudshell"} |
 | `initScript` | | Define where to fetch a script that will be launched on some service on startup. | "https://inseefrlab.github.io/onyxia/onyxia-init.sh" |
@@ -58,6 +59,16 @@ Users can work on Onyxia as a User or as a Group to which they belong. Each user
 | `k8sPublicEndpoint` | | Define external access to kubernetes API if available. It helps Onyxia users to directly connect to kubernetes outside the datalab | See [server properties](###k8sPublicEndpoint-properties) |
 | `quotas` | | Properties setting quotas on how much resource a user can get on the services provider. | See [Quotas properties](###quotas-properties) |
 | `defaultConfiguration` | | Default configuration on services that a user can override. For client purpose only. | See [Default Configuration](###default-configuration-properties) |
+| `customInitScript` | | This can be use to customize user environnement using a regional script executed by some users pods. | See [CustomInitScript](###custom-init-script-properties) |
+
+### CustomInitScript properties
+
+These properties define how to reach the **service provider API**.
+
+| Key | Description | Example |
+| --------------------- | ------------------------------------------------------------------ | ---- |
+| `URL` | URL of the init script | "api.kub.sspcloud.fr" |
+| `checksum` | checksum of the init script |  |
 
 ### Server properties
 
@@ -94,6 +105,16 @@ A quota follows the kubernetes model which is composed of:
 "limits.cpu"
 "requests.storage"
 "count/pods"
+
+### Expose properties
+
+ with **expose**.
+
+| Key | Default | Description |
+| --------------------- | ------- | ------------------------------------------------------------------ |
+| `domain` | | When users request to expose their service, only subdomain of this object will be created. |
+| `ingressClassName` | '' | Ingress Class Name : usefull if you want to use a specific ingress controller in stead of a default one |
+
 
 ### Default configuration properties
 

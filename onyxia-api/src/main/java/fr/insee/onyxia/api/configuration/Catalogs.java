@@ -3,6 +3,9 @@ package fr.insee.onyxia.api.configuration;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "List of catalog wrapper")
 public class Catalogs {
   private List<CatalogWrapper> catalogs = new ArrayList<>();
 
