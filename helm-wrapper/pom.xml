@@ -58,11 +58,6 @@
             <artifactId>jackson-databind</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-            <version>1.30</version>
-        </dependency>
 
         <dependency>
             <groupId>org.zeroturnaround</groupId>
@@ -73,7 +68,7 @@
         <dependency>
             <groupId>io.fabric8</groupId>
             <artifactId>kubernetes-client</artifactId>
-            <version>5.12.2</version>
+            <version>6.2.0</version>
         </dependency>
 
         <dependency>

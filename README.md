@@ -97,6 +97,12 @@ Other configurations
 | `springdoc.swagger-ui.path` | `/` | Open API (swagger) UI path |
 | `springdoc.swagger-ui.oauth.clientId` | `` | clientid used by swagger to authenticate the user, in general the same which is used by onyxia-ui is ok. |
 
+## Onyxia api compatibility matrix with kubernetes
+
+Onyxia api follow the compatibilty matrix of  :
+- helm version and kubectl version installed here https://github.com/InseeFrLab/onyxia-api/blob/master/onyxia-api/Dockerfile
+- the fabric8 kubernetes compatibility client version in the https://github.com/InseeFrLab/onyxia-api/blob/master/onyxia-model/pom.xml
+
 ## Onyxia Universe package format extension
 
 Onyxia extends the official Universe format (see https://github.com/mesosphere/universe) to enhance it.  
