@@ -1,12 +1,33 @@
 {
   "catalogs": [
     {
-      "id": "inseefrlab-helm-charts-datascience",
-      "name": "Inseefrlab datascience",
-      "description": "Services for datascientists. https://github.com/InseeFrLab/helm-charts-datascience",
+      "id": "ide",
+      "name": "IDE",
+      "description": "Services for datascientists.",
       "maintainer": "innovation@insee.fr",
-      "location": "https://inseefrlab.github.io/helm-charts-datascience",
+      "location": "https://inseefrlab.github.io/helm-charts-interactive-services",
       "status": "PROD",
+      "highlightedCharts": ["jupyter-python", "rstudio", "vscode-python"],
+      "type": "helm"
+    },
+    {
+      "id": "databases",
+      "name": "Databases",
+      "description": "Databases for datascientists.",
+      "maintainer": "innovation@insee.fr",
+      "location": "https://inseefrlab.github.io/helm-charts-databases",
+      "status": "PROD",
+      "highlightedCharts": ["postgresql", "elastic"],
+      "type": "helm"
+    },
+    {
+      "id": "automation",
+      "name": "Automation",
+      "description": "Automation for datascientists.",
+      "maintainer": "innovation@insee.fr",
+      "location": "https://inseefrlab.github.io/helm-charts-automation",
+      "status": "PROD",
+      "highlightedCharts": ["argo-cd", "argo-workflows", "mlflow"],
       "type": "helm"
     }
   ]
