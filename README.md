@@ -1,6 +1,13 @@
 # Onyxia API
 
-This is the server part of the Onyxia datalab.  
+This is the server part of the Onyxia datalab.
+
+## Why do we need an API
+
+We could think that Onyxia look like Helm which remove Tiller from its stack.
+In fact an Onyxia user can have no access to kubernetes, this can be important for some installations.
+Onyxia-api give access to the underlying kubernetes cluster.
+
 It interacts with your container orchestrator to deploy users services.  
 Onyxia supports Kubernetes using Helm.  
 Deployable services are listed and configured inside catalogs.  
