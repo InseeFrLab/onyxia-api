@@ -1,6 +1,7 @@
 package fr.insee.onyxia.api.services.impl.kubernetes;
 
 import fr.insee.onyxia.api.configuration.kubernetes.KubernetesClientProvider;
+import fr.insee.onyxia.api.controller.exception.NamespaceNotFoundException;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.project.Project;
 import fr.insee.onyxia.model.region.Region;
@@ -11,6 +12,8 @@ import io.fabric8.kubernetes.api.model.rbac.RoleBindingBuilder;
 import io.fabric8.kubernetes.api.model.rbac.SubjectBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientException;
+
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,6 +36,9 @@ public class KubernetesService {
     public String determineNamespaceAndCreateIfNeeded(Region region, Project project, User user) {
         if (region.getServices().isSingleNamespace()) {
             return getCurrentNamespace(region);
+        }
+        if (StringUtils.isEmpty(project.getNamespace())) {
+            throw new NamespaceNotFoundException();
         }
         KubernetesService.Owner owner = new KubernetesService.Owner();
         if (project.getGroup() != null) {

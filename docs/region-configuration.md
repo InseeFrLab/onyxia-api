@@ -45,6 +45,7 @@ Users can work on Onyxia as a User or as a Group to which they belong. Each user
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
 | `type` | | Type of the platform on which services are launched. Only Kubernetes is supported, Marathon has been removed. | "KUBERNETES" |
 | `singleNamespace` | true | When true, all users share the same namespace on the service provider. This configuration can be used if a project work on its own Onyxia region. | |
+| `userNamespace` | true | When true, all users have a namespace for his work. This configuration can be used if you don't allow user to have their own space to work and only use project space | |
 | `namespacePrefix` | "user-" | User have a personal namespace like namespacePrefix + userId (should only be used when not singleNamespace but not the case) | |
 | `groupNamespacePrefix` | "projet-" | User in a group groupId can access the namespace groupeNamespacePrefix + groupId. This prefix is also used for vault group directory. | |
 | `usernamePrefix` | | If set, the Kubernetes user corresponding to the Onyxia user is named usernamePrefix + userId on impersonation mode, otherwise it is identified only as userId | "user-" |
