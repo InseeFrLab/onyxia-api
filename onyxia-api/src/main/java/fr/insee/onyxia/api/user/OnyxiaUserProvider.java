@@ -55,13 +55,15 @@ public class OnyxiaUserProvider {
         }
         else {
             userProject.setId(region.getServices().getNamespacePrefix()+user.getUser().getIdep());
-            userProject.setGroup(null);
             userProject.setVaultTopDir(user.getUser().getIdep());
+            userProject.setGroup(null);
+            userProject.setName(user.getUser().getIdep()+" personal project");
             if(region.getData()!=null && region.getData().getS3()!=null){
                 userProject.setBucket(region.getData().getS3().getBucketPrefix()+user.getUser().getAttributes().get(region.getData().getS3().getBucketClaim()));
             }
-            userProject.setNamespace(region.getServices().getNamespacePrefix()+user.getUser().getIdep());
-            userProject.setName(user.getUser().getIdep()+" personal project");
+            if (region.getServices().isUserNamespace()) {
+                userProject.setNamespace(region.getServices().getNamespacePrefix()+user.getUser().getIdep());
+            }
         }
         return userProject;
     }

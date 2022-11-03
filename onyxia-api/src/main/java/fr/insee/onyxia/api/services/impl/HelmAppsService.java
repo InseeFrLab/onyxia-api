@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.configuration.kubernetes.HelmClientProvider;
 import fr.insee.onyxia.api.configuration.kubernetes.KubernetesClientProvider;
+import fr.insee.onyxia.api.controller.exception.NamespaceNotFoundException;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.control.AdmissionControllerHelm;
 import fr.insee.onyxia.api.services.control.commons.UrlGenerator;
@@ -145,6 +146,9 @@ public class HelmAppsService implements AppsService {
         if (groupId != null) {
             LOGGER.debug("STUB : group listing is currently not supported on helm");
             return CompletableFuture.completedFuture(new ServicesListing());
+        }
+        if (StringUtils.isEmpty(project.getNamespace())) {
+            throw new NamespaceNotFoundException();
         }
         List<HelmLs> installedCharts = null;
         try {
