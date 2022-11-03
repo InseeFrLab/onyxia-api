@@ -158,6 +158,7 @@ public class Region {
 
 	private Service.ServiceType type;
 	private boolean singleNamespace = true;
+	private boolean userNamespace = true;
 	private String namespacePrefix = "user-";
 	private String groupNamespacePrefix = "projet-";
 	private String usernamePrefix;
@@ -313,6 +314,14 @@ public class Region {
 
 	public void setSingleNamespace(boolean singleNamespace) {
 	    this.singleNamespace = singleNamespace;
+	}
+
+	public boolean isUserNamespace() {
+	    return userNamespace;
+	}
+
+	public void setUserNamespace(boolean userNamespace) {
+	    this.userNamespace = userNamespace;
 	}
 
 	public Service.ServiceType getType() {
