@@ -175,8 +175,8 @@ public class Region {
 	private CustomInitScript customInitScript = new CustomInitScript();
 
 	public static class DefaultConfiguration {
-	    private boolean IPProtection = true;
-	    private boolean networkPolicy = true;
+	    private boolean IPProtection = false;
+	    private boolean networkPolicy = false;
 	    private List<Object> from = new ArrayList<>();
 	    private List<Object> tolerations = new ArrayList<>();
 	    private Object nodeSelector;

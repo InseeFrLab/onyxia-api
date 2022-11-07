@@ -29,8 +29,8 @@
           }
         },
         "defaultConfiguration": {
-          "IPProtection": true,
-          "networkPolicy": true
+          "IPProtection": false,
+          "networkPolicy": false
         },
         "expose": {
           "domain": "fakedomain.kub.example.com"
