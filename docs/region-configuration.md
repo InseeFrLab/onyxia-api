@@ -1,4 +1,12 @@
-# Region configuration
+# Region configuration  
+
+A **region** is the configuration of an independant set of Onyxia services. Thus multiple configuration accessing different services can be plugged on a single Onyxia instance.
+
+A region mainly defines **Onyxia service provider** on which are run the users, groups and global services and how users can interact with it. It also defines a **S3 object storage** and how "buckets" are provided to users.
+
+Most of the configuration of an Onyxia client comes from the region that can be accessed as json via /public/configuration or /public/regions.
+
+See [regions.json](/onyxia-api/src/main/resources/regions.json) for a complete example of regions configuration.
 
 - [Region configuration](#region-configuration)
   - [Main region properties](#main-region-properties)
@@ -11,14 +19,6 @@
     - [S3](#s3)
     - [atlas](#atlas)
   - [Vault properties](#vault-properties)
-
-A **region** is the configuration of an independant set of Onyxia services. Thus multiple configuration accessing different services can be plugged on a single Onyxia instance.
-
-A region mainly defines **Onyxia service provider** on which are run the users, groups and global services and how users can interact with it. It also defines a **S3 object storage** and how "buckets" are provided to users.
-
-Most of the configuration of an Onyxia client comes from the region that can be accessed as json via /public/configuration or /public/regions.
-
-See [regions.json](/onyxia-api/src/main/resources/regions.json) for a complete example of regions configuration.
 
 ## Main region properties
 

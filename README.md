@@ -40,7 +40,12 @@ If you use it in other ways, we would love to hear from you :)
 ## Configuration
 
 Main configuration file is [onyxia-api/src/main/resources/application.properties](onyxia-api/src/main/resources/application.properties).  
-Each variable can be overridden using environment variables.
+Each variable can be overridden using environment variables.  
+
+Regions configuration :
+| Key | Default | Description |
+| --------------------- | ------- | ------------------------------------------------------------------ |
+| `regions` | [onyxia-api/src/main/resources/regions.json](onyxia-api/src/main/resources/regions.json) | List of regions, see [Region configuration](docs/region-configuration.md) |
 
 Authentication configuration
 | Key | Default | Description |
@@ -63,11 +68,6 @@ Security configuration :
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
 | `security.cors.allowed_origins` | | To indicate which origins are allowed by [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) |
-
-Regions configuration :
-| Key | Default | Description |
-| --------------------- | ------- | ------------------------------------------------------------------ |
-| `regions` | see [onyxia-api/src/main/resources/regions.json](onyxia-api/src/main/resources/regions.json) | List of regions, see [Region configuration](docs/region-configuration.md) |
 
 Catalogs configuration :
 
