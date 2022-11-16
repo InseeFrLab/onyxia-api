@@ -39,7 +39,11 @@ public class CompatibilityChecks {
         regionsConfiguration.getResolvedRegions().forEach(region -> {
             if (region.getServices().getType().equals(Service.ServiceType.KUBERNETES)) {
                 KubernetesClient client = kubernetesClientProvider.getRootClient(region);
-                LOGGER.info("Region " + region.getName() + " kubernetes v" + client.getKubernetesVersion().getMajor() + "." + client.getKubernetesVersion().getMinor());
+                try {
+                    LOGGER.info("Region " + region.getName() + " kubernetes v" + client.getKubernetesVersion().getMajor() + "." + client.getKubernetesVersion().getMinor());
+                } catch (Exception e) {
+                    LOGGER.error("Could not contact Kubernetes APIServer for region " + region.getName() + " at " + client.getMasterUrl(), e);
+                }
             }
         });
     }

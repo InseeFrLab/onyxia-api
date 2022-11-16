@@ -91,11 +91,16 @@ Other configurations
 | `springdoc.swagger-ui.path` | `/` | Open API (swagger) UI path |
 | `springdoc.swagger-ui.oauth.clientId` | `` | clientid used by swagger to authenticate the user, in general the same which is used by onyxia-ui is ok. |
 
-## Onyxia API compatibility matrix with kubernetes
+## Onyxia API dependency to Helm
 
-Onyxia-API uses both `helm` and `kubectl` to interact with the Kubernetes cluster.  
-`helm` and `kubectl` are bundled in the `Onyxia API` Docker image. You can check version numbers here : https://github.com/InseeFrLab/onyxia-api/blob/master/onyxia-api/Dockerfile.  
-See [Kubernetes version skew policy](https://kubernetes.io/releases/version-skew-policy/#kubectl) for details on `kubectl` / `kubernetes` compatibility (tl;dr : `kubectl` / `kubernetes` version difference should be `+/-1` max).  
+Onyxia-API makes system calls to `helm` using the [helm-wrapper](helm-wrapper) Java library.  
+`helm` is bundled in the `Onyxia API` Docker image, see current version bundled here : [Dockerfile](onyxia-api/Dockerfile).  
+If running `Onyxia API` locally you need to have `helm` available in the `PATH`.  
+
+## Onyxia API compatibility matrix with Kubernetes
+
+In addition of using `helm`, Onyxia API interacts with the Kubernetes cluster thanks to the [fabric8.io Kubernetes client for Java](https://github.com/fabric8io/kubernetes-client).  
+See [here](https://github.com/fabric8io/kubernetes-client#kubernetes-compatibility-matrix) for the compatibility matrix and [here](onyxia-api/helm-wrapper/pom.xml) for the current version used by Onyxia.
 
 ## Onyxia Helm format extension
 
