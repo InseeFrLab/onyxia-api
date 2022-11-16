@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Onboarding", description = "Onboarding related services")
-@RequestMapping(value={"/api/onboarding", "/onboarding"})
+@RequestMapping("/onboarding")
 @RestController
 @SecurityRequirement(name = "auth")
 public class OnboardingController {
@@ -29,20 +29,20 @@ public class OnboardingController {
     private UserProvider userProvider;
 
     @Operation(
-        summary = "Init a namespace for a user or a group.",
-        description = "create or replace the namespace of the user or the namespace of a group if the user is in the requested group and the according rbac policies. with the group prefix / user prefix of the region",
-        parameters = {
-            @Parameter(
-                required = false,
-                name = "ONYXIA-REGION",
-                description = "The region used by the user, if not provided default to the first region configured.",
-                in = ParameterIn.HEADER,
-                schema = @Schema(
-                    name = "ONYXIA-REGION",
-                    type = "string"
-                )
-            )
-        }
+            summary = "Init a namespace for a user or a group.",
+            description = "create or replace the namespace of the user or the namespace of a group if the user is in the requested group and the according rbac policies. with the group prefix / user prefix of the region",
+            parameters = {
+                    @Parameter(
+                            required = false,
+                            name = "ONYXIA-REGION",
+                            description = "The region used by the user, if not provided default to the first region configured.",
+                            in = ParameterIn.HEADER,
+                            schema = @Schema(
+                                    name = "ONYXIA-REGION",
+                                    type = "string"
+                            )
+                    )
+            }
     )
     @PostMapping
     public void onboard(@Parameter(hidden = true) Region region, @RequestBody OnboardingRequest request) {
@@ -51,8 +51,7 @@ public class OnboardingController {
         if (request.getGroup() != null) {
             owner.setId(request.getGroup());
             owner.setType(KubernetesService.Owner.OwnerType.GROUP);
-        }
-        else {
+        } else {
             owner.setId(userProvider.getUser(region).getIdep());
             owner.setType(KubernetesService.Owner.OwnerType.USER);
         }
@@ -66,7 +65,7 @@ public class OnboardingController {
         }
     }
 
-    @Schema(description="Specification on which namespace to create. If group is provided, create a group namespace, otherwise create the user namespace.")
+    @Schema(description = "Specification on which namespace to create. If group is provided, create a group namespace, otherwise create the user namespace.")
     public static class OnboardingRequest {
 
         @Schema(required = false)
