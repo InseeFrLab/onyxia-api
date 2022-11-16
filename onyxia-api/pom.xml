@@ -127,7 +127,7 @@
     </dependencies>
 
     <properties>
-        <java.version>11</java.version>
+        <java.version>17</java.version>
         <kotlin.version>1.7.0</kotlin.version>
     </properties>
 
