@@ -1,9 +1,4 @@
 FROM eclipse-temurin:17-jre
-# Install kubectl
-RUN apt-get update && apt-get install -y apt-transport-https gnupg2
-RUN curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
-RUN echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee -a /etc/apt/sources.list.d/kubernetes.list
-RUN apt-get update && apt-get install -y kubectl=1.24.8-00
 # Install helm
 RUN curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | DESIRED_VERSION=v3.10.2 bash
 COPY target/*.jar app.jar
