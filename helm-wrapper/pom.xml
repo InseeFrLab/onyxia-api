@@ -17,7 +17,8 @@
     <description>Simple wrapper for Helm (https://helm.sh)</description>
 
     <properties>
-        <java.version>11</java.version>
+        <java.version>17</java.version>
+        <fabric8io.version>6.2.0</fabric8io.version>
     </properties>
 
     <distributionManagement>
@@ -67,7 +68,7 @@
         <dependency>
             <groupId>io.fabric8</groupId>
             <artifactId>kubernetes-client</artifactId>
-            <version>6.2.0</version>
+            <version>${fabric8io.version}</version>
         </dependency>
 
         <dependency>
