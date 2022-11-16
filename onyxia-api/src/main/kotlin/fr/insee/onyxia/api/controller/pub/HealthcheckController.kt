@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @Tag(name = "Public")
-@RequestMapping(value = ["/api/public", "/public"])
+@RequestMapping("/public")
 class HealthcheckController {
 
     @GetMapping("/healthcheck")

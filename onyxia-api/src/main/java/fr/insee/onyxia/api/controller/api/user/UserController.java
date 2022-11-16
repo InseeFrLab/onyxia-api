@@ -11,18 +11,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "User",description = "Personal data")
-@RequestMapping(value={"/api/user", "/user"})
+@Tag(name = "User", description = "Personal data")
+@RequestMapping("/user")
 @RestController
-@SecurityRequirement(name="auth")
+@SecurityRequirement(name = "auth")
 public class UserController {
 
-   @Autowired
-   private OnyxiaUserProvider userProvider;
+    @Autowired
+    private OnyxiaUserProvider userProvider;
 
-   @GetMapping("/info")
-   public OnyxiaUser userInfo(@Parameter(hidden = true) Region region) {
-      return userProvider.getUser(region);
-   }
+    @GetMapping("/info")
+    public OnyxiaUser userInfo(@Parameter(hidden = true) Region region) {
+        return userProvider.getUser(region);
+    }
 
 }
