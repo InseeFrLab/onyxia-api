@@ -594,7 +594,7 @@ public class Region {
 	}
     }
 
-    @Schema(description = "Cloudshell data and health")
+    @Schema(description = "Configuration to be used by the S3 client associated to Onyxia")
     public static class S3 {
 	private String type;
 	@JsonProperty("URL")
@@ -608,6 +608,7 @@ public class Region {
 	private long defaultDurationSeconds;
 	private KeycloakParams keycloakParams;
 	private Monitoring monitoring;
+	private boolean acceptBucketCreation = true;
 
 	public String getType() {
 	    return type;
@@ -695,6 +696,14 @@ public class Region {
 
 	public KeycloakParams getKeycloakParams() {
 	    return keycloakParams;
+	}
+
+	public void setAcceptBucketCreation(boolean acceptBucketCreation) {
+	    this.acceptBucketCreation = acceptBucketCreation;
+	}
+
+	public boolean isAcceptBucketCreation() {
+	    return acceptBucketCreation;
 	}
     }
 
