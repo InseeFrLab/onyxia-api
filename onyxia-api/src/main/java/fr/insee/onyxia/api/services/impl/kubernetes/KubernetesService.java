@@ -1,6 +1,7 @@
 package fr.insee.onyxia.api.services.impl.kubernetes;
 
 import fr.insee.onyxia.api.configuration.kubernetes.KubernetesClientProvider;
+import fr.insee.onyxia.api.controller.exception.NamespaceAlreadyExistException;
 import fr.insee.onyxia.api.controller.exception.NamespaceNotFoundException;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.project.Project;
@@ -18,7 +19,6 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -29,6 +29,9 @@ public class KubernetesService {
 
     public String createDefaultNamespace(Region region, Owner owner) {
         String namespaceId = getDefaultNamespace(region, owner);
+        if (isNamespaceAlreadyExisting(region, namespaceId)){
+            throw new NamespaceAlreadyExistException();
+        }
         return createNamespace(region, namespaceId, owner);
     }
 
@@ -40,29 +43,37 @@ public class KubernetesService {
         if (StringUtils.isEmpty(project.getNamespace())) {
             throw new NamespaceNotFoundException();
         }
-        KubernetesService.Owner owner = new KubernetesService.Owner();
-        if (project.getGroup() != null) {
-            owner.setId(project.getGroup());
-            owner.setType(Owner.OwnerType.GROUP);
+        if (!isNamespaceAlreadyExisting(region, project.getNamespace())) {
+            if (!region.getServices().isAllowNamespaceCreation()) {
+                throw new NamespaceNotFoundException();
+            } else {
+                KubernetesService.Owner owner = new KubernetesService.Owner();
+                if (project.getGroup() != null) {
+                    owner.setId(project.getGroup());
+                    owner.setType(Owner.OwnerType.GROUP);
+                } else {
+                    owner.setId(user.getIdep());
+                    owner.setType(KubernetesService.Owner.OwnerType.USER);
+                }
+                createNamespace(region, project.getNamespace(), owner);
+            }
         }
-        else {
-            owner.setId(user.getIdep());
-            owner.setType(KubernetesService.Owner.OwnerType.USER);
-        }
-        return createNamespace(region, project.getNamespace(), owner);
+        return project.getNamespace();
     }
 
     public String getCurrentNamespace(Region region) {
         return kubernetesClientProvider.getRootClient(region).getNamespace();
     }
 
-    public String createNamespace(Region region, String namespaceId, Owner owner) {
+    private String createNamespace(Region region, String namespaceId, Owner owner) {
         String name = getNameFromOwner(region, owner);
 
         KubernetesClient kubClient = kubernetesClientProvider.getRootClient(region);
 
-        Namespace namespaceToCreate = kubClient.namespaces().createOrReplace(new NamespaceBuilder().withNewMetadata().withName(namespaceId)
-                .addToLabels("onyxia_owner", owner.getId()).endMetadata().build());
+        kubClient.namespaces()
+                .resource(new NamespaceBuilder().withNewMetadata().withName(namespaceId)
+                        .addToLabels("onyxia_owner", owner.getId()).endMetadata().build())
+                .create();
 
         RoleBinding bindingToCreate = kubClient.rbac().roleBindings().inNamespace(namespaceId).createOrReplace(new RoleBindingBuilder()
                 .withNewMetadata()
@@ -79,6 +90,12 @@ public class KubernetesService {
         }
 
         return namespaceId;
+    }
+
+    private boolean isNamespaceAlreadyExisting(Region region, String namespaceId) {
+        return kubernetesClientProvider.getRootClient(region).namespaces()
+        .list().getItems().stream()
+                .anyMatch(ns -> ns.getMetadata().getName().equals(namespaceId));
     }
 
     private void applyQuotas(String namespaceId, KubernetesClient kubClient, Quota inputQuota, boolean overrideExisting) {
@@ -135,13 +152,6 @@ public class KubernetesService {
         else {
             return region.getServices().getGroupNamespacePrefix()+owner.getId();
         }
-    }
-
-
-
-    public List<Namespace> getNamespaces(Region region, Owner owner) {
-        KubernetesClient kubClient = kubernetesClientProvider.getRootClient(region);
-        return kubClient.namespaces().withLabel("onyxia_owner",owner.getId()).list().getItems();
     }
 
     public void applyQuota(Region region, Project project, User user, Quota quota) {

@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,6 +48,9 @@ public class OnboardingController {
     )
     @PostMapping
     public void onboard(@Parameter(hidden = true) Region region, @RequestBody OnboardingRequest request) {
+        if (!region.getServices().isAllowNamespaceCreation()) {
+            throw new NotImplementedException("/onboarding is disabled on this region");
+        }
         checkPermissions(region, request);
         KubernetesService.Owner owner = new KubernetesService.Owner();
         if (request.getGroup() != null) {
