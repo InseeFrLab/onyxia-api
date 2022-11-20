@@ -259,14 +259,10 @@ public class HelmAppsService implements AppsService {
         List<String> urls = new ArrayList<>();
         for (Ingress ingress : ingresses) {
             try {
-                List<String> listHost = ingress.getSpec().getTls().stream().map(tls -> tls.getHosts()).flatMap(x -> x.stream()).collect(Collectors.toList());
-                listHost = listHost.stream().map(host -> {
-                    if (!host.startsWith("http")) {
-                        return "https://" + host;
-                    }
-                    return host;
-                }).collect(Collectors.toList());
-                urls.addAll(listHost);
+                urls.addAll(ingress.getSpec().getRules().stream().flatMap(
+                        rule -> rule.getHttp().getPaths().stream().map(path -> rule.getHost() + path.getPath()))
+                        .map(url -> url.startsWith("http") ? url : "https://" + url)
+                        .collect(Collectors.toList()));
             } catch (Exception e) {
                 System.out.println("Warning : could not read urls from ingress " + ingress.getFullResourceName());
             }
