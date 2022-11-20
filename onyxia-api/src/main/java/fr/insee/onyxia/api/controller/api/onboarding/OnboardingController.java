@@ -1,5 +1,6 @@
 package fr.insee.onyxia.api.controller.api.onboarding;
 
+import fr.insee.onyxia.api.controller.exception.OnboardingDisabledException;
 import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.api.services.impl.kubernetes.KubernetesService;
 import fr.insee.onyxia.model.region.Region;
@@ -46,6 +47,9 @@ public class OnboardingController {
     )
     @PostMapping
     public void onboard(@Parameter(hidden = true) Region region, @RequestBody OnboardingRequest request) {
+        if (!region.getServices().isAllowNamespaceCreation()) {
+            throw new OnboardingDisabledException();
+        }
         checkPermissions(region, request);
         KubernetesService.Owner owner = new KubernetesService.Owner();
         if (request.getGroup() != null) {
