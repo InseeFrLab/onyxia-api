@@ -11,25 +11,24 @@ import fr.insee.onyxia.model.service.UninstallService;
 import org.springframework.scheduling.annotation.Async;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public interface AppsService {
 
-        @Async
-        CompletableFuture<ServicesListing> getUserServices(Region region, Project project, User user) throws  IllegalAccessException, IOException;
+    @Async
+    CompletableFuture<ServicesListing> getUserServices(Region region, Project project, User user) throws IllegalAccessException, IOException;
 
-        @Async
-        CompletableFuture<ServicesListing> getUserServices(Region region,Project project,User user, String groupId)
-                throws IllegalAccessException,  IOException;
+    @Async
+    CompletableFuture<ServicesListing> getUserServices(Region region, Project project, User user, String groupId)
+            throws IllegalAccessException, IOException;
 
-        Collection<Object> installApp(Region region,Project project,CreateServiceDTO requestDTO, String catalogId, Pkg pkg,
-                        User user, Map<String, Object> fusion) throws Exception;
+    InstallDTO installApp(Region region, Project project, CreateServiceDTO requestDTO, String catalogId, Pkg pkg,
+                          User user, Map<String, Object> fusion) throws Exception;
 
-        Service getUserService(Region region,Project project,User user, String serviceId) throws Exception;
+    Service getUserService(Region region, Project project, User user, String serviceId) throws Exception;
 
-        UninstallService destroyService(Region region,Project project,User user, String path, boolean bulk) throws Exception;
+    UninstallService destroyService(Region region, Project project, User user, String path, boolean bulk) throws Exception;
 
-        String getLogs(Region region,Project project,User user, String serviceId, String taskId);
+    String getLogs(Region region, Project project, User user, String serviceId, String taskId);
 }

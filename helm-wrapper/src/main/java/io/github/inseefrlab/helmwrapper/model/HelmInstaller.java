@@ -15,7 +15,7 @@ public class HelmInstaller {
 
     private Object config;
 
-    private ArrayList<Object> manifest;
+    private String manifest;
 
     private Object hooks;
 
@@ -27,16 +27,16 @@ public class HelmInstaller {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public Object getConfig() {
         return config;
     }
 
     public void setConfig(Object config) {
         this.config = config;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public Object getInfo() {
@@ -55,15 +55,15 @@ public class HelmInstaller {
         this.chart = chart;
     }
 
-    public ArrayList<Object> getManifest() {
+    public String getManifest() {
         return manifest;
     }
 
-    public void setManifest(String manifest) {
+    public ArrayList<Object> getParsedManifest() {
         ArrayList<Object> res = new ArrayList<>();
         Yaml yaml = new Yaml(new SafeConstructor());
         yaml.loadAll(manifest).forEach(file -> res.add(file));
-        this.manifest = res;
+        return res;
     }
 
     public Object getHooks() {

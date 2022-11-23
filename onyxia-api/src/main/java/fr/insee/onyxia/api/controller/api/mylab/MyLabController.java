@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.CatalogService;
+import fr.insee.onyxia.api.services.InstallDTO;
 import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.Pkg;
@@ -23,7 +24,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @Tag(name = "My lab", description = "My services")
@@ -214,7 +218,7 @@ public class MyLabController {
         return publishApps(region, project, requestDTO);
     }
 
-    private Collection<Object> publishApps(Region region, Project project, CreateServiceDTO requestDTO)
+    private InstallDTO publishApps(Region region, Project project, CreateServiceDTO requestDTO)
             throws Exception {
         String catalogId = "internal";
         if (requestDTO.getCatalogId() != null && requestDTO.getCatalogId().length() > 0) {

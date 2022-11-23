@@ -6,6 +6,7 @@ import fr.insee.onyxia.api.configuration.kubernetes.HelmClientProvider;
 import fr.insee.onyxia.api.configuration.kubernetes.KubernetesClientProvider;
 import fr.insee.onyxia.api.controller.exception.NamespaceNotFoundException;
 import fr.insee.onyxia.api.services.AppsService;
+import fr.insee.onyxia.api.services.InstallDTO;
 import fr.insee.onyxia.api.services.control.AdmissionControllerHelm;
 import fr.insee.onyxia.api.services.control.commons.UrlGenerator;
 import fr.insee.onyxia.api.services.control.utils.PublishContext;
@@ -85,8 +86,8 @@ public class HelmAppsService implements AppsService {
     }
 
     @Override
-    public Collection<Object> installApp(Region region, Project project, CreateServiceDTO requestDTO, String catalogId, Pkg pkg,
-                                         User user, Map<String, Object> fusion) throws IOException, TimeoutException, InterruptedException {
+    public InstallDTO installApp(Region region, Project project, CreateServiceDTO requestDTO, String catalogId, Pkg pkg,
+                                 User user, Map<String, Object> fusion) throws IOException, TimeoutException, InterruptedException {
 
         PublishContext context = new PublishContext();
 
@@ -128,12 +129,16 @@ public class HelmAppsService implements AppsService {
         }
         File values = File.createTempFile("values", ".yaml");
         mapperHelm.writeValue(values, fusion);
+
         String namespaceId = kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
         HelmInstaller res = getHelmInstallService().installChart(getHelmConfiguration(region, user), catalogId + "/" + pkg.getName(), namespaceId, requestDTO.getName(), requestDTO.getPackageVersion(), requestDTO.isDryRun(),
                 values, null);
-        values.delete();
-        return List.of(res.getManifest());
+        InstallDTO installDTO = new InstallDTO();
+        installDTO.setValues(mapperHelm.writeValueAsString(fusion));
+        installDTO.setManifest(res.getManifest());
+        return installDTO;
     }
+
 
     @Override
     public CompletableFuture<ServicesListing> getUserServices(Region region, Project project, User user) throws IOException, IllegalAccessException {
@@ -260,7 +265,7 @@ public class HelmAppsService implements AppsService {
         for (Ingress ingress : ingresses) {
             try {
                 urls.addAll(ingress.getSpec().getRules().stream().flatMap(
-                        rule -> rule.getHttp().getPaths().stream().map(path -> rule.getHost() + path.getPath()))
+                                rule -> rule.getHttp().getPaths().stream().map(path -> rule.getHost() + path.getPath()))
                         .map(url -> url.startsWith("http") ? url : "https://" + url)
                         .collect(Collectors.toList()));
             } catch (Exception e) {
