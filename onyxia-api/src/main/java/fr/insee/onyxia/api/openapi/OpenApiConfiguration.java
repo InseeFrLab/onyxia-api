@@ -14,10 +14,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-
 @Configuration
 public class OpenApiConfiguration {
-
 
     private static final Logger logger = LoggerFactory.getLogger(OpenApiConfiguration.class);
 
@@ -33,12 +31,33 @@ public class OpenApiConfiguration {
     @ConditionalOnProperty(name = "authentication.mode", havingValue = "openidconnect")
     public OpenAPI customOpenAPIKeycloak() {
         final OpenAPI openapi = createOpenAPI();
-        openapi.components(new Components().addSecuritySchemes(SCHEMEKEYCLOAK, new SecurityScheme()
-                .type(SecurityScheme.Type.OAUTH2).in(SecurityScheme.In.HEADER).description("Authentification keycloak")
-                .flows(new OAuthFlows().authorizationCode(new OAuthFlow()
-                        .authorizationUrl(keycloakUrl + "/realms/" + realmName + "/protocol/openid-connect/auth")
-                        .tokenUrl(keycloakUrl + "/realms/" + realmName + "/protocol/openid-connect/token")
-                .refreshUrl(keycloakUrl + "/realms/" + realmName + "/protocol/openid-connect/token")))));
+        openapi.components(
+                new Components()
+                        .addSecuritySchemes(
+                                SCHEMEKEYCLOAK,
+                                new SecurityScheme()
+                                        .type(SecurityScheme.Type.OAUTH2)
+                                        .in(SecurityScheme.In.HEADER)
+                                        .description("Authentification keycloak")
+                                        .flows(
+                                                new OAuthFlows()
+                                                        .authorizationCode(
+                                                                new OAuthFlow()
+                                                                        .authorizationUrl(
+                                                                                keycloakUrl
+                                                                                        + "/realms/"
+                                                                                        + realmName
+                                                                                        + "/protocol/openid-connect/auth")
+                                                                        .tokenUrl(
+                                                                                keycloakUrl
+                                                                                        + "/realms/"
+                                                                                        + realmName
+                                                                                        + "/protocol/openid-connect/token")
+                                                                        .refreshUrl(
+                                                                                keycloakUrl
+                                                                                        + "/realms/"
+                                                                                        + realmName
+                                                                                        + "/protocol/openid-connect/token")))));
         return openapi;
     }
 
@@ -51,8 +70,9 @@ public class OpenApiConfiguration {
 
     private OpenAPI createOpenAPI() {
         logger.info("surcharge de la configuration swagger");
-        final OpenAPI openapi = new OpenAPI()
-                .info(new Info().title("Onyxia-api").description("Swagger onyxia-api"));
+        final OpenAPI openapi =
+                new OpenAPI()
+                        .info(new Info().title("Onyxia-api").description("Swagger onyxia-api"));
         return openapi;
     }
 }

@@ -37,6 +37,11 @@ Once Onyxia is started, browse to http://localhost:8080 to get the OpenAPI docum
 Onyxia-API is primarly made to work with the webapp [Onyxia-Web](https://github.com/inseefrlab/onyxia-web).  
 If you use it in other ways, we would love to hear from you :)
 
+## Contributing
+
+Contributions are welcome.
+Make sure to conform to Android Open Source Project code style : `mvn spotless:apply` can enforce it.
+
 ## Configuration
 
 Main configuration file is [onyxia-api/src/main/resources/application.properties](onyxia-api/src/main/resources/application.properties).  

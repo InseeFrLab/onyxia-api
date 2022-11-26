@@ -14,15 +14,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class InstallServiceTest {
 
     @Test
-    public void contextLoads() {
-
-    }
+    public void contextLoads() {}
 
     @Test
     public void shouldListInstalls() throws Exception {
         HelmInstallService helmInstallService = new HelmInstallService();
         HelmLs[] result = helmInstallService.listChartInstall(null, null);
-        Assertions.assertEquals(1,result.length);
+        Assertions.assertEquals(1, result.length);
     }
 
     @Test
@@ -31,11 +29,13 @@ public class InstallServiceTest {
         configuration.setApiserverUrl("https://invaliddomain");
         configuration.setKubeToken("");
         HelmInstallService helmInstallService = new HelmInstallService();
-        Assertions.assertThrows(Exception.class,() -> {HelmLs[] result = helmInstallService.listChartInstall(null, null);});
+        Assertions.assertThrows(
+                Exception.class,
+                () -> {
+                    HelmLs[] result = helmInstallService.listChartInstall(null, null);
+                });
     }
 
     @SpringBootApplication
-    public static class MyApp {
-
-    }
+    public static class MyApp {}
 }

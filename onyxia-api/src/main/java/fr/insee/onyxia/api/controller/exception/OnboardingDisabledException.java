@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(value = HttpStatus.NOT_IMPLEMENTED)
 public class OnboardingDisabledException extends RuntimeException {
-	public OnboardingDisabledException() {
-		super("Onboarding is disabled on this onyxia instance");
-	}
+    public OnboardingDisabledException() {
+        super("Onboarding is disabled on this onyxia instance");
+    }
 }

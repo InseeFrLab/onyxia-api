@@ -14,8 +14,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class HelmClientProvider {
 
-    @Autowired
-    private final SecurityConfig securityConfig = new SecurityConfig();
+    @Autowired private final SecurityConfig securityConfig = new SecurityConfig();
 
     @Bean
     public HelmRepoService defaultHelmRepoService() {
@@ -47,11 +46,13 @@ public class HelmClientProvider {
             username = region.getServices().getUsernamePrefix() + username;
         }
 
-        if (region.getServices().getAuthenticationMode() == Region.Services.AuthenticationMode.IMPERSONATE) {
+        if (region.getServices().getAuthenticationMode()
+                == Region.Services.AuthenticationMode.IMPERSONATE) {
             helmConfiguration.setAsKubeUser(username);
         }
 
-        if (region.getServices().getAuthenticationMode() == Region.Services.AuthenticationMode.USER) {
+        if (region.getServices().getAuthenticationMode()
+                == Region.Services.AuthenticationMode.USER) {
             helmConfiguration.setKubeToken((String) user.getAttributes().get("access_token"));
         }
 

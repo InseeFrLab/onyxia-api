@@ -8,7 +8,6 @@ public class UninstallService {
     @Schema(description = "")
     private String path;
 
-
     @Schema(description = "")
     private Boolean success;
 
@@ -27,8 +26,7 @@ public class UninstallService {
         this.success = success;
     }
 
-    public Boolean getSuccess(){
+    public Boolean getSuccess() {
         return success;
     }
-
 }

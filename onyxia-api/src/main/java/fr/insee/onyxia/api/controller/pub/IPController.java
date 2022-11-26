@@ -16,17 +16,19 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @RequestMapping("/public")
 public class IPController {
 
-    @Autowired
-    HttpRequestUtils httpRequestUtils;
+    @Autowired HttpRequestUtils httpRequestUtils;
 
     @Operation(
             summary = "Get your public IP address.",
-            description = "Get the IP addresses of the service caller if it exist on the forwarding headers, otherwise it returns the remote address of the servlet request."
-    )
+            description =
+                    "Get the IP addresses of the service caller if it exist on the forwarding headers, otherwise it returns the remote address of the servlet request.")
     @GetMapping("/ip")
     public IP getIP() {
         IP ip = new IP();
-        ip.setIp(httpRequestUtils.getClientIpAddressIfServletRequestExist(((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()));
+        ip.setIp(
+                httpRequestUtils.getClientIpAddressIfServletRequestExist(
+                        ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+                                .getRequest()));
         return ip;
     }
 

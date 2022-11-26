@@ -1,10 +1,8 @@
-
 package fr.insee.onyxia.model.helm;
 
 import com.fasterxml.jackson.annotation.*;
 import fr.insee.onyxia.model.catalog.CatalogWrapper;
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,11 +16,12 @@ public class Repository extends CatalogWrapper {
     @JsonProperty("apiVersion")
     @Schema(description = "")
     private String apiVersion;
+
     @Schema(description = "")
     @JsonProperty("generated")
     private String generated;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+
+    @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("apiVersion")
     public String getApiVersion() {
@@ -57,6 +56,10 @@ public class Repository extends CatalogWrapper {
     @JsonProperty("entries")
     public void setEntries(Map<String, List<Chart>> entries) {
         super.setEntries(entries);
-        setPackages(entries.values().stream().map(charts -> charts.get(0)).filter(chart -> "application".equalsIgnoreCase(chart.getType())).collect(Collectors.toList()));
+        setPackages(
+                entries.values().stream()
+                        .map(charts -> charts.get(0))
+                        .filter(chart -> "application".equalsIgnoreCase(chart.getType()))
+                        .collect(Collectors.toList()));
     }
 }

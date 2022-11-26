@@ -23,31 +23,38 @@ import org.springframework.web.bind.annotation.RestController;
 @SecurityRequirement(name = "auth")
 public class CloudShellController {
 
-    @Autowired
-    private AppsService helmAppsService;
+    @Autowired private AppsService helmAppsService;
 
-    @Autowired
-    private UserProvider userProvider;
+    @Autowired private UserProvider userProvider;
 
-    @Autowired
-    private CatalogService catalogService;
+    @Autowired private CatalogService catalogService;
 
     @GetMapping
-    public CloudShellStatus getCloudShellStatus(@Parameter(hidden = true) Region region, @Parameter(hidden = true) Project project) {
+    public CloudShellStatus getCloudShellStatus(
+            @Parameter(hidden = true) Region region, @Parameter(hidden = true) Project project) {
         CloudShellStatus status = new CloudShellStatus();
-        Region.CloudshellConfiguration cloudshellConfiguration = region.getServices().getCloudshell();
+        Region.CloudshellConfiguration cloudshellConfiguration =
+                region.getServices().getCloudshell();
         try {
             if (region.getServices().getType().equals(Service.ServiceType.KUBERNETES)) {
-                Service service = helmAppsService.getUserService(region, project, userProvider.getUser(region),
-                        cloudshellConfiguration.getPackageName() + "*");
+                Service service =
+                        helmAppsService.getUserService(
+                                region,
+                                project,
+                                userProvider.getUser(region),
+                                cloudshellConfiguration.getPackageName() + "*");
                 status.setStatus(CloudShellStatus.STATUS_UP);
                 service.getUrls().stream().findFirst().ifPresent(status::setUrl);
             } else {
-                throw new NotImplementedException("Cloudshell is only supported for Kubernetes service provider");
+                throw new NotImplementedException(
+                        "Cloudshell is only supported for Kubernetes service provider");
             }
         } catch (Exception e) {
             status.setStatus(CloudShellStatus.STATUS_DOWN);
-            status.setPackageToDeploy(catalogService.getPackage(cloudshellConfiguration.getCatalogId(), cloudshellConfiguration.getPackageName()));
+            status.setPackageToDeploy(
+                    catalogService.getPackage(
+                            cloudshellConfiguration.getCatalogId(),
+                            cloudshellConfiguration.getPackageName()));
             status.setCatalogId(cloudshellConfiguration.getCatalogId());
             status.setUrl(null);
         }
@@ -58,13 +65,19 @@ public class CloudShellController {
     @Schema(description = "Cloudshell data and health")
     public static class CloudShellStatus {
 
-        public static final String STATUS_UP = "UP", STATUS_LOADING = "LOADING", STATUS_DOWN = "DOWN";
+        public static final String STATUS_UP = "UP",
+                STATUS_LOADING = "LOADING",
+                STATUS_DOWN = "DOWN";
+
         @Schema(description = "Status of the connexion to the cloudshell")
         private String status = STATUS_UP;
+
         @Schema(description = "URL of the cloudshell")
         private String url = null;
+
         @Schema(description = "?")
         private Pkg packageToDeploy = null;
+
         @Schema(description = "?")
         private String catalogId;
 

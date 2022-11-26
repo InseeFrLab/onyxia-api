@@ -1,7 +1,6 @@
 package fr.insee.onyxia.api.services.control.xgenerated;
 
 import fr.insee.onyxia.model.catalog.Config.Property;
-
 import java.util.HashMap;
 import java.util.Map;
 

@@ -2,6 +2,11 @@ package fr.insee.onyxia.api.dao.universe;
 
 import fr.insee.onyxia.api.configuration.Catalogs;
 import io.github.inseefrlab.helmwrapper.service.HelmRepoService;
+import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,48 +16,57 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.io.IOException;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
-
 @Service
 public class CatalogRefresher implements ApplicationRunner {
 
     private final Logger logger = LoggerFactory.getLogger(CatalogRefresher.class);
 
-    @Autowired
-    private Catalogs catalogs;
+    @Autowired private Catalogs catalogs;
 
-    @Autowired
-    private CatalogLoader catalogLoader;
+    @Autowired private CatalogLoader catalogLoader;
 
     @Value("${catalogs.refresh.ms}")
     private long refreshTime;
 
-    @Autowired
-    private HelmRepoService helmRepoService;
+    @Autowired private HelmRepoService helmRepoService;
 
     private void refresh() {
-        catalogs.getCatalogs().stream().forEach(c -> {
-            try {
-                logger.info(helmRepoService.addHelmRepo(c.getLocation(), c.getId()));
-                catalogLoader.updateCatalog(c);
-                if (c.getCatalog() != null && !CollectionUtils.isEmpty(c.getCatalog().getPackages())) {
-                    c.getCatalog().setPackages(c.getCatalog().getPackages().stream().filter(pkg -> {
-                        if (c.getExcludedCharts().contains(pkg.getName())) {
-                            logger.info("Ignoring chart " + pkg.getName() + " in catalog " + c.getName());
-                            return false;
-                        }
-                        return true;
-                    }).collect(Collectors.toList()));
-                }
+        catalogs.getCatalogs().stream()
+                .forEach(
+                        c -> {
+                            try {
+                                logger.info(
+                                        helmRepoService.addHelmRepo(c.getLocation(), c.getId()));
+                                catalogLoader.updateCatalog(c);
+                                if (c.getCatalog() != null
+                                        && !CollectionUtils.isEmpty(c.getCatalog().getPackages())) {
+                                    c.getCatalog()
+                                            .setPackages(
+                                                    c.getCatalog().getPackages().stream()
+                                                            .filter(
+                                                                    pkg -> {
+                                                                        if (c.getExcludedCharts()
+                                                                                .contains(
+                                                                                        pkg
+                                                                                                .getName())) {
+                                                                            logger.info(
+                                                                                    "Ignoring chart "
+                                                                                            + pkg
+                                                                                                    .getName()
+                                                                                            + " in catalog "
+                                                                                            + c
+                                                                                                    .getName());
+                                                                            return false;
+                                                                        }
+                                                                        return true;
+                                                                    })
+                                                            .collect(Collectors.toList()));
+                                }
 
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        });
 
         try {
             helmRepoService.repoUpdate();
@@ -70,13 +84,14 @@ public class CatalogRefresher implements ApplicationRunner {
         this.refresh();
         if (refreshTime > 0L) {
             Timer timer = new Timer();
-            TimerTask timerTask = new TimerTask() {
-                @Override
-                public void run() {
-                    logger.info("refreshing catalogs..");
-                    refresh();
-                }
-            };
+            TimerTask timerTask =
+                    new TimerTask() {
+                        @Override
+                        public void run() {
+                            logger.info("refreshing catalogs..");
+                            refresh();
+                        }
+                    };
             timer.scheduleAtFixedRate(timerTask, refreshTime, refreshTime);
         }
     }

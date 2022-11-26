@@ -6,8 +6,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class DisableChecksForTests {
 
-    @MockBean
-    CompatibilityChecks compatibilityChecks;
+    @MockBean CompatibilityChecks compatibilityChecks;
 
     public CompatibilityChecks getCompatibilityChecks() {
         return compatibilityChecks;

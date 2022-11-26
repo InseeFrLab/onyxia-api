@@ -12,14 +12,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 @Disabled
 public class RepoServiceTest {
 
-    @Autowired
-    private HelmRepoService helmRepoService;
+    @Autowired private HelmRepoService helmRepoService;
 
     @Test
     public void should() throws Exception {
         HelmRepoService repoService = new HelmRepoService();
-        helmRepoService.addHelmRepo("https://inseefrlab.github.io/helm-charts","inseefrlab");
+        helmRepoService.addHelmRepo("https://inseefrlab.github.io/helm-charts", "inseefrlab");
         HelmRepo[] repos = helmRepoService.getHelmRepo();
-        Assertions.assertEquals(1,repos.length);
+        Assertions.assertEquals(1, repos.length);
     }
 }

@@ -1,74 +1,72 @@
 package fr.insee.onyxia.model.catalog.Config;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-
-import io.swagger.v3.oas.annotations.media.Schema;
-
-/**
- * Properties
- */	
+/** Properties */
 @Schema(description = "")
 public class Category {
 
-	@Schema(description = "")
-	Map<String, Property> properties = new HashMap<>();
-	@Schema(description = "")
-	String description;
-	@Schema(description = "")
-	String type;
-	@Schema(description = "")
-	String[] required;
+    @Schema(description = "")
+    Map<String, Property> properties = new HashMap<>();
 
-	public String getDescription() {
-		return description;
-	}
+    @Schema(description = "")
+    String description;
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    @Schema(description = "")
+    String type;
 
-	public String getType() {
-		return type;
-	}
+    @Schema(description = "")
+    String[] required;
 
-	public void setType(String type) {
-		this.type = type;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	@JsonAnyGetter
-	public Map<String, Property> getProperties() {
-		// Map<String,Property> map = new HashMap<>();
-		// for (Entry<String,Property> entry : properties.entrySet()) {
-		// //if (entry.getValue().getApiDefined() == null) {
-		// map.put(entry.getKey(), entry.getValue());
-		// }
-		// }
-		return properties;
-	}
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-	// @Transient
-	// public Map<String,Property> getAllProperties() {
-	// return properties;
-	// }
-	public String[] getRequired() {
-		return required;
-	}
+    public String getType() {
+        return type;
+    }
 
-	public void setRequired(String[] required) {
-		this.required = required;
-	}
+    public void setType(String type) {
+        this.type = type;
+    }
 
-	@JsonAnySetter
-	public void setUnrecognizedFields(String key, Property value) {
-		this.properties.put(key, value);
-	}
+    @JsonAnyGetter
+    public Map<String, Property> getProperties() {
+        // Map<String,Property> map = new HashMap<>();
+        // for (Entry<String,Property> entry : properties.entrySet()) {
+        // //if (entry.getValue().getApiDefined() == null) {
+        // map.put(entry.getKey(), entry.getValue());
+        // }
+        // }
+        return properties;
+    }
 
-	public void setProperties(Map<String, Property> properties) {
-		this.properties = properties;
-	}
+    // @Transient
+    // public Map<String,Property> getAllProperties() {
+    // return properties;
+    // }
+    public String[] getRequired() {
+        return required;
+    }
 
+    public void setRequired(String[] required) {
+        this.required = required;
+    }
+
+    @JsonAnySetter
+    public void setUnrecognizedFields(String key, Property value) {
+        this.properties.put(key, value);
+    }
+
+    public void setProperties(Map<String, Property> properties) {
+        this.properties = properties;
+    }
 }

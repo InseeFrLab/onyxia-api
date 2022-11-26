@@ -1,6 +1,5 @@
 package fr.insee.onyxia.model.service;
 
-
 import java.util.ArrayList;
 import java.util.List;
 

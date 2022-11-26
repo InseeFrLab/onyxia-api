@@ -1,17 +1,29 @@
-
 package fr.insee.onyxia.model.helm;
 
 import com.fasterxml.jackson.annotation.*;
 import fr.insee.onyxia.model.catalog.Pkg;
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({ "apiVersion", "appVersion", "created", "description", "digest", "engine", "home", "icon",
-        "keywords", "maintainers", "name", "sources", "urls", "version" })
+@JsonPropertyOrder({
+    "apiVersion",
+    "appVersion",
+    "created",
+    "description",
+    "digest",
+    "engine",
+    "home",
+    "icon",
+    "keywords",
+    "maintainers",
+    "name",
+    "sources",
+    "urls",
+    "version"
+})
 @Schema(description = "Cloudshell data and health")
 public class Chart extends Pkg {
 
@@ -75,8 +87,7 @@ public class Chart extends Pkg {
     @JsonProperty("version")
     private String version;
 
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("apiVersion")
     public String getApiVersion() {
@@ -241,8 +252,10 @@ public class Chart extends Pkg {
     private class Maintainer {
         @JsonProperty("email")
         private String email;
+
         @JsonProperty("name")
         private String name;
+
         @JsonIgnore
         private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -275,6 +288,5 @@ public class Chart extends Pkg {
         public void setAdditionalProperty(String name, Object value) {
             this.additionalProperties.put(name, value);
         }
-
     }
 }
