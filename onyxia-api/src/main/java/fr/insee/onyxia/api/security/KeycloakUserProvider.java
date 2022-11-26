@@ -61,14 +61,12 @@ public class KeycloakUserProvider {
                     ((List<?>) token.getOtherClaims().getOrDefault("groups", List.of()))
                             .stream().map(String.class::cast).collect(Collectors.toList());
             if (region.getIncludedGroupPattern() != null) {
-                Pattern includePattern =
-                        Pattern.compile(region.getIncludedGroupPattern().toUpperCase());
-                groups.removeIf(group -> !includePattern.matcher(group.toUpperCase()).matches());
+                Pattern includePattern = Pattern.compile(region.getIncludedGroupPattern());
+                groups.removeIf(group -> !includePattern.matcher(group).matches());
             }
             if (region.getExcludedGroupPattern() != null) {
-                Pattern excludePattern =
-                        Pattern.compile(region.getExcludedGroupPattern().toUpperCase());
-                groups.removeIf(group -> excludePattern.matcher(group.toUpperCase()).matches());
+                Pattern excludePattern = Pattern.compile(region.getExcludedGroupPattern());
+                groups.removeIf(group -> excludePattern.matcher(group).matches());
             }
             final User user =
                     User.newInstance()
