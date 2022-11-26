@@ -28,8 +28,8 @@ See [regions.json](/onyxia-api/src/main/resources/regions.json) for a complete e
 | `name` | Descriptive name for the region | "mycloud region" |
 | `description` | Description of the region | "This region is in an awesome cloud" |
 | `location` | Geographical position of the datacenter on which the region is supposed to run. | {lat: 48.864716, longitude: 2.349014, name: "Paris" } |
-| `includedGroupPattern` | Pattern of user groups considered for the user in the region. Patterns are case insensitive. | ".*_Onyxia" |
-| `excludedGroupPattern` | Pattern of user groups that will not be considered for the user in the region. Patterns are case insensitive. | ".*_BadGroup" |
+| `includedGroupPattern` | Pattern of user groups considered for the user in the region. Patterns are case sensitive. | ".*_Onyxia" |
+| `excludedGroupPattern` | Pattern of user groups that will not be considered for the user in the region. Patterns are case sensitive. | ".*_BadGroup" |
 | `onyxiaAPI` | Contains the base url of an onyxia api | {baseURL: "http://localhost:8080"} |
 | `services` | Configuration of Onyxia services provider platform | See [Service](##services-properties) |
 | `data` | Configuration of the S3 Object Storage | See [S3](#data-properties) |
