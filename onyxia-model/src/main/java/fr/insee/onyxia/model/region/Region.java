@@ -22,6 +22,9 @@ public class Region {
     @Schema(description = "")
     private String includedGroupPattern;
 
+    @Schema(description = "Indicate how to transform a group based on `includedGroupPattern`")
+    private String transformGroupPattern;
+
     @Schema(description = "")
     private String excludedGroupPattern;
 
@@ -79,6 +82,14 @@ public class Region {
 
     public void setIncludedGroupPattern(String includedGroupPattern) {
         this.includedGroupPattern = includedGroupPattern;
+    }
+
+    public String getTransformGroupPattern() {
+        return transformGroupPattern;
+    }
+
+    public void setTransformGroupPattern(String transformGroupPattern) {
+        this.transformGroupPattern = transformGroupPattern;
     }
 
     public String getExcludedGroupPattern() {

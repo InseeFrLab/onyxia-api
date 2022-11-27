@@ -5,6 +5,7 @@ import fr.insee.onyxia.api.services.utils.HttpRequestUtils;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.region.Region;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
@@ -57,20 +58,9 @@ public class KeycloakUserProvider {
         return (Region region) -> {
             final AccessToken token = getAccessToken();
             final String tokenString = getAccessTokenString();
-            List<String> groups =
-                    ((List<?>) token.getOtherClaims().getOrDefault("groups", List.of()))
-                            .stream().map(String.class::cast).collect(Collectors.toList());
-            if (region.getIncludedGroupPattern() != null) {
-                Pattern includePattern = Pattern.compile(region.getIncludedGroupPattern());
-                groups.removeIf(group -> !includePattern.matcher(group).matches());
-            }
-            if (region.getExcludedGroupPattern() != null) {
-                Pattern excludePattern = Pattern.compile(region.getExcludedGroupPattern());
-                groups.removeIf(group -> excludePattern.matcher(group).matches());
-            }
             final User user =
                     User.newInstance()
-                            .addGroups(groups)
+                            .addGroups(getGroupsFromToken(region, token))
                             .setEmail(token.getEmail())
                             .setNomComplet(token.getName())
                             .setIdep(token.getPreferredUsername())
@@ -87,5 +77,42 @@ public class KeycloakUserProvider {
             user.getAttributes().put("access_token", tokenString);
             return user;
         };
+    }
+
+    private List<String> getGroupsFromToken(Region region, final AccessToken token) {
+        List<String> groups =
+                ((List<?>) token.getOtherClaims().getOrDefault("groups", List.of()))
+                        .stream().map(String.class::cast).collect(Collectors.toList());
+        if (region.getExcludedGroupPattern() != null) {
+            Pattern excludePattern = Pattern.compile(region.getExcludedGroupPattern());
+            groups.removeIf(group -> excludePattern.matcher(group).matches());
+        }
+        if (region.getIncludedGroupPattern() != null) {
+            Pattern includePattern = Pattern.compile(region.getIncludedGroupPattern());
+            groups.removeIf(group -> !includePattern.matcher(group).matches());
+        }
+        if (region.getIncludedGroupPattern() != null && region.getTransformGroupPattern() != null) {
+            Pattern includePattern = Pattern.compile(region.getIncludedGroupPattern());
+            groups =
+                    groups.stream()
+                            .map(
+                                    group ->
+                                            transformGroupFromProviderGroup(
+                                                    includePattern,
+                                                    region.getTransformGroupPattern(),
+                                                    group))
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.toList());
+        }
+        return groups;
+    }
+
+    private String transformGroupFromProviderGroup(
+            Pattern includePattern, String extractPattern, String providerGroup) {
+        try {
+            return includePattern.matcher(providerGroup).replaceAll(extractPattern);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }
