@@ -5,7 +5,6 @@ import fr.insee.onyxia.api.services.utils.HttpRequestUtils;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.region.Region;
 import java.util.List;
-import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +25,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class KeycloakUserProvider {
 
     @Autowired private HttpRequestUtils httpRequestUtils;
+
+    Pattern rfc1123Pattern = Pattern.compile("[a-z0-9]([-a-z0-9]*[a-z0-9])?");
 
     @Bean
     @Scope(
@@ -101,10 +102,11 @@ public class KeycloakUserProvider {
                                                     includePattern,
                                                     region.getTransformGroupPattern(),
                                                     group))
-                            .filter(Objects::nonNull)
                             .collect(Collectors.toList());
         }
-        return groups;
+        return groups.stream()
+                .filter(this::isRespectingRFC1123LabelName)
+                .collect(Collectors.toList());
     }
 
     private String transformGroupFromProviderGroup(
@@ -114,5 +116,9 @@ public class KeycloakUserProvider {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    private boolean isRespectingRFC1123LabelName(String string) {
+        return string != null && string.length() <= 63 && rfc1123Pattern.matcher(string).matches();
     }
 }

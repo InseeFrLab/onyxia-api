@@ -60,10 +60,10 @@ public class OnyxiaUserProviderWithKeycloakTest {
                     + "then the user should have all groups coming from the access token")
     @Test
     public void shouldReturnGroupsFromAccessToken() {
-        setGroupsInAccessTokenTo(List.of("group1", "group2_Onyxia", "877@_Onyxia"));
+        setGroupsInAccessTokenTo(List.of("group1", "group2-onyxia"));
         OnyxiaUser simpleUser = onyxiaUserProvider.getUser(region);
         assertGroupBelongsToUser(simpleUser, "group1");
-        assertGroupBelongsToUser(simpleUser, "group2_Onyxia");
+        assertGroupBelongsToUser(simpleUser, "group2-onyxia");
     }
 
     @DisplayName(
@@ -72,12 +72,11 @@ public class OnyxiaUserProviderWithKeycloakTest {
                     + "then the user should only get the access token matching groups")
     @Test
     public void shouldOnlyReturnGroupMatchingWhenRegionRule() {
-        setGroupsInAccessTokenTo(List.of("group1", "group2_Onyxia", "877@_Onyxia"));
-        region.setIncludedGroupPattern(".*_Onyxia");
+        setGroupsInAccessTokenTo(List.of("group1", "group2-onyxia"));
+        region.setIncludedGroupPattern(".*-onyxia");
         OnyxiaUser simpleUser = onyxiaUserProvider.getUser(region);
         assertGroupDoesntBelongToUser(simpleUser, "group1");
-        assertGroupBelongsToUser(simpleUser, "group2_Onyxia");
-        assertGroupBelongsToUser(simpleUser, "877@_Onyxia");
+        assertGroupBelongsToUser(simpleUser, "group2-onyxia");
     }
 
     @DisplayName(
@@ -86,7 +85,7 @@ public class OnyxiaUserProviderWithKeycloakTest {
                     + "then the user should get transformed groups")
     @Test
     public void shouldHaveTheTransformedGroups() {
-        setGroupsInAccessTokenTo(List.of("group1", "group2_Onyxia", "877@_Onyxia"));
+        setGroupsInAccessTokenTo(List.of("group1", "group2_Onyxia"));
         region.setIncludedGroupPattern("(.*)_Onyxia");
         region.setTransformGroupPattern("$1-k8s");
         OnyxiaUser simpleUser = onyxiaUserProvider.getUser(region);
@@ -94,7 +93,6 @@ public class OnyxiaUserProviderWithKeycloakTest {
         assertGroupDoesntBelongToUser(simpleUser, "group2_Onyxia");
         assertGroupDoesntBelongToUser(simpleUser, "group1-k8s");
         assertGroupBelongsToUser(simpleUser, "group2-k8s");
-        assertGroupBelongsToUser(simpleUser, "877@-k8s");
     }
 
     @DisplayName(
@@ -103,7 +101,7 @@ public class OnyxiaUserProviderWithKeycloakTest {
                     + "then the user should have no groups")
     @Test
     public void shouldHaveNoGroupsWhenTransformPatternConfIsWrong() {
-        setGroupsInAccessTokenTo(List.of("group1", "group2_Onyxia", "877@_Onyxia"));
+        setGroupsInAccessTokenTo(List.of("group1", "group2_Onyxia"));
         region.setIncludedGroupPattern("(.*)_Onyxia");
         region.setTransformGroupPattern("$2");
         OnyxiaUser simpleUser = onyxiaUserProvider.getUser(region);
@@ -112,18 +110,37 @@ public class OnyxiaUserProviderWithKeycloakTest {
                 simpleUser.getUser().getGroups().isEmpty());
     }
 
+    @Test
+    public void groupsNotRespectingRFC1223ShouldBeRejected() {
+        setGroupsInAccessTokenTo(
+                List.of(
+                        "group1",
+                        "toto_onyxia",
+                        "titi-Onyxia",
+                        "-titi",
+                        "morethan64chargroupmorethan64chargroupmorethan64chargroupmorethan",
+                        "groupwith@"));
+        OnyxiaUser simpleUser = onyxiaUserProvider.getUser(region);
+        assertGroupBelongsToUser(simpleUser, "group1");
+        assertGroupDoesntBelongToUser(simpleUser, "titi-Onyxia");
+        assertGroupDoesntBelongToUser(simpleUser, "-titi");
+        assertGroupDoesntBelongToUser(simpleUser, "group@with");
+        assertGroupDoesntBelongToUser(simpleUser, "toto_onyxia");
+        assertGroupDoesntBelongToUser(
+                simpleUser, "morethan64chargroupmorethan64chargroupmorethan64chargroupmorethan");
+    }
+
     @DisplayName(
             "Given a multi namespace region with a group pattern to exclude set, "
                     + "when we ask for the user groups, "
                     + "then the user should not get the access token matching the exclude pattern")
     @Test
     public void shouldNotReturnGroupMatchingExcludePatternWhenRegionRule() {
-        setGroupsInAccessTokenTo(List.of("group1", "group2_Onyxia", "877@_Onyxia"));
-        region.setExcludedGroupPattern("group2_Onyxia");
+        setGroupsInAccessTokenTo(List.of("group1", "group2-onyxia"));
+        region.setExcludedGroupPattern("group2-onyxia");
         OnyxiaUser simpleUser = onyxiaUserProvider.getUser(region);
         assertGroupBelongsToUser(simpleUser, "group1");
-        assertGroupDoesntBelongToUser(simpleUser, "group2_Onyxia");
-        assertGroupBelongsToUser(simpleUser, "877@_Onyxia");
+        assertGroupDoesntBelongToUser(simpleUser, "group2-onyxia");
     }
 
     @DisplayName(
