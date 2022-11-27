@@ -30,6 +30,8 @@ See [regions.json](/onyxia-api/src/main/resources/regions.json) for a complete e
 | `location` | Geographical position of the datacenter on which the region is supposed to run. | {lat: 48.864716, longitude: 2.349014, name: "Paris" } |
 | `includedGroupPattern` | Pattern of user groups considered for the user in the region. Patterns are case sensitive. | ".*_Onyxia" |
 | `excludedGroupPattern` | Pattern of user groups that will not be considered for the user in the region. Patterns are case sensitive. | ".*_BadGroup" |
+| `transformGroupPattern` | Indicate how to transform a group based on `includedGroupPattern`. For example with a `includedGroupPattern` of "(.*)_Onxyia" and a `transformGroupPattern` of "$1-k8s", a mygroup_Onyxia will be considered by Onyxia as mygroup-k8s. | "$1-k8s" |
+proposition : removeSharedPattern
 | `onyxiaAPI` | Contains the base url of an onyxia api | {baseURL: "http://localhost:8080"} |
 | `services` | Configuration of Onyxia services provider platform | See [Service](##services-properties) |
 | `data` | Configuration of the S3 Object Storage | See [S3](#data-properties) |

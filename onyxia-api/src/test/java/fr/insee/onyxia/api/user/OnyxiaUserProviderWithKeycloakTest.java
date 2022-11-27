@@ -81,6 +81,38 @@ public class OnyxiaUserProviderWithKeycloakTest {
     }
 
     @DisplayName(
+            "Given a multi namespace region with a group pattern set "
+                    + "and group transformation enabled, when we ask for the user groups, "
+                    + "then the user should get transformed groups")
+    @Test
+    public void shouldHaveTheTransformedGroups() {
+        setGroupsInAccessTokenTo(List.of("group1", "group2_Onyxia", "877@_Onyxia"));
+        region.setIncludedGroupPattern("(.*)_Onyxia");
+        region.setTransformGroupPattern("$1-k8s");
+        OnyxiaUser simpleUser = onyxiaUserProvider.getUser(region);
+        assertGroupDoesntBelongToUser(simpleUser, "group1");
+        assertGroupDoesntBelongToUser(simpleUser, "group2_Onyxia");
+        assertGroupDoesntBelongToUser(simpleUser, "group1-k8s");
+        assertGroupBelongsToUser(simpleUser, "group2-k8s");
+        assertGroupBelongsToUser(simpleUser, "877@-k8s");
+    }
+
+    @DisplayName(
+            "Given a multi namespace region with a group pattern set "
+                    + "and group transformation enabled, when we ask for the an invalid transformation, "
+                    + "then the user should have no groups")
+    @Test
+    public void shouldHaveNoGroupsWhenTransformPatternConfIsWrong() {
+        setGroupsInAccessTokenTo(List.of("group1", "group2_Onyxia", "877@_Onyxia"));
+        region.setIncludedGroupPattern("(.*)_Onyxia");
+        region.setTransformGroupPattern("$2");
+        OnyxiaUser simpleUser = onyxiaUserProvider.getUser(region);
+        assertThat(
+                "Invalid transformation should return no groups",
+                simpleUser.getUser().getGroups().isEmpty());
+    }
+
+    @DisplayName(
             "Given a multi namespace region with a group pattern to exclude set, "
                     + "when we ask for the user groups, "
                     + "then the user should not get the access token matching the exclude pattern")
