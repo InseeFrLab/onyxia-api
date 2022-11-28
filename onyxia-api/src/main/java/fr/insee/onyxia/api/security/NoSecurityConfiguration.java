@@ -14,22 +14,17 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @ConditionalOnExpression("'${authentication.mode}' == 'none' or '${authentication.mode}' == ''")
 public class NoSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private HttpRequestUtils httpRequestUtils;
-   
-   @Override
-   protected void configure(HttpSecurity http) throws Exception {
-       http.authorizeRequests().antMatchers("/**").permitAll();
-       http.headers().frameOptions().disable();
-       http.csrf().disable();
+    @Autowired private HttpRequestUtils httpRequestUtils;
 
-   }
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.authorizeRequests().antMatchers("/**").permitAll();
+        http.headers().frameOptions().disable();
+        http.csrf().disable();
+    }
 
-   @Override
-   public void configure(WebSecurity web) {
-       web.ignoring().antMatchers("/**");
-   }
-
-
-
+    @Override
+    public void configure(WebSecurity web) {
+        web.ignoring().antMatchers("/**");
+    }
 }

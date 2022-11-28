@@ -3,22 +3,24 @@ package io.github.inseefrlab.helmwrapper.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.inseefrlab.helmwrapper.model.HelmRepo;
 import io.github.inseefrlab.helmwrapper.utils.Command;
-import org.zeroturnaround.exec.InvalidExitValueException;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
+import org.zeroturnaround.exec.InvalidExitValueException;
 
-/**
- * HelmExecuter
- */
+/** HelmExecuter */
 public class HelmRepoService {
 
     public HelmRepo[] getHelmRepo()
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
         // System.out.println(new ProcessExecutor().getDirectory().getAbsolutePath());
-        HelmRepo[] repo = new ObjectMapper().readValue(Command.executeAndGetResponseAsJson("helm search repo")
-                .getOutput().getString(StandardCharsets.UTF_8.name()), HelmRepo[].class);
+        HelmRepo[] repo =
+                new ObjectMapper()
+                        .readValue(
+                                Command.executeAndGetResponseAsJson("helm search repo")
+                                        .getOutput()
+                                        .getString(StandardCharsets.UTF_8.name()),
+                                HelmRepo[].class);
         return repo;
     }
 
@@ -30,5 +32,4 @@ public class HelmRepoService {
     public void repoUpdate() throws InterruptedException, TimeoutException, IOException {
         Command.execute("helm repo update");
     }
-
 }

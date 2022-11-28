@@ -4,6 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.Service;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,16 +20,12 @@ import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.core.io.support.PropertySourceFactory;
 
-import javax.annotation.PostConstruct;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 @Configuration
-@PropertySource(value = "classpath:regions.json",factory = RegionsConfiguration.JsonLoader.class)
-@PropertySource(value = "classpath:regions-default.json",factory = RegionsConfiguration.JsonLoader.class,ignoreResourceNotFound = true)
+@PropertySource(value = "classpath:regions.json", factory = RegionsConfiguration.JsonLoader.class)
+@PropertySource(
+        value = "classpath:regions-default.json",
+        factory = RegionsConfiguration.JsonLoader.class,
+        ignoreResourceNotFound = true)
 @ConfigurationProperties
 public class RegionsConfiguration {
 
@@ -31,29 +33,41 @@ public class RegionsConfiguration {
 
     private List<Region> resolvedRegions;
 
-    @Autowired
-    private ObjectMapper mapper;
+    @Autowired private ObjectMapper mapper;
 
     private static Logger LOGGER = LoggerFactory.getLogger(RegionsConfiguration.class);
 
     @PostConstruct
     public void load() throws Exception {
         resolvedRegions = Arrays.asList(mapper.readValue(regions, Region[].class));
-        resolvedRegions.forEach(region -> {
-            if (region.getServices().getType().equals(Service.ServiceType.KUBERNETES)) {
-                if (region.getServices().getAuthenticationMode().equals(Region.Services.AuthenticationMode.ADMIN)) {
-                    LOGGER.warn("Using admin authentication for region "+region.getId()+". This may cause a security risk.");
-                }
+        resolvedRegions.forEach(
+                region -> {
+                    if (region.getServices().getType().equals(Service.ServiceType.KUBERNETES)) {
+                        if (region.getServices()
+                                .getAuthenticationMode()
+                                .equals(Region.Services.AuthenticationMode.ADMIN)) {
+                            LOGGER.warn(
+                                    "Using admin authentication for region "
+                                            + region.getId()
+                                            + ". This may cause a security risk.");
+                        }
 
-                if (region.getServices().getAuthenticationMode().equals(Region.Services.AuthenticationMode.IMPERSONATE)) {
-                    LOGGER.info("Using impersonation authentication for region "+region.getId()+". Make sure you are using helm version 3.4.0+.");
-                }
-            }
-        });
+                        if (region.getServices()
+                                .getAuthenticationMode()
+                                .equals(Region.Services.AuthenticationMode.IMPERSONATE)) {
+                            LOGGER.info(
+                                    "Using impersonation authentication for region "
+                                            + region.getId()
+                                            + ". Make sure you are using helm version 3.4.0+.");
+                        }
+                    }
+                });
     }
 
     public Optional<Region> getRegionById(String regionId) {
-        return resolvedRegions.stream().filter(region -> region.getId().equals(regionId)).findFirst();
+        return resolvedRegions.stream()
+                .filter(region -> region.getId().equals(regionId))
+                .findFirst();
     }
 
     public Region getDefaultRegion() {
@@ -75,11 +89,11 @@ public class RegionsConfiguration {
     public static class JsonLoader implements PropertySourceFactory {
 
         @Override
-        public org.springframework.core.env.PropertySource<?> createPropertySource(String name,
-                                                                                   EncodedResource resource) throws IOException {
+        public org.springframework.core.env.PropertySource<?> createPropertySource(
+                String name, EncodedResource resource) throws IOException {
             JsonNode values = new ObjectMapper().readTree(resource.getInputStream());
-            return new MapPropertySource("regions-source", Map.of("regions",values.get("regions").toString()));
+            return new MapPropertySource(
+                    "regions-source", Map.of("regions", values.get("regions").toString()));
         }
-
     }
 }

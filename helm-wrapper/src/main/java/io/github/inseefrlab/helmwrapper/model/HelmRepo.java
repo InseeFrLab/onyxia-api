@@ -1,29 +1,31 @@
 package io.github.inseefrlab.helmwrapper.model;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import java.util.HashMap;
+import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({ "name", "version", "app_version", "description" })
+@JsonPropertyOrder({"name", "version", "app_version", "description"})
 public class HelmRepo {
 
     @JsonProperty("name")
     private String name;
+
     @JsonProperty("version")
     private String version;
+
     @JsonProperty("app_version")
     private String appVersion;
+
     @JsonProperty("description")
     private String description;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+
+    @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("name")
     public String getName() {
@@ -74,5 +76,4 @@ public class HelmRepo {
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
     }
-
 }

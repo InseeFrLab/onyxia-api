@@ -3,7 +3,6 @@ package fr.insee.onyxia.model;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import fr.insee.onyxia.model.project.Project;
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.util.ArrayList;
 import java.util.List;
 
