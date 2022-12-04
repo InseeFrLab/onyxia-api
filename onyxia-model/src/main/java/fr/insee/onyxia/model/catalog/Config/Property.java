@@ -346,6 +346,7 @@ public class Property {
         boolean hidden = false;
         boolean readonly = false;
         String overwriteDefaultWith;
+        String overwriteSliderWith;
 
         public boolean isHidden() {
             return hidden;
@@ -369,6 +370,14 @@ public class Property {
 
         public void setOverwriteDefaultWith(String overwriteDefaultWith) {
             this.overwriteDefaultWith = overwriteDefaultWith;
+        }
+
+        public String getOverwriteSliderWith() {
+            return overwriteSliderWith;
+        }
+
+        public void setOverwriteSliderWith(String overwriteSliderWith) {
+            this.overwriteSliderWith = overwriteSliderWith;
         }
     }
 

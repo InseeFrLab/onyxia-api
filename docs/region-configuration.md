@@ -131,6 +131,8 @@ A quota follows the kubernetes model which is composed of:
 | `tolerations` | NA | This node selector can be injected in a service to force it to run on nodes with this taint |
 | `startupProbe` | NA | This startup probe can be injected in a service. It can help you in environment with slow network to specify a long duration before killing a container |
 | `kafka` | | See [Kafka](####kafka) |
+| `sliders` | | See [sliders](####sliders) |
+| `Resources` | | See [Resources](####resources) |
 
 #### kafka
 
@@ -140,6 +142,38 @@ kafka can be used to get some events in users chart like hive metastore.
 | --------------------- | ------- | ------------------------------------------------------------------ |
 | `URL` | N.A | brokerURL |
 | `topicName` | N.A | topic name for those events |
+
+#### sliders
+
+Sliders specify some slider parameters that may overwrite some defaults.
+
+| Key | Default | Description |
+| --------------------- | ------- | ------------------------------------------------------------------ |
+| `cpu` | N.A | cpu slider parameters |
+| `memory` | N.A | memory slider parameters |
+| `gpu` | N.A | gpu slider parameters |
+| `disk` | N.A | disk slider parameters |
+
+
+| Key | Default | Description |
+| --------------------- | ------- | ------------------------------------------------------------------ |
+| `sliderMin` | N.A | sliderMin |
+| `sliderMax` | N.A | sliderMax |
+| `sliderStep` | N.A | sliderStep |
+| `sliderUnit` | N.A | sliderUnit |
+
+#### resources
+
+Resources specify some values that may overwrite some defaults.
+
+| Key | Default | Description |
+| --------------------- | ------- | ------------------------------------------------------------------ |
+| `cpuRequest` | N.A | overwrite default cpu request if asked by helm-charts |
+| `cpuLimit` | N.A | overwrite default cpu limit if asked by helm-charts |
+| `memoryRequest` | N.A | overwrite default memory request if asked by helm-charts |
+| `memoryLimit` | N.A | overwrite default memory limit if asked by helm-charts |
+| `disk` | N.A | overwrite default disk size if asked by helm-charts |
+| `gpu` | N.A | overwrite default  gpu if asked by helm-charts |
 
 
 ## Data properties
