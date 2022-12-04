@@ -208,6 +208,8 @@ public class Region {
             private Object nodeSelector;
             private Object startupProbe;
             private Kafka kafka = new Kafka();
+            private Sliders sliders = new Sliders();
+            private Resources resources = new Resources();
 
             public void setIPProtection(boolean IPProtection) {
                 this.IPProtection = IPProtection;
@@ -265,6 +267,14 @@ public class Region {
                 this.kafka = kafka;
             }
 
+            public Sliders getSliders() {
+                return sliders;
+            }
+
+            public void setSliders(Sliders sliders) {
+                this.sliders = sliders;
+            }
+
             public static class Kafka {
                 @JsonProperty("URL")
                 private String url;
@@ -285,6 +295,143 @@ public class Region {
 
                 public void setTopicName(String topicName) {
                     this.topicName = topicName;
+                }
+            }
+
+            public static class Sliders {
+
+                Slider cpu;
+                Slider memory;
+                Slider gpu;
+                Slider disk;
+
+                public Slider getCpu() {
+                    return cpu;
+                }
+
+                public void setCpu(Slider cpu) {
+                    this.cpu = cpu;
+                }
+
+                public Slider getMemory() {
+                    return memory;
+                }
+
+                public void setMemory(Slider memory) {
+                    this.memory = memory;
+                }
+
+                public Slider getGpu() {
+                    return gpu;
+                }
+
+                public void setGpu(Slider gpu) {
+                    this.gpu = gpu;
+                }
+
+                public Slider getDisk() {
+                    return disk;
+                }
+
+                public void setDisk(Slider disk) {
+                    this.disk = disk;
+                }
+
+                public static class Slider {
+
+                    Integer sliderMin;
+                    Integer sliderMax;
+                    Integer sliderStep;
+                    String sliderUnit;
+
+                    public Integer getSliderMin() {
+                        return sliderMin;
+                    }
+
+                    public void setSliderMin(Integer sliderMin) {
+                        this.sliderMin = sliderMin;
+                    }
+
+                    public Integer getSliderMax() {
+                        return sliderMax;
+                    }
+
+                    public void setSliderMax(Integer sliderMax) {
+                        this.sliderMax = sliderMax;
+                    }
+
+                    public Integer getSliderStep() {
+                        return sliderStep;
+                    }
+
+                    public void setSliderStep(Integer sliderStep) {
+                        this.sliderStep = sliderStep;
+                    }
+
+                    public String getSliderUnit() {
+                        return sliderUnit;
+                    }
+
+                    public void setSliderUnit(String sliderUnit) {
+                        this.sliderUnit = sliderUnit;
+                    }
+                }
+            }
+
+            public static class Resources {
+                private String cpuRequest;
+                private String cpuLimit;
+                private String memoryRequest;
+                private String memoryLimit;
+                private String disk;
+                private String gpu;
+
+                public String getCpuRequest() {
+                    return cpuRequest;
+                }
+
+                public void setCpuRequest(String cpuRequest) {
+                    this.cpuRequest = cpuRequest;
+                }
+
+                public String getCpuLimit() {
+                    return cpuLimit;
+                }
+
+                public void setCpuLimit(String cpuLimit) {
+                    this.cpuLimit = cpuLimit;
+                }
+
+                public String getMemoryRequest() {
+                    return memoryRequest;
+                }
+
+                public void setMemoryRequest(String memoryRequest) {
+                    this.memoryRequest = memoryRequest;
+                }
+
+                public String getMemoryLimit() {
+                    return memoryLimit;
+                }
+
+                public void setMemoryLimit(String memoryLimit) {
+                    this.memoryLimit = memoryLimit;
+                }
+
+                public String getDisk() {
+                    return disk;
+                }
+
+                public void setDisk(String disk) {
+                    this.disk = disk;
+                }
+
+                public String getGpu() {
+                    return gpu;
+                }
+
+                public void setGpu(String gpu) {
+                    this.gpu = gpu;
                 }
             }
         }
