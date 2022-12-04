@@ -275,6 +275,14 @@ public class Region {
                 this.sliders = sliders;
             }
 
+            public Resources getResources() {
+                return resources;
+            }
+
+            public void setResources(Resources resources) {
+                this.resources = resources;
+            }
+
             public static class Kafka {
                 @JsonProperty("URL")
                 private String url;
