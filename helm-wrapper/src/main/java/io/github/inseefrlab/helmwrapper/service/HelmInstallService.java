@@ -33,9 +33,13 @@ public class HelmInstallService {
             String version,
             boolean dryRun,
             File values,
-            Map<String, String> env)
+            Map<String, String> env,
+            final boolean skipTlsVerify)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
         String command = "helm upgrade --install ";
+        if (skipTlsVerify) {
+            command = command.concat("--insecure-skip-tls-verify ");
+        }
         if (name != null) {
             command = command.concat(name + " ");
         } else {

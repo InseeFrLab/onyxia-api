@@ -235,10 +235,11 @@ public class MyLabController {
         }
         CatalogWrapper catalog = catalogService.getCatalogById(catalogId);
         Pkg pkg = catalog.getCatalog().getPackageByName(requestDTO.getPackageName());
+        boolean skipTlsVerify = catalog.getSkipTlsVerify();
         User user = userProvider.getUser(region);
         Map<String, Object> fusion = new HashMap<>();
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
         return helmAppsService.installApp(
-                region, project, requestDTO, catalogId, pkg, user, fusion);
+                region, project, requestDTO, catalogId, pkg, user, fusion, skipTlsVerify);
     }
 }

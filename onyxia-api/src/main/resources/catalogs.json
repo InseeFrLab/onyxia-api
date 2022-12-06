@@ -8,7 +8,8 @@
       "location": "https://inseefrlab.github.io/helm-charts-interactive-services",
       "status": "PROD",
       "highlightedCharts": ["jupyter-python", "rstudio", "vscode-python"],
-      "type": "helm"
+      "type": "helm",
+      "skipTlsVerify": false
     },
     {
       "id": "databases",
@@ -18,7 +19,8 @@
       "location": "https://inseefrlab.github.io/helm-charts-databases",
       "status": "PROD",
       "highlightedCharts": ["postgresql", "elastic"],
-      "type": "helm"
+      "type": "helm",
+      "skipTlsVerify": false
     },
     {
       "id": "automation",
@@ -28,7 +30,8 @@
       "location": "https://inseefrlab.github.io/helm-charts-automation",
       "status": "PROD",
       "highlightedCharts": ["argo-cd", "argo-workflows", "mlflow"],
-      "type": "helm"
+      "type": "helm",
+      "skipTlsVerify": false
     }
   ]
 }

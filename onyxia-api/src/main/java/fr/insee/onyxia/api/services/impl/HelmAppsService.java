@@ -90,7 +90,8 @@ public class HelmAppsService implements AppsService {
             String catalogId,
             Pkg pkg,
             User user,
-            Map<String, Object> fusion)
+            Map<String, Object> fusion,
+            final boolean skipTlsVerify)
             throws IOException, TimeoutException, InterruptedException {
 
         PublishContext context = new PublishContext();
@@ -172,7 +173,8 @@ public class HelmAppsService implements AppsService {
                                 requestDTO.getPackageVersion(),
                                 requestDTO.isDryRun(),
                                 values,
-                                null);
+                                null,
+                                skipTlsVerify);
         values.delete();
         return List.of(res.getManifest());
     }
