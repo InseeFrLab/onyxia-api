@@ -8,7 +8,6 @@ import fr.insee.onyxia.model.catalog.Config.Config;
 import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.helm.Chart;
 import fr.insee.onyxia.model.helm.Repository;
-import io.github.inseefrlab.helmwrapper.service.HelmRepoService;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -27,17 +26,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class CatalogLoader {
 
-    private final Logger logger = LoggerFactory.getLogger(CatalogRefresher.class);
+    private final Logger logger = LoggerFactory.getLogger(CatalogLoader.class);
 
     @Autowired private ResourceLoader resourceLoader;
-
-    @Autowired private ObjectMapper mapper;
 
     @Autowired
     @Qualifier("helm")
     private ObjectMapper mapperHelm;
-
-    @Autowired private HelmRepoService helmRepoService;
 
     public void updateCatalog(CatalogWrapper cw) {
         logger.info("updating catalog with id :" + cw.getId() + " and type " + cw.getType());
@@ -58,6 +53,16 @@ public class CatalogLoader {
                                     .getInputStream(),
                             "UTF-8");
             Repository repository = mapperHelm.readValue(reader, Repository.class);
+            repository
+                    .getEntries()
+                    .entrySet()
+                    .removeIf(
+                            entry ->
+                                    cw.getExcludedCharts().stream()
+                                            .anyMatch(
+                                                    excludedChart ->
+                                                            excludedChart.equalsIgnoreCase(
+                                                                    entry.getKey())));
             repository.getEntries().values().parallelStream()
                     .forEach(
                             entry -> {
@@ -100,7 +105,7 @@ public class CatalogLoader {
         inputStream.close();
     }
 
-    public void extractDataFromTgz(InputStream in, Chart chart) throws IOException {
+    private void extractDataFromTgz(InputStream in, Chart chart) throws IOException {
         GzipCompressorInputStream gzipIn = new GzipCompressorInputStream(in);
         // HelmConfig config = null;
         try (TarArchiveInputStream tarIn = new TarArchiveInputStream(gzipIn)) {
