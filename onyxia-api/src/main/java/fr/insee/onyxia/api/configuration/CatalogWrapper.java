@@ -46,6 +46,12 @@ public class CatalogWrapper {
     @Schema(description = "names of declarative important charts of the catalog")
     private List<String> highlightedCharts = new ArrayList<>();
 
+    @Schema(description = "Skip tls certificate checks for the repository")
+    private boolean skipTlsVerify;
+
+    @Schema(description = "Verify certificates of HTTPS-enabled servers using this CA bundle")
+    private String caFile;
+
     /**
      * @return the type
      */
@@ -149,5 +155,21 @@ public class CatalogWrapper {
 
     public void setHighlightedCharts(List<String> highlightedCharts) {
         this.highlightedCharts = highlightedCharts;
+    }
+
+    public boolean getSkipTlsVerify() {
+        return skipTlsVerify;
+    }
+
+    public void setSkipTlsVerify(boolean skipTlsVerify) {
+        this.skipTlsVerify = skipTlsVerify;
+    }
+
+    public String getCaFile() {
+        return caFile;
+    }
+
+    public void setCaFile(String caFile) {
+        this.caFile = caFile;
     }
 }

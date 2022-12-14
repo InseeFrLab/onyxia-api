@@ -17,7 +17,8 @@ public class RepoServiceTest {
     @Test
     public void should() throws Exception {
         HelmRepoService repoService = new HelmRepoService();
-        helmRepoService.addHelmRepo("https://inseefrlab.github.io/helm-charts", "inseefrlab");
+        helmRepoService.addHelmRepo(
+                "https://inseefrlab.github.io/helm-charts", "inseefrlab", false, null);
         HelmRepo[] repos = helmRepoService.getHelmRepo();
         Assertions.assertEquals(1, repos.length);
     }

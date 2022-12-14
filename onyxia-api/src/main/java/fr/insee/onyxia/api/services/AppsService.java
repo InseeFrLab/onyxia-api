@@ -32,7 +32,9 @@ public interface AppsService {
             String catalogId,
             Pkg pkg,
             User user,
-            Map<String, Object> fusion)
+            Map<String, Object> fusion,
+            final boolean skipTlsVerify,
+            final String caFile)
             throws Exception;
 
     Service getUserService(Region region, Project project, User user, String serviceId)
