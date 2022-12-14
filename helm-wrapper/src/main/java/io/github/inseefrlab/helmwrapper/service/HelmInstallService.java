@@ -34,11 +34,16 @@ public class HelmInstallService {
             boolean dryRun,
             File values,
             Map<String, String> env,
-            final boolean skipTlsVerify)
+            final boolean skipTlsVerify,
+            String caFile)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
         String command = "helm upgrade --install ";
         if (skipTlsVerify) {
             command = command.concat("--insecure-skip-tls-verify ");
+        } else if (caFile != null) {
+            command =
+                    command.concat(
+                            "--ca-file " + System.getenv("CACERTS_DIR") + "/" + caFile + " ");
         }
         if (name != null) {
             command = command.concat(name + " ");

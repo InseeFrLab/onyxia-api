@@ -9,7 +9,8 @@
       "status": "PROD",
       "highlightedCharts": ["jupyter-python", "rstudio", "vscode-python"],
       "type": "helm",
-      "skipTlsVerify": false
+      "skipTlsVerify": false,
+      "caFile": null
     },
     {
       "id": "databases",
@@ -20,7 +21,8 @@
       "status": "PROD",
       "highlightedCharts": ["postgresql", "elastic"],
       "type": "helm",
-      "skipTlsVerify": false
+      "skipTlsVerify": false,
+      "caFile": null
     },
     {
       "id": "automation",
@@ -31,7 +33,8 @@
       "status": "PROD",
       "highlightedCharts": ["argo-cd", "argo-workflows", "mlflow"],
       "type": "helm",
-      "skipTlsVerify": false
+      "skipTlsVerify": false,
+      "caFile": null
     }
   ]
 }

@@ -35,7 +35,10 @@ public class CatalogRefresher implements ApplicationRunner {
                             try {
                                 logger.info(
                                         helmRepoService.addHelmRepo(
-                                                c.getLocation(), c.getId(), c.getSkipTlsVerify()));
+                                                c.getLocation(),
+                                                c.getId(),
+                                                c.getSkipTlsVerify(),
+                                                c.getCaFile()));
                                 catalogLoader.updateCatalog(c);
                             } catch (Exception e) {
                                 e.printStackTrace();

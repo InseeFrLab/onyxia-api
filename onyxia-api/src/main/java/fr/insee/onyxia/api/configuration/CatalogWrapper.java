@@ -49,6 +49,9 @@ public class CatalogWrapper {
     @Schema(description = "Skip tls certificate checks for the repository")
     private boolean skipTlsVerify;
 
+    @Schema(description = "Verify certificates of HTTPS-enabled servers using this CA bundle")
+    private String caFile;
+
     /**
      * @return the type
      */
@@ -160,5 +163,13 @@ public class CatalogWrapper {
 
     public void setSkipTlsVerify(boolean skipTlsVerify) {
         this.skipTlsVerify = skipTlsVerify;
+    }
+
+    public String getCaFile() {
+        return caFile;
+    }
+
+    public void setCaFile(String caFile) {
+        this.caFile = caFile;
     }
 }
