@@ -26,8 +26,6 @@ public class KeycloakUserProvider {
 
     @Autowired private HttpRequestUtils httpRequestUtils;
 
-    Pattern rfc1123Pattern = Pattern.compile("[a-z0-9]([-a-z0-9]*[a-z0-9])?");
-
     @Bean
     @Scope(
             scopeName = WebApplicationContext.SCOPE_REQUEST,
@@ -92,33 +90,6 @@ public class KeycloakUserProvider {
             Pattern includePattern = Pattern.compile(region.getIncludedGroupPattern());
             groups.removeIf(group -> !includePattern.matcher(group).matches());
         }
-        if (region.getIncludedGroupPattern() != null && region.getTransformGroupPattern() != null) {
-            Pattern includePattern = Pattern.compile(region.getIncludedGroupPattern());
-            groups =
-                    groups.stream()
-                            .map(
-                                    group ->
-                                            transformGroupFromProviderGroup(
-                                                    includePattern,
-                                                    region.getTransformGroupPattern(),
-                                                    group))
-                            .collect(Collectors.toList());
-        }
-        return groups.stream()
-                .filter(this::isRespectingRFC1123LabelName)
-                .collect(Collectors.toList());
-    }
-
-    private String transformGroupFromProviderGroup(
-            Pattern includePattern, String extractPattern, String providerGroup) {
-        try {
-            return includePattern.matcher(providerGroup).replaceAll(extractPattern);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    private boolean isRespectingRFC1123LabelName(String string) {
-        return string != null && string.length() <= 63 && rfc1123Pattern.matcher(string).matches();
+        return groups;
     }
 }
