@@ -60,10 +60,11 @@ public class OnyxiaUserProviderWithKeycloakTest {
                     + "then the user should have all groups coming from the access token")
     @Test
     public void shouldReturnGroupsFromAccessToken() {
-        setGroupsInAccessTokenTo(List.of("group1", "group2-onyxia"));
+        setGroupsInAccessTokenTo(List.of("group1", "group2-onyxia", "group3-INVALID"));
         OnyxiaUser simpleUser = onyxiaUserProvider.getUser(region);
         assertGroupBelongsToUser(simpleUser, "group1");
         assertGroupBelongsToUser(simpleUser, "group2-onyxia");
+        assertGroupBelongsToUser(simpleUser, "group3-INVALID");
     }
 
     @DisplayName(
@@ -77,57 +78,6 @@ public class OnyxiaUserProviderWithKeycloakTest {
         OnyxiaUser simpleUser = onyxiaUserProvider.getUser(region);
         assertGroupDoesntBelongToUser(simpleUser, "group1");
         assertGroupBelongsToUser(simpleUser, "group2-onyxia");
-    }
-
-    @DisplayName(
-            "Given a multi namespace region with a group pattern set "
-                    + "and group transformation enabled, when we ask for the user groups, "
-                    + "then the user should get transformed groups")
-    @Test
-    public void shouldHaveTheTransformedGroups() {
-        setGroupsInAccessTokenTo(List.of("group1", "group2_Onyxia"));
-        region.setIncludedGroupPattern("(.*)_Onyxia");
-        region.setTransformGroupPattern("$1-k8s");
-        OnyxiaUser simpleUser = onyxiaUserProvider.getUser(region);
-        assertGroupDoesntBelongToUser(simpleUser, "group1");
-        assertGroupDoesntBelongToUser(simpleUser, "group2_Onyxia");
-        assertGroupDoesntBelongToUser(simpleUser, "group1-k8s");
-        assertGroupBelongsToUser(simpleUser, "group2-k8s");
-    }
-
-    @DisplayName(
-            "Given a multi namespace region with a group pattern set "
-                    + "and group transformation enabled, when we ask for the an invalid transformation, "
-                    + "then the user should have no groups")
-    @Test
-    public void shouldHaveNoGroupsWhenTransformPatternConfIsWrong() {
-        setGroupsInAccessTokenTo(List.of("group1", "group2_Onyxia"));
-        region.setIncludedGroupPattern("(.*)_Onyxia");
-        region.setTransformGroupPattern("$2");
-        OnyxiaUser simpleUser = onyxiaUserProvider.getUser(region);
-        assertThat(
-                "Invalid transformation should return no groups",
-                simpleUser.getUser().getGroups().isEmpty());
-    }
-
-    @Test
-    public void groupsNotRespectingRFC1223ShouldBeRejected() {
-        setGroupsInAccessTokenTo(
-                List.of(
-                        "group1",
-                        "toto_onyxia",
-                        "titi-Onyxia",
-                        "-titi",
-                        "morethan64chargroupmorethan64chargroupmorethan64chargroupmorethan",
-                        "groupwith@"));
-        OnyxiaUser simpleUser = onyxiaUserProvider.getUser(region);
-        assertGroupBelongsToUser(simpleUser, "group1");
-        assertGroupDoesntBelongToUser(simpleUser, "titi-Onyxia");
-        assertGroupDoesntBelongToUser(simpleUser, "-titi");
-        assertGroupDoesntBelongToUser(simpleUser, "group@with");
-        assertGroupDoesntBelongToUser(simpleUser, "toto_onyxia");
-        assertGroupDoesntBelongToUser(
-                simpleUser, "morethan64chargroupmorethan64chargroupmorethan64chargroupmorethan");
     }
 
     @DisplayName(
