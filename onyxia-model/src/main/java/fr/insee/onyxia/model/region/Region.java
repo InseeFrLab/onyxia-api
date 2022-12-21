@@ -935,6 +935,10 @@ public class Region {
         private String domain;
         private String ingressClassName;
 
+        private boolean ingress = true;
+
+        private boolean route = false;
+
         public void setDomain(String domain) {
             this.domain = domain;
         }
@@ -949,6 +953,22 @@ public class Region {
 
         public String getIngressClassName() {
             return ingressClassName;
+        }
+
+        public void setIngress(boolean ingress) {
+            this.ingress = ingress;
+        }
+
+        public boolean getIngress() {
+            return ingress;
+        }
+
+        public void setRoute(boolean route) {
+            this.route = route;
+        }
+
+        public boolean getRoute() {
+            return route;
         }
     }
 

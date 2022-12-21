@@ -117,7 +117,8 @@ A quota follows the kubernetes model which is composed of:
 | --------------------- | ------- | ------------------------------------------------------------------ |
 | `domain` | | When users request to expose their service, only subdomain of this object will be created. |
 | `ingressClassName` | '' | Ingress Class Name : usefull if you want to use a specific ingress controller in stead of a default one |
-
+| `ingress` | true | Whether or not Kubernetes Ingress is enabled |
+| `route` | false | Whether or not OpenShift Route is enabled |
 
 ### Default configuration properties
 
