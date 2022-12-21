@@ -17,7 +17,7 @@ See [regions.json](/onyxia-api/src/main/resources/regions.json) for a complete e
     - [CustomInitScript properties](#custom-init-script-properties)
   - [Data properties](#data-properties)
     - [S3](#s3)
-    - [atlas](#atlas)
+    - [Atlas](#atlas)
   - [Vault properties](#vault-properties)
 
 ## Main region properties
@@ -32,9 +32,9 @@ See [regions.json](/onyxia-api/src/main/resources/regions.json) for a complete e
 | `excludedGroupPattern` | Pattern of user groups that will not be considered for the user in the region. Patterns are case sensitive. | ".*_BadGroup" |
 | `transformGroupPattern` | Indicate how to transform a group based on `includedGroupPattern` to make a project name used for namespace or S3 bucket for example. For example with a `includedGroupPattern` of "(.*)_Onxyia" and a `transformGroupPattern` of "$1-k8s", a mygroup_Onyxia will generate a mygroup-k8s namespace. | "$1-k8s" |
 | `onyxiaAPI` | Contains the base url of an onyxia api | {baseURL: "http://localhost:8080"} |
-| `services` | Configuration of Onyxia services provider platform | See [Service](##services-properties) |
+| `services` | Configuration of Onyxia services provider platform | See [Services properties](#services-properties) |
 | `data` | Configuration of the S3 Object Storage | See [S3](#data-properties) |
-| `vault` | Configuration of the Vault API | See [vault](#vault-properties) |
+| `vault` | Configuration of the Vault API | See [Vault properties](#vault-properties) |
 
 ## Services properties
 
@@ -53,16 +53,16 @@ Users can work on Onyxia as a User or as a Group to which they belong. Each user
 | `usernamePrefix` | | If set, the Kubernetes user corresponding to the Onyxia user is named usernamePrefix + userId on impersonation mode, otherwise it is identified only as userId | "user-" |
 | `groupPrefix` | | not used | |
 | `authenticationMode` | IMPERSONATE | IMPERSONATE or ADMIN : on ADMIN mode Onyxia uses its admin account on the services provider, with IMPERSONATE mode Onyxia request the API as the user (helm option --kube-as-user) but is only available if the helm version used is above 3.4.0 | |
-| `expose` | | When users request to expose their service, only subdomain of this object domain are allowed | See [Expose properties](###expose-properties) |
+| `expose` | | When users request to expose their service, only subdomain of this object domain are allowed | See [Expose properties](#expose-properties) |
 | `monitoring` | | Define the URL pattern of the monitoring service that is to be launch with each service. Only for client purpose. | {URLPattern: "https://$NAMESPACE-$INSTANCE.mymonitoring.sspcloud.fr"} |
 | `cloudshell` | | Define the catalog and package name where to fetch the cloudshell in the helm catalog. | {catalogId: "inseefrlab-helm-charts-datascience", packageName: "cloudshell"} |
 | `initScript` | | Define where to fetch a script that will be launched on some service on startup. | "https://inseefrlab.github.io/onyxia/onyxia-init.sh" |
 | `allowedURIPattern` | "^https://" | Init scripts set by the user have to respect this pattern. | |
-| `server` | | Define configuration of the services provider API server, this value is not served on the API as it contains credentials for the API. | See [server properties](###server-properties) |
-| `k8sPublicEndpoint` | | Define external access to kubernetes API if available. It helps Onyxia users to directly connect to kubernetes outside the datalab | See [server properties](###k8sPublicEndpoint-properties) |
-| `quotas` | | Properties setting quotas on how much resource a user can get on the services provider. | See [Quotas properties](###quotas-properties) |
-| `defaultConfiguration` | | Default configuration on services that a user can override. For client purpose only. | See [Default Configuration](###default-configuration-properties) |
-| `customInitScript` | | This can be use to customize user environnement using a regional script executed by some users pods. | See [CustomInitScript](###custom-init-script-properties) |
+| `server` | | Define configuration of the services provider API server, this value is not served on the API as it contains credentials for the API. | See [Server properties](#server-properties) |
+| `k8sPublicEndpoint` | | Define external access to kubernetes API if available. It helps Onyxia users to directly connect to kubernetes outside the datalab | See [K8sPublicEndpoint properties](#k8sPublicEndpoint-properties) |
+| `quotas` | | Properties setting quotas on how much resource a user can get on the services provider. | See [Quotas properties](#quotas-properties) |
+| `defaultConfiguration` | | Default configuration on services that a user can override. For client purpose only. | See [Default Configuration](#default-configuration-properties) |
+| `customInitScript` | | This can be use to customize user environnement using a regional script executed by some users pods. | See [CustomInitScript properties](#custom-init-script-properties) |
 
 ### CustomInitScript properties
 
@@ -97,7 +97,7 @@ When this feature is enabled, namespaces are created with **quotas**.
 
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
-| `enabled` | false | Whether or not users are subject to a resouce limitation. Quotas can only be applied on user and not on group. |
+| `enabled` | false | Whether or not users are subject to a resource limitation. Quotas can only be applied on user and not on group. |
 | `allowUserModification` | true | Whether or not the user can manually disable or change its own limitation. |
 | `defaultQuota` | | The quota applied on the namespace before user modification or on reset. |
 
@@ -116,7 +116,7 @@ A quota follows the kubernetes model which is composed of:
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
 | `domain` | | When users request to expose their service, only subdomain of this object will be created. |
-| `ingressClassName` | '' | Ingress Class Name : usefull if you want to use a specific ingress controller in stead of a default one |
+| `ingressClassName` | '' | Ingress Class Name : useful if you want to use a specific ingress controller in stead of a default one |
 | `ingress` | true | Whether or not Kubernetes Ingress is enabled |
 | `route` | false | Whether or not OpenShift Route is enabled |
 
@@ -130,20 +130,20 @@ A quota follows the kubernetes model which is composed of:
 | `nodeSelector` | NA | This node selector can be injected in a service to restrain on which node it can be launched  |
 | `tolerations` | NA | This node selector can be injected in a service to force it to run on nodes with this taint |
 | `startupProbe` | NA | This startup probe can be injected in a service. It can help you in environment with slow network to specify a long duration before killing a container |
-| `kafka` | | See [Kafka](####kafka) |
-| `sliders` | | See [sliders](####sliders) |
-| `Resources` | | See [Resources](####resources) |
+| `kafka` | | See [Kafka](#kafka) |
+| `sliders` | | See [Sliders](#sliders) |
+| `Resources` | | See [Resources](#resources) |
 
-#### kafka
+#### Kafka
 
-kafka can be used to get some events in users chart like hive metastore.
+Kafka can be used to get some events in users chart like hive metastore.
 
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
 | `URL` | N.A | brokerURL |
 | `topicName` | N.A | topic name for those events |
 
-#### sliders
+#### Sliders
 
 Sliders specify some slider parameters that may overwrite some defaults.
 
@@ -162,7 +162,7 @@ Sliders specify some slider parameters that may overwrite some defaults.
 | `sliderStep` | N.A | sliderStep |
 | `sliderUnit` | N.A | sliderUnit |
 
-#### resources
+#### Resources
 
 Resources specify some values that may overwrite some defaults.
 
@@ -203,11 +203,11 @@ All these properties which configure the access to the storage are intended for 
 | `monitoring` | | Defines the URL pattern of the monitoring service of each bucket. | "https://monitoring.sspcloud.fr/$BUCKET_ID" |
 | `acceptBucketCreation` | true | If true, the S3 client should not create bucket. | true |
 
-### atlas
+### Atlas
 
 Atlas is a data management tool.
 
-It can be used to add additionnal feature to the file explorer to transform it into a data explorer
+It can be used to add additional feature to the file explorer to transform it into a data explorer
 
 | Key | Default | Description | Example |
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
@@ -216,7 +216,7 @@ It can be used to add additionnal feature to the file explorer to transform it i
 
 ## Vault properties
 
-It can be used to add additionnal feature to Onyxia. It helps user to keep their secret safe.
+It can be used to add additional feature to Onyxia. It helps user to keep their secret safe.
 
 | Key | Default | Description | Example |
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
