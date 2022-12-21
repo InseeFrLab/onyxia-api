@@ -1,10 +1,10 @@
 # Region configuration  
 
-A **region** is the configuration of an independant set of Onyxia services. Thus multiple configuration accessing different services can be plugged on a single Onyxia instance.
+A **region** is the configuration of an independent set of Onyxia services. Thus multiple configurations accessing different services can be plugged into a single Onyxia instance.
 
-A region mainly defines **Onyxia service provider** on which are run the users, groups and global services and how users can interact with it. It also defines a **S3 object storage** and how "buckets" are provided to users.
+A region mainly defines **Onyxia service provider** on which are run the users, groups, and global services and how users can interact with it. It also defines an **S3 object storage** and how "buckets" are provided to users.
 
-Most of the configuration of an Onyxia client comes from the region that can be accessed as json via /public/configuration or /public/regions.
+Most of the configuration of an Onyxia client comes from the region that can be accessed as JSON via /public/configuration or /public/regions.
 
 See [regions.json](/onyxia-api/src/main/resources/regions.json) for a complete example of regions configuration.
 
@@ -27,10 +27,10 @@ See [regions.json](/onyxia-api/src/main/resources/regions.json) for a complete e
 | `id` | Unique name of the region | "mycloud" |
 | `name` | Descriptive name for the region | "mycloud region" |
 | `description` | Description of the region | "This region is in an awesome cloud" |
-| `location` | Geographical position of the datacenter on which the region is supposed to run. | {lat: 48.864716, longitude: 2.349014, name: "Paris" } |
-| `includedGroupPattern` | Pattern of user groups considered for the user in the region. Patterns are case sensitive. | ".*_Onyxia" |
-| `excludedGroupPattern` | Pattern of user groups that will not be considered for the user in the region. Patterns are case sensitive. | ".*_BadGroup" |
-| `transformGroupPattern` | Indicate how to transform a group based on `includedGroupPattern` to make a project name used for namespace or S3 bucket for example. For example with a `includedGroupPattern` of "(.*)_Onxyia" and a `transformGroupPattern` of "$1-k8s", a mygroup_Onyxia will generate a mygroup-k8s namespace. | "$1-k8s" |
+| `location` | Geographical position of the data center on which the region is supposed to run. | {lat: 48.864716, longitude: 2.349014, name: "Paris" } |
+| `includedGroupPattern` | Pattern of user groups considered for the user in the region. Patterns are case-sensitive. | ".*_Onyxia" |
+| `excludedGroupPattern` | Pattern of user groups that will not be considered for the user in the region. Patterns are case-sensitive. | ".*_BadGroup" |
+| `transformGroupPattern` | Indicate how to transform a group based on `includedGroupPattern` to make a project name used for a namespace or S3 bucket for example. For example with an `includedGroupPattern` of "(.*)_Onxyia" and a `transformGroupPattern` of "$1-k8s", a mygroup_Onyxia will generate a mygroup-k8s namespace. | "$1-k8s" |
 | `onyxiaAPI` | Contains the base url of an onyxia api | {baseURL: "http://localhost:8080"} |
 | `services` | Configuration of Onyxia services provider platform | See [Services properties](#services-properties) |
 | `data` | Configuration of the S3 Object Storage | See [S3](#data-properties) |
@@ -38,7 +38,7 @@ See [regions.json](/onyxia-api/src/main/resources/regions.json) for a complete e
 
 ## Services properties
 
-The onyxia service plateform is a Kubernetes cluster but Onyxia is meant to be extendable to other types of platform if necessary.
+The Onyxia service platform is a Kubernetes cluster but Onyxia is meant to be extendable to other types of a platform if necessary.
 
 Users can work on Onyxia as a User or as a Group to which they belong. Each user and group can have its own **namespace** which is an isolated space of Kubernetes.
 
@@ -46,23 +46,23 @@ Users can work on Onyxia as a User or as a Group to which they belong. Each user
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
 | `type` | | Type of the platform on which services are launched. Only Kubernetes is supported, Marathon has been removed. | "KUBERNETES" |
 | `allowNamespaceCreation` | true | If true, the /onboarding endpoint is enabled and the user will have a namespace created on its first request on a service resource. | true |
-| `singleNamespace` | true | When true, all users share the same namespace on the service provider. This configuration can be used if a project work on its own Onyxia region. | |
-| `userNamespace` | true | When true, all users have a namespace for his work. This configuration can be used if you don't allow user to have their own space to work and only use project space | |
-| `namespacePrefix` | "user-" | User have a personal namespace like namespacePrefix + userId (should only be used when not singleNamespace but not the case) | |
-| `groupNamespacePrefix` | "projet-" | User in a group groupId can access the namespace groupeNamespacePrefix + groupId. This prefix is also used for vault group directory. | |
+| `singleNamespace` | true | When true, all users share the same namespace on the service provider. This configuration can be used if a project works on its own Onyxia region. | |
+| `userNamespace` | true | When true, all users have a namespace for their work. This configuration can be used if you don't allow a user to have their own space to work and only use project space | |
+| `namespacePrefix` | "user-" | User has a personal namespace like namespacePrefix + userId (should only be used when not singleNamespace but not the case) | |
+| `groupNamespacePrefix` | "projet-" | User in a group groupId can access the namespace groupeNamespacePrefix + groupId. This prefix is also used for the Vault group directory. | |
 | `usernamePrefix` | | If set, the Kubernetes user corresponding to the Onyxia user is named usernamePrefix + userId on impersonation mode, otherwise it is identified only as userId | "user-" |
 | `groupPrefix` | | not used | |
-| `authenticationMode` | IMPERSONATE | IMPERSONATE or ADMIN : on ADMIN mode Onyxia uses its admin account on the services provider, with IMPERSONATE mode Onyxia request the API as the user (helm option --kube-as-user) but is only available if the helm version used is above 3.4.0 | |
+| `authenticationMode` | IMPERSONATE | IMPERSONATE or ADMIN: on ADMIN mode Onyxia uses its admin account on the services provider, with IMPERSONATE mode Onyxia request the API as the user (helm option `--kube-as-user`) but is only available if the helm version used is above 3.4.0 | |
 | `expose` | | When users request to expose their service, only subdomain of this object domain are allowed | See [Expose properties](#expose-properties) |
-| `monitoring` | | Define the URL pattern of the monitoring service that is to be launch with each service. Only for client purpose. | {URLPattern: "https://$NAMESPACE-$INSTANCE.mymonitoring.sspcloud.fr"} |
+| `monitoring` | | Define the URL pattern of the monitoring service that is to be launched with each service. Only for client purposes. | {URLPattern: "https://$NAMESPACE-$INSTANCE.mymonitoring.sspcloud.fr"} |
 | `cloudshell` | | Define the catalog and package name where to fetch the cloudshell in the helm catalog. | {catalogId: "inseefrlab-helm-charts-datascience", packageName: "cloudshell"} |
 | `initScript` | | Define where to fetch a script that will be launched on some service on startup. | "https://inseefrlab.github.io/onyxia/onyxia-init.sh" |
 | `allowedURIPattern` | "^https://" | Init scripts set by the user have to respect this pattern. | |
-| `server` | | Define configuration of the services provider API server, this value is not served on the API as it contains credentials for the API. | See [Server properties](#server-properties) |
-| `k8sPublicEndpoint` | | Define external access to kubernetes API if available. It helps Onyxia users to directly connect to kubernetes outside the datalab | See [K8sPublicEndpoint properties](#k8sPublicEndpoint-properties) |
-| `quotas` | | Properties setting quotas on how much resource a user can get on the services provider. | See [Quotas properties](#quotas-properties) |
-| `defaultConfiguration` | | Default configuration on services that a user can override. For client purpose only. | See [Default Configuration](#default-configuration-properties) |
-| `customInitScript` | | This can be use to customize user environnement using a regional script executed by some users pods. | See [CustomInitScript properties](#custom-init-script-properties) |
+| `server` | | Define the configuration of the services provider API server, this value is not served on the API as it contains credentials for the API. | See [Server properties](#server-properties) |
+| `k8sPublicEndpoint` | | Define external access to Kubernetes API if available. It helps Onyxia users to directly connect to Kubernetes outside the datalab | See [K8sPublicEndpoint properties](#k8sPublicEndpoint-properties) |
+| `quotas` | | Properties setting quotas on how many resources a user can get on the services provider. | See [Quotas properties](#quotas-properties) |
+| `defaultConfiguration` | | Default configuration on services that a user can override. For client purposes only. | See [Default Configuration](#default-configuration-properties) |
+| `customInitScript` | | This can be used to customize user environments using a regional script executed by some users' pods. | See [CustomInitScript properties](#custom-init-script-properties) |
 
 ### CustomInitScript properties
 
@@ -80,16 +80,16 @@ These properties define how to reach the **service provider API**.
 | Key | Description | Example |
 | --------------------- | ------------------------------------------------------------------ | ---- |
 | `URL` | URL of the service provider API | "api.kub.sspcloud.fr" |
-| `auth` | Credentials for the service provider API. | {token: "ey...", password : "pwd", username: "admin"} |
+| `auth` | Credentials for the service provider API. | {token: "ey...", password: "pwd", username: "admin"} |
 
 ### K8sPublicEndpoint properties
 
-It can be used to add additionnal feature to Onyxia. It helps Onyxia users to directly connect to kubernetes outside the datalab.
+It can be used to add additional features to Onyxia. It helps Onyxia users to directly connect to Kubernetes outside the datalab.
 
 | Key | Default | Description | Example |
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
-| `URL` | | public URL of the kubernetes API of the region. | "https://vault.change.me" |
-| `keycloakParams` | | Configuration of the keycloak service used to get an access token on the kubernetes api. It defines the keycloak realm, clientId, and Url. | {realm: "sspcloud", clientId: "kubernetes", URL: "https://auth.change.me/auth"} |
+| `URL` | | public URL of the Kubernetes API of the region. | "https://vault.change.me" |
+| `keycloakParams` | | Configuration of the Keycloak service used to get an access token on the Kubernetes API. It defines the Keycloak realm, clientId, and Url. | {realm: "sspcloud", clientId: "kubernetes", URL: "https://auth.change.me/auth"} |
 
 ### Quotas properties
 
@@ -97,11 +97,11 @@ When this feature is enabled, namespaces are created with **quotas**.
 
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
-| `enabled` | false | Whether or not users are subject to a resource limitation. Quotas can only be applied on user and not on group. |
+| `enabled` | false | Whether or not users are subject to a resource limitation. Quotas can only be applied to users and not to groups. |
 | `allowUserModification` | true | Whether or not the user can manually disable or change its own limitation. |
-| `defaultQuota` | | The quota applied on the namespace before user modification or on reset. |
+| `defaultQuota` | | The quota is applied on the namespace before user modification or reset. |
 
-A quota follows the kubernetes model which is composed of:
+A quota follows the Kubernetes model which is composed of:
 "requests.memory"
 "requests.cpu"
 "limits.memory"
@@ -115,8 +115,8 @@ A quota follows the kubernetes model which is composed of:
 
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
-| `domain` | | When users request to expose their service, only subdomain of this object will be created. |
-| `ingressClassName` | '' | Ingress Class Name : useful if you want to use a specific ingress controller in stead of a default one |
+| `domain` | | When users request to expose their service, only the subdomain of this object will be created. |
+| `ingressClassName` | '' | Ingress Class Name: useful if you want to use a specific ingress controller instead of a default one |
 | `ingress` | true | Whether or not Kubernetes Ingress is enabled |
 | `route` | false | Whether or not OpenShift Route is enabled |
 
@@ -124,19 +124,19 @@ A quota follows the kubernetes model which is composed of:
 
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
-| `IPProtection` | false | Whether or not the default behavior of the reverse-proxy serving the service is to block request from an ip other than the one from which it has been created. For client purpose only. |
-| `networkPolicy` | false | Whether or not services can be reached by pods outside of the current namespace. For client purpose only. |
-| `from` | NA | List of allowed source (kubernetes network policies format for from) to reach user http services. Used to allow ingress access to users services |
+| `IPProtection` | false | Whether or not the default behavior of the reverse proxy serving the service is to block a request from an IP other than the one from which it has been created. For client purposes only. |
+| `networkPolicy` | false | Whether or not services can be reached by pods outside of the current namespace. For client purposes only. |
+| `from` | NA | List of allowed sources (Kubernetes network policies format for from) to reach user HTTP services. Used to allow ingress access to users' services |
 | `nodeSelector` | NA | This node selector can be injected in a service to restrain on which node it can be launched  |
 | `tolerations` | NA | This node selector can be injected in a service to force it to run on nodes with this taint |
-| `startupProbe` | NA | This startup probe can be injected in a service. It can help you in environment with slow network to specify a long duration before killing a container |
+| `startupProbe` | NA | This startup probe can be injected into a service. It can help you in an environment with a slow network to specify a long duration before killing a container |
 | `kafka` | | See [Kafka](#kafka) |
 | `sliders` | | See [Sliders](#sliders) |
 | `Resources` | | See [Resources](#resources) |
 
 #### Kafka
 
-Kafka can be used to get some events in users chart like hive metastore.
+Kafka can be used to get some events in the user chart like Hive metastore.
 
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
@@ -168,12 +168,12 @@ Resources specify some values that may overwrite some defaults.
 
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
-| `cpuRequest` | N.A | overwrite default cpu request if asked by helm-charts |
-| `cpuLimit` | N.A | overwrite default cpu limit if asked by helm-charts |
+| `cpuRequest` | N.A | overwrite default CPU request if asked by helm-charts |
+| `cpuLimit` | N.A | overwrite default CPU limit if asked by helm-charts |
 | `memoryRequest` | N.A | overwrite default memory request if asked by helm-charts |
 | `memoryLimit` | N.A | overwrite default memory limit if asked by helm-charts |
 | `disk` | N.A | overwrite default disk size if asked by helm-charts |
-| `gpu` | N.A | overwrite default  gpu if asked by helm-charts |
+| `gpu` | N.A | overwrite default GPU if asked by helm-charts |
 
 
 ## Data properties
@@ -184,14 +184,14 @@ Data properties only contain an object storage S3 configuration.
 
 There are several implementations of the S3 standard like Minio or AWS.
 
-S3 storage are divided by **buckets** with their own access policy.
+S3 storage is divided into **buckets** with their own access policy.
 
 All these properties which configure the access to the storage are intended for Onyxia clients apart except properties on bucket naming.
 
 | Key | Default | Description | Example |
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
 | `type` | | Type of S3 storage implementation. | "minio", "amazon" |
-| `URL` | | URL of the S3 service for the region. Only used when type is minio. | "https://minio.lab.sspcloud.fr" |
+| `URL` | | URL of the S3 service for the region. Only used when the type is Minio. | "https://minio.lab.sspcloud.fr" |
 | `region` | | Name of the region on the S3 service when this service deals with multiple regions. | "us-east-1" |
 | `roleARN` | | Only used when type is "amazon". See [Assume Role With Web Identity Amazon documentation](https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithWebIdentity.html) | |
 | `roleSessionName` | | Only used when type is "amazon". See [Assume Role With Web Identity Amazon documentation](https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithWebIdentity.html) | |
@@ -199,7 +199,7 @@ All these properties which configure the access to the storage are intended for 
 | `bucketPrefix` | | User buckets are named bucketPrefix + the value of the user bucketClaim | "user-" |
 | `groupBucketPrefix` | | Group buckets are named groupBucketPrefix + the value of the user bucketClaim | "project-" |
 | `defaultDurationSeconds` | | Maximum time to live of the S3 access key | 86400 |
-| `keycloakParams` | | Configuration of the keycloak service used to get an access token on the S3 service. It defines the keycloak realm, clientId, and Url. | {realm: "sspcloud", clientId: "onyxia", URL: "https://auth.lab.sspcloud.fr/auth"} |
+| `keycloakParams` | | Configuration of the Keycloak service used to get an access token on the S3 service. It defines the Keycloak realm, clientId, and Url. | {realm: "sspcloud", clientId: "onyxia", URL: "https://auth.lab.sspcloud.fr/auth"} |
 | `monitoring` | | Defines the URL pattern of the monitoring service of each bucket. | "https://monitoring.sspcloud.fr/$BUCKET_ID" |
 | `acceptBucketCreation` | true | If true, the S3 client should not create bucket. | true |
 
@@ -207,57 +207,57 @@ All these properties which configure the access to the storage are intended for 
 
 Atlas is a data management tool.
 
-It can be used to add additional feature to the file explorer to transform it into a data explorer
+It can be used to add additional features to the file explorer to transform it into a data explorer
 
 | Key | Default | Description | Example |
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
 | `URL` | | URL of the atlas service for the region. | "https://atlas.change.me" |
-| `keycloakParams` | | Configuration of the keycloak service used to get an access token on the S3 service. It defines the keycloak realm, clientId, and Url. | {realm: "sspcloud", clientId: "atlas", URL: "https://auth.change.me/auth"} |
+| `keycloakParams` | | Configuration of the Keycloak service used to get an access token on the S3 service. It defines the Keycloak realm, clientId, and Url. | {realm: "sspcloud", clientId: "atlas", URL: "https://auth.change.me/auth"} |
 
 ## Vault properties
 
-It can be used to add additional feature to Onyxia. It helps user to keep their secret safe.
+It can be used to add additional features to Onyxia. It helps users to keep their secrets safe.
 
 | Key | Default | Description | Example |
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
 | `URL` | | URL of the atlas service for the region. | "https://vault.change.me" |
 | `kvEngine` | | mount point of the kv engine. | "onyxia-kv" |
 | `role` | | role of the user in vault | "onyxia-user" |
-| `keycloakParams` | | Configuration of the keycloak service used to get an access token on the vault service. It defines the keycloak realm, clientId, and Url. | {realm: "sspcloud", clientId: "vault", URL: "https://auth.change.me/auth"} |
+| `keycloakParams` | | Configuration of the Keycloak service used to get an access token on the vault service. It defines the Keycloak realm, clientId, and Url. | {realm: "sspcloud", clientId: "vault", URL: "https://auth.change.me/auth"} |
 
 ## ProxyConfiguration properties
 
-It can be used to inject proxyConfiguration in the services, if the helm chart in catalog allow it you can bind this value to helm chart value to override for example HTTP_PROXY, HTTPS_PROXY and NO_PROXY en variable in the pod launched.
+It can be used to inject proxy configuration in the services, if the helm chart in the catalog allows it you can bind this value to the Helm chart value to override for example HTTP_PROXY, HTTPS_PROXY and NO_PROXY en variable in the pod launched.
 
 | Key | Default | Description | Example |
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
-| `httpProxyUrl` | | url of the enterprise proxy for the region for http. | "http://proxy.enterprise.com:8080" |
-| `httpsProxyUrl` | | url of the enterprise proxy for the region for https. | "http://proxy.enterprise.com:8080" |
+| `httpProxyUrl` | | URL of the enterprise proxy for the region for HTTP. | "http://proxy.enterprise.com:8080" |
+| `httpsProxyUrl` | | URL of the enterprise proxy for the region for HTTPS. | "http://proxy.enterprise.com:8080" |
 | `noProxy` | | enterprise local domain that should not take proxy comma separated | "corporate.com" |
 
 ## ProxyInjection properties
 
-It can be used to inject proxy settings in the services, if the helm chart in catalog allow it you can bind this value to helm chart value to override for example HTTP_PROXY, HTTPS_PROXY and NO_PROXY en variable in the pod launched.
+It can be used to inject proxy settings in the services, if the Helm chart in the catalog allows it you can bind this value to the Helm chart value to override for example HTTP_PROXY, HTTPS_PROXY, and NO_PROXY to variables in the pod launched.
 
 | Key | Default | Description | Example |
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
-| `httpProxyUrl` | | url of the enterprise proxy for the region for http. | "http://proxy.enterprise.com:8080" |
-| `httpsProxyUrl` | | url of the enterprise proxy for the region for https. | "http://proxy.enterprise.com:8080" |
+| `httpProxyUrl` | | URL of the enterprise proxy for the region for HTTP. | "http://proxy.enterprise.com:8080" |
+| `httpsProxyUrl` | | URL of the enterprise proxy for the region for HTTPS. | "http://proxy.enterprise.com:8080" |
 | `noProxy` | | enterprise local domain that should not take proxy comma separated | "corporate.com" |
 
 ## PackageRepositoryInjection properties
 
-It can be used to inject Package repository in the services, if the helm chart in catalog allow it you can bind this value to helm chart value to override for example the cran, pypi and conda repository to reach some local entreprise repository on the network.
+It can be used to inject the package repository in the services, if the Helm chart in the catalog allows it you can bind this value to the Helm chart value to override for example the CRAN, PyPI and Conda repositories to reach some local enterprise repository on the network.
 
 | Key | Default | Description | Example |
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
-| `cranProxyUrl` | | url of enterprise local cran repo. | "https://cranProxy" |
-| `condaProxyUrl` | | url of enterprise local conda repo. | "https://condaProxyUrl" |
-| `pypiProxyUrl` | | eurl of enterprise local pypi repo|"https://pypiProxyUrl" |
+| `cranProxyUrl` | | URL of enterprise local cran repository. | "https://cranProxy" |
+| `condaProxyUrl` | | URL of enterprise local Conda repository. | "https://condaProxyUrl" |
+| `pypiProxyUrl` | | URL of enterprise local PyPI repository. | "https://pypiProxyUrl" |
 
 ## CertificateAuthorityInjection properties
 
-It can be used to inject CertificateAuthority in the services, if the helm chart in catalog allow it you can bind this value to helm chart value to add some certificate authorities in the pod.
+It can be used to inject certificate authority into the services, if the Helm chart in the catalog allows it you can bind this value to the Helm chart value to add some certificate authorities in the pod.
 
 | Key | Default | Description | Example |
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
