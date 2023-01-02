@@ -1046,8 +1046,13 @@ public class Region {
 
     public static class CertificateAuthorityInjection {
 
+        /** Will be deprecated in the next releases cacerts as string will replace */
         @Schema(description = "List of crt encoded in base64")
+        @Deprecated
         private List<String> crts = new ArrayList<>();
+
+        private String cacerts;
+        private String pathToCaBundle;
 
         public List<String> getCrts() {
             return crts;
@@ -1055,6 +1060,22 @@ public class Region {
 
         public void setCrts(List<String> crts) {
             this.crts = crts;
+        }
+
+        public String getCacerts() {
+            return cacerts;
+        }
+
+        public void setCacerts(String cacerts) {
+            this.cacerts = cacerts;
+        }
+
+        public String getPathToCaBundle() {
+            return pathToCaBundle;
+        }
+
+        public void setPathToCaBundle(String pathToCaBundle) {
+            this.pathToCaBundle = pathToCaBundle;
         }
     }
 

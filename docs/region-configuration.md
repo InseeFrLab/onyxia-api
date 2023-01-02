@@ -261,4 +261,6 @@ It can be used to inject certificate authority into the services, if the Helm ch
 
 | Key | Default | Description | Example |
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
-| `crts` | | List of encodedbase64 crt. | "LS0tLSBCRUdJTiBDRVJUSUZJQ0FURS0tLS0KTUlJQ1VEQ0NBZG9DQkRhTTF0WXdEUVlKS29aSWh2Y05BUUVFQlFBd2dZOHhDekFKQmdOVkJBWVRBbFZUTVJNd01JSUNDREFhQmdrcWhraUc5dzBCQlFNd0RRUUlJZll5QUVGS2FFRUNBUVVFZ2dIb3pkbWdHejd6YkMxbWNKMnJjTkFRRUVCUUF3Z1k4eEN6QUpCZ05WQkFZVEFsVlRNUk13TUlJQ0NEQWFCZ2txaGtpRzlsVlRNUk13TUlJQ0NEQWFCZ2txaGtpRzl3MEJCUU13RFFRSUlmWXdEUVlKS29aSWh2Y05BUUVFQlFBd2dZOHhDekFraUc5dzBCQlFNd0RRUUlJZll5QUVGS2FFRUNBUVVFZ2dIb3pkbWdHejd3Z1k4eEN6QUpCZ05WQkFZVEFsVlRNUk13TUlJQ0NEQWFCZ2txaGtpRzl3MEJCUU13RFFRSUlmWXlBRUZLYUVFQ0FRVUVnZ0hvemRtZ0d6N3piQzFtY0oycmNOQVFFRUJRQXdnWTh4Q3pBSkJnTlZCQVlUQWxWVE1SCi0tLS1FTkQgQ0VSVElGSUNBVEUtLS0t" |
+| `crts` | | List of encodedbase64 crt. |  Deprecated for cacerts|
+| `cacerts` | | String of crts concatenated in base64 |  LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUZTRENDQkRDZy4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQotLS0tLUJFR0lOIENFUlRJRklDQVRFLS0tLS0KTUlJRlNEQ0NCRENnYW5vdGhlcm9uZS4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQ==|
+| `pathToCaBundle` | | String path where a bundle is made or injected by third party solution | /etc/ssl/certs/ca-certificates.crt|
