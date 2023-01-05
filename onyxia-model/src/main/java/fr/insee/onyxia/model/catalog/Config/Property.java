@@ -61,7 +61,11 @@ public class Property {
     @JsonProperty("enum")
     @Schema(description = "")
     Object enumeration;
-
+    
+    @JsonProperty("listEnum")
+    @Schema(description = "")
+    Object listEnumeration;
+    
     @Schema(description = "")
     Map<String, Property> properties;
 
@@ -239,6 +243,14 @@ public class Property {
 
     public void setEnumeration(Object enumeration) {
         this.enumeration = enumeration;
+    }
+    
+    public Object getListEnumeration() {
+        return listEnumeration;
+    }
+
+    public void setListEnumeration(Object listEnumeration) {
+        this.listEnumeration = listEnumeration;
     }
 
     public String getMinimum() {
