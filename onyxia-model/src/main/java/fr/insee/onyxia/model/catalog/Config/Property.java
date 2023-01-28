@@ -358,7 +358,7 @@ public class Property {
         boolean hidden = false;
         boolean readonly = false;
         String overwriteDefaultWith;
-        String overwriteSliderWith;
+        String useRegionSliderConfig;
 
         public boolean isHidden() {
             return hidden;
@@ -384,12 +384,12 @@ public class Property {
             this.overwriteDefaultWith = overwriteDefaultWith;
         }
 
-        public String getOverwriteSliderWith() {
-            return overwriteSliderWith;
+        public String getUseRegionSliderConfig() {
+            return useRegionSliderConfig;
         }
 
-        public void setOverwriteSliderWith(String overwriteSliderWith) {
-            this.overwriteSliderWith = overwriteSliderWith;
+        public void setUseRegionSliderConfig(String useRegionSliderConfig) {
+            this.useRegionSliderConfig = useRegionSliderConfig;
         }
     }
 
