@@ -105,7 +105,7 @@ If running `Onyxia API` locally you need to have `helm` available in the `PATH`.
 ## Onyxia API compatibility matrix with Kubernetes
 
 In addition of using `helm`, Onyxia API interacts with the Kubernetes cluster thanks to the [fabric8.io Kubernetes client for Java](https://github.com/fabric8io/kubernetes-client).  
-See [here](https://github.com/fabric8io/kubernetes-client#kubernetes-compatibility-matrix) for the compatibility matrix and [here](onyxia-api/helm-wrapper/pom.xml) for the current version used by Onyxia.
+See [here](https://github.com/fabric8io/kubernetes-client#kubernetes-compatibility-matrix) for the compatibility matrix and [here](helm-wrapper/pom.xml#L19) for the current version used by Onyxia.
 
 ## Onyxia Helm format extension
 
