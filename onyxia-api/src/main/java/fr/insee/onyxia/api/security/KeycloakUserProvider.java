@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.representations.AccessToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,6 +26,9 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class KeycloakUserProvider {
 
     @Autowired private HttpRequestUtils httpRequestUtils;
+
+    @Value("${oidc.username-claim}")
+    private String usernameClaim;
 
     @Bean
     @Scope(
@@ -57,12 +61,13 @@ public class KeycloakUserProvider {
         return (Region region) -> {
             final AccessToken token = getAccessToken();
             final String tokenString = getAccessTokenString();
+            final String userId = getUsername(token);
             final User user =
                     User.newInstance()
                             .addGroups(getGroupsFromToken(region, token))
                             .setEmail(token.getEmail())
                             .setNomComplet(token.getName())
-                            .setIdep(token.getPreferredUsername())
+                            .setIdep(userId)
                             .setIp(
                                     httpRequestUtils.getClientIpAddressIfServletRequestExist(
                                             ((ServletRequestAttributes)
@@ -78,6 +83,15 @@ public class KeycloakUserProvider {
         };
     }
 
+    private String getUsername(AccessToken token) {
+        if (usernameClaim == null || "preferred_username".equalsIgnoreCase(usernameClaim)) {
+            return token.getPreferredUsername();
+        } else if ("sub".equals(usernameClaim)) {
+            return token.getSubject();
+        }
+        return token.getOtherClaims().get(usernameClaim).toString();
+    }
+
     private List<String> getGroupsFromToken(Region region, final AccessToken token) {
         List<String> groups =
                 ((List<?>) token.getOtherClaims().getOrDefault("groups", List.of()))
@@ -91,5 +105,13 @@ public class KeycloakUserProvider {
             groups.removeIf(group -> !includePattern.matcher(group).matches());
         }
         return groups;
+    }
+
+    public String getUsernameClaim() {
+        return usernameClaim;
+    }
+
+    public void setUsernameClaim(String usernameClaim) {
+        this.usernameClaim = usernameClaim;
     }
 }
