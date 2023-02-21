@@ -4,13 +4,10 @@ import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.api.services.utils.HttpRequestUtils;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.region.Region;
-import java.util.List;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
 import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.representations.AccessToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,11 +17,20 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 @Configuration
 @ConditionalOnProperty(name = "authentication.mode", havingValue = "openidconnect")
 public class KeycloakUserProvider {
 
-    @Autowired private HttpRequestUtils httpRequestUtils;
+    @Autowired
+    private HttpRequestUtils httpRequestUtils;
+
+    @Value("${oidc.username-claim}")
+    private String usernameClaim;
 
     @Bean
     @Scope(
@@ -57,17 +63,18 @@ public class KeycloakUserProvider {
         return (Region region) -> {
             final AccessToken token = getAccessToken();
             final String tokenString = getAccessTokenString();
+            final String userId = getUsername(token);
             final User user =
                     User.newInstance()
                             .addGroups(getGroupsFromToken(region, token))
                             .setEmail(token.getEmail())
                             .setNomComplet(token.getName())
-                            .setIdep(token.getPreferredUsername())
+                            .setIdep(userId)
                             .setIp(
                                     httpRequestUtils.getClientIpAddressIfServletRequestExist(
                                             ((ServletRequestAttributes)
-                                                            RequestContextHolder
-                                                                    .currentRequestAttributes())
+                                                    RequestContextHolder
+                                                            .currentRequestAttributes())
                                                     .getRequest()))
                             .build();
             user.getAttributes().putAll(token.getOtherClaims());
@@ -76,6 +83,15 @@ public class KeycloakUserProvider {
             user.getAttributes().put("access_token", tokenString);
             return user;
         };
+    }
+
+    private String getUsername(AccessToken token) {
+        if (usernameClaim == null || "preferred_username".equalsIgnoreCase(usernameClaim)) {
+            return token.getPreferredUsername();
+        } else if ("sub".equals(usernameClaim)) {
+            return token.getSubject();
+        }
+        return token.getOtherClaims().get(usernameClaim).toString();
     }
 
     private List<String> getGroupsFromToken(Region region, final AccessToken token) {
@@ -91,5 +107,13 @@ public class KeycloakUserProvider {
             groups.removeIf(group -> !includePattern.matcher(group).matches());
         }
         return groups;
+    }
+
+    public String getUsernameClaim() {
+        return usernameClaim;
+    }
+
+    public void setUsernameClaim(String usernameClaim) {
+        this.usernameClaim = usernameClaim;
     }
 }
