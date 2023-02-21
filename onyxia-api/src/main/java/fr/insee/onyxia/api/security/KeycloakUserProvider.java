@@ -4,6 +4,10 @@ import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.api.services.utils.HttpRequestUtils;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.region.Region;
+import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
 import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.representations.AccessToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,17 +21,11 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.List;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
 @Configuration
 @ConditionalOnProperty(name = "authentication.mode", havingValue = "openidconnect")
 public class KeycloakUserProvider {
 
-    @Autowired
-    private HttpRequestUtils httpRequestUtils;
+    @Autowired private HttpRequestUtils httpRequestUtils;
 
     @Value("${oidc.username-claim}")
     private String usernameClaim;
@@ -73,8 +71,8 @@ public class KeycloakUserProvider {
                             .setIp(
                                     httpRequestUtils.getClientIpAddressIfServletRequestExist(
                                             ((ServletRequestAttributes)
-                                                    RequestContextHolder
-                                                            .currentRequestAttributes())
+                                                            RequestContextHolder
+                                                                    .currentRequestAttributes())
                                                     .getRequest()))
                             .build();
             user.getAttributes().putAll(token.getOtherClaims());
