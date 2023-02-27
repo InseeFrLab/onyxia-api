@@ -8,9 +8,9 @@
     <version>0.0.1-SNAPSHOT</version>
 
     <parent>
-          <groupId>innovation.insee</groupId>
-          <artifactId>onyxia</artifactId>
-          <version>0.0.1-SNAPSHOT</version>
+        <groupId>innovation.insee</groupId>
+        <artifactId>onyxia</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
     </parent>
 
     <dependencies>
@@ -59,7 +59,7 @@
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-spring-boot-starter</artifactId>
-            <version>20.0.1</version>
+            <version>21.0.0</version>
         </dependency>
 
         <dependency>
