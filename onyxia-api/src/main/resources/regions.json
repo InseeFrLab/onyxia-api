@@ -29,11 +29,13 @@
           }
         },
         "defaultConfiguration": {
-          "IPProtection": true,
-          "networkPolicy": true
+          "IPProtection": false,
+          "networkPolicy": false
         },
         "expose": {
-          "domain": "fakedomain.kub.example.com"
+          "domain": "fakedomain.kub.example.com",
+          "ingress": true,
+          "route": false
         },
         "monitoring": {
           "URLPattern": "https://graphana.kub.example.com/$appIdSlug"

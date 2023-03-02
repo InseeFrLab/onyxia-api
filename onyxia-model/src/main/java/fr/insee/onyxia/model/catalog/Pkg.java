@@ -7,10 +7,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public class Pkg {
     @Schema(description = "")
     private String name;
+
     @Schema(description = "")
     private String description;
+
     @Schema(description = "")
     private String version;
+
     @Schema(description = "")
     private Config config;
 
@@ -60,5 +63,4 @@ public class Pkg {
         this.version = version;
         return this;
     }
-
 }

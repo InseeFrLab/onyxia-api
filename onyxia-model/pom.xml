@@ -6,13 +6,13 @@
     <artifactId>onyxia-model</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.1</version>
+          <groupId>innovation.insee</groupId>
+          <artifactId>onyxia</artifactId>
+          <version>0.0.1-SNAPSHOT</version>
     </parent>
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
     </properties>
     <dependencies>
         <dependency>
@@ -49,7 +49,7 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-common</artifactId>
-            <version>1.6.9</version>
+            <version>1.6.12</version>
         </dependency>
 
     </dependencies>
@@ -61,6 +61,10 @@
                 <configuration>
                     <skip>true</skip>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

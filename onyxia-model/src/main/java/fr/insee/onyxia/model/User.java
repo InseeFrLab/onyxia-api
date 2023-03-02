@@ -1,9 +1,7 @@
 package fr.insee.onyxia.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,162 +10,167 @@ import java.util.Map;
 
 @Schema(description = "")
 public class User implements Serializable {
-   
-	private static final long serialVersionUID = 2663796098930599255L;
-	@Schema(description = "")
-	String email;
-	@Schema(description = "")
-	String idep;
-	@Schema(description = "")
-	String nomComplet;
-	@Schema(description = "")
-	String password;
-	@Schema(description = "")
-	String ip;
-	@JsonIgnore
-	@Schema(description = "")
-	Map<String, Object> attributes = new HashMap<>();
-	@Schema(description = "")
-	List<String> groups = new ArrayList<>();
 
+    private static final long serialVersionUID = 2663796098930599255L;
 
-	public Map<String, Object> getAttributes() {
-		return attributes;
-	}
+    @Schema(description = "")
+    String email;
 
-	public void setAttributes(Map<String, Object> attributes) {
-		this.attributes = attributes;
-	}
+    @Schema(description = "")
+    String idep;
 
-	@Override
-	public int hashCode() {
-	   if (idep != null) {
-	      return this.idep.hashCode();
-	   }
-	   return 0;
-	}
+    @Schema(description = "")
+    String nomComplet;
 
-	@Override
-	public boolean equals(Object object) {
-		if (object == null) {
-			return false;
-		}
-		if (!(object instanceof User)) {
-			return false;
-		}
-		final User other = (User) object;
-		if (this.idep == null) {
-		   return other.idep == null;
-		}
-		return this.idep.equals(other.idep);
-	}
+    @Schema(description = "")
+    String password;
 
-	@Override
-	public String toString() {
-	   if (this.idep == null) {
-	      return "Idep null";
-	   }
-	   return this.idep;
-	}
+    @Schema(description = "")
+    String ip;
 
-	public String getIp() {
-		return ip;
-	}
+    @JsonIgnore
+    @Schema(description = "")
+    Map<String, Object> attributes = new HashMap<>();
 
-	public void setIp(String ip) {
-		this.ip = ip;
-	}
+    @Schema(description = "")
+    List<String> groups = new ArrayList<>();
 
-	public String getEmail() {
-		return email;
-	}
+    public Map<String, Object> getAttributes() {
+        return attributes;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public void setAttributes(Map<String, Object> attributes) {
+        this.attributes = attributes;
+    }
 
-	public String getIdep() {
-		return idep;
-	}
+    @Override
+    public int hashCode() {
+        if (idep != null) {
+            return this.idep.hashCode();
+        }
+        return 0;
+    }
 
-	public void setIdep(String idep) {
-		this.idep = idep;
-	}
+    @Override
+    public boolean equals(Object object) {
+        if (object == null) {
+            return false;
+        }
+        if (!(object instanceof User)) {
+            return false;
+        }
+        final User other = (User) object;
+        if (this.idep == null) {
+            return other.idep == null;
+        }
+        return this.idep.equals(other.idep);
+    }
 
-	public String getNomComplet() {
-		return nomComplet;
-	}
+    @Override
+    public String toString() {
+        if (this.idep == null) {
+            return "Idep null";
+        }
+        return this.idep;
+    }
 
-	public void setNomComplet(String nomComplet) {
-		this.nomComplet = nomComplet;
-	}
+    public String getIp() {
+        return ip;
+    }
 
-	public String getPassword() {
-		return password;
-	}
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public List<String> getGroups() {
-		return groups;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public void setGroups(List<String> groups) {
-		this.groups = groups;
-	}
+    public String getIdep() {
+        return idep;
+    }
 
-	public static Builder newInstance() {
-		return new Builder();
-	}
+    public void setIdep(String idep) {
+        this.idep = idep;
+    }
 
-	public static class Builder {
-		private User u;
+    public String getNomComplet() {
+        return nomComplet;
+    }
 
-		private Builder() {
-			u = new User();
-		}
+    public void setNomComplet(String nomComplet) {
+        this.nomComplet = nomComplet;
+    }
 
-		public User build() {
-			return u;
-		}
+    public String getPassword() {
+        return password;
+    }
 
-		/* ** */
-		public Builder setIp(String ip) {
-			u.ip = ip;
-			return this;
-		}
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-		public Builder setEmail(String email) {
-			u.email = email;
-			return this;
-		}
+    public List<String> getGroups() {
+        return groups;
+    }
 
-		public Builder setIdep(String idep) {
-			u.idep = idep;
-			return this;
-		}
+    public void setGroups(List<String> groups) {
+        this.groups = groups;
+    }
 
-		public Builder setNomComplet(String nomComplet) {
-			u.nomComplet = nomComplet;
-			return this;
-		}
+    public static Builder newInstance() {
+        return new Builder();
+    }
 
-		public Builder setPassword(String password) {
-			u.password = password;
-			return this;
-		}
+    public static class Builder {
+        private User u;
 
-		public Builder addGroup(String group) {
-			u.groups.add(group);
-			return this;
-		}
+        private Builder() {
+            u = new User();
+        }
 
-		public Builder addGroups(List<String> groups) {
-			u.groups.addAll(groups);
-			return this;
-		}
-	}
+        public User build() {
+            return u;
+        }
 
+        /* ** */
+        public Builder setIp(String ip) {
+            u.ip = ip;
+            return this;
+        }
+
+        public Builder setEmail(String email) {
+            u.email = email;
+            return this;
+        }
+
+        public Builder setIdep(String idep) {
+            u.idep = idep;
+            return this;
+        }
+
+        public Builder setNomComplet(String nomComplet) {
+            u.nomComplet = nomComplet;
+            return this;
+        }
+
+        public Builder setPassword(String password) {
+            u.password = password;
+            return this;
+        }
+
+        public Builder addGroup(String group) {
+            u.groups.add(group);
+            return this;
+        }
+
+        public Builder addGroups(List<String> groups) {
+            u.groups.addAll(groups);
+            return this;
+        }
+    }
 }

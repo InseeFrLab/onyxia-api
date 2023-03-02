@@ -3,9 +3,7 @@ package fr.insee.onyxia.model.catalog.Config;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -13,49 +11,67 @@ import java.util.Map;
 public class Property {
     @Schema(description = "")
     String type;
+
     @Schema(description = "")
     String description;
+
     @Schema(description = "")
     String title;
-    
+
     @Schema(description = "")
     @JsonProperty("default")
     Object defaut;
+
     @Schema(description = "")
     String pattern;
+
     @Schema(description = "")
     Media media;
+
     @Schema(description = "")
     String minimum;
+
     @Schema(description = "")
     String render;
+
     @Schema(description = "")
     Integer sliderMin;
+
     @Schema(description = "")
     Integer sliderMax;
+
     @Schema(description = "")
     Integer sliderStep;
+
     @Schema(description = "")
     String sliderUnit;
+
     @Schema(description = "")
     String sliderExtremity;
+
     @Schema(description = "")
     String sliderExtremitySemantic;
+
     @Schema(description = "")
     String sliderRangeId;
+
     @Schema(description = "")
     Hidden hidden;
 
     @JsonProperty("enum")
     @Schema(description = "")
     Object enumeration;
+
+    @JsonProperty("listEnum")
+    @Schema(description = "")
+    Object listEnumeration;
+
     @Schema(description = "")
     Map<String, Property> properties;
 
     @JsonProperty("x-form")
     @Schema(description = "")
     private XForm xform;
-
 
     @JsonProperty("x-security")
     @Schema(description = "")
@@ -157,7 +173,6 @@ public class Property {
         this.sliderMax = sliderMax;
     }
 
-
     public Integer getSliderStep() {
         return sliderStep;
     }
@@ -165,7 +180,6 @@ public class Property {
     public void setSliderStep(Integer sliderStep) {
         this.sliderStep = sliderStep;
     }
-
 
     public String getSliderUnit() {
         return sliderUnit;
@@ -198,7 +212,7 @@ public class Property {
     public void setSliderRangeId(String sliderRangeId) {
         this.sliderRangeId = sliderRangeId;
     }
-    
+
     public Hidden getHidden() {
         return hidden;
     }
@@ -229,6 +243,14 @@ public class Property {
 
     public void setEnumeration(Object enumeration) {
         this.enumeration = enumeration;
+    }
+
+    public Object getListEnumeration() {
+        return listEnumeration;
+    }
+
+    public void setListEnumeration(Object listEnumeration) {
+        this.listEnumeration = listEnumeration;
     }
 
     public String getMinimum() {
@@ -296,7 +318,6 @@ public class Property {
         public void setPattern(String pattern) {
             this.pattern = pattern;
         }
-
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -337,6 +358,7 @@ public class Property {
         boolean hidden = false;
         boolean readonly = false;
         String overwriteDefaultWith;
+        String useRegionSliderConfig;
 
         public boolean isHidden() {
             return hidden;
@@ -360,6 +382,14 @@ public class Property {
 
         public void setOverwriteDefaultWith(String overwriteDefaultWith) {
             this.overwriteDefaultWith = overwriteDefaultWith;
+        }
+
+        public String getUseRegionSliderConfig() {
+            return useRegionSliderConfig;
+        }
+
+        public void setUseRegionSliderConfig(String useRegionSliderConfig) {
+            this.useRegionSliderConfig = useRegionSliderConfig;
         }
     }
 
@@ -395,7 +425,9 @@ public class Property {
         }
 
         public static enum XGeneratedType {
-            GroupID, AppID, RandomID, 
+            GroupID,
+            AppID,
+            RandomID,
 
             @JsonProperty("internalDNS")
             @JsonAlias("internal-DNS")
@@ -407,5 +439,4 @@ public class Property {
             InitScript;
         }
     }
-
 }

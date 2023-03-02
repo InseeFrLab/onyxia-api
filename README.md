@@ -1,14 +1,8 @@
 # Onyxia API
 
-This is the server part of the Onyxia datalab.  
-It interacts with your container orchestrator to deploy users services.  
-Onyxia supports Kubernetes using Helm.  
+This is the server part of the Onyxia datalab, it interacts with your container orchestrator (Kubernetes) to deploy users services.  
 Deployable services are listed and configured inside catalogs.  
-Default catalogs are from InseeFrlab : [Universe datascience](https://github.com/InseeFrLab/Universe-Datascience) and [Inseefrlab helm charts](https://github.com/InseeFrLab/helm-charts) but more catalogs can be added.
-
-Onyxia API can handle several "regions" at the same time. Each "region" corresponds to a set of Onyxia services with their own configurations. See [Region configuration](docs/region-configuration.md) to learn how to set up a region.
-
-The opensourcing (and documentation) is still a work in progress, please be patient :)
+Default catalogs are from InseeFrlab : [Interactive services](https://inseefrlab.github.io/helm-charts-interactive-services), [Databases](https://inseefrlab.github.io/helm-charts-databases), [Automation](https://inseefrlab.github.io/helm-charts-automation) but more catalogs (including your own) can be added.
 
 ## Quick start
 
@@ -35,18 +29,28 @@ helm repo add inseefrlab https://inseefrlab.github.io/helm-charts
 helm install inseefrlab/onyxia
 ```
 
-Note that this installs both the [API](https://github.com/InseeFrLab/onyxia-api) and the [UI](https://github.com/inseefrlab/onyxia-ui)
+This will install both the [API](https://github.com/InseeFrLab/onyxia-api) and the [Web](https://github.com/inseefrlab/onyxia-web) components.
 
 ## Usage
 
-Once onyxia is started, browse to http://localhost:8080 to get the OpenAPI documentation.  
-Onyxia-API is primarly made to work with the webapp [Onyxia-UI](https://github.com/inseefrlab/onyxia-ui).  
+Once Onyxia is started, browse to http://localhost:8080 to get the OpenAPI documentation.  
+Onyxia-API is primarly made to work with the webapp [Onyxia-Web](https://github.com/inseefrlab/onyxia-web).  
 If you use it in other ways, we would love to hear from you :)
+
+## Contributing
+
+Contributions are welcome.
+Make sure to conform to Android Open Source Project code style : `mvn spotless:apply` can enforce it.
 
 ## Configuration
 
 Main configuration file is [onyxia-api/src/main/resources/application.properties](onyxia-api/src/main/resources/application.properties).  
-Each variable can be overridden using environment variables.
+Each variable can be overridden using environment variables.  
+
+Regions configuration :
+| Key | Default | Description |
+| --------------------- | ------- | ------------------------------------------------------------------ |
+| `regions` | [onyxia-api/src/main/resources/regions.json](onyxia-api/src/main/resources/regions.json) | List of regions, see [Region configuration](docs/region-configuration.md) |
 
 Authentication configuration
 | Key | Default | Description |
@@ -64,16 +68,12 @@ Open id configuration
 | `keycloak.enable-basic-auth` | `true` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
 | `keycloak.bearer-only` | `true` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
 | `keycloak.disable-trust-manager` | `false` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
+| `oidc.username-claim` | `preferred_username` | Claim to be used as user id. Should respect [RFC 1123](https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#dns-label-names) |
 
 Security configuration :
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
 | `security.cors.allowed_origins` | | To indicate which origins are allowed by [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) |
-
-Regions configuration :
-| Key | Default | Description |
-| --------------------- | ------- | ------------------------------------------------------------------ |
-| `regions` | see [onyxia-api/src/main/resources/regions.json](onyxia-api/src/main/resources/regions.json) | List of regions. |
 
 Catalogs configuration :
 
@@ -97,11 +97,21 @@ Other configurations
 | `springdoc.swagger-ui.path` | `/` | Open API (swagger) UI path |
 | `springdoc.swagger-ui.oauth.clientId` | `` | clientid used by swagger to authenticate the user, in general the same which is used by onyxia-ui is ok. |
 
-## Onyxia Universe package format extension
+## Onyxia API dependency to Helm
 
-Onyxia extends the official Universe format (see https://github.com/mesosphere/universe) to enhance it.  
-This format extension is **fully interoperable** with the official Universe format meaning **Onyxia works with any Universe** and **Universes using Onyxia's extension should be usable in other apps**.
+Onyxia-API makes system calls to `helm` using the [helm-wrapper](helm-wrapper) Java library.  
+`helm` is bundled in the `Onyxia API` Docker image, see current version bundled here : [Dockerfile](onyxia-api/Dockerfile).  
+If running `Onyxia API` locally you need to have `helm` available in the `PATH`.  
 
-The specification is defined [here](docs/specification/README.md).
+## Onyxia API compatibility matrix with Kubernetes
 
-An example of a Universe using this extension is available [here](https://github.com/inseefrlab/Universe-Datascience).
+In addition of using `helm`, Onyxia API interacts with the Kubernetes cluster thanks to the [fabric8.io Kubernetes client for Java](https://github.com/fabric8io/kubernetes-client).  
+See [here](https://github.com/fabric8io/kubernetes-client#kubernetes-compatibility-matrix) for the compatibility matrix and [here](helm-wrapper/pom.xml#L19) for the current version used by Onyxia.
+
+## Onyxia Helm format extension
+
+Onyxia's catalogs are based on the Helm chart format and especially the `values.schema.json` (see https://helm.sh/docs/topics/charts/#schema-files) file used to populate the personalization tabs displayed by the UI.  
+Onyxia is **fully interoperable** with the Helm chart format which means you can use any helm chart repository as a onyxia catalog. But you probably want to use one that includes `values.schema.json` files (those files are optional in helm).  
+Onyxia extends this format to enhance it and provide more customization tools in the UI.  
+
+An example of such extension can be found [here](https://github.com/InseeFrLab/helm-charts-interactive-services/blob/main/charts/jupyter-python/values.schema.json#L190), see `x-onyxia`.

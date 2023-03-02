@@ -7,11 +7,10 @@ import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.project.Project;
 import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.Service;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
-
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,86 +18,99 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Cloud Shell", description = "Cloud shell")
-@RequestMapping(value={"/api/cloudshell", "/cloudshell"})
+@RequestMapping("/cloudshell")
 @RestController
-@SecurityRequirement(name="auth")
+@SecurityRequirement(name = "auth")
 public class CloudShellController {
 
-	@Autowired
-	private AppsService helmAppsService;
+    @Autowired private AppsService helmAppsService;
 
-	@Autowired
-	private UserProvider userProvider;
+    @Autowired private UserProvider userProvider;
 
-	@Autowired
-	private CatalogService catalogService;
+    @Autowired private CatalogService catalogService;
 
-	@GetMapping
-	public CloudShellStatus getCloudShellStatus(@Parameter(hidden = true) Region region, @Parameter(hidden = true) Project project) {
-		CloudShellStatus status = new CloudShellStatus();
-		Region.CloudshellConfiguration cloudshellConfiguration = region.getServices().getCloudshell();
-		try {
-			if (region.getServices().getType().equals(Service.ServiceType.KUBERNETES)) {
-				Service service = helmAppsService.getUserService(region, project, userProvider.getUser(region),
-						cloudshellConfiguration.getPackageName() + "*");
-				status.setStatus(CloudShellStatus.STATUS_UP);
-				service.getUrls().stream().findFirst().ifPresent(status::setUrl);
-			} else {
-				throw new NotImplementedException("Cloudshell is only supported for Kubernetes service provider");
-			}
-		} catch (Exception e) {
-			status.setStatus(CloudShellStatus.STATUS_DOWN);
-			status.setPackageToDeploy(catalogService.getPackage(cloudshellConfiguration.getCatalogId(),cloudshellConfiguration.getPackageName()));
-			status.setCatalogId(cloudshellConfiguration.getCatalogId());
-			status.setUrl(null);
-		}
+    @GetMapping
+    public CloudShellStatus getCloudShellStatus(
+            @Parameter(hidden = true) Region region, @Parameter(hidden = true) Project project) {
+        CloudShellStatus status = new CloudShellStatus();
+        Region.CloudshellConfiguration cloudshellConfiguration =
+                region.getServices().getCloudshell();
+        try {
+            if (region.getServices().getType().equals(Service.ServiceType.KUBERNETES)) {
+                Service service =
+                        helmAppsService.getUserService(
+                                region,
+                                project,
+                                userProvider.getUser(region),
+                                cloudshellConfiguration.getPackageName() + "*");
+                status.setStatus(CloudShellStatus.STATUS_UP);
+                service.getUrls().stream().findFirst().ifPresent(status::setUrl);
+            } else {
+                throw new NotImplementedException(
+                        "Cloudshell is only supported for Kubernetes service provider");
+            }
+        } catch (Exception e) {
+            status.setStatus(CloudShellStatus.STATUS_DOWN);
+            status.setPackageToDeploy(
+                    catalogService.getPackage(
+                            cloudshellConfiguration.getCatalogId(),
+                            cloudshellConfiguration.getPackageName()));
+            status.setCatalogId(cloudshellConfiguration.getCatalogId());
+            status.setUrl(null);
+        }
 
-		return status;
-	}
+        return status;
+    }
 
-	@Schema(description = "Cloudshell data and health")
-	public static class CloudShellStatus {
+    @Schema(description = "Cloudshell data and health")
+    public static class CloudShellStatus {
 
-		public static final String STATUS_UP = "UP", STATUS_LOADING = "LOADING", STATUS_DOWN = "DOWN";
-		@Schema(description = "Status of the connexion to the cloudshell")
-		private String status = STATUS_UP;
-		@Schema(description = "URL of the cloudshell")
-		private String url = null;
-		@Schema(description = "?")
-		private Pkg packageToDeploy = null;
-		@Schema(description = "?")
-		private String catalogId;
+        public static final String STATUS_UP = "UP",
+                STATUS_LOADING = "LOADING",
+                STATUS_DOWN = "DOWN";
 
-		public String getStatus() {
-			return status;
-		}
+        @Schema(description = "Status of the connexion to the cloudshell")
+        private String status = STATUS_UP;
 
-		public void setStatus(String status) {
-			this.status = status;
-		}
+        @Schema(description = "URL of the cloudshell")
+        private String url = null;
 
-		public String getUrl() {
-			return url;
-		}
+        @Schema(description = "?")
+        private Pkg packageToDeploy = null;
 
-		public void setUrl(String url) {
-			this.url = url;
-		}
+        @Schema(description = "?")
+        private String catalogId;
 
-		public Pkg getPackageToDeploy() {
-			return packageToDeploy;
-		}
+        public String getStatus() {
+            return status;
+        }
 
-		public void setPackageToDeploy(Pkg packageToDeploy) {
-			this.packageToDeploy = packageToDeploy;
-		}
+        public void setStatus(String status) {
+            this.status = status;
+        }
 
-		public String getCatalogId() {
-			return catalogId;
-		}
+        public String getUrl() {
+            return url;
+        }
 
-		public void setCatalogId(String catalogId) {
-			this.catalogId = catalogId;
-		}
-	}
+        public void setUrl(String url) {
+            this.url = url;
+        }
+
+        public Pkg getPackageToDeploy() {
+            return packageToDeploy;
+        }
+
+        public void setPackageToDeploy(Pkg packageToDeploy) {
+            this.packageToDeploy = packageToDeploy;
+        }
+
+        public String getCatalogId() {
+            return catalogId;
+        }
+
+        public void setCatalogId(String catalogId) {
+            this.catalogId = catalogId;
+        }
+    }
 }

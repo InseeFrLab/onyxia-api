@@ -8,6 +8,4 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @AutoConfigureRestDocs(outputDir = "target/snippets")
 @TestPropertySource("classpath:application-test.properties")
-public abstract class BaseTest { 
-
-}
+public abstract class BaseTest {}

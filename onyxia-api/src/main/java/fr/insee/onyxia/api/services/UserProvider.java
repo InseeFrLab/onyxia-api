@@ -5,11 +5,11 @@ import fr.insee.onyxia.model.region.Region;
 
 public interface UserProvider {
 
-   /**
-    * Parse the user from context.
-    * User groups should match region group pattern.
-    * @param region contextual region of the user
-    * @return current user
-    */
-   public User getUser(Region region);
+    /**
+     * Parse the user from context. User groups should match region group pattern.
+     *
+     * @param region contextual region of the user
+     * @return current user
+     */
+    public User getUser(Region region);
 }
