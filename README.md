@@ -60,15 +60,10 @@ Authentication configuration
 Open id configuration  
 | Key | Default | Description |
 | -------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `keycloak.realm` | | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
-| `keycloak.resource` | | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
-| `keycloak.auth-server-url` | | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
-| `keycloak.ssl-required` | `external` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
-| `keycloak.public-client` | `true` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
-| `keycloak.enable-basic-auth` | `true` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
-| `keycloak.bearer-only` | `true` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
-| `keycloak.disable-trust-manager` | `false` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
+| `oidc.issuer-uri` | | Issuer URI (e.g `https://auth.example.com/auth/realms/myrealm`), same as the `iss` field of a token |
+| `oidc.audience` | | Optional : audience to validate. Should be present in the token `aud` field |
 | `oidc.username-claim` | `preferred_username` | Claim to be used as user id. Should respect [RFC 1123](https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#dns-label-names) |
+| `oidc.groups-claim` | `groups` | Claim to be used as list of user groups. |
 
 Security configuration :
 | Key | Default | Description |
