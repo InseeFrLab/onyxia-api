@@ -45,6 +45,9 @@ public class OIDCConfiguration {
     @Value("${oidc.issuer-uri}")
     private String issuerUri;
 
+    @Value("${oidc.jwk-uri}")
+    private String jwkUri;
+
     @Value("${oidc.audience}")
     private String audience;
 
@@ -121,7 +124,7 @@ public class OIDCConfiguration {
         return (Region region) -> {
             final User user = User.newInstance().build();
             Jwt userInfo = getUserInfo();
-            user.setIdep(userInfo.getClaims().get(usernameClaim).toString());
+            user.setIdep(userInfo.getClaim(usernameClaim));
             user.setIp(
                     httpRequestUtils.getClientIpAddressIfServletRequestExist(
                             ((ServletRequestAttributes)
@@ -154,12 +157,24 @@ public class OIDCConfiguration {
         this.audience = audience;
     }
 
+    public void setJwkUri(String jwkUri) {
+        this.jwkUri = jwkUri;
+    }
+
     @Bean
+    @ConditionalOnProperty(prefix = "oidc", name = "issuer-uri")
     NimbusJwtDecoder jwtDecoder() {
-        NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder) JwtDecoders.fromIssuerLocation(issuerUri);
+        // If JWK is defined, use that instead of JWT issuer / audience validation
+        if (StringUtils.isNotEmpty(jwkUri)) {
+            NimbusJwtDecoder decoder = NimbusJwtDecoder.withJwkSetUri(jwkUri).build();
+            return decoder;
+        }
+
+        NimbusJwtDecoder jwtDecoder = JwtDecoders.fromIssuerLocation(issuerUri);
 
         OAuth2TokenValidator<Jwt> audienceValidator = new AudienceValidator();
         OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(issuerUri);
+
         OAuth2TokenValidator<Jwt> withAudience =
                 new DelegatingOAuth2TokenValidator<>(withIssuer, audienceValidator);
 
