@@ -71,8 +71,8 @@ Configurable properties :
 | -------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | `oidc.issuer-uri` | | Issuer URI, should be the same as the `iss` field of the tokens |
 | `oidc.jwk-uri` | | JWK URI, useful when auto discovery is not available or when `iss` is not consistent across tokens (e.g [Google](https://stackoverflow.com/questions/38618826/can-i-get-a-consistent-iss-value-for-a-google-openidconnect-id-token)) | 
-| `oidc.audience` | | Optional : audience to validate. Should be the same as the token's `aud` field |
-| `oidc.username-claim` | `preferred_username` | Claim to be used as user id. Should respect [RFC 1123](https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#dns-label-names) |
+| `oidc.audience` | | Optional : audience to validate. Must be the same as the token's `aud` field |
+| `oidc.username-claim` | `preferred_username` | Claim to be used as user id. Must respect [RFC 1123](https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#dns-label-names) |
 | `oidc.groups-claim` | `groups` | Claim to be used as list of user groups. |
 
 ### Security configuration :
