@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-          <groupId>innovation.insee</groupId>
-          <artifactId>onyxia</artifactId>
-          <version>0.0.1-SNAPSHOT</version>
+        <groupId>innovation.insee</groupId>
+        <artifactId>onyxia</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
     </parent>
     <groupId>io.github.inseefrlab</groupId>
     <artifactId>java-helm-wrapper</artifactId>
@@ -16,7 +16,7 @@
 
     <properties>
         <java.version>17</java.version>
-        <fabric8io.version>6.2.0</fabric8io.version>
+        <fabric8io.version>6.4.1</fabric8io.version>
     </properties>
 
     <distributionManagement>
