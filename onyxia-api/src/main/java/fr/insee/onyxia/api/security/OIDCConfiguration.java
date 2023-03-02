@@ -34,8 +34,7 @@ public class OIDCConfiguration {
     @Value("${oidc.groups-claim}")
     private String groupsClaim;
 
-    @Autowired
-    private HttpRequestUtils httpRequestUtils;
+    @Autowired private HttpRequestUtils httpRequestUtils;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -112,8 +111,7 @@ public class OIDCConfiguration {
             user.setIp(
                     httpRequestUtils.getClientIpAddressIfServletRequestExist(
                             ((ServletRequestAttributes)
-                                    RequestContextHolder
-                                            .currentRequestAttributes())
+                                            RequestContextHolder.currentRequestAttributes())
                                     .getRequest()));
             user.setEmail(userInfo.getClaimAsString("email"));
             user.setNomComplet(userInfo.getClaimAsString("name"));
