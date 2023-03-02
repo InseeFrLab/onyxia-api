@@ -4,6 +4,7 @@ import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.api.services.utils.HttpRequestUtils;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.region.Region;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -16,7 +17,14 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.core.OAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoders;
+import org.springframework.security.oauth2.jwt.JwtValidators;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
@@ -33,6 +41,12 @@ public class OIDCConfiguration {
 
     @Value("${oidc.groups-claim}")
     private String groupsClaim;
+
+    @Value("${oidc.issuer-uri}")
+    private String issuerUri;
+
+    @Value("${oidc.audience}")
+    private String audience;
 
     @Autowired private HttpRequestUtils httpRequestUtils;
 
@@ -130,5 +144,41 @@ public class OIDCConfiguration {
 
     public void setHttpRequestUtils(HttpRequestUtils httpRequestUtils) {
         this.httpRequestUtils = httpRequestUtils;
+    }
+
+    public void setIssuerUri(String issuerUri) {
+        this.issuerUri = issuerUri;
+    }
+
+    public void setAudience(String audience) {
+        this.audience = audience;
+    }
+
+    @Bean
+    NimbusJwtDecoder jwtDecoder() {
+        NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder) JwtDecoders.fromIssuerLocation(issuerUri);
+
+        OAuth2TokenValidator<Jwt> audienceValidator = new AudienceValidator();
+        OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(issuerUri);
+        OAuth2TokenValidator<Jwt> withAudience =
+                new DelegatingOAuth2TokenValidator<>(withIssuer, audienceValidator);
+
+        jwtDecoder.setJwtValidator(withAudience);
+
+        return jwtDecoder;
+    }
+
+    public class AudienceValidator implements OAuth2TokenValidator<Jwt> {
+        OAuth2Error error =
+                new OAuth2Error(
+                        "invalid_token", "The required audience " + audience + " is missing", null);
+
+        public OAuth2TokenValidatorResult validate(Jwt jwt) {
+            if (StringUtils.isEmpty(audience) || jwt.getAudience().contains(audience)) {
+                return OAuth2TokenValidatorResult.success();
+            } else {
+                return OAuth2TokenValidatorResult.failure(error);
+            }
+        }
     }
 }
