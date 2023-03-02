@@ -8,10 +8,11 @@ import fr.insee.onyxia.model.project.Project;
 import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.Service;
 import fr.insee.onyxia.model.service.UninstallService;
+import org.springframework.scheduling.annotation.Async;
+
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import org.springframework.scheduling.annotation.Async;
 
 public interface AppsService {
 
@@ -31,7 +32,9 @@ public interface AppsService {
             String catalogId,
             Pkg pkg,
             User user,
-            Map<String, Object> fusion)
+            Map<String, Object> fusion,
+            boolean skipTlsVerify,
+            String caFile)
             throws Exception;
 
     Service getUserService(Region region, Project project, User user, String serviceId)

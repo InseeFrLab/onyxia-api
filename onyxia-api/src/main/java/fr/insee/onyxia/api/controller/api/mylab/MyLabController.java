@@ -20,49 +20,53 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "My lab", description = "My services")
 @RequestMapping("/my-lab")
 @RestController
 @SecurityRequirement(name = "auth")
 public class MyLabController {
-    @Autowired private AppsService helmAppsService;
+    @Autowired
+    private AppsService helmAppsService;
 
-    @Autowired private UserProvider userProvider;
+    @Autowired
+    private UserProvider userProvider;
 
-    @Autowired private CatalogService catalogService;
+    @Autowired
+    private CatalogService catalogService;
 
     @Operation(
             summary = "List the services installed in a namespace.",
             description =
                     "List the services installed in a namespace. With a Kubernetes backend, utilize Helm to list all installed services in a namespace.",
             parameters = {
-                @Parameter(
-                        required = false,
-                        name = "ONYXIA-PROJECT",
-                        description =
-                                "Project associated with the namespace, defaults to user project.",
-                        in = ParameterIn.HEADER,
-                        schema =
-                                @Schema(
-                                        name = "ONYXIA-PROJECT",
-                                        type = "string",
-                                        description = "Generated project id.",
-                                        example = "project-id-example")),
-                @Parameter(
-                        required = false,
-                        name = "groupId",
-                        description = "Deprectated.",
-                        deprecated = true,
-                        in = ParameterIn.QUERY)
+                    @Parameter(
+                            required = false,
+                            name = "ONYXIA-PROJECT",
+                            description =
+                                    "Project associated with the namespace, defaults to user project.",
+                            in = ParameterIn.HEADER,
+                            schema =
+                            @Schema(
+                                    name = "ONYXIA-PROJECT",
+                                    type = "string",
+                                    description = "Generated project id.",
+                                    example = "project-id-example")),
+                    @Parameter(
+                            required = false,
+                            name = "groupId",
+                            description = "Deprectated.",
+                            deprecated = true,
+                            in = ParameterIn.QUERY)
             })
     @GetMapping("/services")
     public ServicesListing getMyServices(
@@ -89,23 +93,23 @@ public class MyLabController {
             description =
                     "Get the description of an installed service in the namespace. With Kubernetes backend, an installed service can be seen as a Helm chart. Its unique identifier will be the release name on the namespace.",
             parameters = {
-                @Parameter(
-                        required = false,
-                        name = "ONYXIA-PROJECT",
-                        description =
-                                "Project associated with the namespace, defaults to user project.",
-                        in = ParameterIn.HEADER,
-                        schema =
-                                @Schema(
-                                        name = "ONYXIA-PROJECT",
-                                        type = "string",
-                                        description = "Generated project id.",
-                                        example = "project-id-example")),
-                @Parameter(
-                        name = "serviceId",
-                        description = "Unique ID of the installed service in that namespace.",
-                        required = true,
-                        in = ParameterIn.QUERY)
+                    @Parameter(
+                            required = false,
+                            name = "ONYXIA-PROJECT",
+                            description =
+                                    "Project associated with the namespace, defaults to user project.",
+                            in = ParameterIn.HEADER,
+                            schema =
+                            @Schema(
+                                    name = "ONYXIA-PROJECT",
+                                    type = "string",
+                                    description = "Generated project id.",
+                                    example = "project-id-example")),
+                    @Parameter(
+                            name = "serviceId",
+                            description = "Unique ID of the installed service in that namespace.",
+                            required = true,
+                            in = ParameterIn.QUERY)
             })
     @GetMapping("/app")
     public @ResponseBody Service getApp(
@@ -125,28 +129,28 @@ public class MyLabController {
             description =
                     "Get the logs of a task in an installed service. With Kubernetes backend, it can be seen as the logs of a pod in the service.",
             parameters = {
-                @Parameter(
-                        required = false,
-                        name = "ONYXIA-PROJECT",
-                        description =
-                                "Project associated with the namespace, defaults to user project.",
-                        in = ParameterIn.HEADER,
-                        schema =
-                                @Schema(
-                                        name = "ONYXIA-PROJECT",
-                                        type = "string",
-                                        description = "Generated project id.",
-                                        example = "project-id-example")),
-                @Parameter(
-                        name = "serviceId",
-                        description = "Unique ID of the installed service in that namespace.",
-                        required = true,
-                        in = ParameterIn.QUERY),
-                @Parameter(
-                        name = "taskId",
-                        description = "Unique ID of the task from the installed service.",
-                        required = true,
-                        in = ParameterIn.QUERY)
+                    @Parameter(
+                            required = false,
+                            name = "ONYXIA-PROJECT",
+                            description =
+                                    "Project associated with the namespace, defaults to user project.",
+                            in = ParameterIn.HEADER,
+                            schema =
+                            @Schema(
+                                    name = "ONYXIA-PROJECT",
+                                    type = "string",
+                                    description = "Generated project id.",
+                                    example = "project-id-example")),
+                    @Parameter(
+                            name = "serviceId",
+                            description = "Unique ID of the installed service in that namespace.",
+                            required = true,
+                            in = ParameterIn.QUERY),
+                    @Parameter(
+                            name = "taskId",
+                            description = "Unique ID of the task from the installed service.",
+                            required = true,
+                            in = ParameterIn.QUERY)
             })
     @GetMapping("/app/logs")
     public @ResponseBody String getLogs(
@@ -166,29 +170,29 @@ public class MyLabController {
             description =
                     "Delete an installed service launched through Onyxia on the namespace given the path, or delete *ALL* installed services on the namespace on bulk deletes. It will prioritize the bulk parameter.",
             parameters = {
-                @Parameter(
-                        required = false,
-                        name = "ONYXIA-PROJECT",
-                        description =
-                                "Project associated with the namespace, defaults to user project.",
-                        in = ParameterIn.HEADER,
-                        schema =
-                                @Schema(
-                                        name = "ONYXIA-PROJECT",
-                                        type = "string",
-                                        description = "Generated project id.",
-                                        example = "project-id-example")),
-                @Parameter(
-                        name = "path",
-                        description = "Path to the installed service in that namespace.",
-                        required = false,
-                        in = ParameterIn.QUERY),
-                @Parameter(
-                        name = "bulk",
-                        description =
-                                "Wheather to delete all services in a namespace, if set to true, or to look at path.",
-                        required = false,
-                        in = ParameterIn.QUERY)
+                    @Parameter(
+                            required = false,
+                            name = "ONYXIA-PROJECT",
+                            description =
+                                    "Project associated with the namespace, defaults to user project.",
+                            in = ParameterIn.HEADER,
+                            schema =
+                            @Schema(
+                                    name = "ONYXIA-PROJECT",
+                                    type = "string",
+                                    description = "Generated project id.",
+                                    example = "project-id-example")),
+                    @Parameter(
+                            name = "path",
+                            description = "Path to the installed service in that namespace.",
+                            required = false,
+                            in = ParameterIn.QUERY),
+                    @Parameter(
+                            name = "bulk",
+                            description =
+                                    "Wheather to delete all services in a namespace, if set to true, or to look at path.",
+                            required = false,
+                            in = ParameterIn.QUERY)
             })
     @DeleteMapping("/app")
     public UninstallService destroyApp(
@@ -209,18 +213,18 @@ public class MyLabController {
             description =
                     "Launch a service package through Onyxia in the namespace, given its catalog, package and configurations out of the available services in this Onyxia instance. More information of available catalogs and packages can be found in the public endpoints.",
             parameters = {
-                @Parameter(
-                        required = false,
-                        name = "ONYXIA-PROJECT",
-                        description =
-                                "Project associated with the namespace, defaults to user project.",
-                        in = ParameterIn.HEADER,
-                        schema =
-                                @Schema(
-                                        name = "ONYXIA-PROJECT",
-                                        type = "string",
-                                        description = "Generated project id.",
-                                        example = "project-id-example"))
+                    @Parameter(
+                            required = false,
+                            name = "ONYXIA-PROJECT",
+                            description =
+                                    "Project associated with the namespace, defaults to user project.",
+                            in = ParameterIn.HEADER,
+                            schema =
+                            @Schema(
+                                    name = "ONYXIA-PROJECT",
+                                    type = "string",
+                                    description = "Generated project id.",
+                                    example = "project-id-example"))
             })
     @PutMapping("/app")
     public Object publishService(
@@ -239,10 +243,12 @@ public class MyLabController {
         }
         CatalogWrapper catalog = catalogService.getCatalogById(catalogId);
         Pkg pkg = catalog.getCatalog().getPackageByName(requestDTO.getPackageName());
+        boolean skipTlsVerify = catalog.getSkipTlsVerify();
+        String caFile = catalog.getCaFile();
         User user = userProvider.getUser(region);
         Map<String, Object> fusion = new HashMap<>();
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
         return helmAppsService.installApp(
-                region, project, requestDTO, catalogId, pkg, user, fusion);
+                region, project, requestDTO, catalogId, pkg, user, fusion, skipTlsVerify, caFile);
     }
 }

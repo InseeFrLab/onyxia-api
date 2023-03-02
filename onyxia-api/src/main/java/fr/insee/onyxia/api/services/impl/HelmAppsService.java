@@ -1,7 +1,5 @@
 package fr.insee.onyxia.api.services.impl;
 
-import static java.util.stream.Collectors.joining;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.configuration.kubernetes.HelmClientProvider;
@@ -33,6 +31,13 @@ import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
 import io.github.inseefrlab.helmwrapper.model.HelmLs;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService.MultipleServiceFound;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.access.AccessDeniedException;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -44,12 +49,8 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.access.AccessDeniedException;
+
+import static java.util.stream.Collectors.joining;
 
 @org.springframework.stereotype.Service
 @Qualifier("Helm")
@@ -61,19 +62,24 @@ public class HelmAppsService implements AppsService {
     @Qualifier("helm")
     ObjectMapper mapperHelm;
 
-    @Autowired private KubernetesService kubernetesService;
+    @Autowired
+    private KubernetesService kubernetesService;
 
     @Autowired(required = false)
     private List<AdmissionControllerHelm> admissionControllers = new ArrayList<>();
 
     private SimpleDateFormat helmDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    @Autowired private KubernetesClientProvider kubernetesClientProvider;
+    @Autowired
+    private KubernetesClientProvider kubernetesClientProvider;
 
-    @Autowired private HelmClientProvider helmClientProvider;
+    @Autowired
+    private HelmClientProvider helmClientProvider;
 
-    @Autowired private XGeneratedProcessor xGeneratedProcessor;
+    @Autowired
+    private XGeneratedProcessor xGeneratedProcessor;
 
-    @Autowired private UrlGenerator urlGenerator;
+    @Autowired
+    private UrlGenerator urlGenerator;
 
     private HelmConfiguration getHelmConfiguration(Region region, User user) {
         return helmClientProvider.getConfiguration(region, user);
@@ -91,7 +97,9 @@ public class HelmAppsService implements AppsService {
             String catalogId,
             Pkg pkg,
             User user,
-            Map<String, Object> fusion)
+            Map<String, Object> fusion,
+            final boolean skipTlsVerify,
+            final String caFile)
             throws IOException, TimeoutException, InterruptedException {
 
         PublishContext context = new PublishContext();
@@ -123,8 +131,8 @@ public class HelmAppsService implements AppsService {
                                 context.getGlobalContext().getRandomizedId(),
                                 scopeName
                                         + (StringUtils.isNotBlank(xGenerated.getName())
-                                                ? "-" + xGenerated.getName()
-                                                : ""),
+                                        ? "-" + xGenerated.getName()
+                                        : ""),
                                 region.getServices().getExpose().getDomain());
                     }
 
@@ -174,7 +182,10 @@ public class HelmAppsService implements AppsService {
                                 requestDTO.getPackageVersion(),
                                 requestDTO.isDryRun(),
                                 values,
-                                null);
+                                null,
+                                skipTlsVerify,
+                                caFile
+                        );
         InstallDTO installDTO = new InstallDTO();
         installDTO.setValues(mapperHelm.writeValueAsString(fusion));
         installDTO.setManifest(res.getManifest());
@@ -437,8 +448,8 @@ public class HelmAppsService implements AppsService {
                                         event.getInvolvedObject() != null
                                                 && event.getInvolvedObject().getName() != null
                                                 && event.getInvolvedObject()
-                                                        .getName()
-                                                        .contains(release.getName()))
+                                                .getName()
+                                                .contains(release.getName()))
                         .map(
                                 event -> {
                                     Event newEvent = new Event();
