@@ -16,13 +16,10 @@ import org.springframework.context.event.EventListener;
 public class CompatibilityChecks {
 
     private static Logger LOGGER = LoggerFactory.getLogger(RegionsConfiguration.class);
-    @Autowired
-    RegionsConfiguration regionsConfiguration;
-    @Autowired
-    KubernetesClientProvider kubernetesClientProvider;
+    @Autowired RegionsConfiguration regionsConfiguration;
+    @Autowired KubernetesClientProvider kubernetesClientProvider;
 
-    @Autowired
-    HelmVersionService helmVersionService;
+    @Autowired HelmVersionService helmVersionService;
 
     @EventListener(ContextRefreshedEvent.class)
     public void checkHelm() {
@@ -36,15 +33,32 @@ public class CompatibilityChecks {
 
     @EventListener(ContextRefreshedEvent.class)
     public void checkKubernetesVersion() {
-        regionsConfiguration.getResolvedRegions().forEach(region -> {
-            if (region.getServices().getType().equals(Service.ServiceType.KUBERNETES)) {
-                KubernetesClient client = kubernetesClientProvider.getRootClient(region);
-                try {
-                    LOGGER.info("Region " + region.getName() + " kubernetes v" + client.getKubernetesVersion().getMajor() + "." + client.getKubernetesVersion().getMinor());
-                } catch (Exception e) {
-                    LOGGER.error("Could not contact Kubernetes APIServer for region " + region.getName() + " at " + client.getMasterUrl(), e);
-                }
-            }
-        });
+        regionsConfiguration
+                .getResolvedRegions()
+                .forEach(
+                        region -> {
+                            if (region.getServices()
+                                    .getType()
+                                    .equals(Service.ServiceType.KUBERNETES)) {
+                                KubernetesClient client =
+                                        kubernetesClientProvider.getRootClient(region);
+                                try {
+                                    LOGGER.info(
+                                            "Region "
+                                                    + region.getName()
+                                                    + " kubernetes v"
+                                                    + client.getKubernetesVersion().getMajor()
+                                                    + "."
+                                                    + client.getKubernetesVersion().getMinor());
+                                } catch (Exception e) {
+                                    LOGGER.error(
+                                            "Could not contact Kubernetes APIServer for region "
+                                                    + region.getName()
+                                                    + " at "
+                                                    + client.getMasterUrl(),
+                                            e);
+                                }
+                            }
+                        });
     }
 }

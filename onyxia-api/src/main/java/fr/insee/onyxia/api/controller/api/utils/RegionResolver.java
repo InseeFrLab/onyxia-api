@@ -2,6 +2,7 @@ package fr.insee.onyxia.api.controller.api.utils;
 
 import fr.insee.onyxia.api.configuration.properties.RegionsConfiguration;
 import fr.insee.onyxia.model.region.Region;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Service;
@@ -10,16 +11,12 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-import javax.servlet.http.HttpServletRequest;
-
 @Service
 public class RegionResolver implements HandlerMethodArgumentResolver {
-    
-    @Autowired
-    private HttpServletRequest request;
 
-    @Autowired
-    private RegionsConfiguration regionsConfiguration;
+    @Autowired private HttpServletRequest request;
+
+    @Autowired private RegionsConfiguration regionsConfiguration;
 
     @Override
     public boolean supportsParameter(MethodParameter methodParameter) {
@@ -27,7 +24,12 @@ public class RegionResolver implements HandlerMethodArgumentResolver {
     }
 
     @Override
-    public Object resolveArgument(MethodParameter methodParameter, ModelAndViewContainer modelAndViewContainer, NativeWebRequest nativeWebRequest, WebDataBinderFactory webDataBinderFactory) throws Exception {
+    public Object resolveArgument(
+            MethodParameter methodParameter,
+            ModelAndViewContainer modelAndViewContainer,
+            NativeWebRequest nativeWebRequest,
+            WebDataBinderFactory webDataBinderFactory)
+            throws Exception {
         String region = nativeWebRequest.getHeader("ONYXIA-REGION");
         Region defaultRegion = regionsConfiguration.getDefaultRegion();
         if (region != null) {

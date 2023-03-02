@@ -1,35 +1,40 @@
 package io.github.inseefrlab.helmwrapper.model;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import java.util.HashMap;
+import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({ "name", "namespace", "revision", "updated", "status", "chart", "app_version" })
+@JsonPropertyOrder({"name", "namespace", "revision", "updated", "status", "chart", "app_version"})
 public class HelmLs {
 
     @JsonProperty("name")
     private String name;
+
     @JsonProperty("namespace")
     private String namespace;
+
     @JsonProperty("revision")
     private String revision;
+
     @JsonProperty("updated")
     private String updated;
+
     @JsonProperty("status")
     private String status;
+
     @JsonProperty("chart")
     private String chart;
+
     @JsonProperty("app_version")
     private String appVersion;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+
+    @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("name")
     public String getName() {

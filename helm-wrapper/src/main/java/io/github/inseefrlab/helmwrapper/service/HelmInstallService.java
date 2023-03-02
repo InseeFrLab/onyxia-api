@@ -7,41 +7,51 @@ import io.github.inseefrlab.helmwrapper.configuration.HelmConfiguration;
 import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
 import io.github.inseefrlab.helmwrapper.model.HelmLs;
 import io.github.inseefrlab.helmwrapper.utils.Command;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.zeroturnaround.exec.InvalidExitValueException;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.zeroturnaround.exec.InvalidExitValueException;
 
-/**
- * HelmInstall
- */
+/** HelmInstall */
 public class HelmInstallService {
 
     private final Logger logger = LoggerFactory.getLogger(HelmInstallService.class);
 
-    public HelmInstallService() {
+    public HelmInstallService() {}
 
-    }
-    public HelmInstaller installChart(HelmConfiguration configuration,String chart, String namespace, String name, String version,
-          boolean dryRun, File values, Map<String, String> env)
+    public HelmInstaller installChart(
+            HelmConfiguration configuration,
+            String chart,
+            String namespace,
+            String name,
+            String version,
+            boolean dryRun,
+            File values,
+            Map<String, String> env,
+            final boolean skipTlsVerify,
+            String caFile)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
         String command = "helm upgrade --install ";
-        if (name != null) {
-            command = command.concat(name+ " ");
+        if (skipTlsVerify) {
+            command = command.concat("--insecure-skip-tls-verify ");
+        } else if (caFile != null) {
+            command =
+                    command.concat(
+                            "--ca-file " + System.getenv("CACERTS_DIR") + "/" + caFile + " ");
         }
-        else {
+        if (name != null) {
+            command = command.concat(name + " ");
+        } else {
             command = command.concat("--generate-name ");
         }
-        command = command.concat(chart+" ");
-        command = command.concat("-n "+namespace);
+        command = command.concat(chart + " ");
+        command = command.concat("-n " + namespace);
         if (StringUtils.isNotBlank(version)) {
             command = command.concat(" --version " + version);
         }
@@ -54,28 +64,38 @@ public class HelmInstallService {
         if (dryRun) {
             command = command.concat(" --dry-run");
         }
-        String res = Command.executeAndGetResponseAsJson(configuration, command).getOutput().getString();
+        String res =
+                Command.executeAndGetResponseAsJson(configuration, command).getOutput().getString();
         return new ObjectMapper().readValue(res, HelmInstaller.class);
     }
 
     public int uninstaller(HelmConfiguration configuration, String name, String namespace)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        return Command.execute(configuration,"helm uninstall " + name + " -n " + namespace).getExitValue();
+        return Command.execute(configuration, "helm uninstall " + name + " -n " + namespace)
+                .getExitValue();
     }
 
-    public HelmLs[] listChartInstall(HelmConfiguration configuration, String namespace) throws JsonMappingException, InvalidExitValueException,
-            JsonProcessingException, IOException, InterruptedException, TimeoutException {
+    public HelmLs[] listChartInstall(HelmConfiguration configuration, String namespace)
+            throws JsonMappingException, InvalidExitValueException, JsonProcessingException,
+                    IOException, InterruptedException, TimeoutException {
         String cmd = "helm ls";
         if (namespace != null) {
             cmd = cmd + " -n " + namespace;
         }
-        return new ObjectMapper().readValue(Command.executeAndGetResponseAsJson(configuration,cmd).getOutput().getString(),
-                HelmLs[].class);
+        return new ObjectMapper()
+                .readValue(
+                        Command.executeAndGetResponseAsJson(configuration, cmd)
+                                .getOutput()
+                                .getString(),
+                        HelmLs[].class);
     }
 
     public String getManifest(HelmConfiguration configuration, String id, String namespace) {
         try {
-            return Command.execute(configuration,"helm get manifest " + id + " --namespace " + namespace).getOutput().getString();
+            return Command.execute(
+                            configuration, "helm get manifest " + id + " --namespace " + namespace)
+                    .getOutput()
+                    .getString();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -88,7 +108,10 @@ public class HelmInstallService {
 
     public String getValues(HelmConfiguration configuration, String id, String namespace) {
         try {
-            return Command.executeAndGetResponseAsJson(configuration,"helm get values " + id + " --namespace " + namespace).getOutput().getString();
+            return Command.executeAndGetResponseAsJson(
+                            configuration, "helm get values " + id + " --namespace " + namespace)
+                    .getOutput()
+                    .getString();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -101,7 +124,10 @@ public class HelmInstallService {
 
     public String getNotes(HelmConfiguration configuration, String id, String namespace) {
         try {
-            return Command.executeAndGetResponseAsRaw(configuration,"helm get notes " + id + " --namespace " + namespace).getOutput().getString();
+            return Command.executeAndGetResponseAsRaw(
+                            configuration, "helm get notes " + id + " --namespace " + namespace)
+                    .getOutput()
+                    .getString();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -115,32 +141,47 @@ public class HelmInstallService {
     private String buildEnvVar(Map<String, String> env) {
         if (env != null) {
             Set<String> envKeys = env.keySet();
-            return envKeys.stream().map(key -> "--set " + key + "=" + env.get(key)).collect(Collectors.joining(" "));
+            return envKeys.stream()
+                    .map(key -> "--set " + key + "=" + env.get(key))
+                    .collect(Collectors.joining(" "));
         }
         return "";
     }
 
     /**
-     * 
      * @param appId
      * @param namespace
      * @return
      * @throws MultipleServiceFound
      */
-    public HelmLs getAppById(HelmConfiguration configuration, String appId, String namespace) throws MultipleServiceFound {
+    public HelmLs getAppById(HelmConfiguration configuration, String appId, String namespace)
+            throws MultipleServiceFound {
         try {
-            HelmLs[] result = new ObjectMapper()
-                    .readValue(Command.executeAndGetResponseAsJson(configuration,"helm list --filter " + appId + " -n " + namespace)
-                            .getOutput().getString(), HelmLs[].class);
+            HelmLs[] result =
+                    new ObjectMapper()
+                            .readValue(
+                                    Command.executeAndGetResponseAsJson(
+                                                    configuration,
+                                                    "helm list --filter "
+                                                            + appId
+                                                            + " -n "
+                                                            + namespace)
+                                            .getOutput()
+                                            .getString(),
+                                    HelmLs[].class);
             if (result.length == 0) {
                 return null;
 
             } else if (result.length == 1) {
                 return result[0];
             } else {
-                throw new MultipleServiceFound("One service was expected but " + result.length + " were found");
+                throw new MultipleServiceFound(
+                        "One service was expected but " + result.length + " were found");
             }
-        } catch (InvalidExitValueException | IOException | InterruptedException | TimeoutException e) {
+        } catch (InvalidExitValueException
+                | IOException
+                | InterruptedException
+                | TimeoutException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }

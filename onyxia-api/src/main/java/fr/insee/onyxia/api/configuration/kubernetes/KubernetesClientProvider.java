@@ -18,8 +18,7 @@ public class KubernetesClientProvider {
 
     private final Logger logger = LoggerFactory.getLogger(KubernetesClientProvider.class);
 
-    @Autowired
-    private SecurityConfig securityConfig;
+    @Autowired private SecurityConfig securityConfig;
 
     /**
      * This returns the root client which has extended permissions. Currently cluster-admin. User
@@ -40,16 +39,16 @@ public class KubernetesClientProvider {
             username = region.getServices().getUsernamePrefix() + user.getIdep();
         }
 
-        if (region.getServices().getAuthenticationMode() == Region.Services.AuthenticationMode.IMPERSONATE) {
+        if (region.getServices().getAuthenticationMode()
+                == Region.Services.AuthenticationMode.IMPERSONATE) {
             config.setImpersonateUsername(username);
             config.setImpersonateGroups(null);
         }
 
-        if (region.getServices()
-                .getAuthenticationMode() == Region.Services.AuthenticationMode.USER) {
+        if (region.getServices().getAuthenticationMode()
+                == Region.Services.AuthenticationMode.USER) {
             config.setOauthToken((String) user.getAttributes().get("access_token"));
         }
-
 
         return new KubernetesClientBuilder().withConfig(config).build();
     }
@@ -58,16 +57,11 @@ public class KubernetesClientProvider {
         final ConfigBuilder configBuilder = new ConfigBuilder();
         if (region.getServices().getServer() != null
                 && region.getServices().getServer().getUrl() != null) {
-            configBuilder.withMasterUrl(region.getServices()
-                    .getServer()
-                    .getUrl());
+            configBuilder.withMasterUrl(region.getServices().getServer().getUrl());
         }
 
-        if (region.getServices()
-                .getServer() != null) {
-            final Region.Auth auth = region.getServices()
-                    .getServer()
-                    .getAuth();
+        if (region.getServices().getServer() != null) {
+            final Region.Auth auth = region.getServices().getServer().getAuth();
             if (auth != null) {
                 if (StringUtils.isNotEmpty(auth.getToken())) {
                     configBuilder.withOauthToken(auth.getToken());

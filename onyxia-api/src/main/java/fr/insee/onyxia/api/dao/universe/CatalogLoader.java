@@ -8,7 +8,11 @@ import fr.insee.onyxia.model.catalog.Config.Config;
 import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.helm.Chart;
 import fr.insee.onyxia.model.helm.Repository;
-import io.github.inseefrlab.helmwrapper.service.HelmRepoService;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.stream.Collectors;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
@@ -19,30 +23,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
-
 @Service
 public class CatalogLoader {
 
-    private final Logger logger = LoggerFactory.getLogger(CatalogRefresher.class);
+    private final Logger logger = LoggerFactory.getLogger(CatalogLoader.class);
 
-    @Autowired
-    private ResourceLoader resourceLoader;
-
-    @Autowired
-    private ObjectMapper mapper;
+    @Autowired private ResourceLoader resourceLoader;
 
     @Autowired
     @Qualifier("helm")
     private ObjectMapper mapperHelm;
-
-    @Autowired
-    private HelmRepoService helmRepoService;
 
     public void updateCatalog(CatalogWrapper cw) {
         logger.info("updating catalog with id :" + cw.getId() + " and type " + cw.getType());
@@ -53,25 +43,44 @@ public class CatalogLoader {
         }
     }
 
-    /**
-     * TODO : move this helm specific logic somewhere else ?
-     */
+    /** TODO : move this helm specific logic somewhere else ? */
     private void updateHelmRepository(CatalogWrapper cw) {
         try {
-            Reader reader = new InputStreamReader(resourceLoader.getResource(cw.getLocation()+"/index.yaml").getInputStream(),
-                    "UTF-8");
+            Reader reader =
+                    new InputStreamReader(
+                            resourceLoader
+                                    .getResource(cw.getLocation() + "/index.yaml")
+                                    .getInputStream(),
+                            "UTF-8");
             Repository repository = mapperHelm.readValue(reader, Repository.class);
-            repository.getEntries().values().parallelStream().forEach(entry -> {
-                entry.parallelStream().forEach(pkg -> {
-                    try {
-                        refreshPackage(cw, pkg);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
-            });
-            repository.setPackages(repository.getEntries().values().stream().map(charts -> charts.get(0))
-                    .filter(chart -> "application".equalsIgnoreCase(chart.getType())).collect(Collectors.toList()));
+            repository
+                    .getEntries()
+                    .entrySet()
+                    .removeIf(
+                            entry ->
+                                    cw.getExcludedCharts().stream()
+                                            .anyMatch(
+                                                    excludedChart ->
+                                                            excludedChart.equalsIgnoreCase(
+                                                                    entry.getKey())));
+            repository.getEntries().values().parallelStream()
+                    .forEach(
+                            entry -> {
+                                entry.parallelStream()
+                                        .forEach(
+                                                pkg -> {
+                                                    try {
+                                                        refreshPackage(cw, pkg);
+                                                    } catch (IOException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                });
+                            });
+            repository.setPackages(
+                    repository.getEntries().values().stream()
+                            .map(charts -> charts.get(0))
+                            .filter(chart -> "application".equalsIgnoreCase(chart.getType()))
+                            .collect(Collectors.toList()));
             cw.setCatalog(repository);
             cw.setLastUpdateTime(System.currentTimeMillis());
         } catch (Exception e) {
@@ -86,22 +95,26 @@ public class CatalogLoader {
 
         Chart chart = (Chart) pkg;
         // TODO : support multiple urls
-        InputStream inputStream = resourceLoader.getResource(cw.getLocation()+"/index.yaml")
-                .createRelative(chart.getUrls().stream().findFirst().get())
-                .getInputStream();
+        InputStream inputStream =
+                resourceLoader
+                        .getResource(cw.getLocation() + "/index.yaml")
+                        .createRelative(chart.getUrls().stream().findFirst().get())
+                        .getInputStream();
         extractDataFromTgz(inputStream, chart);
 
         inputStream.close();
     }
 
-    public void extractDataFromTgz(InputStream in, Chart chart) throws IOException {
+    private void extractDataFromTgz(InputStream in, Chart chart) throws IOException {
         GzipCompressorInputStream gzipIn = new GzipCompressorInputStream(in);
         // HelmConfig config = null;
         try (TarArchiveInputStream tarIn = new TarArchiveInputStream(gzipIn)) {
             TarArchiveEntry entry;
 
             while ((entry = tarIn.getNextTarEntry()) != null) {
-                if (entry.getName().endsWith(chart.getName()+"/values.schema.json") && ! entry.getName().endsWith("charts/"+chart.getName()+"/values.schema.json")) {
+                if (entry.getName().endsWith(chart.getName() + "/values.schema.json")
+                        && !entry.getName()
+                                .endsWith("charts/" + chart.getName() + "/values.schema.json")) {
                     // TODO : mutualize objectmapper
                     ObjectMapper mapper = new ObjectMapper();
                     mapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, false);
@@ -117,7 +130,5 @@ public class CatalogLoader {
                 }
             }
         }
-
     }
-
 }

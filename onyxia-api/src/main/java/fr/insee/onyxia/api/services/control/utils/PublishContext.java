@@ -7,16 +7,12 @@ import java.util.UUID;
 public class PublishContext {
 
     private Context globalContext = new Context();
-    private Map<String,Context> localContexts = new HashMap<>();
+    private Map<String, Context> localContexts = new HashMap<>();
     private String catalogId;
 
-    public PublishContext() {
+    public PublishContext() {}
 
-    }
-
-    public PublishContext(String catalogId) {
-
-    }
+    public PublishContext(String catalogId) {}
 
     private Context getLocalContext(String key) {
         if (!localContexts.containsKey(key)) {
@@ -34,16 +30,16 @@ public class PublishContext {
         return catalogId;
     }
 
-
     public static class Context {
         private String randomizedId;
 
-        private Map<String,Object> data = new HashMap<>();
+        private Map<String, Object> data = new HashMap<>();
 
         public String getRandomizedId() {
             if (randomizedId == null) {
                 UUID uuid = UUID.randomUUID();
-                randomizedId = Long.toString(-uuid.getLeastSignificantBits());;
+                randomizedId = Long.toString(-uuid.getLeastSignificantBits());
+                ;
             }
             return randomizedId;
         }

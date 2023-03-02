@@ -2,9 +2,7 @@ package fr.insee.onyxia.api.services.control.utils;
 
 import org.springframework.stereotype.Service;
 
-/**
- * IDSanitizer
- */
+/** IDSanitizer */
 @Service
 public class IDSanitizer {
 

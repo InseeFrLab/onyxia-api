@@ -7,6 +7,7 @@ public class QuotaUsage {
 
     @Schema(description = "")
     private Quota spec;
+
     @Schema(description = "")
     private Quota usage;
 

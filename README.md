@@ -37,6 +37,11 @@ Once Onyxia is started, browse to http://localhost:8080 to get the OpenAPI docum
 Onyxia-API is primarly made to work with the webapp [Onyxia-Web](https://github.com/inseefrlab/onyxia-web).  
 If you use it in other ways, we would love to hear from you :)
 
+## Contributing
+
+Contributions are welcome.
+Make sure to conform to Android Open Source Project code style : `mvn spotless:apply` can enforce it.
+
 ## Configuration
 
 Main configuration file is [onyxia-api/src/main/resources/application.properties](onyxia-api/src/main/resources/application.properties).  
@@ -63,6 +68,7 @@ Open id configuration
 | `keycloak.enable-basic-auth` | `true` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
 | `keycloak.bearer-only` | `true` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
 | `keycloak.disable-trust-manager` | `false` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
+| `oidc.username-claim` | `preferred_username` | Claim to be used as user id. Should respect [RFC 1123](https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#dns-label-names) |
 
 Security configuration :
 | Key | Default | Description |
@@ -100,7 +106,7 @@ If running `Onyxia API` locally you need to have `helm` available in the `PATH`.
 ## Onyxia API compatibility matrix with Kubernetes
 
 In addition of using `helm`, Onyxia API interacts with the Kubernetes cluster thanks to the [fabric8.io Kubernetes client for Java](https://github.com/fabric8io/kubernetes-client).  
-See [here](https://github.com/fabric8io/kubernetes-client#kubernetes-compatibility-matrix) for the compatibility matrix and [here](onyxia-api/helm-wrapper/pom.xml) for the current version used by Onyxia.
+See [here](https://github.com/fabric8io/kubernetes-client#kubernetes-compatibility-matrix) for the compatibility matrix and [here](helm-wrapper/pom.xml#L19) for the current version used by Onyxia.
 
 ## Onyxia Helm format extension
 
