@@ -17,22 +17,56 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 @ConditionalOnProperty(name = "authentication.mode", havingValue = "openidconnect")
 public class OIDCConfiguration {
 
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf().disable().sessionManagement()
+        http.csrf()
+                .disable()
+                .sessionManagement()
                 // use previously declared bean
-                .sessionAuthenticationStrategy(sessionAuthenticationStrategy()).sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionAuthenticationStrategy(sessionAuthenticationStrategy())
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 // manage routes securisation here
-                .authorizeRequests().antMatchers(HttpMethod.OPTIONS).permitAll()
+                .authorizeRequests()
+                .antMatchers(HttpMethod.OPTIONS)
+                .permitAll()
                 // configuration pour Swagger
-                .antMatchers("/", "/swagger-ui**", "/swagger-ui/**", "/v2/api-docs", "/v3/api-docs", "/v3/api-docs/*", "/csrf", "/webjars/**", "/swagger-resources/**", "/actuator/**", "/actuator").permitAll()
-                .antMatchers("/api", "/api/swagger-ui**", "/api/swagger-ui/**", "/api/v2/api-docs", "/api/v3/api-docs", "/api/v3/api-docs/*", "/api/csrf", "/api/webjars/**", "/api/swagger-resources/**", "/api/actuator/**", "/api/actuator").permitAll()
+                .antMatchers(
+                        "/",
+                        "/swagger-ui**",
+                        "/swagger-ui/**",
+                        "/v2/api-docs",
+                        "/v3/api-docs",
+                        "/v3/api-docs/*",
+                        "/csrf",
+                        "/webjars/**",
+                        "/swagger-resources/**",
+                        "/actuator/**",
+                        "/actuator")
+                .permitAll()
+                .antMatchers(
+                        "/api",
+                        "/api/swagger-ui**",
+                        "/api/swagger-ui/**",
+                        "/api/v2/api-docs",
+                        "/api/v3/api-docs",
+                        "/api/v3/api-docs/*",
+                        "/api/csrf",
+                        "/api/webjars/**",
+                        "/api/swagger-resources/**",
+                        "/api/actuator/**",
+                        "/api/actuator")
+                .permitAll()
                 // configuration pour public
-                .antMatchers("/public/**").permitAll()
-                .antMatchers("/api/public/**").permitAll()
-                .anyRequest().authenticated().and().oauth2ResourceServer().jwt();
+                .antMatchers("/public/**")
+                .permitAll()
+                .antMatchers("/api/public/**")
+                .permitAll()
+                .anyRequest()
+                .authenticated()
+                .and()
+                .oauth2ResourceServer()
+                .jwt();
         return http.build();
     }
 
@@ -45,10 +79,8 @@ public class OIDCConfiguration {
     @Bean
     public UserProvider getUserProvider() {
         return (Region region) -> {
-            final User user = User.newInstance()
-                    .build();
+            final User user = User.newInstance().build();
             return user;
         };
     }
-
 }
