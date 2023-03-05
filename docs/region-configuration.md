@@ -99,7 +99,7 @@ When this feature is enabled, namespaces are created with **quotas**.
 | --------------------- | ------- | ------------------------------------------------------------------ |
 | `enabled` | false | Whether or not users are subject to a resource limitation. Quotas can only be applied to users and not to groups. |
 | `allowUserModification` | true | Whether or not the user can manually disable or change its own limitation. |
-| `defaultQuota` | | The quota is applied on the namespace before user modification or reset. |
+| `default` | | The quota is applied on the namespace before user modification or reset. |
 
 A quota follows the Kubernetes model which is composed of:
 "requests.memory"
