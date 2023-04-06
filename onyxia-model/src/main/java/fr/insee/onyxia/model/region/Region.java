@@ -185,8 +185,8 @@ public class Region {
         private Service.ServiceType type;
         private boolean singleNamespace = true;
         private boolean allowNamespaceCreation = true;
-        private Map<String, String> namespaceLabels = new HashMap<String, String>();
-        private Map<String, String> namespaceAnnotations = new HashMap<String, String>();
+        private Map<String,String> namespaceLabels = new HashMap<String,String>();
+        private Map<String,String> namespaceAnnotations = new HashMap<String,String>();
         private boolean userNamespace = true;
         private String namespacePrefix = "user-";
         private String groupNamespacePrefix = "projet-";
