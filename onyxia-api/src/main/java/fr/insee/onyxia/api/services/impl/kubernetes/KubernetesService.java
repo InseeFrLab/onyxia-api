@@ -73,7 +73,9 @@ public class KubernetesService {
                         new NamespaceBuilder()
                                 .withNewMetadata()
                                 .withName(namespaceId)
+                                .withLabels(region.getServices.getNamespaceLabels())
                                 .addToLabels("onyxia_owner", owner.getId())
+                                .withAnnotations(region.getServices.getNamespaceAnnotations())
                                 .endMetadata()
                                 .build())
                 .create();

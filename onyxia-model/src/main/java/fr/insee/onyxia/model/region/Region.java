@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.insee.onyxia.model.service.Service;
 import fr.insee.onyxia.model.service.quota.Quota;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -183,6 +185,8 @@ public class Region {
         private Service.ServiceType type;
         private boolean singleNamespace = true;
         private boolean allowNamespaceCreation = true;
+        private Map<String, String> namespaceLabels = new HashMap<String, String>();
+        private Map<String, String> namespaceAnnotations = new HashMap<String, String>();
         private boolean userNamespace = true;
         private String namespacePrefix = "user-";
         private String groupNamespacePrefix = "projet-";
@@ -506,6 +510,22 @@ public class Region {
 
         public void setAllowNamespaceCreation(boolean allowNamespaceCreation) {
             this.allowNamespaceCreation = allowNamespaceCreation;
+        }
+
+        public Map<String,String> getNamespaceLabels() {
+            return namespaceLabels;
+        }
+
+        public void getNamespaceLabels(Map<String,String> namespaceLabels) {
+            this.namespaceLabels = namespaceLabels;
+        }
+
+        public Map<String,String> getNamespaceAnnotations() {
+            return namespaceAnnotations;
+        }
+
+        public void getNamespaceAnnotations(Map<String,String> namespaceAnnotations) {
+            this.namespaceAnnotations = namespaceAnnotations;
         }
 
         public boolean isUserNamespace() {

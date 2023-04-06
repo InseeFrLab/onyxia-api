@@ -46,6 +46,8 @@ Users can work on Onyxia as a User or as a Group to which they belong. Each user
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
 | `type` | | Type of the platform on which services are launched. Only Kubernetes is supported, Marathon has been removed. | "KUBERNETES" |
 | `allowNamespaceCreation` | true | If true, the /onboarding endpoint is enabled and the user will have a namespace created on its first request on a service resource. | true |
+| `namespaceLabels` |  | Labels to add at namespace creation | {"zone":"prod"} |
+| `namespaceAnnotations` |  | Annotations to add at namespace creation | {"zone":"prod"} |
 | `singleNamespace` | true | When true, all users share the same namespace on the service provider. This configuration can be used if a project works on its own Onyxia region. | |
 | `userNamespace` | true | When true, all users have a namespace for their work. This configuration can be used if you don't allow a user to have their own space to work and only use project space | |
 | `namespacePrefix` | "user-" | User has a personal namespace like namespacePrefix + userId (should only be used when not singleNamespace but not the case) | |
