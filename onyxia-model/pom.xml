@@ -6,9 +6,9 @@
     <artifactId>onyxia-model</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <parent>
-          <groupId>innovation.insee</groupId>
-          <artifactId>onyxia</artifactId>
-          <version>0.0.1-SNAPSHOT</version>
+        <groupId>innovation.insee</groupId>
+        <artifactId>onyxia</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
     </parent>
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -49,7 +49,7 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-common</artifactId>
-            <version>1.6.12</version>
+            <version>1.6.14</version>
         </dependency>
 
     </dependencies>
