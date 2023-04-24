@@ -357,7 +357,7 @@ public class HelmAppsService implements AppsService {
         KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
         InputStream inputStream =
                 new ByteArrayInputStream(manifest.getBytes(Charset.forName("UTF-8")));
-        List<HasMetadata> hasMetadatas = client.load(inputStream).get();
+        List<HasMetadata> hasMetadatas = client.load(inputStream).items();
         List<Ingress> ingresses =
                 hasMetadatas.stream()
                         .filter(hasMetadata -> hasMetadata instanceof Ingress)
