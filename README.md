@@ -60,7 +60,7 @@ Each variable can be overridden using environment variables.
 ### Open id configuration (used when `authentication.mode`=`openidconnect`)  
 You have to specify either `oidc.issuer-uri` or `oidc.jwk-uri`.  
 Common used configurations :  
-| Provider | `oidc.issuer-uri` | `jwk-uri` |
+| Provider | `oidc.issuer-uri` | `oidc.jwk-uri` |
 |---|---|---|
 | Keycloak  | `https://keycloak.example.com/auth/realms/REALMNAME` |   |
 | Google  |   | `https://www.googleapis.com/oauth2/v3/certs` |
