@@ -720,7 +720,7 @@ public class Region {
 
         private String kvEngine;
         private String role;
-        private String authPath="jwt";
+        private String authPath = "jwt";
 
         private KeycloakParams keycloakParams;
 
