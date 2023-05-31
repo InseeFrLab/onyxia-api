@@ -225,6 +225,7 @@ It can be used to add additional features to Onyxia. It helps users to keep thei
 | `URL` | | URL of the atlas service for the region. | "https://vault.change.me" |
 | `kvEngine` | | mount point of the kv engine. | "onyxia-kv" |
 | `role` | | role of the user in vault | "onyxia-user" |
+| `authPath` | "jwt" | path of the jwt auth method. | "jwt" |
 | `keycloakParams` | | Configuration of the Keycloak service used to get an access token on the vault service. It defines the Keycloak realm, clientId, and Url. | {realm: "sspcloud", clientId: "vault", URL: "https://auth.change.me/auth"} |
 
 ## ProxyConfiguration properties

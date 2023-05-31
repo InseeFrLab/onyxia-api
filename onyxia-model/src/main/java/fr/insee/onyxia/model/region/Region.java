@@ -720,6 +720,7 @@ public class Region {
 
         private String kvEngine;
         private String role;
+        private String authPath;
 
         private KeycloakParams keycloakParams;
 
@@ -745,6 +746,14 @@ public class Region {
 
         public void setRole(String role) {
             this.role = role;
+        }
+
+        public String getAuthPath() {
+            return authPath;
+        }
+
+        public void setAuthPath(String authPath) {
+            this.authPath = authPath;
         }
 
         public void setKeycloakParams(KeycloakParams keycloakParams) {
