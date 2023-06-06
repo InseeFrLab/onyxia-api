@@ -15,7 +15,7 @@
         "namespacePrefix": "user-",
         "usernamePrefix": "oidc-",
         "groupNamespacePrefix": "projet-",
-        "authenticationMode" : "admin",
+        "authenticationMode": "admin",
         "quotas": {
           "enabled": false,
           "allowUserModification": true,
@@ -35,7 +35,8 @@
         "expose": {
           "domain": "fakedomain.kub.example.com",
           "ingress": true,
-          "route": false
+          "route": false,
+          "istio": false
         },
         "monitoring": {
           "URLPattern": "https://graphana.kub.example.com/$appIdSlug"
@@ -46,7 +47,6 @@
         }
       },
       "data": {
-       
       },
       "auth": {
         "type": "openidconnect"
