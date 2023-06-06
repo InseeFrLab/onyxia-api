@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.insee.onyxia.model.service.Service;
 import fr.insee.onyxia.model.service.quota.Quota;
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -1094,9 +1093,7 @@ public class Region {
 
     public static class CertificateAuthorityInjection {
 
-        /**
-         * Will be deprecated in the next releases cacerts as string will replace
-         */
+        /** Will be deprecated in the next releases cacerts as string will replace */
         @Schema(description = "List of crt encoded in base64")
         @Deprecated
         private List<String> crts = new ArrayList<>();
