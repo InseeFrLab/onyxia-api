@@ -96,7 +96,7 @@ public class CatalogLoader {
 
         // TODO : support multiple urls
         Resource resource = resourceLoader
-                .getResource(cw.getLocation() + "/index.yaml")
+                .getResource(cw.getLocation() + "/")
                 .createRelative(chart.getUrls().stream().findFirst().get());
 
         try (InputStream inputStream = resource.getInputStream()) {
