@@ -6,8 +6,8 @@ import static org.hamcrest.Matchers.is;
 
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.configuration.CustomObjectMapper;
-import java.util.List;
 import fr.insee.onyxia.api.util.TestUtils;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -64,8 +64,9 @@ public class CatalogLoaderTest {
 
         assertThat(
                 stdErrLogs,
-                containsString("fr.insee.onyxia.api.dao.universe.CatalogLoaderException: " +
-                        "Exception occurred during loading resource: class path resource " +
-                        "[catalog-loader-test/keepeme1.gz]"));
+                containsString(
+                        "fr.insee.onyxia.api.dao.universe.CatalogLoaderException: "
+                                + "Exception occurred during loading resource: class path resource "
+                                + "[catalog-loader-test/keepeme1.gz]"));
     }
 }

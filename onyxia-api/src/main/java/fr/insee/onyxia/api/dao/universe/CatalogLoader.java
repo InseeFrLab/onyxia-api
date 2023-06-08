@@ -72,7 +72,8 @@ public class CatalogLoader {
                                                 pkg -> {
                                                     try {
                                                         refreshPackage(cw, pkg);
-                                                    } catch (CatalogLoaderException | IOException e) {
+                                                    } catch (CatalogLoaderException
+                                                            | IOException e) {
                                                         e.printStackTrace();
                                                     }
                                                 });
@@ -89,20 +90,23 @@ public class CatalogLoader {
         }
     }
 
-    private void refreshPackage(CatalogWrapper cw, Pkg pkg) throws CatalogLoaderException, IOException {
+    private void refreshPackage(CatalogWrapper cw, Pkg pkg)
+            throws CatalogLoaderException, IOException {
         if (!(pkg instanceof Chart chart)) {
             throw new IllegalArgumentException("Package should be of type Chart");
         }
 
         // TODO : support multiple urls
-        Resource resource = resourceLoader
-                .getResource(cw.getLocation() + "/")
-                .createRelative(chart.getUrls().stream().findFirst().get());
+        Resource resource =
+                resourceLoader
+                        .getResource(cw.getLocation() + "/")
+                        .createRelative(chart.getUrls().stream().findFirst().get());
 
         try (InputStream inputStream = resource.getInputStream()) {
             extractDataFromTgz(inputStream, chart);
         } catch (IOException e) {
-            throw new CatalogLoaderException("Exception occurred during loading resource: " + resource.getDescription(), e);
+            throw new CatalogLoaderException(
+                    "Exception occurred during loading resource: " + resource.getDescription(), e);
         }
     }
 
