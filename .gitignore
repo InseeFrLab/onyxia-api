@@ -7,3 +7,5 @@ node_modules
 .idea
 *.iml
 .vscode
+onyxia-api/src/main/resources/application.properties.local
+onyxia-api/src/main/resources/regions.json.local

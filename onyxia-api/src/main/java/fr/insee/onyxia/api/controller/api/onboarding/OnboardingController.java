@@ -47,7 +47,7 @@ public class OnboardingController {
             throw new OnboardingDisabledException();
         }
         checkPermissions(region, request);
-        KubernetesService.Owner owner = new KubernetesService.Owner();
+        final KubernetesService.Owner owner = new KubernetesService.Owner();
         if (request.getGroup() != null) {
             owner.setId(request.getGroup());
             owner.setType(KubernetesService.Owner.OwnerType.GROUP);
