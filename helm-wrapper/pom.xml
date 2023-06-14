@@ -16,7 +16,7 @@
 
     <properties>
         <java.version>17</java.version>
-        <fabric8io.version>6.4.1</fabric8io.version>
+        <fabric8io.version>6.7.1</fabric8io.version>
     </properties>
 
     <distributionManagement>
