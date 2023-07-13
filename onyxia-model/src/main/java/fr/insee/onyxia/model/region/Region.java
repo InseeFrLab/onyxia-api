@@ -1009,6 +1009,8 @@ public class Region {
 
         private boolean route = false;
 
+        private IstioIngress istio;
+
         public void setDomain(String domain) {
             this.domain = domain;
         }
@@ -1039,6 +1041,36 @@ public class Region {
 
         public boolean getRoute() {
             return route;
+        }
+
+        public void setIstio(IstioIngress istio) {
+            this.istio = istio;
+        }
+
+        public IstioIngress getIstio() {
+            return istio;
+        }
+    }
+
+    public static class IstioIngress {
+        private boolean enabled = false;
+
+        private String[] gateways = new String[0];
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public String[] getGateways() {
+            return gateways;
+        }
+
+        public void setGateways(String[] gateways) {
+            this.gateways = gateways;
         }
     }
 
