@@ -52,7 +52,13 @@
         "expose": {
           "domain": "fakedomain.kub.example.com",
           "ingress": true,
-          "route": false
+          "route": false,
+          "istio": {
+            "enabled": false,
+            "gateways": [
+              "istio-system/example-gateway"
+            ]
+          }
         },
         "monitoring": {
           "URLPattern": "https://graphana.kub.example.com/$appIdSlug"
