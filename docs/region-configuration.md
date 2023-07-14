@@ -119,12 +119,23 @@ A quota follows the Kubernetes model which is composed of:
 
  with **expose**.
 
-| Key | Default | Description |
-| --------------------- | ------- | ------------------------------------------------------------------ |
-| `domain` | | When users request to expose their service, only the subdomain of this object will be created. |
-| `ingressClassName` | '' | Ingress Class Name: useful if you want to use a specific ingress controller instead of a default one |
-| `ingress` | true | Whether or not Kubernetes Ingress is enabled |
-| `route` | false | Whether or not OpenShift Route is enabled |
+| Key                | Default | Description                                                                                          |
+|--------------------|---------|------------------------------------------------------------------------------------------------------|
+| `domain`           |         | When users request to expose their service, only the subdomain of this object will be created.       |
+| `ingressClassName` | ''      | Ingress Class Name: useful if you want to use a specific ingress controller instead of a default one |
+| `ingress`          | true    | Whether or not Kubernetes Ingress is enabled                                                         |
+| `route`            | false   | Whether or not OpenShift Route is enabled                                                            |
+| `istio`            |         | See [Istio](#istio)                                                                                  |
+
+
+#### istio
+
+| Key        | Default | Description                                                                                                 |
+|------------|--------|--------------------------------------------------------------------------------------------------------------|
+| `enabled`  | false  | Whether or not Istio is enabled                                                                              |
+| `gateways` | []     | List of istio gateways to be used. Should contain at least one element. E.g. `["istio-system/my-gateway"]`   |
+
+
 
 ### Default configuration properties
 

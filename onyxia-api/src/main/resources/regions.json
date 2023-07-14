@@ -55,9 +55,7 @@
           "route": false,
           "istio": {
             "enabled": false,
-            "gateways": [
-              "istio-system/example-gateway"
-            ]
+            "gateways": []
           }
         },
         "monitoring": {
