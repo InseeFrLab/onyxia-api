@@ -1182,14 +1182,26 @@ public class Region {
     }
 
     public static class PackageRepositoryInjection {
-        @Schema(description = "httpProxyUrl to inject in helm values")
+
+        @Schema(description = "cranProxyUrl to inject in helm values")
         private String cranProxyUrl;
 
-        @Schema(description = "httpProxyUrl to inject in helm values")
+        @Schema(description = "condaProxyUrl to inject in helm values")
         private String condaProxyUrl;
 
-        @Schema(description = "httpProxyUrl to inject in helm values")
+        @Schema(description = "packageManager url to inject in helm values")
+        private String packageManagerUrl;
+
+        @Schema(description = "pypiProxyUrl to inject in helm values")
         private String pypiProxyUrl;
+
+        public String getPackageManagerUrl() {
+            return packageManagerUrl;
+        }
+
+        public void setPackageManagerUrl(String packageManagerUrl) {
+            this.packageManagerUrl = packageManagerUrl;
+        }
 
         public String getCranProxyUrl() {
             return cranProxyUrl;
