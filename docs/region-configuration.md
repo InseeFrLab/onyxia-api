@@ -271,6 +271,7 @@ It can be used to inject the package repository in the services, if the Helm cha
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
 | `cranProxyUrl` | | URL of enterprise local cran repository. | "https://cranProxy" |
 | `condaProxyUrl` | | URL of enterprise local Conda repository. | "https://condaProxyUrl" |
+| `packageManagerUrl` | | URL of the packagemanager. | "https://packagemanager.posit.co/cran/__linux__" or "https://packagemanagerUrl.internal/cran/__linux__" or "keepDefault" to keep the default one in the image in first position |
 | `pypiProxyUrl` | | URL of enterprise local PyPI repository. | "https://pypiProxyUrl" |
 
 ## CertificateAuthorityInjection properties
