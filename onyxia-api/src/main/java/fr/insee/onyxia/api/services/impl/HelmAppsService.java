@@ -1,5 +1,6 @@
 package fr.insee.onyxia.api.services.impl;
 
+import static fr.insee.onyxia.api.services.impl.ServiceUrlResolver.getServiceUrls;
 import static java.util.stream.Collectors.joining;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -24,27 +25,22 @@ import fr.insee.onyxia.model.project.Project;
 import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.*;
 import io.fabric8.kubernetes.api.model.EventList;
-import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
-import io.fabric8.kubernetes.api.model.HasMetadata;
-import io.fabric8.kubernetes.api.model.networking.v1.Ingress;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.github.inseefrlab.helmwrapper.configuration.HelmConfiguration;
 import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
 import io.github.inseefrlab.helmwrapper.model.HelmLs;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService.MultipleServiceFound;
-import java.io.ByteArrayInputStream;
+
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -358,7 +354,7 @@ public class HelmAppsService implements AppsService {
             Region region, HelmLs release, String manifest, User user) {
         KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
 
-        List<String> urls = getUrls(region, manifest, client);
+        List<String> urls = getServiceUrls(region, manifest, client);
         Service service = new Service();
         service.setUrls(urls);
 
@@ -435,93 +431,5 @@ public class HelmAppsService implements AppsService {
 
         return service;
     }
-    
-    private static List<String> getUrls(Region region, String manifest, KubernetesClient client) {
-        Region.Expose expose = region.getServices().getExpose();
-        boolean isIstioEnabled = expose.getIstio() != null && expose.getIstio().isEnabled();
-        boolean isServiceExposed = expose.getIngress() || expose.getRoute() || isIstioEnabled;
-        if (!isServiceExposed) {
-            return List.of();
-        }
 
-        List<HasMetadata> hasMetadata;
-        try (InputStream inputStream = new ByteArrayInputStream(manifest.getBytes(StandardCharsets.UTF_8))) {
-            hasMetadata = client.load(inputStream).items();
-        } catch (IOException e) {
-            throw new RuntimeException("Exception during loading manifest", e);
-        }
-
-        var urls = new ArrayList<String>();
-
-        if(expose.getIngress()) {
-            List<Ingress> ingresses = getResourceOfType(hasMetadata, Ingress.class).toList();
-
-            for (Ingress ingress : ingresses) {
-                try {
-                    urls.addAll(
-                            ingress.getSpec().getRules().stream()
-                                    .flatMap(
-                                            rule ->
-                                                    rule.getHttp().getPaths().stream()
-                                                            .map(
-                                                                    path ->
-                                                                            rule.getHost()
-                                                                                    + path.getPath()))
-                                    .toList());
-                } catch (Exception e) {
-                    System.out.println(
-                            "Warning : could not read urls from ingress "
-                                    + ingress.getFullResourceName());
-                }
-            }
-        } else if (expose.getRoute()) {
-            // https://docs.openshift.com/container-platform/4.13/rest_api/network_apis/route-route-openshift-io-v1.html#status-ingress
-            // https://docs.openshift.com/container-platform/4.11/networking/routes/route-configuration.html
-            List<GenericKubernetesResource> routes =
-                    getResourceOfType(hasMetadata, "route.openshift.io/v1", "Route").toList();
-
-            for (GenericKubernetesResource resource : routes) {
-                try {
-                    urls.add(resource.get("spec", "host"));
-                } catch (Exception e) {
-                    System.out.println(
-                            "Warning : could not read urls from OpenShift Route "
-                                    + resource.getFullResourceName());
-                }
-            }
-        } else if (isIstioEnabled) {
-            List<GenericKubernetesResource> virtualServices =
-                    getResourceOfType(hasMetadata, "networking.istio.io/", "VirtualService").toList();
-
-            for (GenericKubernetesResource resource : virtualServices) {
-                try {
-                    // For now we assume we have a simple VirtualService with no routing, thus the hosts are also  the URL.
-                    // One should consider to add support for 'spec/http[*]/match[*]/uri/prefix'
-                    urls.addAll(resource.get("spec", "hosts"));
-                } catch (Exception e) {
-                    System.out.println(
-                            "Warning : could not read urls from Istio Virtual Service "
-                                    + resource.getFullResourceName());
-                }
-            }
-        }
-
-        // Ensure every URL start with http-prefix
-        return urls.stream()
-                .map(url -> url.startsWith("http") ? url : "https://" + url)
-                .toList();
-    }
-
-    private static <T extends HasMetadata> Stream<T> getResourceOfType(List<HasMetadata> resourcesStream, Class<T> type) {
-        return resourcesStream
-                .stream()
-                .filter(type::isInstance)
-                .map(type::cast);
-    }
-
-    private static Stream<GenericKubernetesResource> getResourceOfType(List<HasMetadata> resourcesStream, String apiVersionPrefix, String kind) {
-        return getResourceOfType(resourcesStream, GenericKubernetesResource.class)
-                .filter(resource -> resource.getApiVersion().startsWith(apiVersionPrefix))
-                .filter(resource -> resource.getKind().equalsIgnoreCase(kind));
-    }
 }
