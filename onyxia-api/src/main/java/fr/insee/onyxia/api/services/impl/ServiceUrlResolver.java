@@ -52,7 +52,9 @@ public final class ServiceUrlResolver {
                                     + ingress.getFullResourceName());
                 }
             }
-        } else if (expose.getRoute()) {
+        }
+
+        if (expose.getRoute()) {
             // https://docs.openshift.com/container-platform/4.13/rest_api/network_apis/route-route-openshift-io-v1.html#status-ingress
             // https://docs.openshift.com/container-platform/4.11/networking/routes/route-configuration.html
             List<GenericKubernetesResource> routes =
@@ -67,7 +69,9 @@ public final class ServiceUrlResolver {
                                     + resource.getFullResourceName());
                 }
             }
-        } else if (isIstioEnabled) {
+        }
+
+        if (isIstioEnabled) {
             List<GenericKubernetesResource> virtualServices =
                     getResourceOfType(hasMetadata, "networking.istio.io/", "VirtualService").toList();
 
