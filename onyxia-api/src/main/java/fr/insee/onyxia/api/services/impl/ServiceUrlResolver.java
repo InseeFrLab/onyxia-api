@@ -5,7 +5,6 @@ import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.networking.v1.Ingress;
 import io.fabric8.kubernetes.client.KubernetesClient;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,7 +23,8 @@ public final class ServiceUrlResolver {
         }
 
         List<HasMetadata> hasMetadata;
-        try (InputStream inputStream = new ByteArrayInputStream(manifest.getBytes(StandardCharsets.UTF_8))) {
+        try (InputStream inputStream =
+                new ByteArrayInputStream(manifest.getBytes(StandardCharsets.UTF_8))) {
             hasMetadata = client.load(inputStream).items();
         } catch (IOException e) {
             throw new RuntimeException("Exception during loading manifest", e);
@@ -38,13 +38,15 @@ public final class ServiceUrlResolver {
             for (Ingress ingress : ingresses) {
                 try {
                     urls.addAll(
-                            ingress.getSpec().getRules()
-                                    .stream()
-                                    .flatMap(rule ->
-                                            rule.getHttp().getPaths()
-                                                    .stream()
-                                                    .map(path -> rule.getHost() + path.getPath())
-                                    )
+                            ingress.getSpec().getRules().stream()
+                                    .flatMap(
+                                            rule ->
+                                                    rule.getHttp().getPaths().stream()
+                                                            .map(
+                                                                    path ->
+                                                                            rule.getHost()
+                                                                                    + path
+                                                                                            .getPath()))
                                     .toList());
                 } catch (Exception e) {
                     System.out.println(
@@ -73,11 +75,13 @@ public final class ServiceUrlResolver {
 
         if (isIstioEnabled) {
             List<GenericKubernetesResource> virtualServices =
-                    getResourceOfType(hasMetadata, "networking.istio.io/", "VirtualService").toList();
+                    getResourceOfType(hasMetadata, "networking.istio.io/", "VirtualService")
+                            .toList();
 
             for (GenericKubernetesResource resource : virtualServices) {
                 try {
-                    // For now we assume we have a simple VirtualService with no routing, thus the hosts are also  the URL.
+                    // For now we assume we have a simple VirtualService with no routing, thus the
+                    // hosts are also  the URL.
                     // One should consider to add support for 'spec/http[*]/match[*]/uri/prefix'
                     urls.addAll(resource.get("spec", "hosts"));
                 } catch (Exception e) {
@@ -89,19 +93,16 @@ public final class ServiceUrlResolver {
         }
 
         // Ensure every URL start with http-prefix
-        return urls.stream()
-                .map(url -> url.startsWith("http") ? url : "https://" + url)
-                .toList();
+        return urls.stream().map(url -> url.startsWith("http") ? url : "https://" + url).toList();
     }
 
-    private static <T extends HasMetadata> Stream<T> getResourceOfType(List<HasMetadata> resourcesStream, Class<T> type) {
-        return resourcesStream
-                .stream()
-                .filter(type::isInstance)
-                .map(type::cast);
+    private static <T extends HasMetadata> Stream<T> getResourceOfType(
+            List<HasMetadata> resourcesStream, Class<T> type) {
+        return resourcesStream.stream().filter(type::isInstance).map(type::cast);
     }
 
-    private static Stream<GenericKubernetesResource> getResourceOfType(List<HasMetadata> resourcesStream, String apiVersionPrefix, String kind) {
+    private static Stream<GenericKubernetesResource> getResourceOfType(
+            List<HasMetadata> resourcesStream, String apiVersionPrefix, String kind) {
         return getResourceOfType(resourcesStream, GenericKubernetesResource.class)
                 .filter(resource -> resource.getApiVersion().startsWith(apiVersionPrefix))
                 .filter(resource -> resource.getKind().equalsIgnoreCase(kind));
