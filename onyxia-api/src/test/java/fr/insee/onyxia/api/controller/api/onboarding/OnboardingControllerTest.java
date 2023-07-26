@@ -55,7 +55,7 @@ class OnboardingControllerTest extends BaseTest {
         region.setServices(servicesConfiguration);
         when(regionsConfiguration.getDefaultRegion()).thenReturn(region);
         mockMvc.perform(post("/onboarding").content("{}").contentType(APPLICATION_JSON))
-                .andExpect(status().isNotImplemented());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
