@@ -50,6 +50,7 @@ public class OnboardingController {
         if (!region.getServices().isAllowNamespaceCreation()) {
             throw new OnboardingDisabledException();
         }
+
         checkPermissions(region, request);
         final KubernetesService.Owner owner = new KubernetesService.Owner();
         if (request.getGroup() != null) {
