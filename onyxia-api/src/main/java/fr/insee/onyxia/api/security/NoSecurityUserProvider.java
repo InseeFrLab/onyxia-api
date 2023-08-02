@@ -20,17 +20,18 @@ public class NoSecurityUserProvider {
     @Bean
     public UserProvider getUserProvider() {
         return (Region region) -> {
-            final User user = User.newInstance()
-                    .setEmail("toto@tld.fr")
-                    .setNomComplet("John doe")
-                    .setIdep("default")
-                    .setIp(
-                            httpRequestUtils.getClientIpAddressIfServletRequestExist(
-                                    ((ServletRequestAttributes)
-                                            RequestContextHolder
-                                                    .currentRequestAttributes())
-                                            .getRequest()))
-                    .build();
+            final User user =
+                    User.newInstance()
+                            .setEmail("toto@tld.fr")
+                            .setNomComplet("John doe")
+                            .setIdep("default")
+                            .setIp(
+                                    httpRequestUtils.getClientIpAddressIfServletRequestExist(
+                                            ((ServletRequestAttributes)
+                                                            RequestContextHolder
+                                                                    .currentRequestAttributes())
+                                                    .getRequest()))
+                            .build();
             user.getAttributes().put("preferred_username", "toto");
             user.getAttributes().put("access_token", "mock-token-string");
             return user;
