@@ -1,5 +1,6 @@
 package fr.insee.onyxia.api.services.impl;
 
+import static fr.insee.onyxia.api.services.impl.ServiceUrlResolver.getServiceUrls;
 import static java.util.stream.Collectors.joining;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -24,19 +25,14 @@ import fr.insee.onyxia.model.project.Project;
 import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.*;
 import io.fabric8.kubernetes.api.model.EventList;
-import io.fabric8.kubernetes.api.model.HasMetadata;
-import io.fabric8.kubernetes.api.model.networking.v1.Ingress;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.github.inseefrlab.helmwrapper.configuration.HelmConfiguration;
 import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
 import io.github.inseefrlab.helmwrapper.model.HelmLs;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService.MultipleServiceFound;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -355,35 +351,9 @@ public class HelmAppsService implements AppsService {
     private Service getServiceFromRelease(
             Region region, HelmLs release, String manifest, User user) {
         KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
-        InputStream inputStream =
-                new ByteArrayInputStream(manifest.getBytes(Charset.forName("UTF-8")));
-        List<HasMetadata> hasMetadatas = client.load(inputStream).items();
-        List<Ingress> ingresses =
-                hasMetadatas.stream()
-                        .filter(hasMetadata -> hasMetadata instanceof Ingress)
-                        .map(hasMetadata -> (Ingress) hasMetadata)
-                        .collect(Collectors.toList());
+
+        List<String> urls = getServiceUrls(region, manifest, client);
         Service service = new Service();
-        List<String> urls = new ArrayList<>();
-        for (Ingress ingress : ingresses) {
-            try {
-                urls.addAll(
-                        ingress.getSpec().getRules().stream()
-                                .flatMap(
-                                        rule ->
-                                                rule.getHttp().getPaths().stream()
-                                                        .map(
-                                                                path ->
-                                                                        rule.getHost()
-                                                                                + path.getPath()))
-                                .map(url -> url.startsWith("http") ? url : "https://" + url)
-                                .collect(Collectors.toList()));
-            } catch (Exception e) {
-                System.out.println(
-                        "Warning : could not read urls from ingress "
-                                + ingress.getFullResourceName());
-            }
-        }
         service.setUrls(urls);
 
         service.setInstances(1);

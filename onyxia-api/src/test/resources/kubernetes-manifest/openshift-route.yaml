@@ -1,0 +1,12 @@
+# https://docs.openshift.com/container-platform/4.13/networking/routes/route-configuration.html#nw-creating-a-route_route-configuration
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: hello-openshift
+spec:
+  host: hello-openshift.example.com
+  port:
+    targetPort: 8080
+  to:
+    kind: Service
+    name: hello-openshift
