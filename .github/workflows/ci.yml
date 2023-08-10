@@ -14,6 +14,11 @@ on:
     paths-ignore:
       - 'docs/**'
 
+env:
+  REGISTRY: europe-north1-docker.pkg.dev/artifact-registry-3j/dapla-lab-docker/onyxia
+  IMAGE: onyxia-api
+  TAG: ${{ github.ref_name }}-${{ github.sha }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -46,6 +51,9 @@ jobs:
         run: mvn spotless:check
   docker:
     needs: build
+    permissions:
+      contents: "read"
+      id-token: "write"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -55,31 +63,48 @@ jobs:
         with:
           name: jar
           path: onyxia-api/target
-      - name: Docker meta
-        id: docker_meta
-        uses: crazy-max/ghaction-docker-meta@v1.12.0
+      - id: "auth"
+        name: "Authenticate to Google Cloud"
+        uses: "google-github-actions/auth@v1.1.1"
         with:
-          images: inseefrlab/onyxia-api # list of Docker images to use as base name for tags
+          workload_identity_provider: "projects/518276327717/locations/global/workloadIdentityPools/gh-actions/providers/gh-actions"
+          service_account: "gh-actions-dapla-lab@artifact-registry-3j.iam.gserviceaccount.com"
+          token_format: "access_token"
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
+        id: buildx
         uses: docker/setup-buildx-action@v1
-      - name: Login to DockerHub
-        if: github.event_name != 'pull_request'
+      - name: Login to registry
         uses: docker/login-action@v1
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          registry: ${{ env.REGISTRY }}
+          username: "oauth2accesstoken"
+          password: "${{ steps.auth.outputs.access_token }}"
+      - name: Docker meta
+        id: metadata
+        uses: docker/metadata-action@v3
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE }}
+          # Docker tags based on the following events/attributes
+          tags: |
+            type=schedule
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern=v{{version}}
+            type=semver,pattern=v{{major}}.{{minor}}
+            type=semver,pattern=v{{major}}
+            type=sha
+            type=raw,value=${{ env.TAG }}, enable=true
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: onyxia-api
           platforms: linux/amd64,linux/arm64
           file: onyxia-api/Dockerfile
-          push: ${{ github.event_name != 'pull_request' }}
+          push: true
           tags: |
-            ${{ steps.docker_meta.outputs.tags }}
-            ${{ github.ref == 'refs/heads/master' && 'inseefrlab/onyxia-api:latest' || '' }}
-          labels: ${{ steps.docker_meta.outputs.labels }}
+            ${{ steps.metadata.outputs.tags }}
+          labels: ${{ steps.metadata.outputs.labels }}
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
