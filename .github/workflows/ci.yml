@@ -15,7 +15,7 @@ on:
       - 'docs/**'
 
 env:
-  REGISTRY: europe-north1-docker.pkg.dev/artifact-registry-3j/dapla-lab-docker/onyxia
+  REGISTRY: europe-north1-docker.pkg.dev/artifact-registry-5n/dapla-lab-docker/onyxia
   IMAGE: onyxia-api
   TAG: ${{ github.ref_name }}-${{ github.sha }}
 
@@ -68,7 +68,7 @@ jobs:
         uses: "google-github-actions/auth@v1.1.1"
         with:
           workload_identity_provider: "projects/518276327717/locations/global/workloadIdentityPools/gh-actions/providers/gh-actions"
-          service_account: "gh-actions-dapla-lab@artifact-registry-3j.iam.gserviceaccount.com"
+          service_account: "gh-actions-dapla-lab@artifact-registry-5n.iam.gserviceaccount.com"
           token_format: "access_token"
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
