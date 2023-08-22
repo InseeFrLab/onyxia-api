@@ -67,7 +67,7 @@ jobs:
         name: "Authenticate to Google Cloud"
         uses: "google-github-actions/auth@v1.1.1"
         with:
-          workload_identity_provider: "projects/518276327717/locations/global/workloadIdentityPools/gh-actions/providers/gh-actions"
+          workload_identity_provider: "projects/848539402404/locations/global/workloadIdentityPools/gh-actions/providers/gh-actions"
           service_account: "gh-actions-dapla-lab@artifact-registry-5n.iam.gserviceaccount.com"
           token_format: "access_token"
       - name: Set up QEMU
