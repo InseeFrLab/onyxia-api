@@ -352,9 +352,20 @@ public class HelmAppsService implements AppsService {
             Region region, HelmLs release, String manifest, User user) {
         KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
 
-        List<String> urls = getServiceUrls(region, manifest, client);
         Service service = new Service();
-        service.setUrls(urls);
+
+        try {
+            List<String> urls = getServiceUrls(region, manifest, client);
+            service.setUrls(urls);
+        } catch (Exception e) {
+            System.out.println(
+                    "Warning : Failed to retrieve URLS for release "
+                            + release.getName()
+                            + " namespace "
+                            + release.getNamespace());
+            e.printStackTrace();
+            service.setUrls(List.of());
+        }
 
         service.setInstances(1);
 

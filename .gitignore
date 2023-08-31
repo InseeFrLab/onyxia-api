@@ -9,3 +9,4 @@ node_modules
 .vscode
 onyxia-api/src/main/resources/application.properties.local
 onyxia-api/src/main/resources/regions.json.local
+target
