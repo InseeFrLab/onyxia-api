@@ -207,7 +207,27 @@ public class HelmAppsService implements AppsService {
         }
         List<Service> services = new ArrayList<>();
         for (HelmLs release : installedCharts) {
-            services.add(getHelmApp(region, user, release));
+            Service service = getHelmApp(region, user, release);
+            boolean canUserSeeThisService = false;
+            if (project.getGroup() == null) {
+                // Personal group
+                canUserSeeThisService = true;
+            } else {
+                if (service.getEnv().containsKey("onyxia.share")
+                        && "true".equals(service.getEnv().get("onyxia.share"))) {
+                    // Service has been intentionally shared
+                    canUserSeeThisService = true;
+                }
+                if (service.getEnv().containsKey("onyxia.owner")
+                        && user.getIdep().equalsIgnoreCase(service.getEnv().get("onyxia.owner"))) {
+                    // User is owner
+                    canUserSeeThisService = true;
+                }
+            }
+
+            if (canUserSeeThisService) {
+                services.add(service);
+            }
         }
         ServicesListing listing = new ServicesListing();
         listing.setApps(services);
