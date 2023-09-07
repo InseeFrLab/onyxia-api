@@ -7,11 +7,6 @@ import io.github.inseefrlab.helmwrapper.configuration.HelmConfiguration;
 import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
 import io.github.inseefrlab.helmwrapper.model.HelmLs;
 import io.github.inseefrlab.helmwrapper.utils.Command;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.zeroturnaround.exec.InvalidExitValueException;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
@@ -19,18 +14,20 @@ import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.zeroturnaround.exec.InvalidExitValueException;
 
-/**
- * HelmInstall
- */
+/** HelmInstall */
 public class HelmInstallService {
 
     private final Logger logger = LoggerFactory.getLogger(HelmInstallService.class);
 
-    private final Pattern helmNamePattern = Pattern.compile("^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$");
+    private final Pattern helmNamePattern =
+            Pattern.compile("^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$");
 
-    public HelmInstallService() {
-    }
+    public HelmInstallService() {}
 
     public HelmInstaller installChart(
             HelmConfiguration configuration,
@@ -43,7 +40,8 @@ public class HelmInstallService {
             Map<String, String> env,
             final boolean skipTlsVerify,
             String caFile)
-            throws InvalidExitValueException, IOException, InterruptedException, TimeoutException, IllegalArgumentException {
+            throws InvalidExitValueException, IOException, InterruptedException, TimeoutException,
+                    IllegalArgumentException {
         String command = "helm upgrade --install ";
         if (skipTlsVerify) {
             command = command.concat("--insecure-skip-tls-verify ");
@@ -53,10 +51,12 @@ public class HelmInstallService {
                             "--ca-file " + System.getenv("CACERTS_DIR") + "/" + caFile + " ");
         }
 
-
         if (name != null) {
             if (!helmNamePattern.matcher(name).matches() || name.length() > 53) {
-                throw new IllegalArgumentException("Invalid release name " + name + " , must match regex ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$ and the length must not be longer than 53");
+                throw new IllegalArgumentException(
+                        "Invalid release name "
+                                + name
+                                + " , must match regex ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$ and the length must not be longer than 53");
             }
             command = command.concat(name + " ");
         } else {
@@ -89,7 +89,7 @@ public class HelmInstallService {
 
     public HelmLs[] listChartInstall(HelmConfiguration configuration, String namespace)
             throws JsonMappingException, InvalidExitValueException, JsonProcessingException,
-            IOException, InterruptedException, TimeoutException {
+                    IOException, InterruptedException, TimeoutException {
         String cmd = "helm ls";
         if (namespace != null) {
             cmd = cmd + " -n " + namespace;
@@ -191,9 +191,9 @@ public class HelmInstallService {
                         "One service was expected but " + result.length + " were found");
             }
         } catch (InvalidExitValueException
-                 | IOException
-                 | InterruptedException
-                 | TimeoutException e) {
+                | IOException
+                | InterruptedException
+                | TimeoutException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
