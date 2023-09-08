@@ -160,21 +160,24 @@ public class HelmAppsService implements AppsService {
         mapperHelm.writeValue(values, fusion);
         String namespaceId =
                 kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
-        HelmInstaller res =
-                getHelmInstallService()
-                        .installChart(
-                                getHelmConfiguration(region, user),
-                                catalogId + "/" + pkg.getName(),
-                                namespaceId,
-                                requestDTO.getName(),
-                                requestDTO.getPackageVersion(),
-                                requestDTO.isDryRun(),
-                                values,
-                                null,
-                                skipTlsVerify,
-                                caFile);
-        values.delete();
-        return List.of(res.getManifest());
+        try {
+            HelmInstaller res =
+                    getHelmInstallService()
+                            .installChart(
+                                    getHelmConfiguration(region, user),
+                                    catalogId + "/" + pkg.getName(),
+                                    namespaceId,
+                                    requestDTO.getName(),
+                                    requestDTO.getPackageVersion(),
+                                    requestDTO.isDryRun(),
+                                    values,
+                                    null,
+                                    skipTlsVerify,
+                                    caFile);
+            return List.of(res.getManifest());
+        } catch (IllegalArgumentException e) {
+            throw new AccessDeniedException(e.getMessage());
+        }
     }
 
     @Override
