@@ -114,6 +114,10 @@ A quota follows the Kubernetes model which is composed of:
 "limits.cpu"
 "requests.storage"
 "count/pods"
+"requests.ephemeral-storage"
+"limits.ephemeral-storage"
+"requests.nvidia.com/gpu"
+"limits.nvidia.com/gpu"
 
 ### Expose properties
 
