@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
+import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,8 @@ import org.zeroturnaround.exec.listener.ProcessListener;
 /** Executeur */
 public class Command {
 
+    private static final Pattern safeToConcatenate =
+            Pattern.compile("^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$");
     private static Logger LOGGER = LoggerFactory.getLogger(Command.class);
 
     private static ProcessExecutor getProcessExecutor() {
@@ -140,5 +143,17 @@ public class Command {
         }
 
         return newCommand;
+    }
+
+    public static void safeConcat(StringBuilder currentCommand, String toConcat)
+            throws IllegalArgumentException {
+        if (!safeToConcatenate.matcher(toConcat).matches()) {
+            throw new IllegalArgumentException(
+                    "Illegal character found while building helm command, refusing to concatenate "
+                            + toConcat
+                            + " to "
+                            + currentCommand.toString());
+        }
+        currentCommand.append(toConcat);
     }
 }

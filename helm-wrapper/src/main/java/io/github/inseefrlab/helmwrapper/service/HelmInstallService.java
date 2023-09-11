@@ -1,5 +1,7 @@
 package io.github.inseefrlab.helmwrapper.service;
 
+import static io.github.inseefrlab.helmwrapper.utils.Command.safeConcat;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,8 +28,6 @@ public class HelmInstallService {
     private final Logger logger = LoggerFactory.getLogger(HelmInstallService.class);
 
     private final Pattern helmNamePattern =
-            Pattern.compile("^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$");
-    private final Pattern safeToConcatenate =
             Pattern.compile("^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$");
 
     public HelmInstallService() {}
@@ -128,12 +128,22 @@ public class HelmInstallService {
             throw new IllegalArgumentException(
                     "Invalid info type " + infoType + ", should be manifest, notes or values");
         }
-        StringBuilder command = new StringBuilder("helm get " + infoType);
+        StringBuilder command = new StringBuilder("helm get " + infoType + " ");
         try {
             safeConcat(command, id);
             command.append(" --namespace ");
             safeConcat(command, namespace);
-            return Command.execute(configuration, command.toString()).getOutput().getString();
+            if (infoType.equals("notes")) {
+                return Command.executeAndGetResponseAsRaw(configuration, command.toString())
+                        .getOutput()
+                        .getString();
+            } else if (infoType.equals("values")) {
+                return Command.executeAndGetResponseAsJson(configuration, command.toString())
+                        .getOutput()
+                        .getString();
+            } else {
+                return Command.execute(configuration, command.toString()).getOutput().getString();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -152,18 +162,6 @@ public class HelmInstallService {
                     .collect(Collectors.joining(" "));
         }
         return "";
-    }
-
-    private void safeConcat(StringBuilder currentCommand, String toConcat)
-            throws IllegalArgumentException {
-        if (!safeToConcatenate.matcher(toConcat).matches()) {
-            throw new IllegalArgumentException(
-                    "Illegal character found while building helm command, refusing to concatenate "
-                            + toConcat
-                            + " to "
-                            + currentCommand.toString());
-        }
-        currentCommand.append(toConcat);
     }
 
     /**
