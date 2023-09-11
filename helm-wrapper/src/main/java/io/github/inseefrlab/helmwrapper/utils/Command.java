@@ -18,7 +18,8 @@ import org.zeroturnaround.exec.listener.ProcessListener;
 public class Command {
 
     private static final Pattern safeToConcatenate =
-            Pattern.compile("^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$");
+            Pattern.compile(
+                    "^[ ]*[a-z0-9]([-a-z0-9 ]*[a-z0-9 ])?(\\.[a-z0-9 ]([-a-z0-9 ]*[a-z0-9 ])?)*[ ]*$");
     private static Logger LOGGER = LoggerFactory.getLogger(Command.class);
 
     private static ProcessExecutor getProcessExecutor() {
