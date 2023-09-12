@@ -1,5 +1,7 @@
 package io.github.inseefrlab.helmwrapper.service;
 
+import static io.github.inseefrlab.helmwrapper.utils.Command.safeConcat;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,11 +9,6 @@ import io.github.inseefrlab.helmwrapper.configuration.HelmConfiguration;
 import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
 import io.github.inseefrlab.helmwrapper.model.HelmLs;
 import io.github.inseefrlab.helmwrapper.utils.Command;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.zeroturnaround.exec.InvalidExitValueException;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -20,12 +17,12 @@ import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.zeroturnaround.exec.InvalidExitValueException;
 
-import static io.github.inseefrlab.helmwrapper.utils.Command.safeConcat;
-
-/**
- * HelmInstall
- */
+/** HelmInstall */
 public class HelmInstallService {
 
     private final Logger logger = LoggerFactory.getLogger(HelmInstallService.class);
@@ -33,8 +30,7 @@ public class HelmInstallService {
     private final Pattern helmNamePattern =
             Pattern.compile("^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$");
 
-    public HelmInstallService() {
-    }
+    public HelmInstallService() {}
 
     public HelmInstaller installChart(
             HelmConfiguration configuration,
@@ -48,7 +44,7 @@ public class HelmInstallService {
             final boolean skipTlsVerify,
             String caFile)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException,
-            IllegalArgumentException {
+                    IllegalArgumentException {
         StringBuilder command = new StringBuilder("helm upgrade --install ");
         if (skipTlsVerify) {
             command.append("--insecure-skip-tls-verify ");
@@ -101,7 +97,7 @@ public class HelmInstallService {
 
     public HelmLs[] listChartInstall(HelmConfiguration configuration, String namespace)
             throws JsonMappingException, InvalidExitValueException, JsonProcessingException,
-            IOException, InterruptedException, TimeoutException {
+                    IOException, InterruptedException, TimeoutException {
         StringBuilder command = new StringBuilder("helm ls");
         if (namespace != null) {
             command.append(" -n ");
@@ -200,9 +196,9 @@ public class HelmInstallService {
                         "One service was expected but " + result.length + " were found");
             }
         } catch (InvalidExitValueException
-                 | IOException
-                 | InterruptedException
-                 | TimeoutException e) {
+                | IOException
+                | InterruptedException
+                | TimeoutException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
