@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jupyter-python-3574-ui
+spec:
+  rules:
+    - host: jupyter-python-3574-0.example.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: jupyter-python-3574
+                port:
+                  number: 8888
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - jupyter-python-3574-0.example.com

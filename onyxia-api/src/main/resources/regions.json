@@ -7,7 +7,6 @@
       "onyxiaAPI": {
         "baseURL": ""
       },
-      "includedGroupPattern": ".*_Onyxia",
       "services": {
         "type": "KUBERNETES",
         "initScript": "https://git.lab.sspcloud.fr/innovation/plateforme-onyxia/services-ressources/-/raw/master/onyxia-init.sh",
@@ -17,8 +16,8 @@
         "groupNamespacePrefix": "projet-",
         "authenticationMode" : "admin",
         "quotas": {
-          "enabled": false,
           "allowUserModification": true,
+          "enabled": false,
           "default": {
             "requests.memory": "10Gi",
             "requests.cpu": "10",
@@ -26,6 +25,24 @@
             "limits.cpu": "10",
             "requests.storage": "100Gi",
             "count/pods": "50"
+          },
+          "userEnabled": false,
+          "user": {
+            "requests.memory": "11Gi",
+            "requests.cpu": "11",
+            "limits.memory": "11Gi",
+            "limits.cpu": "11",
+            "requests.storage": "101Gi",
+            "count/pods": "51"
+          },
+          "groupEnabled": false,
+          "group": {
+            "requests.memory": "12Gi",
+            "requests.cpu": "12",
+            "limits.memory": "12Gi",
+            "limits.cpu": "12",
+            "requests.storage": "102Gi",
+            "count/pods": "52"
           }
         },
         "defaultConfiguration": {
@@ -35,7 +52,11 @@
         "expose": {
           "domain": "fakedomain.kub.example.com",
           "ingress": true,
-          "route": false
+          "route": false,
+          "istio": {
+            "enabled": false,
+            "gateways": []
+          }
         },
         "monitoring": {
           "URLPattern": "https://graphana.kub.example.com/$appIdSlug"

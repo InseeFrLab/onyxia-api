@@ -185,8 +185,8 @@ public class Region {
         private Service.ServiceType type;
         private boolean singleNamespace = true;
         private boolean allowNamespaceCreation = true;
-        private Map<String, String> namespaceLabels = new HashMap<String, String>();
-        private Map<String, String> namespaceAnnotations = new HashMap<String, String>();
+        private Map<String, String> namespaceLabels = new HashMap<>();
+        private Map<String, String> namespaceAnnotations = new HashMap<>();
         private boolean userNamespace = true;
         private String namespacePrefix = "user-";
         private String groupNamespacePrefix = "projet-";
@@ -449,11 +449,20 @@ public class Region {
         }
 
         public static class Quotas {
+            // could be deprecated as userQuota/groupQuota is enough
             private boolean enabled = false;
+            private boolean userEnabled = false;
+            private boolean groupEnabled = false;
             private boolean allowUserModification = true;
-
+            // could be deprecated
             @JsonProperty("default")
             private Quota defaultQuota;
+
+            @JsonProperty("user")
+            private Quota userQuota;
+
+            @JsonProperty("group")
+            private Quota groupQuota;
 
             public boolean isEnabled() {
                 return enabled;
@@ -461,6 +470,38 @@ public class Region {
 
             public void setEnabled(boolean enabled) {
                 this.enabled = enabled;
+            }
+
+            public boolean isUserEnabled() {
+                return userEnabled;
+            }
+
+            public void setUserEnabled(boolean userEnabled) {
+                this.userEnabled = userEnabled;
+            }
+
+            public boolean isGroupEnabled() {
+                return groupEnabled;
+            }
+
+            public void setGroupEnabled(boolean groupEnabled) {
+                this.groupEnabled = groupEnabled;
+            }
+
+            public Quota getUserQuota() {
+                return userQuota;
+            }
+
+            public void setUserQuota(Quota userQuota) {
+                this.userQuota = userQuota;
+            }
+
+            public Quota getGroupQuota() {
+                return groupQuota;
+            }
+
+            public void setGroupQuota(Quota groupQuota) {
+                this.groupQuota = groupQuota;
             }
 
             public boolean isAllowUserModification() {
@@ -720,6 +761,7 @@ public class Region {
 
         private String kvEngine;
         private String role;
+        private String authPath = "jwt";
 
         private KeycloakParams keycloakParams;
 
@@ -745,6 +787,14 @@ public class Region {
 
         public void setRole(String role) {
             this.role = role;
+        }
+
+        public String getAuthPath() {
+            return authPath;
+        }
+
+        public void setAuthPath(String authPath) {
+            this.authPath = authPath;
         }
 
         public void setKeycloakParams(KeycloakParams keycloakParams) {
@@ -959,6 +1009,8 @@ public class Region {
 
         private boolean route = false;
 
+        private IstioIngress istio;
+
         public void setDomain(String domain) {
             this.domain = domain;
         }
@@ -989,6 +1041,36 @@ public class Region {
 
         public boolean getRoute() {
             return route;
+        }
+
+        public void setIstio(IstioIngress istio) {
+            this.istio = istio;
+        }
+
+        public IstioIngress getIstio() {
+            return istio;
+        }
+    }
+
+    public static class IstioIngress {
+        private boolean enabled = false;
+
+        private String[] gateways = new String[0];
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public String[] getGateways() {
+            return gateways;
+        }
+
+        public void setGateways(String[] gateways) {
+            this.gateways = gateways;
         }
     }
 
@@ -1100,14 +1182,26 @@ public class Region {
     }
 
     public static class PackageRepositoryInjection {
-        @Schema(description = "httpProxyUrl to inject in helm values")
+
+        @Schema(description = "cranProxyUrl to inject in helm values")
         private String cranProxyUrl;
 
-        @Schema(description = "httpProxyUrl to inject in helm values")
+        @Schema(description = "condaProxyUrl to inject in helm values")
         private String condaProxyUrl;
 
-        @Schema(description = "httpProxyUrl to inject in helm values")
+        @Schema(description = "packageManager url to inject in helm values")
+        private String packageManagerUrl;
+
+        @Schema(description = "pypiProxyUrl to inject in helm values")
         private String pypiProxyUrl;
+
+        public String getPackageManagerUrl() {
+            return packageManagerUrl;
+        }
+
+        public void setPackageManagerUrl(String packageManagerUrl) {
+            this.packageManagerUrl = packageManagerUrl;
+        }
 
         public String getCranProxyUrl() {
             return cranProxyUrl;

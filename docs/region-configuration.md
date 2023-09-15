@@ -99,9 +99,13 @@ When this feature is enabled, namespaces are created with **quotas**.
 
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
-| `enabled` | false | Whether or not users are subject to a resource limitation. Quotas can only be applied to users and not to groups. |
-| `allowUserModification` | true | Whether or not the user can manually disable or change its own limitation. |
-| `default` | | The quota is applied on the namespace at creation, before user modification or reset. New configuration will not be applied to existing namespaces. |
+| `enabled` | false | Whether or not users are subject to a resource limitation. Quotas can only be applied to users and not to groups. (will be deprecated see userEnabled and groupEnabled) |
+| `allowUserModification` | true | Whether or not the user can manually disable or change its own limitation or group limitation. |
+| `default` | | This quota is applied on the namespace at creation, before user modification or reset. New configuration will not be applied to existing namespaces. (will be deprecated see userEnabled and groupEnabled) |
+| `userEnabled` | false | Whether or not users are subject to a resource limitation. Enable this on user namespace only with user quota content based on kubernetes model . |
+| `user` | false | This quota is applied on the user namespace at creation, before user modification or reset. New configuration will not be applied to already existing namespaces. |
+| `groupEnabled` | false |Whether or not users are subject to a resource limitation. Enable this on group/project namespace only ith group quota content. |
+| `group` | false | This quota is applied on the group namespace at creation, before user modification or reset. New configuration will not be applied to already existing namespaces. |
 
 A quota follows the Kubernetes model which is composed of:
 "requests.memory"
@@ -110,17 +114,32 @@ A quota follows the Kubernetes model which is composed of:
 "limits.cpu"
 "requests.storage"
 "count/pods"
+"requests.ephemeral-storage"
+"limits.ephemeral-storage"
+"requests.nvidia.com/gpu"
+"limits.nvidia.com/gpu"
 
 ### Expose properties
 
  with **expose**.
 
-| Key | Default | Description |
-| --------------------- | ------- | ------------------------------------------------------------------ |
-| `domain` | | When users request to expose their service, only the subdomain of this object will be created. |
-| `ingressClassName` | '' | Ingress Class Name: useful if you want to use a specific ingress controller instead of a default one |
-| `ingress` | true | Whether or not Kubernetes Ingress is enabled |
-| `route` | false | Whether or not OpenShift Route is enabled |
+| Key                | Default | Description                                                                                          |
+|--------------------|---------|------------------------------------------------------------------------------------------------------|
+| `domain`           |         | When users request to expose their service, only the subdomain of this object will be created.       |
+| `ingressClassName` | ''      | Ingress Class Name: useful if you want to use a specific ingress controller instead of a default one |
+| `ingress`          | true    | Whether or not Kubernetes Ingress is enabled                                                         |
+| `route`            | false   | Whether or not OpenShift Route is enabled                                                            |
+| `istio`            |         | See [Istio](#istio)                                                                                  |
+
+
+#### istio
+
+| Key        | Default | Description                                                                                                 |
+|------------|--------|--------------------------------------------------------------------------------------------------------------|
+| `enabled`  | false  | Whether or not Istio is enabled                                                                              |
+| `gateways` | []     | List of istio gateways to be used. Should contain at least one element. E.g. `["istio-system/my-gateway"]`   |
+
+
 
 ### Default configuration properties
 
@@ -225,6 +244,7 @@ It can be used to add additional features to Onyxia. It helps users to keep thei
 | `URL` | | URL of the atlas service for the region. | "https://vault.change.me" |
 | `kvEngine` | | mount point of the kv engine. | "onyxia-kv" |
 | `role` | | role of the user in vault | "onyxia-user" |
+| `authPath` | "jwt" | path of the jwt auth method. | "jwt" |
 | `keycloakParams` | | Configuration of the Keycloak service used to get an access token on the vault service. It defines the Keycloak realm, clientId, and Url. | {realm: "sspcloud", clientId: "vault", URL: "https://auth.change.me/auth"} |
 
 ## ProxyConfiguration properties
@@ -255,6 +275,7 @@ It can be used to inject the package repository in the services, if the Helm cha
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
 | `cranProxyUrl` | | URL of enterprise local cran repository. | "https://cranProxy" |
 | `condaProxyUrl` | | URL of enterprise local Conda repository. | "https://condaProxyUrl" |
+| `packageManagerUrl` | | URL of the packagemanager. | "https://packagemanager.posit.co/cran/__linux__" or "https://packagemanagerUrl.internal/cran/__linux__" will be in first position |
 | `pypiProxyUrl` | | URL of enterprise local PyPI repository. | "https://pypiProxyUrl" |
 
 ## CertificateAuthorityInjection properties
