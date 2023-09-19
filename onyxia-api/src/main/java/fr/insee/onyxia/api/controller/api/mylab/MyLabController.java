@@ -13,6 +13,10 @@ import fr.insee.onyxia.model.project.Project;
 import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.Service;
 import fr.insee.onyxia.model.service.UninstallService;
+import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanKind;
+import io.opentelemetry.api.trace.Tracer;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -35,6 +39,8 @@ public class MyLabController {
     @Autowired private UserProvider userProvider;
 
     @Autowired private CatalogService catalogService;
+
+    @Autowired private OpenTelemetry openTelemetry;
 
     @Operation(
             summary = "List the services installed in a namespace.",
@@ -229,6 +235,9 @@ public class MyLabController {
 
     private Collection<Object> publishApps(
             Region region, Project project, CreateServiceDTO requestDTO) throws Exception {
+        Tracer tracer = openTelemetry.getTracer(getClass().getCanonicalName());
+        Span span = tracer.spanBuilder("New service").setSpanKind(SpanKind.INTERNAL).startSpan();
+        span.addEvent("Start");
         String catalogId = "internal";
         if (requestDTO.getCatalogId() != null && requestDTO.getCatalogId().length() > 0) {
             catalogId = requestDTO.getCatalogId();
@@ -238,9 +247,24 @@ public class MyLabController {
         boolean skipTlsVerify = catalog.getSkipTlsVerify();
         String caFile = catalog.getCaFile();
         User user = userProvider.getUser(region);
+        span.setAttribute("user", user.getIdep());
+        span.setAttribute("package", requestDTO.getPackageName());
+        span.setAttribute("catalog", requestDTO.getCatalogId());
         Map<String, Object> fusion = new HashMap<>();
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
-        return helmAppsService.installApp(
-                region, project, requestDTO, catalogId, pkg, user, fusion, skipTlsVerify, caFile);
+        Collection<Object> result =
+                helmAppsService.installApp(
+                        region,
+                        project,
+                        requestDTO,
+                        catalogId,
+                        pkg,
+                        user,
+                        fusion,
+                        skipTlsVerify,
+                        caFile);
+        span.addEvent("End");
+        span.end();
+        return result;
     }
 }
