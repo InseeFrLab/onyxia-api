@@ -1,7 +1,10 @@
 package fr.insee.onyxia.api;
 
+import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.sdk.autoconfigure.AutoConfiguredOpenTelemetrySdk;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 @SpringBootApplication(scanBasePackages = {"io.github.inseefrlab", "fr.insee.onyxia"})
@@ -10,5 +13,10 @@ public class Application {
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
+    }
+
+    @Bean
+    public OpenTelemetry openTelemetry() {
+        return AutoConfiguredOpenTelemetrySdk.builder().build().getOpenTelemetrySdk();
     }
 }
