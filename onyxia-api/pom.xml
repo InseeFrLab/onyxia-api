@@ -64,12 +64,12 @@
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
-            <version>4.10.0</version>
+            <version>4.11.0</version>
         </dependency>
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>logging-interceptor</artifactId>
-            <version>4.10.0</version>
+            <version>4.11.0</version>
         </dependency>
         <dependency>
             <groupId>innovation.insee</groupId>
@@ -96,7 +96,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.23.0</version>
+            <version>1.24.0</version>
         </dependency>
 
         <dependency>
@@ -114,13 +114,13 @@
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>s3</artifactId>
-            <version>2.20.85</version>
+            <version>2.20.158</version>
         </dependency>
 
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>sts</artifactId>
-            <version>2.20.85</version>
+            <version>2.20.158</version>
         </dependency>
 
         <dependency>
@@ -132,7 +132,7 @@
 
     <properties>
         <java.version>17</java.version>
-        <kotlin.version>1.7.0</kotlin.version>
+        <kotlin.version>1.9.10</kotlin.version>
     </properties>
 
     <build>
@@ -203,7 +203,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.6.1</version>
+                <version>3.11.0</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
