@@ -59,7 +59,7 @@
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-spring-boot-starter</artifactId>
-            <version>21.1.1</version>
+            <version>21.1.2</version>
         </dependency>
 
         <dependency>
