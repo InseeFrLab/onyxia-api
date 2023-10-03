@@ -133,7 +133,7 @@
 
     <properties>
         <java.version>17</java.version>
-        <kotlin.version>1.7.0</kotlin.version>
+        <kotlin.version>1.9.10</kotlin.version>
     </properties>
 
     <build>
