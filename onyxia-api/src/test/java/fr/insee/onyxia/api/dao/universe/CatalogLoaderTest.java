@@ -7,13 +7,16 @@ import static org.hamcrest.Matchers.is;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.configuration.CustomObjectMapper;
 import fr.insee.onyxia.api.util.TestUtils;
+import fr.insee.onyxia.model.helm.Chart;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.util.CollectionUtils;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {CatalogLoader.class, CustomObjectMapper.class})
@@ -47,6 +50,27 @@ public class CatalogLoaderTest {
                 "cw does not have the excluded packages",
                 cw.getCatalog().getPackages().stream()
                         .noneMatch(p -> p.getName().equalsIgnoreCase("excludeme")));
+    }
+
+    @Test
+    public void loadMaintainers() {
+        CatalogWrapper cw = new CatalogWrapper();
+        cw.setType("helm");
+        cw.setLocation("classpath:/catalog-loader-test");
+        cw.setExcludedCharts(List.of("excludemetoo", "excludeme"));
+        catalogLoader.updateCatalog(cw);
+        List<List<Chart.Maintainer>> maintainers =
+                cw.getCatalog().getPackages().stream()
+                        .map(p -> ((Chart) p).getMaintainers())
+                        .collect(Collectors.toList());
+        assertThat(
+                "Maintainers have been loaded",
+                maintainers.stream()
+                        .filter(l -> !CollectionUtils.isEmpty(l))
+                        .anyMatch(
+                                l ->
+                                        l.get(0).getName().equals("test")
+                                                && l.get(0).getEmail().equals("test@example.com")));
     }
 
     @DisplayName(
