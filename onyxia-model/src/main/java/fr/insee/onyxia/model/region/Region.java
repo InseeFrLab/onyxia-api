@@ -1,5 +1,6 @@
 package fr.insee.onyxia.model.region;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.insee.onyxia.model.service.Service;
@@ -183,7 +184,7 @@ public class Region {
         private String groupNamespacePrefix = "projet-";
         private String usernamePrefix;
         private String groupPrefix;
-        private AuthenticationMode authenticationMode = AuthenticationMode.IMPERSONATE;
+        private AuthenticationMode authenticationMode = AuthenticationMode.SERVICEACCOUNT;
         private Expose expose;
         private Server server;
         private Monitoring monitoring;
@@ -366,10 +367,12 @@ public class Region {
         public static enum AuthenticationMode {
             @JsonProperty("impersonate")
             IMPERSONATE,
-            @JsonProperty("admin")
-            ADMIN,
-            @JsonProperty("user")
-            USER
+            @JsonProperty("serviceAccount")
+            @JsonAlias("admin")
+            SERVICEACCOUNT,
+
+            @JsonProperty("tokenPassthrough")
+            TOKEN_PASSTHROUGH
         }
 
         public static class DefaultConfiguration {
