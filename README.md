@@ -58,12 +58,12 @@ Each variable can be overridden using environment variables.
 | `authentication.mode` | `none` | Supported modes are : `none`, `openidconnect` (must be configured) |
 
 ### Open id configuration (used when `authentication.mode`=`openidconnect`)  
-You have to specify either `oidc.issuer-uri` or `oidc.jwk-uri`.  
+You have to specify `oidc.issuer-uri`. `oidc.jwk-uri` is optional.  
 Common used configurations :  
 | Provider | `oidc.issuer-uri` | `oidc.jwk-uri` |
 |---|---|---|
 | Keycloak  | `https://keycloak.example.com/auth/realms/REALMNAME` |   |
-| Google  |   | `https://www.googleapis.com/oauth2/v3/certs` |
+| Google  | https://accounts.google.com  | `https://www.googleapis.com/oauth2/v3/certs` |
 | Microsoft | `https://login.microsoftonline.com/TENANTID/v2.0` |   |
 
 Configurable properties :  
@@ -71,6 +71,7 @@ Configurable properties :
 | -------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | `oidc.issuer-uri` | | Issuer URI, should be the same as the `iss` field of the tokens |
 | `oidc.jwk-uri` | | JWK URI, useful when auto discovery is not available or when `iss` is not consistent across tokens (e.g [Google](https://stackoverflow.com/questions/38618826/can-i-get-a-consistent-iss-value-for-a-google-openidconnect-id-token)) | 
+| `oidc.clientID` | | Client id to be used by Onyxia web application |
 | `oidc.audience` | | Optional : audience to validate. Must be the same as the token's `aud` field |
 | `oidc.username-claim` | `preferred_username` | Claim to be used as user id. Must conform to [RFC 1123](https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#dns-label-names) |
 | `oidc.groups-claim` | `groups` | Claim to be used as list of user groups. |

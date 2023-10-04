@@ -51,6 +51,9 @@ public class OIDCConfiguration {
     @Value("${oidc.audience}")
     private String audience;
 
+    @Value("${oidc.clientID}")
+    private String clientID;
+
     @Autowired private HttpRequestUtils httpRequestUtils;
 
     @Bean
@@ -149,16 +152,44 @@ public class OIDCConfiguration {
         this.httpRequestUtils = httpRequestUtils;
     }
 
+    public String getGroupsClaim() {
+        return groupsClaim;
+    }
+
+    public void setGroupsClaim(String groupsClaim) {
+        this.groupsClaim = groupsClaim;
+    }
+
+    public String getIssuerUri() {
+        return issuerUri;
+    }
+
     public void setIssuerUri(String issuerUri) {
         this.issuerUri = issuerUri;
+    }
+
+    public String getJwkUri() {
+        return jwkUri;
+    }
+
+    public void setJwkUri(String jwkUri) {
+        this.jwkUri = jwkUri;
+    }
+
+    public String getAudience() {
+        return audience;
     }
 
     public void setAudience(String audience) {
         this.audience = audience;
     }
 
-    public void setJwkUri(String jwkUri) {
-        this.jwkUri = jwkUri;
+    public String getClientID() {
+        return clientID;
+    }
+
+    public void setClientID(String clientID) {
+        this.clientID = clientID;
     }
 
     @Bean
