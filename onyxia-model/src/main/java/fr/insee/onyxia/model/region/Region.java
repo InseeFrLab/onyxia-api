@@ -728,13 +728,12 @@ public class Region {
         }
     }
 
-    @Schema(description = "Cloudshell data and health")
     public static class Atlas {
 
         @JsonProperty("URL")
         private String url;
 
-        private Authentication authentication;
+        private Authentication authentication = new Authentication();
 
         public String getUrl() {
             return url;
@@ -763,7 +762,7 @@ public class Region {
         private String role;
         private String authPath = "jwt";
 
-        private Authentication authentication;
+        private Authentication authentication = new Authentication();
 
         public String getUrl() {
             return url;
@@ -811,7 +810,7 @@ public class Region {
         @JsonProperty("URL")
         private String url;
 
-        private Authentication authentication;
+        private Authentication authentication = new Authentication();
 
         public String getUrl() {
             return url;
@@ -868,7 +867,7 @@ public class Region {
         private String groupBucketPrefix = "";
         private String bucketClaim = "preferred_username";
         private long defaultDurationSeconds;
-        private Authentication authentication;
+        private Authentication authentication = new Authentication();
         private Monitoring monitoring;
         private boolean acceptBucketCreation = true;
 
