@@ -744,11 +744,11 @@ public class Region {
             this.url = url;
         }
 
-        public Authentication getKeycloakParams() {
+        public Authentication getAuthentication() {
             return authentication;
         }
 
-        public void setKeycloakParams(Authentication authentication) {
+        public void setAuthentication(Authentication authentication) {
             this.authentication = authentication;
         }
     }
@@ -797,11 +797,11 @@ public class Region {
             this.authPath = authPath;
         }
 
-        public Authentication getKeycloakParams() {
+        public Authentication getAuthentication() {
             return authentication;
         }
 
-        public void setKeycloakParams(Authentication authentication) {
+        public void setAuthentication(Authentication authentication) {
             this.authentication = authentication;
         }
     }
@@ -821,11 +821,11 @@ public class Region {
             this.url = url;
         }
 
-        public Authentication getKeycloakParams() {
+        public Authentication getAuthentication() {
             return authentication;
         }
 
-        public void setKeycloakParams(Authentication authentication) {
+        public void setAuthentication(Authentication authentication) {
             this.authentication = authentication;
         }
     }
@@ -952,11 +952,11 @@ public class Region {
             this.monitoring = monitoring;
         }
 
-        public Authentication getKeycloakParams() {
+        public Authentication getAuthentication() {
             return authentication;
         }
 
-        public void setKeycloakParams(Authentication authentication) {
+        public void setAuthentication(Authentication authentication) {
             this.authentication = authentication;
         }
 
