@@ -40,16 +40,16 @@ public class ConfigurationController {
         }
         appInfo.setBuild(buildInfo);
         appInfo.setRegions(regionsConfiguration.getResolvedRegions());
-        AuthenticationInfo authenticationInfo = new AuthenticationInfo();
+        Region.Authentication authenticationInfo = new Region.Authentication();
         if (oidcConfiguration != null) {
             authenticationInfo.setMode("openidconnect");
-            OpenIDConnectConfigurationInfo oidcInfo = new OpenIDConnectConfigurationInfo();
+            Region.OpenIDConnectConfigurationInfo oidcInfo =
+                    new Region.OpenIDConnectConfigurationInfo();
             oidcInfo.setClientID(oidcConfiguration.getClientID());
             oidcInfo.setIssuerURI(oidcConfiguration.getIssuerUri());
-            oidcInfo.setAudience(oidcConfiguration.getAudience());
             authenticationInfo.setOidcConfiguration(oidcInfo);
         }
-        appInfo.setAuthenticationInfo(authenticationInfo);
+        appInfo.setAuthentication(authenticationInfo);
         return appInfo;
     }
 
@@ -61,64 +61,13 @@ public class ConfigurationController {
         this.oidcConfiguration = oidcConfiguration;
     }
 
-    public static class AuthenticationInfo {
-        private String mode = "none";
-        private OpenIDConnectConfigurationInfo oidcConfiguration = null;
-
-        public String getMode() {
-            return mode;
-        }
-
-        public void setMode(String mode) {
-            this.mode = mode;
-        }
-
-        public OpenIDConnectConfigurationInfo getOidcConfiguration() {
-            return oidcConfiguration;
-        }
-
-        public void setOidcConfiguration(OpenIDConnectConfigurationInfo oidcConfiguration) {
-            this.oidcConfiguration = oidcConfiguration;
-        }
-    }
-
-    public static class OpenIDConnectConfigurationInfo {
-        private String issuerURI;
-        private String clientID;
-        private String audience = null;
-
-        public String getIssuerURI() {
-            return issuerURI;
-        }
-
-        public void setIssuerURI(String issuerURI) {
-            this.issuerURI = issuerURI;
-        }
-
-        public String getClientID() {
-            return clientID;
-        }
-
-        public void setClientID(String clientID) {
-            this.clientID = clientID;
-        }
-
-        public String getAudience() {
-            return audience;
-        }
-
-        public void setAudience(String audience) {
-            this.audience = audience;
-        }
-    }
-
-    @Schema(description = "Cloudshell data and health")
+    @Schema(description = "")
     public class AppInfo {
 
         private BuildInfo build;
         private List<Region> regions;
 
-        private AuthenticationInfo authenticationInfo;
+        private Region.Authentication authentication;
 
         public BuildInfo getBuild() {
             return build;
@@ -136,12 +85,12 @@ public class ConfigurationController {
             this.regions = regions;
         }
 
-        public AuthenticationInfo getAuthenticationInfo() {
-            return authenticationInfo;
+        public Region.Authentication getAuthentication() {
+            return authentication;
         }
 
-        public void setAuthenticationInfo(AuthenticationInfo authenticationInfo) {
-            this.authenticationInfo = authenticationInfo;
+        public void setAuthentication(Region.Authentication authentication) {
+            this.authentication = authentication;
         }
     }
 

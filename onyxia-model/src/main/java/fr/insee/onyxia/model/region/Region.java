@@ -734,7 +734,7 @@ public class Region {
         @JsonProperty("URL")
         private String url;
 
-        private KeycloakParams keycloakParams;
+        private Authentication authentication;
 
         public String getUrl() {
             return url;
@@ -744,12 +744,12 @@ public class Region {
             this.url = url;
         }
 
-        public KeycloakParams getKeycloakParams() {
-            return keycloakParams;
+        public Authentication getKeycloakParams() {
+            return authentication;
         }
 
-        public void setKeycloakParams(KeycloakParams keycloakParams) {
-            this.keycloakParams = keycloakParams;
+        public void setKeycloakParams(Authentication authentication) {
+            this.authentication = authentication;
         }
     }
 
@@ -763,7 +763,7 @@ public class Region {
         private String role;
         private String authPath = "jwt";
 
-        private KeycloakParams keycloakParams;
+        private Authentication authentication;
 
         public String getUrl() {
             return url;
@@ -797,12 +797,12 @@ public class Region {
             this.authPath = authPath;
         }
 
-        public KeycloakParams getKeycloakParams() {
-            return keycloakParams;
+        public Authentication getKeycloakParams() {
+            return authentication;
         }
 
-        public void setKeycloakParams(KeycloakParams keycloakParams) {
-            this.keycloakParams = keycloakParams;
+        public void setKeycloakParams(Authentication authentication) {
+            this.authentication = authentication;
         }
     }
 
@@ -811,7 +811,7 @@ public class Region {
         @JsonProperty("URL")
         private String url;
 
-        private KeycloakParams keycloakParams;
+        private Authentication authentication;
 
         public String getUrl() {
             return url;
@@ -821,12 +821,12 @@ public class Region {
             this.url = url;
         }
 
-        public KeycloakParams getKeycloakParams() {
-            return keycloakParams;
+        public Authentication getKeycloakParams() {
+            return authentication;
         }
 
-        public void setKeycloakParams(KeycloakParams keycloakParams) {
-            this.keycloakParams = keycloakParams;
+        public void setKeycloakParams(Authentication authentication) {
+            this.authentication = authentication;
         }
     }
 
@@ -868,7 +868,7 @@ public class Region {
         private String groupBucketPrefix = "";
         private String bucketClaim = "preferred_username";
         private long defaultDurationSeconds;
-        private KeycloakParams keycloakParams;
+        private Authentication authentication;
         private Monitoring monitoring;
         private boolean acceptBucketCreation = true;
 
@@ -952,12 +952,12 @@ public class Region {
             this.monitoring = monitoring;
         }
 
-        public KeycloakParams getKeycloakParams() {
-            return keycloakParams;
+        public Authentication getKeycloakParams() {
+            return authentication;
         }
 
-        public void setKeycloakParams(KeycloakParams keycloakParams) {
-            this.keycloakParams = keycloakParams;
+        public void setKeycloakParams(Authentication authentication) {
+            this.authentication = authentication;
         }
 
         public boolean isAcceptBucketCreation() {
@@ -969,35 +969,46 @@ public class Region {
         }
     }
 
-    public static class KeycloakParams {
-        @JsonProperty("URL")
-        private String url;
+    public static class Authentication {
 
-        private String clientId;
-        private String realm;
+        private String mode = "none";
+        private OpenIDConnectConfigurationInfo oidcConfiguration = null;
 
-        public String getUrl() {
-            return url;
+        public String getMode() {
+            return mode;
         }
 
-        public void setUrl(String url) {
-            this.url = url;
+        public void setMode(String mode) {
+            this.mode = mode;
         }
 
-        public String getClientId() {
-            return clientId;
+        public OpenIDConnectConfigurationInfo getOidcConfiguration() {
+            return oidcConfiguration;
         }
 
-        public void setUClientId(String clientId) {
-            this.clientId = clientId;
+        public void setOidcConfiguration(OpenIDConnectConfigurationInfo oidcConfiguration) {
+            this.oidcConfiguration = oidcConfiguration;
+        }
+    }
+
+    public static class OpenIDConnectConfigurationInfo {
+        private String issuerURI;
+        private String clientID;
+
+        public String getIssuerURI() {
+            return issuerURI;
         }
 
-        public String getRealm() {
-            return realm;
+        public void setIssuerURI(String issuerURI) {
+            this.issuerURI = issuerURI;
         }
 
-        public void setRealm(String realm) {
-            this.realm = realm;
+        public String getClientID() {
+            return clientID;
+        }
+
+        public void setClientID(String clientID) {
+            this.clientID = clientID;
         }
     }
 
