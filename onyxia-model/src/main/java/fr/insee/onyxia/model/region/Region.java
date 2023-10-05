@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.insee.onyxia.model.service.Service;
 import fr.insee.onyxia.model.service.quota.Quota;
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -733,7 +734,7 @@ public class Region {
         @JsonProperty("URL")
         private String url;
 
-        private Authentication authentication = new Authentication();
+        private OIDCConfiguration OIDCConfiguration = null;
 
         public String getUrl() {
             return url;
@@ -743,12 +744,12 @@ public class Region {
             this.url = url;
         }
 
-        public Authentication getAuthentication() {
-            return authentication;
+        public Region.OIDCConfiguration getOIDCConfiguration() {
+            return OIDCConfiguration;
         }
 
-        public void setAuthentication(Authentication authentication) {
-            this.authentication = authentication;
+        public void setOIDCConfiguration(Region.OIDCConfiguration OIDCConfiguration) {
+            this.OIDCConfiguration = OIDCConfiguration;
         }
     }
 
@@ -762,7 +763,7 @@ public class Region {
         private String role;
         private String authPath = "jwt";
 
-        private Authentication authentication = new Authentication();
+        private OIDCConfiguration OIDCConfiguration = null;
 
         public String getUrl() {
             return url;
@@ -796,12 +797,12 @@ public class Region {
             this.authPath = authPath;
         }
 
-        public Authentication getAuthentication() {
-            return authentication;
+        public Region.OIDCConfiguration getOIDCConfiguration() {
+            return OIDCConfiguration;
         }
 
-        public void setAuthentication(Authentication authentication) {
-            this.authentication = authentication;
+        public void setOIDCConfiguration(Region.OIDCConfiguration OIDCConfiguration) {
+            this.OIDCConfiguration = OIDCConfiguration;
         }
     }
 
@@ -810,7 +811,7 @@ public class Region {
         @JsonProperty("URL")
         private String url;
 
-        private Authentication authentication = new Authentication();
+        private OIDCConfiguration OIDCConfiguration = null;
 
         public String getUrl() {
             return url;
@@ -820,12 +821,12 @@ public class Region {
             this.url = url;
         }
 
-        public Authentication getAuthentication() {
-            return authentication;
+        public Region.OIDCConfiguration getOIDCConfiguration() {
+            return OIDCConfiguration;
         }
 
-        public void setAuthentication(Authentication authentication) {
-            this.authentication = authentication;
+        public void setOIDCConfiguration(Region.OIDCConfiguration OIDCConfiguration) {
+            this.OIDCConfiguration = OIDCConfiguration;
         }
     }
 
@@ -867,7 +868,7 @@ public class Region {
         private String groupBucketPrefix = "";
         private String bucketClaim = "preferred_username";
         private long defaultDurationSeconds;
-        private Authentication authentication = new Authentication();
+        private OIDCConfiguration OIDCConfiguration = null;
         private Monitoring monitoring;
         private boolean acceptBucketCreation = true;
 
@@ -951,12 +952,12 @@ public class Region {
             this.monitoring = monitoring;
         }
 
-        public Authentication getAuthentication() {
-            return authentication;
+        public Region.OIDCConfiguration getOIDCConfiguration() {
+            return OIDCConfiguration;
         }
 
-        public void setAuthentication(Authentication authentication) {
-            this.authentication = authentication;
+        public void setOIDCConfiguration(Region.OIDCConfiguration OIDCConfiguration) {
+            this.OIDCConfiguration = OIDCConfiguration;
         }
 
         public boolean isAcceptBucketCreation() {
@@ -968,29 +969,8 @@ public class Region {
         }
     }
 
-    public static class Authentication {
+    public static class OIDCConfiguration {
 
-        private String mode = "none";
-        private OpenIDConnectConfigurationInfo oidcConfiguration = null;
-
-        public String getMode() {
-            return mode;
-        }
-
-        public void setMode(String mode) {
-            this.mode = mode;
-        }
-
-        public OpenIDConnectConfigurationInfo getOidcConfiguration() {
-            return oidcConfiguration;
-        }
-
-        public void setOidcConfiguration(OpenIDConnectConfigurationInfo oidcConfiguration) {
-            this.oidcConfiguration = oidcConfiguration;
-        }
-    }
-
-    public static class OpenIDConnectConfigurationInfo {
         private String issuerURI;
         private String clientID;
 
@@ -1158,7 +1138,9 @@ public class Region {
 
     public static class CertificateAuthorityInjection {
 
-        /** Will be deprecated in the next releases cacerts as string will replace */
+        /**
+         * Will be deprecated in the next releases cacerts as string will replace
+         */
         @Schema(description = "List of crt encoded in base64")
         @Deprecated
         private List<String> crts = new ArrayList<>();

@@ -6,12 +6,13 @@ import fr.insee.onyxia.model.region.Region;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @Tag(name = "Public", description = "Information endpoints")
@@ -24,7 +25,8 @@ public class ConfigurationController {
     @Autowired(required = false)
     private OIDCConfiguration oidcConfiguration;
 
-    @Autowired private RegionsConfiguration regionsConfiguration;
+    @Autowired
+    private RegionsConfiguration regionsConfiguration;
 
     @Operation(
             summary = "Get this Onyxia API full configuration description.",
@@ -40,16 +42,12 @@ public class ConfigurationController {
         }
         appInfo.setBuild(buildInfo);
         appInfo.setRegions(regionsConfiguration.getResolvedRegions());
-        Region.Authentication authenticationInfo = new Region.Authentication();
+        Region.OIDCConfiguration OIDCConfiguration = new Region.OIDCConfiguration();
         if (oidcConfiguration != null) {
-            authenticationInfo.setMode("openidconnect");
-            Region.OpenIDConnectConfigurationInfo oidcInfo =
-                    new Region.OpenIDConnectConfigurationInfo();
-            oidcInfo.setClientID(oidcConfiguration.getClientID());
-            oidcInfo.setIssuerURI(oidcConfiguration.getIssuerUri());
-            authenticationInfo.setOidcConfiguration(oidcInfo);
+            OIDCConfiguration.setIssuerURI(oidcConfiguration.getIssuerUri());
+            OIDCConfiguration.setClientID(oidcConfiguration.getClientID());
+            appInfo.setOIDCConfiguration(OIDCConfiguration);
         }
-        appInfo.setAuthentication(authenticationInfo);
         return appInfo;
     }
 
@@ -67,7 +65,7 @@ public class ConfigurationController {
         private BuildInfo build;
         private List<Region> regions;
 
-        private Region.Authentication authentication;
+        private Region.OIDCConfiguration OIDCConfiguration;
 
         public BuildInfo getBuild() {
             return build;
@@ -85,12 +83,12 @@ public class ConfigurationController {
             this.regions = regions;
         }
 
-        public Region.Authentication getAuthentication() {
-            return authentication;
+        public Region.OIDCConfiguration getOIDCConfiguration() {
+            return OIDCConfiguration;
         }
 
-        public void setAuthentication(Region.Authentication authentication) {
-            this.authentication = authentication;
+        public void setOIDCConfiguration(Region.OIDCConfiguration OIDCConfiguration) {
+            this.OIDCConfiguration = OIDCConfiguration;
         }
     }
 
