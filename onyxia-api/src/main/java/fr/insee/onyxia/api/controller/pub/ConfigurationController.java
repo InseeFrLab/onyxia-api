@@ -44,7 +44,7 @@ public class ConfigurationController {
         if (oidcConfiguration != null) {
             OIDCConfiguration.setIssuerURI(oidcConfiguration.getIssuerUri());
             OIDCConfiguration.setClientID(oidcConfiguration.getClientID());
-            appInfo.setOIDCConfiguration(OIDCConfiguration);
+            appInfo.setOidcConfiguration(OIDCConfiguration);
         }
         return appInfo;
     }
@@ -63,7 +63,7 @@ public class ConfigurationController {
         private BuildInfo build;
         private List<Region> regions;
 
-        private Region.OIDCConfiguration OIDCConfiguration;
+        private Region.OIDCConfiguration oidcConfiguration;
 
         public BuildInfo getBuild() {
             return build;
@@ -81,12 +81,12 @@ public class ConfigurationController {
             this.regions = regions;
         }
 
-        public Region.OIDCConfiguration getOIDCConfiguration() {
-            return OIDCConfiguration;
+        public Region.OIDCConfiguration getOidcConfiguration() {
+            return oidcConfiguration;
         }
 
-        public void setOIDCConfiguration(Region.OIDCConfiguration OIDCConfiguration) {
-            this.OIDCConfiguration = OIDCConfiguration;
+        public void setOidcConfiguration(Region.OIDCConfiguration oidcConfiguration) {
+            this.oidcConfiguration = oidcConfiguration;
         }
     }
 

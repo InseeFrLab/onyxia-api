@@ -733,8 +733,7 @@ public class Region {
         @JsonProperty("URL")
         private String url;
 
-        @JsonProperty("oidcConfiguration")
-        private OIDCConfiguration OIDCConfiguration = null;
+        private OIDCConfiguration oidcConfiguration = null;
 
         public String getUrl() {
             return url;
@@ -744,12 +743,12 @@ public class Region {
             this.url = url;
         }
 
-        public Region.OIDCConfiguration getOIDCConfiguration() {
-            return OIDCConfiguration;
+        public OIDCConfiguration getOidcConfiguration() {
+            return oidcConfiguration;
         }
 
-        public void setOIDCConfiguration(Region.OIDCConfiguration OIDCConfiguration) {
-            this.OIDCConfiguration = OIDCConfiguration;
+        public void setOidcConfiguration(OIDCConfiguration oidcConfiguration) {
+            this.oidcConfiguration = oidcConfiguration;
         }
     }
 
@@ -763,8 +762,7 @@ public class Region {
         private String role;
         private String authPath = "jwt";
 
-        @JsonProperty("oidcConfiguration")
-        private OIDCConfiguration OIDCConfiguration = null;
+        private OIDCConfiguration oidcConfiguration = null;
 
         public String getUrl() {
             return url;
@@ -798,12 +796,12 @@ public class Region {
             this.authPath = authPath;
         }
 
-        public Region.OIDCConfiguration getOIDCConfiguration() {
-            return OIDCConfiguration;
+        public OIDCConfiguration getOidcConfiguration() {
+            return oidcConfiguration;
         }
 
-        public void setOIDCConfiguration(Region.OIDCConfiguration OIDCConfiguration) {
-            this.OIDCConfiguration = OIDCConfiguration;
+        public void setOidcConfiguration(OIDCConfiguration oidcConfiguration) {
+            this.oidcConfiguration = oidcConfiguration;
         }
     }
 
@@ -812,8 +810,7 @@ public class Region {
         @JsonProperty("URL")
         private String url;
 
-        @JsonProperty("oidcConfiguration")
-        private OIDCConfiguration OIDCConfiguration = null;
+        private OIDCConfiguration oidcConfiguration = null;
 
         public String getUrl() {
             return url;
@@ -823,12 +820,12 @@ public class Region {
             this.url = url;
         }
 
-        public Region.OIDCConfiguration getOIDCConfiguration() {
-            return OIDCConfiguration;
+        public OIDCConfiguration getOidcConfiguration() {
+            return oidcConfiguration;
         }
 
-        public void setOIDCConfiguration(Region.OIDCConfiguration OIDCConfiguration) {
-            this.OIDCConfiguration = OIDCConfiguration;
+        public void setOidcConfiguration(OIDCConfiguration oidcConfiguration) {
+            this.oidcConfiguration = oidcConfiguration;
         }
     }
 
@@ -871,8 +868,7 @@ public class Region {
         private String bucketClaim = "preferred_username";
         private long defaultDurationSeconds;
 
-        @JsonProperty("oidcConfiguration")
-        private OIDCConfiguration OIDCConfiguration = null;
+        private OIDCConfiguration oidcConfiguration = null;
 
         private Monitoring monitoring;
         private boolean acceptBucketCreation = true;
@@ -957,12 +953,12 @@ public class Region {
             this.monitoring = monitoring;
         }
 
-        public Region.OIDCConfiguration getOIDCConfiguration() {
-            return OIDCConfiguration;
+        public OIDCConfiguration getOidcConfiguration() {
+            return oidcConfiguration;
         }
 
-        public void setOIDCConfiguration(Region.OIDCConfiguration OIDCConfiguration) {
-            this.OIDCConfiguration = OIDCConfiguration;
+        public void setOidcConfiguration(OIDCConfiguration oidcConfiguration) {
+            this.oidcConfiguration = oidcConfiguration;
         }
 
         public boolean isAcceptBucketCreation() {
