@@ -733,6 +733,7 @@ public class Region {
         @JsonProperty("URL")
         private String url;
 
+        @JsonProperty("oidcConfiguration")
         private OIDCConfiguration OIDCConfiguration = null;
 
         public String getUrl() {
@@ -762,6 +763,7 @@ public class Region {
         private String role;
         private String authPath = "jwt";
 
+        @JsonProperty("oidcConfiguration")
         private OIDCConfiguration OIDCConfiguration = null;
 
         public String getUrl() {
@@ -810,6 +812,7 @@ public class Region {
         @JsonProperty("URL")
         private String url;
 
+        @JsonProperty("oidcConfiguration")
         private OIDCConfiguration OIDCConfiguration = null;
 
         public String getUrl() {
@@ -867,7 +870,10 @@ public class Region {
         private String groupBucketPrefix = "";
         private String bucketClaim = "preferred_username";
         private long defaultDurationSeconds;
+
+        @JsonProperty("oidcConfiguration")
         private OIDCConfiguration OIDCConfiguration = null;
+
         private Monitoring monitoring;
         private boolean acceptBucketCreation = true;
 
