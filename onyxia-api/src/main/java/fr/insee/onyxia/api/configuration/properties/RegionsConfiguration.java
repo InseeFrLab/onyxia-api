@@ -29,13 +29,10 @@ import org.springframework.core.io.support.PropertySourceFactory;
 @ConfigurationProperties
 public class RegionsConfiguration {
 
-    private String regions;
-
-    private List<Region> resolvedRegions;
-
-    @Autowired private ObjectMapper mapper;
-
     private static Logger LOGGER = LoggerFactory.getLogger(RegionsConfiguration.class);
+    private String regions;
+    private List<Region> resolvedRegions;
+    @Autowired private ObjectMapper mapper;
 
     @PostConstruct
     public void load() throws Exception {
@@ -45,11 +42,11 @@ public class RegionsConfiguration {
                     if (region.getServices().getType().equals(Service.ServiceType.KUBERNETES)) {
                         if (region.getServices()
                                 .getAuthenticationMode()
-                                .equals(Region.Services.AuthenticationMode.ADMIN)) {
+                                .equals(Region.Services.AuthenticationMode.SERVICEACCOUNT)) {
                             LOGGER.warn(
-                                    "Using admin authentication for region "
+                                    "Using serviceAccount authentication for region "
                                             + region.getId()
-                                            + ". This may cause a security risk.");
+                                            + ". Onyxia will deploy services using it's own global permissions, this may be a security issue.");
                         }
 
                         if (region.getServices()
@@ -58,7 +55,16 @@ public class RegionsConfiguration {
                             LOGGER.info(
                                     "Using impersonation authentication for region "
                                             + region.getId()
-                                            + ". Make sure you are using helm version 3.4.0+.");
+                                            + ".");
+                        }
+
+                        if (region.getServices()
+                                .getAuthenticationMode()
+                                .equals(Region.Services.AuthenticationMode.TOKEN_PASSTHROUGH)) {
+                            LOGGER.info(
+                                    "Using token passthrough authentication for region "
+                                            + region.getId()
+                                            + ". User token will be used by Onyxia to interact with the API Server.");
                         }
                     }
                 });

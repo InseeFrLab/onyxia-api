@@ -10,7 +10,12 @@
       "highlightedCharts": ["jupyter-python", "rstudio", "vscode-python"],
       "type": "helm",
       "skipTlsVerify": false,
-      "caFile": null
+      "caFile": null,
+      "allowSharing": false,
+      "visible": {
+        "user": true,
+        "project": true
+      }
     },
     {
       "id": "databases",
@@ -22,7 +27,12 @@
       "highlightedCharts": ["postgresql", "elastic"],
       "type": "helm",
       "skipTlsVerify": false,
-      "caFile": null
+      "caFile": null,
+      "allowSharing": true,
+      "visible": {
+        "user": true,
+        "project": true
+      }
     },
     {
       "id": "automation",
@@ -34,7 +44,12 @@
       "highlightedCharts": ["argo-cd", "argo-workflows", "mlflow"],
       "type": "helm",
       "skipTlsVerify": false,
-      "caFile": null
+      "caFile": null,
+      "allowSharing": true,
+      "visible": {
+        "user": true,
+        "project": true
+      }
     }
   ]
 }

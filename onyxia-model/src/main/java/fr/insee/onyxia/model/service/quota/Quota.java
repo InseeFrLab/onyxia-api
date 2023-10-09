@@ -68,7 +68,7 @@ public class Quota {
         quotas.put("limits.cpu", getCpuLimits());
         quotas.put("requests.storage", getStorageRequests());
         quotas.put("count/pods", getPodsCount() == null ? null : String.valueOf(getPodsCount()));
-        quotas.put("requests.ephemeral-storage", getEphemeralStorageLimits());
+        quotas.put("requests.ephemeral-storage", getEphemeralStorageRequests());
         quotas.put("limits.ephemeral-storage", getEphemeralStorageLimits());
         quotas.put(
                 "requests.nvidia.com/gpu",
