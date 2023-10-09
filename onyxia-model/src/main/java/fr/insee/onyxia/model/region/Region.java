@@ -731,13 +731,12 @@ public class Region {
         }
     }
 
-    @Schema(description = "Cloudshell data and health")
     public static class Atlas {
 
         @JsonProperty("URL")
         private String url;
 
-        private KeycloakParams keycloakParams;
+        private OIDCConfiguration oidcConfiguration = null;
 
         public String getUrl() {
             return url;
@@ -747,12 +746,12 @@ public class Region {
             this.url = url;
         }
 
-        public KeycloakParams getKeycloakParams() {
-            return keycloakParams;
+        public OIDCConfiguration getOidcConfiguration() {
+            return oidcConfiguration;
         }
 
-        public void setKeycloakParams(KeycloakParams keycloakParams) {
-            this.keycloakParams = keycloakParams;
+        public void setOidcConfiguration(OIDCConfiguration oidcConfiguration) {
+            this.oidcConfiguration = oidcConfiguration;
         }
     }
 
@@ -766,7 +765,7 @@ public class Region {
         private String role;
         private String authPath = "jwt";
 
-        private KeycloakParams keycloakParams;
+        private OIDCConfiguration oidcConfiguration = null;
 
         public String getUrl() {
             return url;
@@ -800,12 +799,12 @@ public class Region {
             this.authPath = authPath;
         }
 
-        public KeycloakParams getKeycloakParams() {
-            return keycloakParams;
+        public OIDCConfiguration getOidcConfiguration() {
+            return oidcConfiguration;
         }
 
-        public void setKeycloakParams(KeycloakParams keycloakParams) {
-            this.keycloakParams = keycloakParams;
+        public void setOidcConfiguration(OIDCConfiguration oidcConfiguration) {
+            this.oidcConfiguration = oidcConfiguration;
         }
     }
 
@@ -814,7 +813,7 @@ public class Region {
         @JsonProperty("URL")
         private String url;
 
-        private KeycloakParams keycloakParams;
+        private OIDCConfiguration oidcConfiguration = null;
 
         public String getUrl() {
             return url;
@@ -824,12 +823,12 @@ public class Region {
             this.url = url;
         }
 
-        public KeycloakParams getKeycloakParams() {
-            return keycloakParams;
+        public OIDCConfiguration getOidcConfiguration() {
+            return oidcConfiguration;
         }
 
-        public void setKeycloakParams(KeycloakParams keycloakParams) {
-            this.keycloakParams = keycloakParams;
+        public void setOidcConfiguration(OIDCConfiguration oidcConfiguration) {
+            this.oidcConfiguration = oidcConfiguration;
         }
     }
 
@@ -871,7 +870,9 @@ public class Region {
         private String groupBucketPrefix = "";
         private String bucketClaim = "preferred_username";
         private long defaultDurationSeconds;
-        private KeycloakParams keycloakParams;
+
+        private OIDCConfiguration oidcConfiguration = null;
+
         private Monitoring monitoring;
         private boolean acceptBucketCreation = true;
 
@@ -955,12 +956,12 @@ public class Region {
             this.monitoring = monitoring;
         }
 
-        public KeycloakParams getKeycloakParams() {
-            return keycloakParams;
+        public OIDCConfiguration getOidcConfiguration() {
+            return oidcConfiguration;
         }
 
-        public void setKeycloakParams(KeycloakParams keycloakParams) {
-            this.keycloakParams = keycloakParams;
+        public void setOidcConfiguration(OIDCConfiguration oidcConfiguration) {
+            this.oidcConfiguration = oidcConfiguration;
         }
 
         public boolean isAcceptBucketCreation() {
@@ -972,35 +973,25 @@ public class Region {
         }
     }
 
-    public static class KeycloakParams {
-        @JsonProperty("URL")
-        private String url;
+    public static class OIDCConfiguration {
 
-        private String clientId;
-        private String realm;
+        private String issuerURI;
+        private String clientID;
 
-        public String getUrl() {
-            return url;
+        public String getIssuerURI() {
+            return issuerURI;
         }
 
-        public void setUrl(String url) {
-            this.url = url;
+        public void setIssuerURI(String issuerURI) {
+            this.issuerURI = issuerURI;
         }
 
-        public String getClientId() {
-            return clientId;
+        public String getClientID() {
+            return clientID;
         }
 
-        public void setUClientId(String clientId) {
-            this.clientId = clientId;
-        }
-
-        public String getRealm() {
-            return realm;
-        }
-
-        public void setRealm(String realm) {
-            this.realm = realm;
+        public void setClientID(String clientID) {
+            this.clientID = clientID;
         }
     }
 

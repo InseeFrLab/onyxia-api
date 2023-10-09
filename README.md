@@ -47,42 +47,48 @@ Make sure to conform to Android Open Source Project code style : `mvn spotless:a
 Main configuration file is [onyxia-api/src/main/resources/application.properties](onyxia-api/src/main/resources/application.properties).  
 Each variable can be overridden using environment variables.  
 
-Regions configuration :
+### Regions configuration :
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
 | `regions` | [onyxia-api/src/main/resources/regions.json](onyxia-api/src/main/resources/regions.json) | List of regions, see [Region configuration](docs/region-configuration.md) |
 
-Authentication configuration
+### Authentication configuration
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
 | `authentication.mode` | `none` | Supported modes are : `none`, `openidconnect` (must be configured) |
 
-Open id configuration  
+### Open id configuration (used when `authentication.mode`=`openidconnect`)  
+You have to specify `oidc.issuer-uri`. `oidc.jwk-uri` is optional.  
+Common used configurations :  
+| Provider | `oidc.issuer-uri` | `oidc.jwk-uri` |
+|---|---|---|
+| Keycloak  | `https://keycloak.example.com/auth/realms/REALMNAME` |   |
+| Google  | https://accounts.google.com  | `https://www.googleapis.com/oauth2/v3/certs` |
+| Microsoft | `https://login.microsoftonline.com/TENANTID/v2.0` |   |
+
+Configurable properties :  
 | Key | Default | Description |
 | -------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `keycloak.realm` | | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
-| `keycloak.resource` | | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
-| `keycloak.auth-server-url` | | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
-| `keycloak.ssl-required` | `external` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
-| `keycloak.public-client` | `true` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
-| `keycloak.enable-basic-auth` | `true` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
-| `keycloak.bearer-only` | `true` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
-| `keycloak.disable-trust-manager` | `false` | See [Keycloak configuration](https://www.keycloak.org/docs/latest/securing_apps/#_java_adapter_config) |
-| `oidc.username-claim` | `preferred_username` | Claim to be used as user id. Should respect [RFC 1123](https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#dns-label-names) |
+| `oidc.issuer-uri` | | Issuer URI, should be the same as the `iss` field of the tokens |
+| `oidc.jwk-uri` | | JWK URI, useful when auto discovery is not available or when `iss` is not consistent across tokens (e.g [Google](https://stackoverflow.com/questions/38618826/can-i-get-a-consistent-iss-value-for-a-google-openidconnect-id-token)) | 
+| `oidc.clientID` | | Client id to be used by Onyxia web application |
+| `oidc.audience` | | Optional : audience to validate. Must be the same as the token's `aud` field |
+| `oidc.username-claim` | `preferred_username` | Claim to be used as user id. Must conform to [RFC 1123](https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#dns-label-names) |
+| `oidc.groups-claim` | `groups` | Claim to be used as list of user groups. |
 
-Security configuration :
+### Security configuration :
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
 | `security.cors.allowed_origins` | | To indicate which origins are allowed by [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) |
 
-Catalogs configuration :
+### Catalogs configuration :
 
 | Key | Default | Description |
 | --------------------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `catalogs` | see [onyxia-api/src/main/resources/catalogs.json](onyxia-api/src/main/resources/catalogs.json) | List of catalogs. Each catalog can be of type `universe` or `helm`. Mixing is supported. If there is no region of corresponding type then the catalog will be ignored |
 | `catalogs.refresh.ms` | `300000` (5 minutes) | The rate at which the catalogs should be refreshed. `<= 0` means no refreshs after initial loading |
 
-HTTP configuration  
+### HTTP configuration  
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
 | `http.proxyHost` | | Proxy hostname (e.g : proxy.example.com) |
@@ -91,7 +97,7 @@ HTTP configuration
 | `http.proxyUsername` | | Username if the proxy requires authentication |
 | `http.proxyPassword` | | Password if the proxy requires authentication |
 
-Other configurations
+### Other configurations
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
 | `springdoc.swagger-ui.path` | `/` | Open API (swagger) UI path |
