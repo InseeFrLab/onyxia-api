@@ -91,7 +91,7 @@ It can be used to add additional features to Onyxia. It helps Onyxia users to di
 | Key | Default | Description | Example |
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
 | `URL` | | public URL of the Kubernetes API of the region. | "https://vault.change.me" |
-| `keycloakParams` | | Configuration of the Keycloak service used to get an access token on the Kubernetes API. It defines the Keycloak realm, clientId, and Url. | {realm: "sspcloud", clientId: "kubernetes", URL: "https://auth.change.me/auth"} |
+| `oidcConfiguration` | | Allow override of openidconnect authentication for this specific service. If not defined then global Onyxia authentication will be used. | {clientID: "onyxia", issuerURI: "https://auth.lab.sspcloud.fr/auth"} |
 
 ### Quotas properties
 
@@ -220,7 +220,7 @@ All these properties which configure the access to the storage are intended for 
 | `bucketPrefix` | | User buckets are named bucketPrefix + the value of the user bucketClaim | "user-" |
 | `groupBucketPrefix` | | Group buckets are named groupBucketPrefix + the value of the user bucketClaim | "project-" |
 | `defaultDurationSeconds` | | Maximum time to live of the S3 access key | 86400 |
-| `keycloakParams` | | Configuration of the Keycloak service used to get an access token on the S3 service. It defines the Keycloak realm, clientId, and Url. | {realm: "sspcloud", clientId: "onyxia", URL: "https://auth.lab.sspcloud.fr/auth"} |
+| `oidcConfiguration` | | Allow override of openidconnect authentication for this specific service. If not defined then global Onyxia authentication will be used. | {clientID: "onyxia", issuerURI: "https://auth.lab.sspcloud.fr/auth"} |
 | `monitoring` | | Defines the URL pattern of the monitoring service of each bucket. | "https://monitoring.sspcloud.fr/$BUCKET_ID" |
 | `acceptBucketCreation` | true | If true, the S3 client should not create bucket. | true |
 
@@ -233,7 +233,7 @@ It can be used to add additional features to the file explorer to transform it i
 | Key | Default | Description | Example |
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
 | `URL` | | URL of the atlas service for the region. | "https://atlas.change.me" |
-| `keycloakParams` | | Configuration of the Keycloak service used to get an access token on the S3 service. It defines the Keycloak realm, clientId, and Url. | {realm: "sspcloud", clientId: "atlas", URL: "https://auth.change.me/auth"} |
+| `oidcConfiguration` | | Allow override of openidconnect authentication for this specific service. If not defined then global Onyxia authentication will be used. | {clientID: "onyxia", issuerURI: "https://auth.lab.sspcloud.fr/auth"} |
 
 ## Vault properties
 
@@ -245,7 +245,7 @@ It can be used to add additional features to Onyxia. It helps users to keep thei
 | `kvEngine` | | mount point of the kv engine. | "onyxia-kv" |
 | `role` | | role of the user in vault | "onyxia-user" |
 | `authPath` | "jwt" | path of the jwt auth method. | "jwt" |
-| `keycloakParams` | | Configuration of the Keycloak service used to get an access token on the vault service. It defines the Keycloak realm, clientId, and Url. | {realm: "sspcloud", clientId: "vault", URL: "https://auth.change.me/auth"} |
+| `oidcConfiguration` | | Allow override of openidconnect authentication for this specific service. If not defined then global Onyxia authentication will be used. | {clientID: "onyxia", issuerURI: "https://auth.lab.sspcloud.fr/auth"} |
 
 ## ProxyConfiguration properties
 
