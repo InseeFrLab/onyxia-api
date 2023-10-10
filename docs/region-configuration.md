@@ -46,13 +46,15 @@ Users can work on Onyxia as a User or as a Group to which they belong. Each user
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
 | `type` | | Type of the platform on which services are launched. Only Kubernetes is supported, Marathon has been removed. | "KUBERNETES" |
 | `allowNamespaceCreation` | true | If true, the /onboarding endpoint is enabled and the user will have a namespace created on its first request on a service resource. | true |
+| `namespaceLabels` |  | Labels to add at namespace creation | {"zone":"prod"} |
+| `namespaceAnnotations` |  | Annotations to add at namespace creation | {"zone":"prod"} |
 | `singleNamespace` | true | When true, all users share the same namespace on the service provider. This configuration can be used if a project works on its own Onyxia region. | |
 | `userNamespace` | true | When true, all users have a namespace for their work. This configuration can be used if you don't allow a user to have their own space to work and only use project space | |
 | `namespacePrefix` | "user-" | User has a personal namespace like namespacePrefix + userId (should only be used when not singleNamespace but not the case) | |
 | `groupNamespacePrefix` | "projet-" | User in a group groupId can access the namespace groupeNamespacePrefix + groupId. This prefix is also used for the Vault group directory. | |
 | `usernamePrefix` | | If set, the Kubernetes user corresponding to the Onyxia user is named usernamePrefix + userId on impersonation mode, otherwise it is identified only as userId | "user-" |
 | `groupPrefix` | | not used | |
-| `authenticationMode` | IMPERSONATE | IMPERSONATE or ADMIN: on ADMIN mode Onyxia uses its admin account on the services provider, with IMPERSONATE mode Onyxia request the API as the user (helm option `--kube-as-user`) but is only available if the helm version used is above 3.4.0 | |
+| `authenticationMode` | serviceAccount | serviceAccount, impersonate or tokenPassthrough : on serviceAccount mode Onyxia API uses its own serviceAccount (by default admin or cluster-admin), with impersonate mode Onyxia requests the API with user's permissions (helm option `--kube-as-user`). With tokenPassthrough, the authentication token is passed to the API server. | |
 | `expose` | | When users request to expose their service, only subdomain of this object domain are allowed | See [Expose properties](#expose-properties) |
 | `monitoring` | | Define the URL pattern of the monitoring service that is to be launched with each service. Only for client purposes. | {URLPattern: "https://$NAMESPACE-$INSTANCE.mymonitoring.sspcloud.fr"} |
 | `cloudshell` | | Define the catalog and package name where to fetch the cloudshell in the helm catalog. | {catalogId: "inseefrlab-helm-charts-datascience", packageName: "cloudshell"} |
@@ -89,7 +91,7 @@ It can be used to add additional features to Onyxia. It helps Onyxia users to di
 | Key | Default | Description | Example |
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
 | `URL` | | public URL of the Kubernetes API of the region. | "https://vault.change.me" |
-| `keycloakParams` | | Configuration of the Keycloak service used to get an access token on the Kubernetes API. It defines the Keycloak realm, clientId, and Url. | {realm: "sspcloud", clientId: "kubernetes", URL: "https://auth.change.me/auth"} |
+| `oidcConfiguration` | | Allow override of openidconnect authentication for this specific service. If not defined then global Onyxia authentication will be used. | {clientID: "onyxia", issuerURI: "https://auth.lab.sspcloud.fr/auth"} |
 
 ### Quotas properties
 
@@ -97,9 +99,13 @@ When this feature is enabled, namespaces are created with **quotas**.
 
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
-| `enabled` | false | Whether or not users are subject to a resource limitation. Quotas can only be applied to users and not to groups. |
-| `allowUserModification` | true | Whether or not the user can manually disable or change its own limitation. |
-| `defaultQuota` | | The quota is applied on the namespace before user modification or reset. |
+| `enabled` | false | Whether or not users are subject to a resource limitation. Quotas can only be applied to users and not to groups. (will be deprecated see userEnabled and groupEnabled) |
+| `allowUserModification` | true | Whether or not the user can manually disable or change its own limitation or group limitation. |
+| `default` | | This quota is applied on the namespace at creation, before user modification or reset. New configuration will not be applied to existing namespaces. (will be deprecated see userEnabled and groupEnabled) |
+| `userEnabled` | false | Whether or not users are subject to a resource limitation. Enable this on user namespace only with user quota content based on kubernetes model . |
+| `user` | false | This quota is applied on the user namespace at creation, before user modification or reset. New configuration will not be applied to already existing namespaces. |
+| `groupEnabled` | false |Whether or not users are subject to a resource limitation. Enable this on group/project namespace only ith group quota content. |
+| `group` | false | This quota is applied on the group namespace at creation, before user modification or reset. New configuration will not be applied to already existing namespaces. |
 
 A quota follows the Kubernetes model which is composed of:
 "requests.memory"
@@ -108,17 +114,32 @@ A quota follows the Kubernetes model which is composed of:
 "limits.cpu"
 "requests.storage"
 "count/pods"
+"requests.ephemeral-storage"
+"limits.ephemeral-storage"
+"requests.nvidia.com/gpu"
+"limits.nvidia.com/gpu"
 
 ### Expose properties
 
  with **expose**.
 
-| Key | Default | Description |
-| --------------------- | ------- | ------------------------------------------------------------------ |
-| `domain` | | When users request to expose their service, only the subdomain of this object will be created. |
-| `ingressClassName` | '' | Ingress Class Name: useful if you want to use a specific ingress controller instead of a default one |
-| `ingress` | true | Whether or not Kubernetes Ingress is enabled |
-| `route` | false | Whether or not OpenShift Route is enabled |
+| Key                | Default | Description                                                                                          |
+|--------------------|---------|------------------------------------------------------------------------------------------------------|
+| `domain`           |         | When users request to expose their service, only the subdomain of this object will be created.       |
+| `ingressClassName` | ''      | Ingress Class Name: useful if you want to use a specific ingress controller instead of a default one |
+| `ingress`          | true    | Whether or not Kubernetes Ingress is enabled                                                         |
+| `route`            | false   | Whether or not OpenShift Route is enabled                                                            |
+| `istio`            |         | See [Istio](#istio)                                                                                  |
+
+
+#### istio
+
+| Key        | Default | Description                                                                                                 |
+|------------|--------|--------------------------------------------------------------------------------------------------------------|
+| `enabled`  | false  | Whether or not Istio is enabled                                                                              |
+| `gateways` | []     | List of istio gateways to be used. Should contain at least one element. E.g. `["istio-system/my-gateway"]`   |
+
+
 
 ### Default configuration properties
 
@@ -199,7 +220,7 @@ All these properties which configure the access to the storage are intended for 
 | `bucketPrefix` | | User buckets are named bucketPrefix + the value of the user bucketClaim | "user-" |
 | `groupBucketPrefix` | | Group buckets are named groupBucketPrefix + the value of the user bucketClaim | "project-" |
 | `defaultDurationSeconds` | | Maximum time to live of the S3 access key | 86400 |
-| `keycloakParams` | | Configuration of the Keycloak service used to get an access token on the S3 service. It defines the Keycloak realm, clientId, and Url. | {realm: "sspcloud", clientId: "onyxia", URL: "https://auth.lab.sspcloud.fr/auth"} |
+| `oidcConfiguration` | | Allow override of openidconnect authentication for this specific service. If not defined then global Onyxia authentication will be used. | {clientID: "onyxia", issuerURI: "https://auth.lab.sspcloud.fr/auth"} |
 | `monitoring` | | Defines the URL pattern of the monitoring service of each bucket. | "https://monitoring.sspcloud.fr/$BUCKET_ID" |
 | `acceptBucketCreation` | true | If true, the S3 client should not create bucket. | true |
 
@@ -212,7 +233,7 @@ It can be used to add additional features to the file explorer to transform it i
 | Key | Default | Description | Example |
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
 | `URL` | | URL of the atlas service for the region. | "https://atlas.change.me" |
-| `keycloakParams` | | Configuration of the Keycloak service used to get an access token on the S3 service. It defines the Keycloak realm, clientId, and Url. | {realm: "sspcloud", clientId: "atlas", URL: "https://auth.change.me/auth"} |
+| `oidcConfiguration` | | Allow override of openidconnect authentication for this specific service. If not defined then global Onyxia authentication will be used. | {clientID: "onyxia", issuerURI: "https://auth.lab.sspcloud.fr/auth"} |
 
 ## Vault properties
 
@@ -223,7 +244,8 @@ It can be used to add additional features to Onyxia. It helps users to keep thei
 | `URL` | | URL of the atlas service for the region. | "https://vault.change.me" |
 | `kvEngine` | | mount point of the kv engine. | "onyxia-kv" |
 | `role` | | role of the user in vault | "onyxia-user" |
-| `keycloakParams` | | Configuration of the Keycloak service used to get an access token on the vault service. It defines the Keycloak realm, clientId, and Url. | {realm: "sspcloud", clientId: "vault", URL: "https://auth.change.me/auth"} |
+| `authPath` | "jwt" | path of the jwt auth method. | "jwt" |
+| `oidcConfiguration` | | Allow override of openidconnect authentication for this specific service. If not defined then global Onyxia authentication will be used. | {clientID: "onyxia", issuerURI: "https://auth.lab.sspcloud.fr/auth"} |
 
 ## ProxyConfiguration properties
 
@@ -253,6 +275,7 @@ It can be used to inject the package repository in the services, if the Helm cha
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
 | `cranProxyUrl` | | URL of enterprise local cran repository. | "https://cranProxy" |
 | `condaProxyUrl` | | URL of enterprise local Conda repository. | "https://condaProxyUrl" |
+| `packageManagerUrl` | | URL of the packagemanager. | "https://packagemanager.posit.co/cran/__linux__" or "https://packagemanagerUrl.internal/cran/__linux__" will be in first position |
 | `pypiProxyUrl` | | URL of enterprise local PyPI repository. | "https://pypiProxyUrl" |
 
 ## CertificateAuthorityInjection properties

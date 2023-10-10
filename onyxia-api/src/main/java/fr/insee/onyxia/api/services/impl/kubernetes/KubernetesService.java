@@ -7,7 +7,11 @@ import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.project.Project;
 import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.quota.Quota;
-import io.fabric8.kubernetes.api.model.*;
+import io.fabric8.kubernetes.api.model.NamespaceBuilder;
+import io.fabric8.kubernetes.api.model.Quantity;
+import io.fabric8.kubernetes.api.model.ResourceQuota;
+import io.fabric8.kubernetes.api.model.ResourceQuotaBuilder;
+import io.fabric8.kubernetes.api.model.ResourceQuotaFluent;
 import io.fabric8.kubernetes.api.model.rbac.RoleBinding;
 import io.fabric8.kubernetes.api.model.rbac.RoleBindingBuilder;
 import io.fabric8.kubernetes.api.model.rbac.SubjectBuilder;
@@ -16,6 +20,8 @@ import io.fabric8.kubernetes.client.KubernetesClientException;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,8 +30,10 @@ public class KubernetesService {
 
     @Autowired private KubernetesClientProvider kubernetesClientProvider;
 
+    private final Logger logger = LoggerFactory.getLogger(KubernetesService.class);
+
     public String createDefaultNamespace(Region region, Owner owner) {
-        String namespaceId = getDefaultNamespace(region, owner);
+        final String namespaceId = getDefaultNamespace(region, owner);
         if (isNamespaceAlreadyExisting(region, namespaceId)) {
             throw new NamespaceAlreadyExistException();
         }
@@ -44,7 +52,7 @@ public class KubernetesService {
             if (!region.getServices().isAllowNamespaceCreation()) {
                 throw new NamespaceNotFoundException();
             } else {
-                KubernetesService.Owner owner = new KubernetesService.Owner();
+                final KubernetesService.Owner owner = new KubernetesService.Owner();
                 if (project.getGroup() != null) {
                     owner.setId(project.getGroup());
                     owner.setType(Owner.OwnerType.GROUP);
@@ -63,9 +71,9 @@ public class KubernetesService {
     }
 
     private String createNamespace(Region region, String namespaceId, Owner owner) {
-        String name = getNameFromOwner(region, owner);
+        final String name = getNameFromOwner(region, owner);
 
-        KubernetesClient kubClient = kubernetesClientProvider.getRootClient(region);
+        final KubernetesClient kubClient = kubernetesClientProvider.getRootClient(region);
 
         kubClient
                 .namespaces()
@@ -73,12 +81,14 @@ public class KubernetesService {
                         new NamespaceBuilder()
                                 .withNewMetadata()
                                 .withName(namespaceId)
+                                .withLabels(region.getServices().getNamespaceLabels())
                                 .addToLabels("onyxia_owner", owner.getId())
+                                .withAnnotations(region.getServices().getNamespaceAnnotations())
                                 .endMetadata()
                                 .build())
                 .create();
 
-        RoleBinding bindingToCreate =
+        final RoleBinding bindingToCreate =
                 kubClient
                         .rbac()
                         .roleBindings()
@@ -104,14 +114,40 @@ public class KubernetesService {
                                         .endRoleRef()
                                         .build());
 
-        // Currently, no quotas for groups
-        if (owner.getType() == Owner.OwnerType.USER
-                && region.getServices().getQuotas().isEnabled()) {
-            Quota defaultQuota = region.getServices().getQuotas().getDefaultQuota();
+        // could be deleted if enabled and default quota is deprecated
+        final boolean oldEnabled =
+                owner.getType() == Owner.OwnerType.USER
+                        && region.getServices().getQuotas().isEnabled();
+        final boolean userEnabled =
+                owner.getType() == Owner.OwnerType.USER
+                        && region.getServices().getQuotas().isUserEnabled();
+        final boolean groupEnabled =
+                owner.getType() == Owner.OwnerType.GROUP
+                        && region.getServices().getQuotas().isGroupEnabled();
+
+        if (oldEnabled) {
+            final Quota quota = region.getServices().getQuotas().getDefaultQuota();
+            logger.warn("applying old enabled style quota, this parameter will be deprecated");
             applyQuotas(
                     namespaceId,
                     kubClient,
-                    defaultQuota,
+                    quota,
+                    !region.getServices().getQuotas().isAllowUserModification());
+        } else if (userEnabled) {
+            final Quota quota = region.getServices().getQuotas().getUserQuota();
+            logger.info("applying user enabled style quota");
+            applyQuotas(
+                    namespaceId,
+                    kubClient,
+                    quota,
+                    !region.getServices().getQuotas().isAllowUserModification());
+        } else if (groupEnabled) {
+            final Quota quota = region.getServices().getQuotas().getGroupQuota();
+            logger.info("applying user enabled style quota");
+            applyQuotas(
+                    namespaceId,
+                    kubClient,
+                    quota,
                     !region.getServices().getQuotas().isAllowUserModification());
         }
 
@@ -133,7 +169,7 @@ public class KubernetesService {
             KubernetesClient kubClient,
             Quota inputQuota,
             boolean overrideExisting) {
-        ResourceQuotaBuilder resourceQuotaBuilder = new ResourceQuotaBuilder();
+        final ResourceQuotaBuilder resourceQuotaBuilder = new ResourceQuotaBuilder();
         resourceQuotaBuilder
                 .withNewMetadata()
                 .withLabels(Map.of("createdby", "onyxia"))
@@ -141,13 +177,13 @@ public class KubernetesService {
                 .withNamespace(namespaceId)
                 .endMetadata();
 
-        Map<String, String> quotasToApply = inputQuota.asMap();
+        final Map<String, String> quotasToApply = inputQuota.asMap();
 
         if (quotasToApply.entrySet().stream().filter(e -> e.getValue() != null).count() == 0) {
             return;
         }
 
-        ResourceQuotaFluent.SpecNested<ResourceQuotaBuilder> resourceQuotaBuilderSpecNested =
+        final ResourceQuotaFluent.SpecNested<ResourceQuotaBuilder> resourceQuotaBuilderSpecNested =
                 resourceQuotaBuilder.withNewSpec();
         quotasToApply.entrySet().stream()
                 .filter(e -> e.getValue() != null)
@@ -157,13 +193,13 @@ public class KubernetesService {
                                         e.getKey(), Quantity.parse(e.getValue())));
         resourceQuotaBuilderSpecNested.endSpec();
 
-        ResourceQuota quota = resourceQuotaBuilder.build();
+        final ResourceQuota quota = resourceQuotaBuilder.build();
         if (overrideExisting) {
             kubClient.resourceQuotas().inNamespace(namespaceId).createOrReplace(quota);
         } else {
             try {
                 kubClient.resourceQuotas().inNamespace(namespaceId).create(quota);
-            } catch (KubernetesClientException e) {
+            } catch (final KubernetesClientException e) {
                 if (e.getCode() != 409) {
                     // This is not a "quota already in place" error
                     throw e;
@@ -193,14 +229,14 @@ public class KubernetesService {
     }
 
     public void applyQuota(Region region, Project project, User user, Quota quota) {
-        KubernetesClient kubClient = kubernetesClientProvider.getRootClient(region);
-        String namespace = determineNamespaceAndCreateIfNeeded(region, project, user);
+        final KubernetesClient kubClient = kubernetesClientProvider.getRootClient(region);
+        final String namespace = determineNamespaceAndCreateIfNeeded(region, project, user);
         applyQuotas(namespace, kubClient, quota, true);
     }
 
     public ResourceQuota getOnyxiaQuota(Region region, Project project, User user) {
-        KubernetesClient kubClient = kubernetesClientProvider.getRootClient(region);
-        String namespace = determineNamespaceAndCreateIfNeeded(region, project, user);
+        final KubernetesClient kubClient = kubernetesClientProvider.getRootClient(region);
+        final String namespace = determineNamespaceAndCreateIfNeeded(region, project, user);
         return kubClient.resourceQuotas().inNamespace(namespace).withName("onyxia-quota").get();
     }
 

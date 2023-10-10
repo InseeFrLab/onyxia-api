@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
@@ -71,7 +72,8 @@ public class CatalogLoader {
                                                 pkg -> {
                                                     try {
                                                         refreshPackage(cw, pkg);
-                                                    } catch (IOException e) {
+                                                    } catch (CatalogLoaderException
+                                                            | IOException e) {
                                                         e.printStackTrace();
                                                     }
                                                 });
@@ -88,21 +90,24 @@ public class CatalogLoader {
         }
     }
 
-    private void refreshPackage(CatalogWrapper cw, Pkg pkg) throws IOException {
-        if (!(pkg instanceof Chart)) {
+    private void refreshPackage(CatalogWrapper cw, Pkg pkg)
+            throws CatalogLoaderException, IOException {
+        if (!(pkg instanceof Chart chart)) {
             throw new IllegalArgumentException("Package should be of type Chart");
         }
 
-        Chart chart = (Chart) pkg;
         // TODO : support multiple urls
-        InputStream inputStream =
+        Resource resource =
                 resourceLoader
-                        .getResource(cw.getLocation() + "/index.yaml")
-                        .createRelative(chart.getUrls().stream().findFirst().get())
-                        .getInputStream();
-        extractDataFromTgz(inputStream, chart);
+                        .getResource(cw.getLocation() + "/")
+                        .createRelative(chart.getUrls().stream().findFirst().get());
 
-        inputStream.close();
+        try (InputStream inputStream = resource.getInputStream()) {
+            extractDataFromTgz(inputStream, chart);
+        } catch (IOException e) {
+            throw new CatalogLoaderException(
+                    "Exception occurred during loading resource: " + resource.getDescription(), e);
+        }
     }
 
     private void extractDataFromTgz(InputStream in, Chart chart) throws IOException {

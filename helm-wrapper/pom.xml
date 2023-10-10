@@ -16,7 +16,6 @@
 
     <properties>
         <java.version>17</java.version>
-        <fabric8io.version>6.4.1</fabric8io.version>
     </properties>
 
     <distributionManagement>
@@ -66,13 +65,12 @@
         <dependency>
             <groupId>io.fabric8</groupId>
             <artifactId>kubernetes-client</artifactId>
-            <version>${fabric8io.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.12.0</version>
+            <version>3.13.0</version>
         </dependency>
     </dependencies>
 

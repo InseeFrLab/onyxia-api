@@ -1,5 +1,6 @@
 package fr.insee.onyxia.api.services.impl;
 
+import static fr.insee.onyxia.api.services.impl.ServiceUrlResolver.getServiceUrls;
 import static java.util.stream.Collectors.joining;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -24,19 +25,14 @@ import fr.insee.onyxia.model.project.Project;
 import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.*;
 import io.fabric8.kubernetes.api.model.EventList;
-import io.fabric8.kubernetes.api.model.HasMetadata;
-import io.fabric8.kubernetes.api.model.networking.v1.Ingress;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.github.inseefrlab.helmwrapper.configuration.HelmConfiguration;
 import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
 import io.github.inseefrlab.helmwrapper.model.HelmLs;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService.MultipleServiceFound;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -164,21 +160,24 @@ public class HelmAppsService implements AppsService {
         mapperHelm.writeValue(values, fusion);
         String namespaceId =
                 kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
-        HelmInstaller res =
-                getHelmInstallService()
-                        .installChart(
-                                getHelmConfiguration(region, user),
-                                catalogId + "/" + pkg.getName(),
-                                namespaceId,
-                                requestDTO.getName(),
-                                requestDTO.getPackageVersion(),
-                                requestDTO.isDryRun(),
-                                values,
-                                null,
-                                skipTlsVerify,
-                                caFile);
-        values.delete();
-        return List.of(res.getManifest());
+        try {
+            HelmInstaller res =
+                    getHelmInstallService()
+                            .installChart(
+                                    getHelmConfiguration(region, user),
+                                    catalogId + "/" + pkg.getName(),
+                                    namespaceId,
+                                    requestDTO.getName(),
+                                    requestDTO.getPackageVersion(),
+                                    requestDTO.isDryRun(),
+                                    values,
+                                    null,
+                                    skipTlsVerify,
+                                    caFile);
+            return List.of(res.getManifest());
+        } catch (IllegalArgumentException e) {
+            throw new AccessDeniedException(e.getMessage());
+        }
     }
 
     @Override
@@ -211,7 +210,27 @@ public class HelmAppsService implements AppsService {
         }
         List<Service> services = new ArrayList<>();
         for (HelmLs release : installedCharts) {
-            services.add(getHelmApp(region, user, release));
+            Service service = getHelmApp(region, user, release);
+            boolean canUserSeeThisService = false;
+            if (project.getGroup() == null) {
+                // Personal group
+                canUserSeeThisService = true;
+            } else {
+                if (service.getEnv().containsKey("onyxia.share")
+                        && "true".equals(service.getEnv().get("onyxia.share"))) {
+                    // Service has been intentionally shared
+                    canUserSeeThisService = true;
+                }
+                if (service.getEnv().containsKey("onyxia.owner")
+                        && user.getIdep().equalsIgnoreCase(service.getEnv().get("onyxia.owner"))) {
+                    // User is owner
+                    canUserSeeThisService = true;
+                }
+            }
+
+            if (canUserSeeThisService) {
+                services.add(service);
+            }
         }
         ServicesListing listing = new ServicesListing();
         listing.setApps(services);
@@ -355,36 +374,21 @@ public class HelmAppsService implements AppsService {
     private Service getServiceFromRelease(
             Region region, HelmLs release, String manifest, User user) {
         KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
-        InputStream inputStream =
-                new ByteArrayInputStream(manifest.getBytes(Charset.forName("UTF-8")));
-        List<HasMetadata> hasMetadatas = client.load(inputStream).get();
-        List<Ingress> ingresses =
-                hasMetadatas.stream()
-                        .filter(hasMetadata -> hasMetadata instanceof Ingress)
-                        .map(hasMetadata -> (Ingress) hasMetadata)
-                        .collect(Collectors.toList());
+
         Service service = new Service();
-        List<String> urls = new ArrayList<>();
-        for (Ingress ingress : ingresses) {
-            try {
-                urls.addAll(
-                        ingress.getSpec().getRules().stream()
-                                .flatMap(
-                                        rule ->
-                                                rule.getHttp().getPaths().stream()
-                                                        .map(
-                                                                path ->
-                                                                        rule.getHost()
-                                                                                + path.getPath()))
-                                .map(url -> url.startsWith("http") ? url : "https://" + url)
-                                .collect(Collectors.toList()));
-            } catch (Exception e) {
-                System.out.println(
-                        "Warning : could not read urls from ingress "
-                                + ingress.getFullResourceName());
-            }
+
+        try {
+            List<String> urls = getServiceUrls(region, manifest, client);
+            service.setUrls(urls);
+        } catch (Exception e) {
+            System.out.println(
+                    "Warning : Failed to retrieve URLS for release "
+                            + release.getName()
+                            + " namespace "
+                            + release.getNamespace());
+            e.printStackTrace();
+            service.setUrls(List.of());
         }
-        service.setUrls(urls);
 
         service.setInstances(1);
 

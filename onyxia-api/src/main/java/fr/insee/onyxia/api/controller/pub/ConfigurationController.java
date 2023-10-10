@@ -1,6 +1,7 @@
 package fr.insee.onyxia.api.controller.pub;
 
 import fr.insee.onyxia.api.configuration.properties.RegionsConfiguration;
+import fr.insee.onyxia.api.security.OIDCConfiguration;
 import fr.insee.onyxia.model.region.Region;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,6 +21,9 @@ public class ConfigurationController {
     @Autowired(required = false)
     private BuildProperties build;
 
+    @Autowired(required = false)
+    private OIDCConfiguration oidcConfiguration;
+
     @Autowired private RegionsConfiguration regionsConfiguration;
 
     @Operation(
@@ -36,14 +40,30 @@ public class ConfigurationController {
         }
         appInfo.setBuild(buildInfo);
         appInfo.setRegions(regionsConfiguration.getResolvedRegions());
+        Region.OIDCConfiguration OIDCConfiguration = new Region.OIDCConfiguration();
+        if (oidcConfiguration != null) {
+            OIDCConfiguration.setIssuerURI(oidcConfiguration.getIssuerUri());
+            OIDCConfiguration.setClientID(oidcConfiguration.getClientID());
+            appInfo.setOidcConfiguration(OIDCConfiguration);
+        }
         return appInfo;
     }
 
-    @Schema(description = "Cloudshell data and health")
+    public OIDCConfiguration getOidcConfiguration() {
+        return oidcConfiguration;
+    }
+
+    public void setOidcConfiguration(OIDCConfiguration oidcConfiguration) {
+        this.oidcConfiguration = oidcConfiguration;
+    }
+
+    @Schema(description = "")
     public class AppInfo {
 
         private BuildInfo build;
         private List<Region> regions;
+
+        private Region.OIDCConfiguration oidcConfiguration;
 
         public BuildInfo getBuild() {
             return build;
@@ -59,6 +79,14 @@ public class ConfigurationController {
 
         public void setRegions(List<Region> regions) {
             this.regions = regions;
+        }
+
+        public Region.OIDCConfiguration getOidcConfiguration() {
+            return oidcConfiguration;
+        }
+
+        public void setOidcConfiguration(Region.OIDCConfiguration oidcConfiguration) {
+            this.oidcConfiguration = oidcConfiguration;
         }
     }
 

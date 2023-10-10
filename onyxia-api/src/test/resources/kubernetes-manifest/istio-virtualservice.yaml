@@ -1,0 +1,19 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: jupyter-python-3574-ui
+spec:
+  gateways:
+    - istio-system/my-gateway
+  hosts:
+    - jupyter-python-3574-0.example.com
+  http:
+    - match:
+        - uri:
+            prefix: /
+      name: ui
+      route:
+        - destination:
+            host: jupyter-python-3574
+            port:
+              number: 8888

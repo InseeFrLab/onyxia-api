@@ -44,14 +44,38 @@ public class Quota {
     @JsonProperty("count/pods")
     private Integer podsCount;
 
+    @Schema(description = "The request ephemeralStorage allowed")
+    @JsonProperty("requests.ephemeral-storage")
+    private String ephemeralStorageRequests;
+
+    @Schema(description = "The request ephemeralStorage allowed")
+    @JsonProperty("limits.ephemeral-storage")
+    private String ephemeralStorageLimits;
+
+    @Schema(description = "The request nvidia gpu")
+    @JsonProperty("requests.nvidia.com/gpu")
+    private Integer nvidiaGpuRequests;
+
+    @Schema(description = "The limit nvidia gpu")
+    @JsonProperty("limits.nvidia.com/gpu")
+    private Integer nvidiaGpuLimits;
+
     public Map<String, String> asMap() {
-        Map<String, String> quotas = new HashMap<>();
+        final Map<String, String> quotas = new HashMap<>();
         quotas.put("requests.memory", getMemoryRequests());
         quotas.put("requests.cpu", getCpuRequests());
         quotas.put("limits.memory", getMemoryLimits());
         quotas.put("limits.cpu", getCpuLimits());
         quotas.put("requests.storage", getStorageRequests());
         quotas.put("count/pods", getPodsCount() == null ? null : String.valueOf(getPodsCount()));
+        quotas.put("requests.ephemeral-storage", getEphemeralStorageRequests());
+        quotas.put("limits.ephemeral-storage", getEphemeralStorageLimits());
+        quotas.put(
+                "requests.nvidia.com/gpu",
+                getNvidiaGpuRequests() == null ? null : String.valueOf(getNvidiaGpuRequests()));
+        quotas.put(
+                "limits.nvidia.com/gpu",
+                getNvidiaGpuLimits() == null ? null : String.valueOf(getNvidiaGpuLimits()));
         return quotas;
     }
 
@@ -111,5 +135,37 @@ public class Quota {
 
     public void setPodsCount(Integer podsCount) {
         this.podsCount = podsCount;
+    }
+
+    public String getEphemeralStorageRequests() {
+        return ephemeralStorageRequests;
+    }
+
+    public void setEphemeralStorageRequests(String ephemeralStorageRequests) {
+        this.ephemeralStorageRequests = ephemeralStorageRequests;
+    }
+
+    public String getEphemeralStorageLimits() {
+        return ephemeralStorageLimits;
+    }
+
+    public void setEphemeralStorageLimits(String ephemeralStorageLimits) {
+        this.ephemeralStorageLimits = ephemeralStorageLimits;
+    }
+
+    public Integer getNvidiaGpuRequests() {
+        return nvidiaGpuRequests;
+    }
+
+    public void setNvidiaGpuRequests(Integer nvidiaGpuRequests) {
+        this.nvidiaGpuRequests = nvidiaGpuRequests;
+    }
+
+    public Integer getNvidiaGpuLimits() {
+        return nvidiaGpuLimits;
+    }
+
+    public void setNvidiaGpuLimits(Integer nvidiaGpuLimits) {
+        this.nvidiaGpuLimits = nvidiaGpuLimits;
     }
 }

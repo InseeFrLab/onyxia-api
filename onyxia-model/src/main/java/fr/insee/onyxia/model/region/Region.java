@@ -1,12 +1,15 @@
 package fr.insee.onyxia.model.region;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.insee.onyxia.model.service.Service;
 import fr.insee.onyxia.model.service.quota.Quota;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Schema(description = "")
 public class Region {
@@ -128,6 +131,10 @@ public class Region {
         return vault;
     }
 
+    public void setVault(Vault vault) {
+        this.vault = vault;
+    }
+
     public ProxyInjection getProxyInjection() {
         return proxyInjection;
     }
@@ -154,10 +161,6 @@ public class Region {
         this.certificateAuthorityInjection = certificateAuthorityInjection;
     }
 
-    public void setVault(Vault vault) {
-        this.vault = vault;
-    }
-
     public OnyxiaAPI getOnyxiaAPI() {
         return onyxiaAPI;
     }
@@ -171,24 +174,17 @@ public class Region {
             allowSetters = true)
     public static class Services {
 
-        public static enum AuthenticationMode {
-            @JsonProperty("impersonate")
-            IMPERSONATE,
-            @JsonProperty("admin")
-            ADMIN,
-            @JsonProperty("user")
-            USER
-        }
-
         private Service.ServiceType type;
         private boolean singleNamespace = true;
         private boolean allowNamespaceCreation = true;
+        private Map<String, String> namespaceLabels = new HashMap<>();
+        private Map<String, String> namespaceAnnotations = new HashMap<>();
         private boolean userNamespace = true;
         private String namespacePrefix = "user-";
         private String groupNamespacePrefix = "projet-";
         private String usernamePrefix;
         private String groupPrefix;
-        private AuthenticationMode authenticationMode = AuthenticationMode.IMPERSONATE;
+        private AuthenticationMode authenticationMode = AuthenticationMode.SERVICEACCOUNT;
         private Expose expose;
         private Server server;
         private Monitoring monitoring;
@@ -199,6 +195,185 @@ public class Region {
         private DefaultConfiguration defaultConfiguration = new DefaultConfiguration();
         private K8sPublicEndpoint k8sPublicEndpoint = new K8sPublicEndpoint();
         private CustomInitScript customInitScript = new CustomInitScript();
+
+        public DefaultConfiguration getDefaultConfiguration() {
+            return defaultConfiguration;
+        }
+
+        public void setDefaultConfiguration(DefaultConfiguration defaultConfiguration) {
+            this.defaultConfiguration = defaultConfiguration;
+        }
+
+        public CustomInitScript getCustomInitScript() {
+            return customInitScript;
+        }
+
+        public void setCustomInitScript(CustomInitScript customInitScript) {
+            this.customInitScript = customInitScript;
+        }
+
+        public boolean isSingleNamespace() {
+            return singleNamespace;
+        }
+
+        public void setSingleNamespace(boolean singleNamespace) {
+            this.singleNamespace = singleNamespace;
+        }
+
+        public boolean isAllowNamespaceCreation() {
+            return allowNamespaceCreation;
+        }
+
+        public void setAllowNamespaceCreation(boolean allowNamespaceCreation) {
+            this.allowNamespaceCreation = allowNamespaceCreation;
+        }
+
+        public Map<String, String> getNamespaceLabels() {
+            return namespaceLabels;
+        }
+
+        public void getNamespaceLabels(Map<String, String> namespaceLabels) {
+            this.namespaceLabels = namespaceLabels;
+        }
+
+        public Map<String, String> getNamespaceAnnotations() {
+            return namespaceAnnotations;
+        }
+
+        public void getNamespaceAnnotations(Map<String, String> namespaceAnnotations) {
+            this.namespaceAnnotations = namespaceAnnotations;
+        }
+
+        public boolean isUserNamespace() {
+            return userNamespace;
+        }
+
+        public void setUserNamespace(boolean userNamespace) {
+            this.userNamespace = userNamespace;
+        }
+
+        public Service.ServiceType getType() {
+            return type;
+        }
+
+        public void setType(Service.ServiceType type) {
+            this.type = type;
+        }
+
+        public String getNamespacePrefix() {
+            return namespacePrefix;
+        }
+
+        public void setNamespacePrefix(String namespacePrefix) {
+            this.namespacePrefix = namespacePrefix;
+        }
+
+        public String getUsernamePrefix() {
+            return usernamePrefix;
+        }
+
+        public void setUsernamePrefix(String usernamePrefix) {
+            this.usernamePrefix = usernamePrefix;
+        }
+
+        public Expose getExpose() {
+            return expose;
+        }
+
+        public void setExpose(Expose expose) {
+            this.expose = expose;
+        }
+
+        public Server getServer() {
+            return server;
+        }
+
+        public void setServer(Server server) {
+            this.server = server;
+        }
+
+        public CloudshellConfiguration getCloudshell() {
+            return cloudshell;
+        }
+
+        public void setCloudshell(CloudshellConfiguration cloudshell) {
+            this.cloudshell = cloudshell;
+        }
+
+        public Monitoring getMonitoring() {
+            return monitoring;
+        }
+
+        public void setMonitoring(Monitoring monitoring) {
+            this.monitoring = monitoring;
+        }
+
+        public String getInitScript() {
+            return initScript;
+        }
+
+        public void setInitScript(String initScript) {
+            this.initScript = initScript;
+        }
+
+        public String getAllowedURIPattern() {
+            return allowedURIPattern;
+        }
+
+        public void setAllowedURIPattern(String allowedURIPattern) {
+            this.allowedURIPattern = allowedURIPattern;
+        }
+
+        public AuthenticationMode getAuthenticationMode() {
+            return authenticationMode;
+        }
+
+        public void setAuthenticationMode(AuthenticationMode authenticationMode) {
+            this.authenticationMode = authenticationMode;
+        }
+
+        public String getGroupNamespacePrefix() {
+            return groupNamespacePrefix;
+        }
+
+        public void setGroupNamespacePrefix(String groupNamespacePrefix) {
+            this.groupNamespacePrefix = groupNamespacePrefix;
+        }
+
+        public String getGroupPrefix() {
+            return groupPrefix;
+        }
+
+        public void setGroupPrefix(String groupPrefix) {
+            this.groupPrefix = groupPrefix;
+        }
+
+        public K8sPublicEndpoint getK8sPublicEndpoint() {
+            return k8sPublicEndpoint;
+        }
+
+        public void setK8sPublicEndpoint(K8sPublicEndpoint k8sPublicEndpoint) {
+            this.k8sPublicEndpoint = k8sPublicEndpoint;
+        }
+
+        public Quotas getQuotas() {
+            return quotas;
+        }
+
+        public void setQuotas(Quotas quotas) {
+            this.quotas = quotas;
+        }
+
+        public static enum AuthenticationMode {
+            @JsonProperty("impersonate")
+            IMPERSONATE,
+            @JsonProperty("serviceAccount")
+            @JsonAlias("admin")
+            SERVICEACCOUNT,
+
+            @JsonProperty("tokenPassthrough")
+            TOKEN_PASSTHROUGH
+        }
 
         public static class DefaultConfiguration {
             private boolean IPProtection = false;
@@ -211,52 +386,52 @@ public class Region {
             private Sliders sliders = new Sliders();
             private Resources resources = new Resources();
 
-            public void setIPProtection(boolean IPProtection) {
-                this.IPProtection = IPProtection;
-            }
-
             public boolean isIPProtection() {
                 return IPProtection;
             }
 
-            public void setNetworkPolicy(boolean networkPolicy) {
-                this.networkPolicy = networkPolicy;
+            public void setIPProtection(boolean IPProtection) {
+                this.IPProtection = IPProtection;
             }
 
             public boolean isNetworkPolicy() {
                 return networkPolicy;
             }
 
-            public void setFrom(List<Object> from) {
-                this.from = from;
+            public void setNetworkPolicy(boolean networkPolicy) {
+                this.networkPolicy = networkPolicy;
             }
 
             public List<Object> getFrom() {
                 return from;
             }
 
-            public void setTolerations(List<Object> tolerations) {
-                this.tolerations = tolerations;
+            public void setFrom(List<Object> from) {
+                this.from = from;
             }
 
             public List<Object> getTolerations() {
                 return tolerations;
             }
 
-            public void setNodeSelector(Object nodeSelector) {
-                this.nodeSelector = nodeSelector;
+            public void setTolerations(List<Object> tolerations) {
+                this.tolerations = tolerations;
             }
 
             public Object getNodeSelector() {
                 return nodeSelector;
             }
 
-            public void setStartupProbe(Object startupProbe) {
-                this.startupProbe = startupProbe;
+            public void setNodeSelector(Object nodeSelector) {
+                this.nodeSelector = nodeSelector;
             }
 
             public Object getStartupProbe() {
                 return startupProbe;
+            }
+
+            public void setStartupProbe(Object startupProbe) {
+                this.startupProbe = startupProbe;
             }
 
             public Kafka getKafka() {
@@ -445,11 +620,20 @@ public class Region {
         }
 
         public static class Quotas {
+            // could be deprecated as userQuota/groupQuota is enough
             private boolean enabled = false;
+            private boolean userEnabled = false;
+            private boolean groupEnabled = false;
             private boolean allowUserModification = true;
-
+            // could be deprecated
             @JsonProperty("default")
             private Quota defaultQuota;
+
+            @JsonProperty("user")
+            private Quota userQuota;
+
+            @JsonProperty("group")
+            private Quota groupQuota;
 
             public boolean isEnabled() {
                 return enabled;
@@ -457,6 +641,38 @@ public class Region {
 
             public void setEnabled(boolean enabled) {
                 this.enabled = enabled;
+            }
+
+            public boolean isUserEnabled() {
+                return userEnabled;
+            }
+
+            public void setUserEnabled(boolean userEnabled) {
+                this.userEnabled = userEnabled;
+            }
+
+            public boolean isGroupEnabled() {
+                return groupEnabled;
+            }
+
+            public void setGroupEnabled(boolean groupEnabled) {
+                this.groupEnabled = groupEnabled;
+            }
+
+            public Quota getUserQuota() {
+                return userQuota;
+            }
+
+            public void setUserQuota(Quota userQuota) {
+                this.userQuota = userQuota;
+            }
+
+            public Quota getGroupQuota() {
+                return groupQuota;
+            }
+
+            public void setGroupQuota(Quota groupQuota) {
+                this.groupQuota = groupQuota;
             }
 
             public boolean isAllowUserModification() {
@@ -475,170 +691,18 @@ public class Region {
                 this.defaultQuota = defaultQuota;
             }
         }
-
-        public DefaultConfiguration getDefaultConfiguration() {
-            return defaultConfiguration;
-        }
-
-        public void setDefaultConfiguration(DefaultConfiguration defaultConfiguration) {
-            this.defaultConfiguration = defaultConfiguration;
-        }
-
-        public CustomInitScript getCustomInitScript() {
-            return customInitScript;
-        }
-
-        public void setCustomInitScript(CustomInitScript customInitScript) {
-            this.customInitScript = customInitScript;
-        }
-
-        public boolean isSingleNamespace() {
-            return singleNamespace;
-        }
-
-        public void setSingleNamespace(boolean singleNamespace) {
-            this.singleNamespace = singleNamespace;
-        }
-
-        public boolean isAllowNamespaceCreation() {
-            return allowNamespaceCreation;
-        }
-
-        public void setAllowNamespaceCreation(boolean allowNamespaceCreation) {
-            this.allowNamespaceCreation = allowNamespaceCreation;
-        }
-
-        public boolean isUserNamespace() {
-            return userNamespace;
-        }
-
-        public void setUserNamespace(boolean userNamespace) {
-            this.userNamespace = userNamespace;
-        }
-
-        public Service.ServiceType getType() {
-            return type;
-        }
-
-        public void setType(Service.ServiceType type) {
-            this.type = type;
-        }
-
-        public String getNamespacePrefix() {
-            return namespacePrefix;
-        }
-
-        public void setNamespacePrefix(String namespacePrefix) {
-            this.namespacePrefix = namespacePrefix;
-        }
-
-        public String getUsernamePrefix() {
-            return usernamePrefix;
-        }
-
-        public void setUsernamePrefix(String usernamePrefix) {
-            this.usernamePrefix = usernamePrefix;
-        }
-
-        public Expose getExpose() {
-            return expose;
-        }
-
-        public void setExpose(Expose expose) {
-            this.expose = expose;
-        }
-
-        public Server getServer() {
-            return server;
-        }
-
-        public void setServer(Server server) {
-            this.server = server;
-        }
-
-        public CloudshellConfiguration getCloudshell() {
-            return cloudshell;
-        }
-
-        public void setCloudshell(CloudshellConfiguration cloudshell) {
-            this.cloudshell = cloudshell;
-        }
-
-        public Monitoring getMonitoring() {
-            return monitoring;
-        }
-
-        public void setMonitoring(Monitoring monitoring) {
-            this.monitoring = monitoring;
-        }
-
-        public String getInitScript() {
-            return initScript;
-        }
-
-        public void setInitScript(String initScript) {
-            this.initScript = initScript;
-        }
-
-        public String getAllowedURIPattern() {
-            return allowedURIPattern;
-        }
-
-        public void setAllowedURIPattern(String allowedURIPattern) {
-            this.allowedURIPattern = allowedURIPattern;
-        }
-
-        public AuthenticationMode getAuthenticationMode() {
-            return authenticationMode;
-        }
-
-        public void setAuthenticationMode(AuthenticationMode authenticationMode) {
-            this.authenticationMode = authenticationMode;
-        }
-
-        public void setGroupNamespacePrefix(String groupNamespacePrefix) {
-            this.groupNamespacePrefix = groupNamespacePrefix;
-        }
-
-        public String getGroupNamespacePrefix() {
-            return groupNamespacePrefix;
-        }
-
-        public void setGroupPrefix(String groupPrefix) {
-            this.groupPrefix = groupPrefix;
-        }
-
-        public String getGroupPrefix() {
-            return groupPrefix;
-        }
-
-        public K8sPublicEndpoint getK8sPublicEndpoint() {
-            return k8sPublicEndpoint;
-        }
-
-        public void setK8sPublicEndpoint(K8sPublicEndpoint k8sPublicEndpoint) {
-            this.k8sPublicEndpoint = k8sPublicEndpoint;
-        }
-
-        public Quotas getQuotas() {
-            return quotas;
-        }
-
-        public void setQuotas(Quotas quotas) {
-            this.quotas = quotas;
-        }
     }
 
     public static class Monitoring {
         @JsonProperty("URLPattern")
         private String urlPattern;
 
-        public void setUrlPattern(String urlPattern) {
-            this.urlPattern = urlPattern;
-        }
-
         public String getUrlPattern() {
             return urlPattern;
+        }
+
+        public void setUrlPattern(String urlPattern) {
+            this.urlPattern = urlPattern;
         }
     }
 
@@ -667,13 +731,12 @@ public class Region {
         }
     }
 
-    @Schema(description = "Cloudshell data and health")
     public static class Atlas {
 
         @JsonProperty("URL")
         private String url;
 
-        private KeycloakParams keycloakParams;
+        private OIDCConfiguration oidcConfiguration = null;
 
         public String getUrl() {
             return url;
@@ -683,12 +746,12 @@ public class Region {
             this.url = url;
         }
 
-        public void setKeycloakParams(KeycloakParams keycloakParams) {
-            this.keycloakParams = keycloakParams;
+        public OIDCConfiguration getOidcConfiguration() {
+            return oidcConfiguration;
         }
 
-        public KeycloakParams getKeycloakParams() {
-            return keycloakParams;
+        public void setOidcConfiguration(OIDCConfiguration oidcConfiguration) {
+            this.oidcConfiguration = oidcConfiguration;
         }
     }
 
@@ -700,8 +763,9 @@ public class Region {
 
         private String kvEngine;
         private String role;
+        private String authPath = "jwt";
 
-        private KeycloakParams keycloakParams;
+        private OIDCConfiguration oidcConfiguration = null;
 
         public String getUrl() {
             return url;
@@ -727,12 +791,20 @@ public class Region {
             this.role = role;
         }
 
-        public void setKeycloakParams(KeycloakParams keycloakParams) {
-            this.keycloakParams = keycloakParams;
+        public String getAuthPath() {
+            return authPath;
         }
 
-        public KeycloakParams getKeycloakParams() {
-            return keycloakParams;
+        public void setAuthPath(String authPath) {
+            this.authPath = authPath;
+        }
+
+        public OIDCConfiguration getOidcConfiguration() {
+            return oidcConfiguration;
+        }
+
+        public void setOidcConfiguration(OIDCConfiguration oidcConfiguration) {
+            this.oidcConfiguration = oidcConfiguration;
         }
     }
 
@@ -741,7 +813,7 @@ public class Region {
         @JsonProperty("URL")
         private String url;
 
-        private KeycloakParams keycloakParams;
+        private OIDCConfiguration oidcConfiguration = null;
 
         public String getUrl() {
             return url;
@@ -751,12 +823,12 @@ public class Region {
             this.url = url;
         }
 
-        public void setKeycloakParams(KeycloakParams keycloakParams) {
-            this.keycloakParams = keycloakParams;
+        public OIDCConfiguration getOidcConfiguration() {
+            return oidcConfiguration;
         }
 
-        public KeycloakParams getKeycloakParams() {
-            return keycloakParams;
+        public void setOidcConfiguration(OIDCConfiguration oidcConfiguration) {
+            this.oidcConfiguration = oidcConfiguration;
         }
     }
 
@@ -795,10 +867,12 @@ public class Region {
         private String roleARN;
         private String roleSessionName;
         private String bucketPrefix;
-        private String groupBucketPrefix;
+        private String groupBucketPrefix = "";
         private String bucketClaim = "preferred_username";
         private long defaultDurationSeconds;
-        private KeycloakParams keycloakParams;
+
+        private OIDCConfiguration oidcConfiguration = null;
+
         private Monitoring monitoring;
         private boolean acceptBucketCreation = true;
 
@@ -874,60 +948,50 @@ public class Region {
             this.defaultDurationSeconds = defaultDurationSeconds;
         }
 
-        public void setMonitoring(Monitoring monitoring) {
-            this.monitoring = monitoring;
-        }
-
         public Monitoring getMonitoring() {
             return monitoring;
         }
 
-        public void setKeycloakParams(KeycloakParams keycloakParams) {
-            this.keycloakParams = keycloakParams;
+        public void setMonitoring(Monitoring monitoring) {
+            this.monitoring = monitoring;
         }
 
-        public KeycloakParams getKeycloakParams() {
-            return keycloakParams;
+        public OIDCConfiguration getOidcConfiguration() {
+            return oidcConfiguration;
         }
 
-        public void setAcceptBucketCreation(boolean acceptBucketCreation) {
-            this.acceptBucketCreation = acceptBucketCreation;
+        public void setOidcConfiguration(OIDCConfiguration oidcConfiguration) {
+            this.oidcConfiguration = oidcConfiguration;
         }
 
         public boolean isAcceptBucketCreation() {
             return acceptBucketCreation;
         }
+
+        public void setAcceptBucketCreation(boolean acceptBucketCreation) {
+            this.acceptBucketCreation = acceptBucketCreation;
+        }
     }
 
-    public static class KeycloakParams {
-        @JsonProperty("URL")
-        private String url;
+    public static class OIDCConfiguration {
 
-        private String clientId;
-        private String realm;
+        private String issuerURI;
+        private String clientID;
 
-        public String getUrl() {
-            return url;
+        public String getIssuerURI() {
+            return issuerURI;
         }
 
-        public void setUrl(String url) {
-            this.url = url;
+        public void setIssuerURI(String issuerURI) {
+            this.issuerURI = issuerURI;
         }
 
-        public String getClientId() {
-            return clientId;
+        public String getClientID() {
+            return clientID;
         }
 
-        public void setUClientId(String clientId) {
-            this.clientId = clientId;
-        }
-
-        public String getRealm() {
-            return realm;
-        }
-
-        public void setRealm(String realm) {
-            this.realm = realm;
+        public void setClientID(String clientID) {
+            this.clientID = clientID;
         }
     }
 
@@ -939,36 +1003,68 @@ public class Region {
 
         private boolean route = false;
 
-        public void setDomain(String domain) {
-            this.domain = domain;
-        }
+        private IstioIngress istio;
 
         public String getDomain() {
             return domain;
         }
 
-        public void setIngressClassName(String ingressClassName) {
-            this.ingressClassName = ingressClassName;
+        public void setDomain(String domain) {
+            this.domain = domain;
         }
 
         public String getIngressClassName() {
             return ingressClassName;
         }
 
-        public void setIngress(boolean ingress) {
-            this.ingress = ingress;
+        public void setIngressClassName(String ingressClassName) {
+            this.ingressClassName = ingressClassName;
         }
 
         public boolean getIngress() {
             return ingress;
         }
 
-        public void setRoute(boolean route) {
-            this.route = route;
+        public void setIngress(boolean ingress) {
+            this.ingress = ingress;
         }
 
         public boolean getRoute() {
             return route;
+        }
+
+        public void setRoute(boolean route) {
+            this.route = route;
+        }
+
+        public IstioIngress getIstio() {
+            return istio;
+        }
+
+        public void setIstio(IstioIngress istio) {
+            this.istio = istio;
+        }
+    }
+
+    public static class IstioIngress {
+        private boolean enabled = false;
+
+        private String[] gateways = new String[0];
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public String[] getGateways() {
+            return gateways;
+        }
+
+        public void setGateways(String[] gateways) {
+            this.gateways = gateways;
         }
     }
 
@@ -1080,14 +1176,26 @@ public class Region {
     }
 
     public static class PackageRepositoryInjection {
-        @Schema(description = "httpProxyUrl to inject in helm values")
+
+        @Schema(description = "cranProxyUrl to inject in helm values")
         private String cranProxyUrl;
 
-        @Schema(description = "httpProxyUrl to inject in helm values")
+        @Schema(description = "condaProxyUrl to inject in helm values")
         private String condaProxyUrl;
 
-        @Schema(description = "httpProxyUrl to inject in helm values")
+        @Schema(description = "packageManager url to inject in helm values")
+        private String packageManagerUrl;
+
+        @Schema(description = "pypiProxyUrl to inject in helm values")
         private String pypiProxyUrl;
+
+        public String getPackageManagerUrl() {
+            return packageManagerUrl;
+        }
+
+        public void setPackageManagerUrl(String packageManagerUrl) {
+            this.packageManagerUrl = packageManagerUrl;
+        }
 
         public String getCranProxyUrl() {
             return cranProxyUrl;
@@ -1124,28 +1232,28 @@ public class Region {
 
         private String name;
 
-        public void setLat(double lat) {
-            this.lat = lat;
-        }
-
-        public void setLongitude(double longitude) {
-            this.longitude = longitude;
-        }
-
         public double getLat() {
             return lat;
+        }
+
+        public void setLat(double lat) {
+            this.lat = lat;
         }
 
         public double getLongitude() {
             return longitude;
         }
 
-        public void setName(String name) {
-            this.name = name;
+        public void setLongitude(double longitude) {
+            this.longitude = longitude;
         }
 
         public String getName() {
             return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
         }
     }
 
