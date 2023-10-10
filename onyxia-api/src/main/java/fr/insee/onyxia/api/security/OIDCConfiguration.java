@@ -54,7 +54,8 @@ public class OIDCConfiguration {
     @Value("${oidc.clientID}")
     private String clientID;
 
-    @Autowired private HttpRequestUtils httpRequestUtils;
+    @Autowired
+    private HttpRequestUtils httpRequestUtils;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -67,10 +68,10 @@ public class OIDCConfiguration {
                 .and()
                 // manage routes securisation here
                 .authorizeRequests()
-                .antMatchers(HttpMethod.OPTIONS)
+                .requestMatchers(HttpMethod.OPTIONS)
                 .permitAll()
                 // configuration pour Swagger
-                .antMatchers(
+                .requestMatchers(
                         "/",
                         "/swagger-ui**",
                         "/swagger-ui/**",
@@ -83,7 +84,7 @@ public class OIDCConfiguration {
                         "/actuator/**",
                         "/actuator")
                 .permitAll()
-                .antMatchers(
+                .requestMatchers(
                         "/api",
                         "/api/swagger-ui**",
                         "/api/swagger-ui/**",
@@ -97,9 +98,9 @@ public class OIDCConfiguration {
                         "/api/actuator")
                 .permitAll()
                 // configuration pour public
-                .antMatchers("/public/**")
+                .requestMatchers("/public/**")
                 .permitAll()
-                .antMatchers("/api/public/**")
+                .requestMatchers("/api/public/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated()
@@ -131,7 +132,7 @@ public class OIDCConfiguration {
             user.setIp(
                     httpRequestUtils.getClientIpAddressIfServletRequestExist(
                             ((ServletRequestAttributes)
-                                            RequestContextHolder.currentRequestAttributes())
+                                    RequestContextHolder.currentRequestAttributes())
                                     .getRequest()));
             user.setEmail(userInfo.getClaimAsString("email"));
             user.setNomComplet(userInfo.getClaimAsString("name"));
