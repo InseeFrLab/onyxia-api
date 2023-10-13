@@ -196,12 +196,22 @@ public class Region {
         private K8sPublicEndpoint k8sPublicEndpoint = new K8sPublicEndpoint();
         private CustomInitScript customInitScript = new CustomInitScript();
 
+        private Map<String, Object> customValues = new HashMap<>();
+
         public DefaultConfiguration getDefaultConfiguration() {
             return defaultConfiguration;
         }
 
         public void setDefaultConfiguration(DefaultConfiguration defaultConfiguration) {
             this.defaultConfiguration = defaultConfiguration;
+        }
+
+        public Map<String, Object> getCustomValues() {
+            return customValues;
+        }
+
+        public void setCustomValues(Map<String, Object> customValues) {
+            this.customValues = customValues;
         }
 
         public CustomInitScript getCustomInitScript() {
