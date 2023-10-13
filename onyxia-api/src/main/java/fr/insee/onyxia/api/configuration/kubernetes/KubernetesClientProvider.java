@@ -46,7 +46,7 @@ public class KubernetesClientProvider {
         }
 
         if (region.getServices().getAuthenticationMode()
-                == Region.Services.AuthenticationMode.USER) {
+                == Region.Services.AuthenticationMode.TOKEN_PASSTHROUGH) {
             config.setOauthToken((String) user.getAttributes().get("access_token"));
         }
 

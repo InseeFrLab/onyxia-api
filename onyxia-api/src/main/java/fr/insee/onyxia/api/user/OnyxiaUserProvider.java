@@ -14,13 +14,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class OnyxiaUserProvider {
 
-    @Autowired private UserProvider userProvider;
-
-    @Autowired private KubernetesService kubernetesService; // TODO : cleanup
-
-    private Logger logger = LoggerFactory.getLogger(OnyxiaUserProvider.class);
-
     Pattern rfc1123Pattern = Pattern.compile("[a-z0-9]([-a-z0-9]*[a-z0-9])?");
+    @Autowired private UserProvider userProvider;
+    @Autowired private KubernetesService kubernetesService; // TODO : cleanup
+    private Logger logger = LoggerFactory.getLogger(OnyxiaUserProvider.class);
 
     public OnyxiaUser getUser(Region region) {
         OnyxiaUser user = new OnyxiaUser(userProvider.getUser(region));
@@ -51,7 +48,12 @@ public class OnyxiaUserProvider {
                                     if (region.getData() != null
                                             && region.getData().getS3() != null) {
                                         project.setBucket(
-                                                region.getData().getS3().getGroupBucketPrefix()
+                                                (region.getData().getS3().getGroupBucketPrefix()
+                                                                        == null
+                                                                ? ""
+                                                                : region.getData()
+                                                                        .getS3()
+                                                                        .getGroupBucketPrefix())
                                                         + projectBaseName);
                                     }
                                     project.setNamespace(

@@ -14,7 +14,7 @@
         "namespacePrefix": "user-",
         "usernamePrefix": "oidc-",
         "groupNamespacePrefix": "projet-",
-        "authenticationMode" : "admin",
+        "authenticationMode": "serviceAccount",
         "quotas": {
           "allowUserModification": true,
           "enabled": false,
@@ -67,7 +67,6 @@
         }
       },
       "data": {
-       
       },
       "auth": {
         "type": "openidconnect"
