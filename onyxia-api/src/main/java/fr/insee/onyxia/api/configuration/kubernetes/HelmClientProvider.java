@@ -52,7 +52,7 @@ public class HelmClientProvider {
         }
 
         if (region.getServices().getAuthenticationMode()
-                == Region.Services.AuthenticationMode.USER) {
+                == Region.Services.AuthenticationMode.TOKEN_PASSTHROUGH) {
             helmConfiguration.setKubeToken((String) user.getAttributes().get("access_token"));
         }
 

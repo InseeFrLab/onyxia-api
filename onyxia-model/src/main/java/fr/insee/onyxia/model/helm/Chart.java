@@ -249,7 +249,7 @@ public class Chart extends Pkg {
         this.additionalProperties.put(name, value);
     }
 
-    private class Maintainer {
+    public static class Maintainer {
         @JsonProperty("email")
         private String email;
 

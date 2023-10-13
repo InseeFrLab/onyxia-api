@@ -52,6 +52,12 @@ public class CatalogWrapper {
     @Schema(description = "Verify certificates of HTTPS-enabled servers using this CA bundle")
     private String caFile;
 
+    @Schema(description = "Allow sharing this service within a project")
+    private boolean allowSharing = true;
+
+    @Schema(description = "Should this catalog be visible in user context ? Project context ?")
+    private CatalogVisibility visible = new CatalogVisibility();
+
     /**
      * @return the type
      */
@@ -171,5 +177,43 @@ public class CatalogWrapper {
 
     public void setCaFile(String caFile) {
         this.caFile = caFile;
+    }
+
+    public boolean isAllowSharing() {
+        return allowSharing;
+    }
+
+    public void setAllowSharing(boolean allowSharing) {
+        this.allowSharing = allowSharing;
+    }
+
+    public CatalogVisibility getVisible() {
+        return visible;
+    }
+
+    public void setVisible(CatalogVisibility visible) {
+        this.visible = visible;
+    }
+
+    public static class CatalogVisibility {
+
+        private boolean user = true;
+        private boolean project = true;
+
+        public boolean isUser() {
+            return user;
+        }
+
+        public void setUser(boolean user) {
+            this.user = user;
+        }
+
+        public boolean isProject() {
+            return project;
+        }
+
+        public void setProject(boolean project) {
+            this.project = project;
+        }
     }
 }
