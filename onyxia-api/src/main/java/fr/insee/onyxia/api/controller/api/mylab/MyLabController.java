@@ -240,6 +240,7 @@ public class MyLabController {
         User user = userProvider.getUser(region);
         Map<String, Object> fusion = new HashMap<>();
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
+        fusion.putAll(region.getServices().getCustomValues());
         return helmAppsService.installApp(
                 region, project, requestDTO, catalogId, pkg, user, fusion, skipTlsVerify, caFile);
     }
