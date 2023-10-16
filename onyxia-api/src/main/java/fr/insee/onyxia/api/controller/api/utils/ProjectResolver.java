@@ -4,7 +4,7 @@ import fr.insee.onyxia.api.user.OnyxiaUserProvider;
 import fr.insee.onyxia.model.OnyxiaUser;
 import fr.insee.onyxia.model.project.Project;
 import fr.insee.onyxia.model.region.Region;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
