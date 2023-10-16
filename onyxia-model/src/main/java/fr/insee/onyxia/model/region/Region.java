@@ -625,6 +625,7 @@ public class Region {
             private boolean userEnabled = false;
             private boolean groupEnabled = false;
             private boolean allowUserModification = true;
+
             // could be deprecated
             @JsonProperty("default")
             private Quota defaultQuota;

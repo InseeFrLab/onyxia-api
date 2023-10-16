@@ -43,7 +43,10 @@ public class HelmInstallService {
             Map<String, String> env,
             final boolean skipTlsVerify,
             String caFile)
-            throws InvalidExitValueException, IOException, InterruptedException, TimeoutException,
+            throws InvalidExitValueException,
+                    IOException,
+                    InterruptedException,
+                    TimeoutException,
                     IllegalArgumentException {
         StringBuilder command = new StringBuilder("helm upgrade --install ");
         if (skipTlsVerify) {
@@ -96,8 +99,12 @@ public class HelmInstallService {
     }
 
     public HelmLs[] listChartInstall(HelmConfiguration configuration, String namespace)
-            throws JsonMappingException, InvalidExitValueException, JsonProcessingException,
-                    IOException, InterruptedException, TimeoutException {
+            throws JsonMappingException,
+                    InvalidExitValueException,
+                    JsonProcessingException,
+                    IOException,
+                    InterruptedException,
+                    TimeoutException {
         StringBuilder command = new StringBuilder("helm ls");
         if (namespace != null) {
             command.append(" -n ");
