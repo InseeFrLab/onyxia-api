@@ -21,8 +21,8 @@
     </distributionManagement>
     <properties>
         <fabric8io.version>6.7.1</fabric8io.version>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
     </properties>
 
     <dependencyManagement>
@@ -70,7 +70,7 @@
                     <configuration>
                         <java>
                             <googleJavaFormat>
-                                <version>1.15.0</version>
+                                <version>1.18.1</version>
                                 <style>AOSP</style>
                             </googleJavaFormat>
                         </java>
