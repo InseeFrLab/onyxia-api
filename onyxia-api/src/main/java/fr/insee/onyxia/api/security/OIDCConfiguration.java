@@ -135,7 +135,9 @@ public class OIDCConfiguration {
                                     .getRequest()));
             user.setEmail(userInfo.getClaimAsString("email"));
             user.setNomComplet(userInfo.getClaimAsString("name"));
-            user.setGroups(userInfo.getClaimAsStringList(groupsClaim));
+            if (userInfo.getClaimAsStringList(groupsClaim) != null) {
+                user.setGroups(userInfo.getClaimAsStringList(groupsClaim));
+            }
             user.getAttributes().putAll(userInfo.getClaims());
             user.getAttributes().put("sub", userInfo.getSubject());
             user.getAttributes().put("access_token", userInfo.getTokenValue());
