@@ -67,10 +67,10 @@ public class OIDCConfiguration {
                 .and()
                 // manage routes securisation here
                 .authorizeRequests()
-                .antMatchers(HttpMethod.OPTIONS)
+                .requestMatchers(HttpMethod.OPTIONS)
                 .permitAll()
                 // configuration pour Swagger
-                .antMatchers(
+                .requestMatchers(
                         "/",
                         "/swagger-ui**",
                         "/swagger-ui/**",
@@ -83,7 +83,7 @@ public class OIDCConfiguration {
                         "/actuator/**",
                         "/actuator")
                 .permitAll()
-                .antMatchers(
+                .requestMatchers(
                         "/api",
                         "/api/swagger-ui**",
                         "/api/swagger-ui/**",
@@ -97,9 +97,9 @@ public class OIDCConfiguration {
                         "/api/actuator")
                 .permitAll()
                 // configuration pour public
-                .antMatchers("/public/**")
+                .requestMatchers("/public/**")
                 .permitAll()
-                .antMatchers("/api/public/**")
+                .requestMatchers("/api/public/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated()

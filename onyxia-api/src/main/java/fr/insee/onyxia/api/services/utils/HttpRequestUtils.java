@@ -1,6 +1,6 @@
 package fr.insee.onyxia.api.services.utils;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 
 @Service
