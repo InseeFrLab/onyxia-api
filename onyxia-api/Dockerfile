@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21_35-jre
+FROM eclipse-temurin:21.0.1_12-jre
 # Install helm
 RUN curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | DESIRED_VERSION=v3.12.0 bash
 COPY target/*.jar app.jar
