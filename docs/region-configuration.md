@@ -65,7 +65,7 @@ Users can work on Onyxia as a User or as a Group to which they belong. Each user
 | `quotas` | | Properties setting quotas on how many resources a user can get on the services provider. | See [Quotas properties](#quotas-properties) |
 | `defaultConfiguration` | | Default configuration on services that a user can override. For client purposes only. | See [Default Configuration](#default-configuration-properties) |
 | `customInitScript` | | This can be used to customize user environments using a regional script executed by some users' pods. | See [CustomInitScript properties](#custom-init-script-properties) |
-| `customValues` | | This can be used to specify custom values thath should be avaiable in the underlaying helm chart when a service is launched. Nested values are supported. | ` "customValues": {"myCustomKey": "myValue", "myNestedCustomKey": {"nestedKey": "nestedValue"} }` |
+| `customValues` | | This can be used to specify custom values that will be available for helm chart injection in the web app. Nested values are supported. | ` "customValues": {"myCustomKey": "myValue", "myNestedCustomKey": {"nestedKey": "nestedValue"} }` |
 
 ### CustomInitScript properties
 
