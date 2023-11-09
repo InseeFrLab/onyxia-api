@@ -180,6 +180,9 @@ public class CatalogController {
         userDefinedValues.setDescription("Values defined by the end user");
         userDefinedValues.setDefaut("");
         userDefinedValues.setTitle("User defined values");
+        XOnyxia xonyxiaUserDefinedValues = new XOnyxia();
+        xonyxiaUserDefinedValues.setHidden(true);
+        userDefinedValues.setXonyxia(xonyxiaUserDefinedValues);
         onyxiaProperties.put("userDefinedValues", userDefinedValues);
         Property owner = new Property();
         owner.setType("string");
