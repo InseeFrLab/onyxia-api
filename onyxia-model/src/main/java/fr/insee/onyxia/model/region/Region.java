@@ -823,6 +823,7 @@ public class Region {
     public static class Git {
 
         private String type;
+
         @JsonProperty("URL")
         private String url;
 
