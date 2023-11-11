@@ -852,6 +852,7 @@ public class Region {
             this.oidcConfiguration = oidcConfiguration;
         }
     }
+
     public static class K8sPublicEndpoint {
 
         @JsonProperty("URL")
