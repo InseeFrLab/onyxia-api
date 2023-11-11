@@ -19,6 +19,7 @@ See [regions.json](/onyxia-api/src/main/resources/regions.json) for a complete e
     - [S3](#s3)
     - [Atlas](#atlas)
   - [Vault properties](#vault-properties)
+  - [Git properties](#git-properties)
 
 ## Main region properties
 
@@ -242,10 +243,20 @@ It can be used to add additional features to Onyxia. It helps users to keep thei
 
 | Key | Default | Description | Example |
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
-| `URL` | | URL of the atlas service for the region. | "https://vault.change.me" |
+| `URL` | | URL of the vault service for the region. | "https://vault.change.me" |
 | `kvEngine` | | mount point of the kv engine. | "onyxia-kv" |
 | `role` | | role of the user in vault | "onyxia-user" |
 | `authPath` | "jwt" | path of the jwt auth method. | "jwt" |
+| `oidcConfiguration` | | Allow override of openidconnect authentication for this specific service. If not defined then global Onyxia authentication will be used. | {clientID: "onyxia", issuerURI: "https://auth.lab.sspcloud.fr/auth"} |
+
+## Git properties
+
+It can be used to add additional features to Onyxia. It helps users to keep their code safe.
+
+| Key | Default | Description | Example |
+| --------------------- | ------- | ------------------------------------------------------------------ | ---- |
+| `type` | | Type of Git implementation. | "gitlab", "github" |
+| `URL` | | URL of the git service for the region. | "https://git.change.me" |
 | `oidcConfiguration` | | Allow override of openidconnect authentication for this specific service. If not defined then global Onyxia authentication will be used. | {clientID: "onyxia", issuerURI: "https://auth.lab.sspcloud.fr/auth"} |
 
 ## ProxyConfiguration properties

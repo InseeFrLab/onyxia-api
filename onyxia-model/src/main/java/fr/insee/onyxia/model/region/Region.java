@@ -819,6 +819,39 @@ public class Region {
         }
     }
 
+    @Schema(description = "Git Configuration")
+    public static class Git {
+
+        private String type;
+        @JsonProperty("URL")
+        private String url;
+
+        private OIDCConfiguration oidcConfiguration = null;
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+        
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
+
+        public OIDCConfiguration getOidcConfiguration() {
+            return oidcConfiguration;
+        }
+
+        public void setOidcConfiguration(OIDCConfiguration oidcConfiguration) {
+            this.oidcConfiguration = oidcConfiguration;
+        }
+    }
     public static class K8sPublicEndpoint {
 
         @JsonProperty("URL")
