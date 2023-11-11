@@ -835,7 +835,7 @@ public class Region {
         public void setType(String type) {
             this.type = type;
         }
-        
+
         public String getUrl() {
             return url;
         }
