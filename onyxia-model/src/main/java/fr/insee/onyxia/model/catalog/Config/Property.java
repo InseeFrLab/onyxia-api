@@ -359,6 +359,8 @@ public class Property {
         boolean readonly = false;
         String overwriteDefaultWith;
         String useRegionSliderConfig;
+        Object formFieldLabel;
+        Object formFieldHelperText;
 
         public boolean isHidden() {
             return hidden;
@@ -390,6 +392,22 @@ public class Property {
 
         public void setUseRegionSliderConfig(String useRegionSliderConfig) {
             this.useRegionSliderConfig = useRegionSliderConfig;
+        }
+
+        public Object getFormFieldLabel() {
+            return formFieldLabel;
+        }
+
+        public void setFormFieldLabel(Object formFieldLabel) {
+            this.formFieldLabel = formFieldLabel;
+        }
+
+        public Object getFormFieldHelperText() {
+            return formFieldHelperText;
+        }
+
+        public void setFormFieldHelperText(Object formFieldHelperText) {
+            this.formFieldHelperText = formFieldHelperText;
         }
     }
 
