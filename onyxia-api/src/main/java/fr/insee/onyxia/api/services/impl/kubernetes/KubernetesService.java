@@ -11,7 +11,6 @@ import io.fabric8.kubernetes.api.model.NamespaceBuilder;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.ResourceQuota;
 import io.fabric8.kubernetes.api.model.ResourceQuotaBuilder;
-import io.fabric8.kubernetes.api.model.ResourceQuotaFluent;
 import io.fabric8.kubernetes.api.model.rbac.RoleBinding;
 import io.fabric8.kubernetes.api.model.rbac.RoleBindingBuilder;
 import io.fabric8.kubernetes.api.model.rbac.SubjectBuilder;
@@ -183,8 +182,7 @@ public class KubernetesService {
             return;
         }
 
-        var resourceQuotaBuilderSpecNested =
-                resourceQuotaBuilder.withNewSpec();
+        var resourceQuotaBuilderSpecNested = resourceQuotaBuilder.withNewSpec();
         quotasToApply.entrySet().stream()
                 .filter(e -> e.getValue() != null)
                 .forEach(
