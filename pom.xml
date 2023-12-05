@@ -20,7 +20,7 @@
 
     </distributionManagement>
     <properties>
-        <fabric8io.version>6.7.1</fabric8io.version>
+        <fabric8io.version>6.9.2</fabric8io.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
     </properties>
@@ -66,7 +66,7 @@
                 <plugin>
                     <groupId>com.diffplug.spotless</groupId>
                     <artifactId>spotless-maven-plugin</artifactId>
-                    <version>2.40.0</version>
+                    <version>2.41.1</version>
                     <configuration>
                         <java>
                             <googleJavaFormat>
