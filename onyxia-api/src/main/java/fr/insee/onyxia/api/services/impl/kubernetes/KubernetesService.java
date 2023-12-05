@@ -183,7 +183,7 @@ public class KubernetesService {
             return;
         }
 
-        final ResourceQuotaFluent.SpecNested<ResourceQuotaBuilder> resourceQuotaBuilderSpecNested =
+        var resourceQuotaBuilderSpecNested =
                 resourceQuotaBuilder.withNewSpec();
         quotasToApply.entrySet().stream()
                 .filter(e -> e.getValue() != null)
