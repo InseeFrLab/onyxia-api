@@ -41,7 +41,7 @@ public class Region {
     private OnyxiaAPI onyxiaAPI;
 
     @Schema(description = "")
-    private Data data;
+    private Data data = new Data();
 
     @Schema(description = "")
     private Vault vault;
@@ -736,6 +736,8 @@ public class Region {
         @JsonProperty("S3")
         private S3 s3;
 
+        private ExternalS3 externalS3 = new ExternalS3();
+
         public Atlas getAtlas() {
             return atlas;
         }
@@ -1028,6 +1030,42 @@ public class Region {
         public void setAcceptBucketCreation(boolean acceptBucketCreation) {
             this.acceptBucketCreation = acceptBucketCreation;
         }
+    }
+
+    @Schema(description = "Configuration to be used by the S3 client associated to Onyxia")
+    public static class ExternalS3 {
+
+        private boolean enabled = false;
+
+        @JsonProperty("URL")
+        private String url;
+
+        private String region;
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
+
+        public String getRegion() {
+            return region;
+        }
+
+        public void setRegion(String region) {
+            this.region = region;
+        }
+
     }
 
     public static class OIDCConfiguration {
