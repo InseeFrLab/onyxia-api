@@ -229,6 +229,21 @@ All these properties which configure the access to the storage are intended for 
 | `monitoring` | | Defines the URL pattern of the monitoring service of each bucket. | "https://monitoring.sspcloud.fr/$BUCKET_ID" |
 | `acceptBucketCreation` | true | If true, the S3 client should not create bucket. | true |
 
+### S3
+
+There are several implementations of the S3 standard like Minio or AWS.
+
+S3 storage is divided into **buckets** with their own access policy.
+
+All these properties which configure the access to the storage are intended for Onyxia clients apart except properties on bucket naming.
+
+| Key | Default | Description | Example |
+| --------------------- | ------- | ------------------------------------------------------------------ | ---- |
+| `enabled` | true | If true, user can user external bucket. | |
+| `URL` | | Default URL for the S3 storage to help users to specify an unmanaged bucket. | "https://minio.lab.sspcloud.fr" |
+| `region` | | Default region for the S3 storage to help users to specify an unmanaged bucket. | "us-east-1" |
+
+
 ### Atlas
 
 Atlas is a data management tool.
