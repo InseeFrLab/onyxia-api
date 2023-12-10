@@ -47,6 +47,9 @@ public class Region {
     private Vault vault;
 
     @Schema(description = "")
+    private Git git;
+
+    @Schema(description = "")
     private ProxyInjection proxyInjection;
 
     @Schema(description = "")
@@ -133,6 +136,14 @@ public class Region {
 
     public void setVault(Vault vault) {
         this.vault = vault;
+    }
+
+    public Git getGit() {
+        return git;
+    }
+
+    public void setGit(Git git) {
+        this.git = git;
     }
 
     public ProxyInjection getProxyInjection() {
