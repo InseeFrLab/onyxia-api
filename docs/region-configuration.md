@@ -229,7 +229,7 @@ All these properties which configure the access to the storage are intended for 
 | `monitoring` | | Defines the URL pattern of the monitoring service of each bucket. | "https://monitoring.sspcloud.fr/$BUCKET_ID" |
 | `acceptBucketCreation` | true | If true, the S3 client should not create bucket. | true |
 
-### S3
+### ExternalS3
 
 There are several implementations of the S3 standard like Minio or AWS.
 
