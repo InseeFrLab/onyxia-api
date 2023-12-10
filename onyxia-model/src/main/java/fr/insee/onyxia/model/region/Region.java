@@ -1055,7 +1055,8 @@ public class Region {
     public static class Expose {
         private String domain;
         private String ingressClassName;
-
+        private boolean isDefaultCertificate = true;
+        private Map<String, String> annotations = new HashMap<>();
         private boolean ingress = true;
 
         private boolean route = false;
@@ -1076,6 +1077,22 @@ public class Region {
 
         public void setIngressClassName(String ingressClassName) {
             this.ingressClassName = ingressClassName;
+        }
+
+        public boolean getIsDefaultCertificate() {
+            return isDefaultCertificate;
+        }
+
+        public void setIsDefaultCertificate(boolean isDefaultCertificate) {
+            this.isDefaultCertificate = isDefaultCertificate;
+        }
+
+        public Map<String, String> getAnnotations() {
+            return annotations;
+        }
+
+        public void getAnnotations(Map<String, String> annotations) {
+            this.annotations = annotations;
         }
 
         public boolean getIngress() {
