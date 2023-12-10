@@ -753,6 +753,14 @@ public class Region {
         public void setS3(S3 s3) {
             this.s3 = s3;
         }
+
+        public S3 getExternalS3() {
+            return externalS3;
+        }
+
+        public void setExternalS3(ExternalS3 externalS3) {
+            this.externalS3 = externalS3;
+        }
     }
 
     public static class Atlas {
@@ -1035,7 +1043,7 @@ public class Region {
     @Schema(description = "Configuration to be used by the S3 client associated to Onyxia")
     public static class ExternalS3 {
 
-        private boolean enabled = false;
+        private boolean enabled = true;
 
         @JsonProperty("URL")
         private String url;
@@ -1065,7 +1073,6 @@ public class Region {
         public void setRegion(String region) {
             this.region = region;
         }
-
     }
 
     public static class OIDCConfiguration {
