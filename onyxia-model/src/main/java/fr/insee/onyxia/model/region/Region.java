@@ -754,7 +754,7 @@ public class Region {
             this.s3 = s3;
         }
 
-        public S3 getExternalS3() {
+        public ExternalS3 getExternalS3() {
             return externalS3;
         }
 
@@ -1040,7 +1040,7 @@ public class Region {
         }
     }
 
-    @Schema(description = "Configuration to be used by the S3 client associated to Onyxia")
+    @Schema(description = "Default Configuration for the unmanaged S3")
     public static class ExternalS3 {
 
         private boolean enabled = true;
