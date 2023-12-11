@@ -1045,10 +1045,9 @@ public class Region {
 
         private boolean enabled = true;
 
-        @JsonProperty("URL")
-        private String url;
+        private String defaultURL;
 
-        private String region;
+        private String defaultRegion;
 
         public boolean isEnabled() {
             return enabled;
@@ -1058,20 +1057,20 @@ public class Region {
             this.enabled = enabled;
         }
 
-        public String getUrl() {
-            return url;
+        public String getDefaultURL() {
+            return defaultURL;
         }
 
-        public void setUrl(String url) {
-            this.url = url;
+        public void setDefaultURL(String defaultURL) {
+            this.defaultURL = defaultURL;
         }
 
-        public String getRegion() {
-            return region;
+        public String getDefaultRegion() {
+            return defaultRegion;
         }
 
-        public void setRegion(String region) {
-            this.region = region;
+        public void setDefaultRegion(String defaultRegion) {
+            this.defaultRegion = defaultRegion;
         }
     }
 
