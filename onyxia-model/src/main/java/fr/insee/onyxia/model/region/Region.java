@@ -1140,10 +1140,6 @@ public class Region {
             return annotations;
         }
 
-        public void getAnnotations(Map<String, String> annotations) {
-            this.annotations = annotations;
-        }
-
         public boolean getIngress() {
             return ingress;
         }
