@@ -196,12 +196,22 @@ public class Region {
         private K8sPublicEndpoint k8sPublicEndpoint = new K8sPublicEndpoint();
         private CustomInitScript customInitScript = new CustomInitScript();
 
+        private Map<String, Object> customValues = new HashMap<>();
+
         public DefaultConfiguration getDefaultConfiguration() {
             return defaultConfiguration;
         }
 
         public void setDefaultConfiguration(DefaultConfiguration defaultConfiguration) {
             this.defaultConfiguration = defaultConfiguration;
+        }
+
+        public Map<String, Object> getCustomValues() {
+            return customValues;
+        }
+
+        public void setCustomValues(Map<String, Object> customValues) {
+            this.customValues = customValues;
         }
 
         public CustomInitScript getCustomInitScript() {
@@ -798,6 +808,41 @@ public class Region {
 
         public void setAuthPath(String authPath) {
             this.authPath = authPath;
+        }
+
+        public OIDCConfiguration getOidcConfiguration() {
+            return oidcConfiguration;
+        }
+
+        public void setOidcConfiguration(OIDCConfiguration oidcConfiguration) {
+            this.oidcConfiguration = oidcConfiguration;
+        }
+    }
+
+    @Schema(description = "Git Configuration")
+    public static class Git {
+
+        private String type;
+
+        @JsonProperty("URL")
+        private String url;
+
+        private OIDCConfiguration oidcConfiguration = null;
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
         }
 
         public OIDCConfiguration getOidcConfiguration() {

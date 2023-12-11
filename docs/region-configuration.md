@@ -19,6 +19,7 @@ See [regions.json](/onyxia-api/src/main/resources/regions.json) for a complete e
     - [S3](#s3)
     - [Atlas](#atlas)
   - [Vault properties](#vault-properties)
+  - [Git properties](#git-properties)
 
 ## Main region properties
 
@@ -65,6 +66,7 @@ Users can work on Onyxia as a User or as a Group to which they belong. Each user
 | `quotas` | | Properties setting quotas on how many resources a user can get on the services provider. | See [Quotas properties](#quotas-properties) |
 | `defaultConfiguration` | | Default configuration on services that a user can override. For client purposes only. | See [Default Configuration](#default-configuration-properties) |
 | `customInitScript` | | This can be used to customize user environments using a regional script executed by some users' pods. | See [CustomInitScript properties](#custom-init-script-properties) |
+| `customValues` | | This can be used to specify custom values that will be available for helm chart injection in the web app. Nested values are supported. | ` "customValues": {"myCustomKey": "myValue", "myNestedCustomKey": {"nestedKey": "nestedValue"} }` |
 
 ### CustomInitScript properties
 
@@ -241,10 +243,20 @@ It can be used to add additional features to Onyxia. It helps users to keep thei
 
 | Key | Default | Description | Example |
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
-| `URL` | | URL of the atlas service for the region. | "https://vault.change.me" |
+| `URL` | | URL of the vault service for the region. | "https://vault.change.me" |
 | `kvEngine` | | mount point of the kv engine. | "onyxia-kv" |
 | `role` | | role of the user in vault | "onyxia-user" |
 | `authPath` | "jwt" | path of the jwt auth method. | "jwt" |
+| `oidcConfiguration` | | Allow override of openidconnect authentication for this specific service. If not defined then global Onyxia authentication will be used. | {clientID: "onyxia", issuerURI: "https://auth.lab.sspcloud.fr/auth"} |
+
+## Git properties
+
+It can be used to add additional features to Onyxia. It helps users to keep their code safe.
+
+| Key | Default | Description | Example |
+| --------------------- | ------- | ------------------------------------------------------------------ | ---- |
+| `type` | | Type of Git implementation. | "gitlab", "github" |
+| `URL` | | URL of the git service for the region. | "https://git.change.me" |
 | `oidcConfiguration` | | Allow override of openidconnect authentication for this specific service. If not defined then global Onyxia authentication will be used. | {clientID: "onyxia", issuerURI: "https://auth.lab.sspcloud.fr/auth"} |
 
 ## ProxyConfiguration properties

@@ -1,5 +1,7 @@
 package fr.insee.onyxia.api.security;
 
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+
 import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.api.services.utils.HttpRequestUtils;
 import fr.insee.onyxia.model.User;
@@ -70,36 +72,58 @@ public class OIDCConfiguration {
                 .requestMatchers(HttpMethod.OPTIONS)
                 .permitAll()
                 // configuration pour Swagger
-                .requestMatchers(
-                        "/",
-                        "/swagger-ui**",
-                        "/swagger-ui/**",
-                        "/v2/api-docs",
-                        "/v3/api-docs",
-                        "/v3/api-docs/*",
-                        "/csrf",
-                        "/webjars/**",
-                        "/swagger-resources/**",
-                        "/actuator/**",
-                        "/actuator")
+                .requestMatchers(antMatcher("/"))
                 .permitAll()
-                .requestMatchers(
-                        "/api",
-                        "/api/swagger-ui**",
-                        "/api/swagger-ui/**",
-                        "/api/v2/api-docs",
-                        "/api/v3/api-docs",
-                        "/api/v3/api-docs/*",
-                        "/api/csrf",
-                        "/api/webjars/**",
-                        "/api/swagger-resources/**",
-                        "/api/actuator/**",
-                        "/api/actuator")
+                .requestMatchers(antMatcher("/swagger-ui**"))
+                .permitAll()
+                .requestMatchers(antMatcher("/swagger-ui/**"))
+                .permitAll()
+                .requestMatchers(antMatcher("/v2/api-docs"))
+                .permitAll()
+                .requestMatchers(antMatcher("/v3/api-docs"))
+                .permitAll()
+                .requestMatchers(antMatcher("/v3/api-docs/*"))
+                .permitAll()
+                .requestMatchers(antMatcher("/csrf"))
+                .permitAll()
+                .requestMatchers(antMatcher("/webjars/**"))
+                .permitAll()
+                .requestMatchers(antMatcher("/swagger-resources/**"))
+                .permitAll()
+                .requestMatchers(antMatcher("/actuator/**"))
+                .permitAll()
+                .requestMatchers(antMatcher("/actuator"))
+                .permitAll()
+                .requestMatchers(antMatcher("/api"))
+                .permitAll()
+                .requestMatchers(antMatcher("/api/swagger-ui**"))
+                .permitAll()
+                .requestMatchers(antMatcher("/api/swagger-ui/**"))
+                .permitAll()
+                .requestMatchers(antMatcher("/api/v2/api-docs"))
+                .permitAll()
+                .requestMatchers(antMatcher("/api/v3/api-docs"))
+                .permitAll()
+                .requestMatchers(antMatcher("/api/v3/api-docs/*"))
+                .permitAll()
+                .requestMatchers(antMatcher("/api/csrf"))
+                .permitAll()
+                .requestMatchers(antMatcher("/api/webjars/**"))
+                .permitAll()
+                .requestMatchers(antMatcher("/api/swagger-resources/**"))
+                .permitAll()
+                .requestMatchers(antMatcher("/api/actuator/**"))
+                .permitAll()
+                .requestMatchers(antMatcher("/api/actuator"))
+                .permitAll()
+                .requestMatchers(antMatcher("/configuration/**"))
+                .permitAll()
+                .requestMatchers(antMatcher("/swagger-resources/**"))
                 .permitAll()
                 // configuration pour public
-                .requestMatchers("/public/**")
+                .requestMatchers(antMatcher("/public/**"))
                 .permitAll()
-                .requestMatchers("/api/public/**")
+                .requestMatchers(antMatcher("/api/public/**"))
                 .permitAll()
                 .anyRequest()
                 .authenticated()
@@ -135,7 +159,9 @@ public class OIDCConfiguration {
                                     .getRequest()));
             user.setEmail(userInfo.getClaimAsString("email"));
             user.setNomComplet(userInfo.getClaimAsString("name"));
-            user.setGroups(userInfo.getClaimAsStringList(groupsClaim));
+            if (userInfo.getClaimAsStringList(groupsClaim) != null) {
+                user.setGroups(userInfo.getClaimAsStringList(groupsClaim));
+            }
             user.getAttributes().putAll(userInfo.getClaims());
             user.getAttributes().put("sub", userInfo.getSubject());
             user.getAttributes().put("access_token", userInfo.getTokenValue());
