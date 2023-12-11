@@ -239,8 +239,8 @@ All these properties which configure the access to the storage are intended for 
 | Key | Default | Description | Example |
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
 | `enabled` | true | If true, user can user external bucket. | |
-| `URL` | | Default URL for the S3 storage to help users to specify an unmanaged bucket. | "https://minio.lab.sspcloud.fr" |
-| `region` | | Default region for the S3 storage to help users to specify an unmanaged bucket. | "us-east-1" |
+| `defaultURL` | | Default URL for the S3 storage to help users to specify an unmanaged bucket. | "https://minio.lab.sspcloud.fr" |
+| `defaultRegion` | | Default region for the S3 storage to help users to specify an unmanaged bucket. | "us-east-1" |
 
 
 ### Atlas
