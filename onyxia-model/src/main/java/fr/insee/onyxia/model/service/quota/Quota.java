@@ -85,6 +85,12 @@ public class Quota {
         setMemoryLimits(data.get("limits.memory"));
         setCpuLimits(data.get("limits.cpu"));
         setStorageRequests(data.get("requests.storage"));
+        if (data.containsKey("requests.nvidia.com/gpu")) {
+            setNvidiaGpuRequests(Integer.parseInt(data.get("requests.nvidia.com/gpu")));
+        }
+        if (data.containsKey("limits.nvidia.com/gpu")) {
+            setNvidiaGpuLimits(Integer.parseInt(data.get("limits.nvidia.com/gpu")));
+        }
         setPodsCount(
                 data.get("count/pods") == null ? null : Integer.valueOf(data.get("count/pods")));
     }
