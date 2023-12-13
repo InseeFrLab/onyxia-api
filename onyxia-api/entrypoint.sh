@@ -13,4 +13,4 @@ if [[ -n "$CACERTS_DIR" ]]; then
 fi
 
 # Run application
-java -jar /app.jar
+java org.springframework.boot.loader.JarLauncher

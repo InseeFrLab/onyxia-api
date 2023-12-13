@@ -19,6 +19,7 @@ See [regions.json](/onyxia-api/src/main/resources/regions.json) for a complete e
     - [S3](#s3)
     - [Atlas](#atlas)
   - [Vault properties](#vault-properties)
+  - [Git properties](#git-properties)
 
 ## Main region properties
 
@@ -65,6 +66,7 @@ Users can work on Onyxia as a User or as a Group to which they belong. Each user
 | `quotas` | | Properties setting quotas on how many resources a user can get on the services provider. | See [Quotas properties](#quotas-properties) |
 | `defaultConfiguration` | | Default configuration on services that a user can override. For client purposes only. | See [Default Configuration](#default-configuration-properties) |
 | `customInitScript` | | This can be used to customize user environments using a regional script executed by some users' pods. | See [CustomInitScript properties](#custom-init-script-properties) |
+| `customValues` | | This can be used to specify custom values that will be available for helm chart injection in the web app. Nested values are supported. | ` "customValues": {"myCustomKey": "myValue", "myNestedCustomKey": {"nestedKey": "nestedValue"} }` |
 
 ### CustomInitScript properties
 
@@ -126,10 +128,12 @@ A quota follows the Kubernetes model which is composed of:
 | Key                | Default | Description                                                                                          |
 |--------------------|---------|------------------------------------------------------------------------------------------------------|
 | `domain`           |         | When users request to expose their service, only the subdomain of this object will be created.       |
-| `ingressClassName` | ''      | Ingress Class Name: useful if you want to use a specific ingress controller instead of a default one |
 | `ingress`          | true    | Whether or not Kubernetes Ingress is enabled                                                         |
 | `route`            | false   | Whether or not OpenShift Route is enabled                                                            |
 | `istio`            |         | See [Istio](#istio)                                                                                  |
+| `ingressClassName` | ''      | Ingress Class Name: useful if you want to use a specific ingress controller instead of a default one |
+| `annotations` |  | Annotations to add at ingress creation {"cert-manager.io/cluster-issuer": "nameOfClusterIssuer"} |
+| `useDefaultCertificate`           | true      | When true, no TLS secret name will be generated, specify false if you want ingress certificate to be managed by CertManager|
 
 
 #### istio
@@ -224,6 +228,21 @@ All these properties which configure the access to the storage are intended for 
 | `monitoring` | | Defines the URL pattern of the monitoring service of each bucket. | "https://monitoring.sspcloud.fr/$BUCKET_ID" |
 | `acceptBucketCreation` | true | If true, the S3 client should not create bucket. | true |
 
+### ExternalS3
+
+There are several implementations of the S3 standard like Minio or AWS.
+
+S3 storage is divided into **buckets** with their own access policy.
+
+All these properties which configure the access to the storage are intended for Onyxia clients apart except properties on bucket naming.
+
+| Key | Default | Description | Example |
+| --------------------- | ------- | ------------------------------------------------------------------ | ---- |
+| `enabled` | true | If true, user can user external bucket. | |
+| `defaultURL` | | Default URL for the S3 storage to help users to specify an unmanaged bucket. | "https://minio.lab.sspcloud.fr" |
+| `defaultRegion` | | Default region for the S3 storage to help users to specify an unmanaged bucket. | "us-east-1" |
+
+
 ### Atlas
 
 Atlas is a data management tool.
@@ -241,10 +260,20 @@ It can be used to add additional features to Onyxia. It helps users to keep thei
 
 | Key | Default | Description | Example |
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
-| `URL` | | URL of the atlas service for the region. | "https://vault.change.me" |
+| `URL` | | URL of the vault service for the region. | "https://vault.change.me" |
 | `kvEngine` | | mount point of the kv engine. | "onyxia-kv" |
 | `role` | | role of the user in vault | "onyxia-user" |
 | `authPath` | "jwt" | path of the jwt auth method. | "jwt" |
+| `oidcConfiguration` | | Allow override of openidconnect authentication for this specific service. If not defined then global Onyxia authentication will be used. | {clientID: "onyxia", issuerURI: "https://auth.lab.sspcloud.fr/auth"} |
+
+## Git properties
+
+It can be used to add additional features to Onyxia. It helps users to keep their code safe.
+
+| Key | Default | Description | Example |
+| --------------------- | ------- | ------------------------------------------------------------------ | ---- |
+| `type` | | Type of Git implementation. | "gitlab", "github" |
+| `URL` | | URL of the git service for the region. | "https://git.change.me" |
 | `oidcConfiguration` | | Allow override of openidconnect authentication for this specific service. If not defined then global Onyxia authentication will be used. | {clientID: "onyxia", issuerURI: "https://auth.lab.sspcloud.fr/auth"} |
 
 ## ProxyConfiguration properties

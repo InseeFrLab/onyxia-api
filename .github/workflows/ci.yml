@@ -15,7 +15,7 @@ on:
       - 'docs/**'
 
 env:
-  REGISTRY: europe-north1-docker.pkg.dev/artifact-registry-5n/dapla-lab-docker/onyxia
+  REGISTRY: europe-north1-docker.pkg.dev/${{ secrets.GAR_PROJECT_ID }}/dapla-lab-docker/onyxia
   IMAGE: onyxia-api
   TAG: ${{ github.ref_name }}-${{ github.sha }}
 
@@ -25,7 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 21
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
@@ -43,7 +43,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 21
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
@@ -67,8 +67,8 @@ jobs:
         name: "Authenticate to Google Cloud"
         uses: "google-github-actions/auth@v1.1.1"
         with:
-          workload_identity_provider: "projects/848539402404/locations/global/workloadIdentityPools/gh-actions/providers/gh-actions"
-          service_account: "gh-actions-dapla-lab@artifact-registry-5n.iam.gserviceaccount.com"
+          workload_identity_provider: "projects/${{ secrets.GAR_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/gh-actions/providers/gh-actions"
+          service_account: "gh-actions-dapla-lab@${{ secrets.GAR_PROJECT_ID }}.iam.gserviceaccount.com"
           token_format: "access_token"
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -83,7 +83,7 @@ jobs:
           password: "${{ steps.auth.outputs.access_token }}"
       - name: Docker meta
         id: metadata
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE }}
           # Docker tags based on the following events/attributes
