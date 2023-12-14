@@ -6,6 +6,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.inseefrlab.helmwrapper.configuration.HelmConfiguration;
+import io.github.inseefrlab.helmwrapper.events.InstallAppEvent;
+import io.github.inseefrlab.helmwrapper.events.InstallAppEventPublisher;
 import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
 import io.github.inseefrlab.helmwrapper.model.HelmLs;
 import io.github.inseefrlab.helmwrapper.utils.Command;
@@ -20,18 +22,23 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 import org.zeroturnaround.exec.InvalidExitValueException;
 
 /** HelmInstall */
 public class HelmInstallService {
 
-    private final Logger logger = LoggerFactory.getLogger(HelmInstallService.class);
-
     private final Pattern helmNamePattern =
             Pattern.compile("^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$");
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(HelmInstallService.class);
+
     public HelmInstallService() {}
 
+    @Autowired
+    InstallAppEventPublisher installAppEventPublisher;
     public HelmInstaller installChart(
             HelmConfiguration configuration,
             String chart,
@@ -86,7 +93,11 @@ public class HelmInstallService {
                 Command.executeAndGetResponseAsJson(configuration, command.toString())
                         .getOutput()
                         .getString();
-        return new ObjectMapper().readValue(res, HelmInstaller.class);
+
+        HelmInstaller helmInstaller = new ObjectMapper().readValue(res, HelmInstaller.class);
+        installAppEventPublisher.publishInstallAppEvent(helmInstaller);
+        return helmInstaller;
+
     }
 
     public int uninstaller(HelmConfiguration configuration, String name, String namespace)

@@ -1,9 +1,12 @@
 package io.github.inseefrlab.helmwrapper.model;
 
 import java.util.ArrayList;
+
+import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 
+@Component
 public class HelmInstaller {
 
     private String name;
