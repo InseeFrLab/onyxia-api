@@ -34,7 +34,6 @@ public class HelmInstallService {
 
     public HelmInstallService() {}
 
-    @Autowired InstallAppEventPublisher installAppEventPublisher;
 
     public HelmInstaller installChart(
             HelmConfiguration configuration,
@@ -92,7 +91,6 @@ public class HelmInstallService {
                         .getString();
 
         HelmInstaller helmInstaller = new ObjectMapper().readValue(res, HelmInstaller.class);
-        installAppEventPublisher.publishInstallAppEvent(helmInstaller);
         return helmInstaller;
     }
 
