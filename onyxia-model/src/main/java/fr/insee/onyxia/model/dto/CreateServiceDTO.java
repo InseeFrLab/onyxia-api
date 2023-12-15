@@ -2,9 +2,11 @@ package fr.insee.onyxia.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.stereotype.Component;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Schema(description = "Paramètre de création d'un service")
+@Component
 public class CreateServiceDTO {
     @Schema(
             description = "Catalog where the package of the service is taken from.",

@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.configuration.kubernetes.HelmClientProvider;
 import fr.insee.onyxia.api.configuration.kubernetes.KubernetesClientProvider;
 import fr.insee.onyxia.api.controller.exception.NamespaceNotFoundException;
+import fr.insee.onyxia.api.events.InstallServiceEventPublisher;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.control.AdmissionControllerHelm;
 import fr.insee.onyxia.api.services.control.commons.UrlGenerator;
@@ -69,6 +70,8 @@ public class HelmAppsService implements AppsService {
     @Autowired private XGeneratedProcessor xGeneratedProcessor;
 
     @Autowired private UrlGenerator urlGenerator;
+
+    @Autowired InstallServiceEventPublisher installServiceEventPublisher;
 
     private HelmConfiguration getHelmConfiguration(Region region, User user) {
         return helmClientProvider.getConfiguration(region, user);
@@ -161,6 +164,7 @@ public class HelmAppsService implements AppsService {
         String namespaceId =
                 kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
         try {
+
             HelmInstaller res =
                     getHelmInstallService()
                             .installChart(
@@ -174,6 +178,7 @@ public class HelmAppsService implements AppsService {
                                     null,
                                     skipTlsVerify,
                                     caFile);
+            installServiceEventPublisher.publishInstallServiceEvent(requestDTO);
             return List.of(res.getManifest());
         } catch (IllegalArgumentException e) {
             throw new AccessDeniedException(e.getMessage());
@@ -273,6 +278,7 @@ public class HelmAppsService implements AppsService {
                 kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
         UninstallService result = new UninstallService();
         result.setPath(path);
+        installServiceEventPublisher.publishUninstallServiceEvent(result.getPath());
         int status = 0;
         if (bulk) {
             // If bulk in kub we ignore the path and delete every helm release
@@ -297,7 +303,6 @@ public class HelmAppsService implements AppsService {
                             .uninstaller(
                                     getHelmConfiguration(region, user), cannonicalPath, namespace);
         }
-
         result.setSuccess(status == 0);
         return result;
     }
