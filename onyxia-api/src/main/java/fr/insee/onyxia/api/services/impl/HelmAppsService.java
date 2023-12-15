@@ -1,7 +1,6 @@
 package fr.insee.onyxia.api.services.impl;
 
 import static fr.insee.onyxia.api.services.impl.ServiceUrlResolver.getServiceUrls;
-import static java.util.stream.Collectors.joining;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -283,14 +282,14 @@ public class HelmAppsService implements AppsService {
             HelmLs[] releases =
                     getHelmInstallService()
                             .listChartInstall(getHelmConfiguration(region, user), namespace);
-            for (int i = 0; i < releases.length; i++) {
+            for (HelmLs release : releases) {
                 status =
                         Math.max(
                                 0,
                                 getHelmInstallService()
                                         .uninstaller(
                                                 getHelmConfiguration(region, user),
-                                                releases[i].getName(),
+                                                release.getName(),
                                                 namespace));
             }
         } else {
@@ -345,7 +344,7 @@ public class HelmAppsService implements AppsService {
                                     mapAppender(result, currentNode, new ArrayList<String>()));
             service.setEnv(result);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.warn("Exception occurred", e);
         }
         try {
             String notes =
@@ -356,7 +355,7 @@ public class HelmAppsService implements AppsService {
                                     release.getNamespace());
             service.setPostInstallInstructions(notes);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.warn("Exception occurred", e);
         }
         return service;
     }
@@ -365,7 +364,7 @@ public class HelmAppsService implements AppsService {
             Map<String, String> result, Map.Entry<String, JsonNode> node, List<String> names) {
         names.add(node.getKey());
         if (node.getValue().isValueNode()) {
-            String name = names.stream().collect(joining("."));
+            String name = String.join(".", names);
             result.put(name, node.getValue().asText());
         } else {
             node.getValue()
@@ -385,12 +384,11 @@ public class HelmAppsService implements AppsService {
             List<String> urls = getServiceUrls(region, manifest, client);
             service.setUrls(urls);
         } catch (Exception e) {
-            System.out.println(
-                    "Warning : Failed to retrieve URLS for release "
-                            + release.getName()
-                            + " namespace "
-                            + release.getNamespace());
-            e.printStackTrace();
+            LOGGER.warn(
+                    "Failed to retrieve URLS for release {} namespace {}",
+                    release.getName(),
+                    release.getNamespace(),
+                    e);
             service.setUrls(List.of());
         }
 
