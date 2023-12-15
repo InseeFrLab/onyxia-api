@@ -177,6 +177,10 @@ public class HelmAppsService implements AppsService {
             return List.of(res.getManifest());
         } catch (IllegalArgumentException e) {
             throw new AccessDeniedException(e.getMessage());
+        } finally {
+            if (!values.delete()) {
+                LOGGER.warn("Failed to delete values file, path {}", values.getAbsolutePath());
+            }
         }
     }
 
