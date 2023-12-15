@@ -60,7 +60,9 @@ public class HelmInstallService {
                 throw new IllegalArgumentException(
                         "Invalid release name "
                                 + name
-                                + " , must match regex ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$ and the length must not be longer than 53");
+                                + " , must match regex "
+                                + helmNamePattern
+                                + " and the length must not be longer than 53");
             }
             safeConcat(command, name + " ");
         } else {
