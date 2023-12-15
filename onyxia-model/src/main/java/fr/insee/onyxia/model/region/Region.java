@@ -41,10 +41,13 @@ public class Region {
     private OnyxiaAPI onyxiaAPI;
 
     @Schema(description = "")
-    private Data data;
+    private Data data = new Data();
 
     @Schema(description = "")
     private Vault vault;
+
+    @Schema(description = "")
+    private Git git;
 
     @Schema(description = "")
     private ProxyInjection proxyInjection;
@@ -133,6 +136,14 @@ public class Region {
 
     public void setVault(Vault vault) {
         this.vault = vault;
+    }
+
+    public Git getGit() {
+        return git;
+    }
+
+    public void setGit(Git git) {
+        this.git = git;
     }
 
     public ProxyInjection getProxyInjection() {
@@ -725,6 +736,8 @@ public class Region {
         @JsonProperty("S3")
         private S3 s3;
 
+        private ExternalS3 externalS3 = new ExternalS3();
+
         public Atlas getAtlas() {
             return atlas;
         }
@@ -739,6 +752,14 @@ public class Region {
 
         public void setS3(S3 s3) {
             this.s3 = s3;
+        }
+
+        public ExternalS3 getExternalS3() {
+            return externalS3;
+        }
+
+        public void setExternalS3(ExternalS3 externalS3) {
+            this.externalS3 = externalS3;
         }
     }
 
@@ -1019,6 +1040,40 @@ public class Region {
         }
     }
 
+    @Schema(description = "Default Configuration for the unmanaged S3")
+    public static class ExternalS3 {
+
+        private boolean enabled = true;
+
+        private String defaultURL;
+
+        private String defaultRegion;
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public String getDefaultURL() {
+            return defaultURL;
+        }
+
+        public void setDefaultURL(String defaultURL) {
+            this.defaultURL = defaultURL;
+        }
+
+        public String getDefaultRegion() {
+            return defaultRegion;
+        }
+
+        public void setDefaultRegion(String defaultRegion) {
+            this.defaultRegion = defaultRegion;
+        }
+    }
+
     public static class OIDCConfiguration {
 
         private String issuerURI;
@@ -1044,7 +1099,8 @@ public class Region {
     public static class Expose {
         private String domain;
         private String ingressClassName;
-
+        private boolean useDefaultCertificate = true;
+        private Map<String, String> annotations = new HashMap<>();
         private boolean ingress = true;
 
         private boolean route = false;
@@ -1065,6 +1121,22 @@ public class Region {
 
         public void setIngressClassName(String ingressClassName) {
             this.ingressClassName = ingressClassName;
+        }
+
+        public boolean getUseDefaultCertificate() {
+            return useDefaultCertificate;
+        }
+
+        public void setUseDefaultCertificate(boolean useDefaultCertificate) {
+            this.useDefaultCertificate = useDefaultCertificate;
+        }
+
+        public void setAnnotations(Map<String, String> annotations) {
+            this.annotations = annotations;
+        }
+
+        public Map<String, String> getAnnotations() {
+            return annotations;
         }
 
         public boolean getIngress() {

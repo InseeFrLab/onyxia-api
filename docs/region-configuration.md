@@ -128,10 +128,12 @@ A quota follows the Kubernetes model which is composed of:
 | Key                | Default | Description                                                                                          |
 |--------------------|---------|------------------------------------------------------------------------------------------------------|
 | `domain`           |         | When users request to expose their service, only the subdomain of this object will be created.       |
-| `ingressClassName` | ''      | Ingress Class Name: useful if you want to use a specific ingress controller instead of a default one |
 | `ingress`          | true    | Whether or not Kubernetes Ingress is enabled                                                         |
 | `route`            | false   | Whether or not OpenShift Route is enabled                                                            |
 | `istio`            |         | See [Istio](#istio)                                                                                  |
+| `ingressClassName` | ''      | Ingress Class Name: useful if you want to use a specific ingress controller instead of a default one |
+| `annotations` |  | Annotations to add at ingress creation {"cert-manager.io/cluster-issuer": "nameOfClusterIssuer"} |
+| `useDefaultCertificate`           | true      | When true, no TLS secret name will be generated, specify false if you want ingress certificate to be managed by CertManager|
 
 
 #### istio
@@ -225,6 +227,21 @@ All these properties which configure the access to the storage are intended for 
 | `oidcConfiguration` | | Allow override of openidconnect authentication for this specific service. If not defined then global Onyxia authentication will be used. | {clientID: "onyxia", issuerURI: "https://auth.lab.sspcloud.fr/auth"} |
 | `monitoring` | | Defines the URL pattern of the monitoring service of each bucket. | "https://monitoring.sspcloud.fr/$BUCKET_ID" |
 | `acceptBucketCreation` | true | If true, the S3 client should not create bucket. | true |
+
+### ExternalS3
+
+There are several implementations of the S3 standard like Minio or AWS.
+
+S3 storage is divided into **buckets** with their own access policy.
+
+All these properties which configure the access to the storage are intended for Onyxia clients apart except properties on bucket naming.
+
+| Key | Default | Description | Example |
+| --------------------- | ------- | ------------------------------------------------------------------ | ---- |
+| `enabled` | true | If true, user can user external bucket. | |
+| `defaultURL` | | Default URL for the S3 storage to help users to specify an unmanaged bucket. | "https://minio.lab.sspcloud.fr" |
+| `defaultRegion` | | Default region for the S3 storage to help users to specify an unmanaged bucket. | "us-east-1" |
+
 
 ### Atlas
 
