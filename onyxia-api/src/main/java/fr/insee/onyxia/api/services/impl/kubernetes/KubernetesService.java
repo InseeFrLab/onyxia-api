@@ -142,7 +142,7 @@ public class KubernetesService {
                     !region.getServices().getQuotas().isAllowUserModification());
         } else if (groupEnabled) {
             final Quota quota = region.getServices().getQuotas().getGroupQuota();
-            LOGGER.info("applying user enabled style quota");
+            LOGGER.info("applying group enabled style quota");
             applyQuotas(
                     namespaceId,
                     kubClient,
