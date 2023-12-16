@@ -15,7 +15,7 @@ import org.springframework.context.event.EventListener;
 @Configuration
 public class CompatibilityChecks {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(RegionsConfiguration.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CompatibilityChecks.class);
     @Autowired RegionsConfiguration regionsConfiguration;
     @Autowired KubernetesClientProvider kubernetesClientProvider;
 

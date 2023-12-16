@@ -22,7 +22,7 @@ public class CatalogsLoader {
 
     @Autowired private CatalogsConfiguration catalogsConfiguration;
 
-    private static Logger logger = LoggerFactory.getLogger(CatalogsLoader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CatalogsLoader.class);
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
@@ -30,7 +30,7 @@ public class CatalogsLoader {
         Catalogs catalogs = new Catalogs();
         catalogs.setCatalogs(catalogsConfiguration.getResolvedCatalogs());
         catalogs.setCatalogs(catalogFilter.filterCatalogs(catalogs.getCatalogs()));
-        logger.info("Serving " + catalogs.getCatalogs().size() + " catalogs");
+        LOGGER.info("Serving " + catalogs.getCatalogs().size() + " catalogs");
         return catalogs;
     }
 }

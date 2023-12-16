@@ -30,7 +30,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class CatalogLoader {
 
-    private final Logger logger = LoggerFactory.getLogger(CatalogLoader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CatalogLoader.class);
 
     @Autowired private ResourceLoader resourceLoader;
 
@@ -39,11 +39,11 @@ public class CatalogLoader {
     private ObjectMapper mapperHelm;
 
     public void updateCatalog(CatalogWrapper cw) {
-        logger.info("updating catalog with id :" + cw.getId() + " and type " + cw.getType());
+        LOGGER.info("updating catalog with id :" + cw.getId() + " and type " + cw.getType());
         if (cw.getType().equals(Repository.TYPE_HELM)) {
             updateHelmRepository(cw);
         } else {
-            logger.warn("Unsupported catalog type: id: {}, type: {}", cw.getId(), cw.getType());
+            LOGGER.warn("Unsupported catalog type: id: {}, type: {}", cw.getId(), cw.getType());
         }
     }
 
@@ -77,7 +77,7 @@ public class CatalogLoader {
                                                         refreshPackage(cw, pkg);
                                                     } catch (CatalogLoaderException
                                                             | IOException e) {
-                                                        logger.info("Exception occurred", e);
+                                                        LOGGER.info("Exception occurred", e);
                                                     }
                                                 });
                             });
@@ -89,7 +89,7 @@ public class CatalogLoader {
             cw.setCatalog(repository);
             cw.setLastUpdateTime(System.currentTimeMillis());
         } catch (Exception e) {
-            logger.info("Exception occurred", e);
+            LOGGER.info("Exception occurred", e);
         }
     }
 

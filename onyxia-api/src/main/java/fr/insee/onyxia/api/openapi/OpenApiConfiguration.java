@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenApiConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(OpenApiConfiguration.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenApiConfiguration.class);
 
     // TODO : add oauth authentication
 
@@ -23,7 +23,7 @@ public class OpenApiConfiguration {
     }
 
     private OpenAPI createOpenAPI() {
-        logger.info("surcharge de la configuration swagger");
+        LOGGER.info("surcharge de la configuration swagger");
         final OpenAPI openapi =
                 new OpenAPI()
                         .info(new Info().title("Onyxia-api").description("Swagger onyxia-api"));
