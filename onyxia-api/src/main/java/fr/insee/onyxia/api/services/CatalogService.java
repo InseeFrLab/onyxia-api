@@ -9,13 +9,13 @@ import java.util.Optional;
 
 public interface CatalogService {
 
-    public Catalogs getCatalogs();
+    Catalogs getCatalogs();
 
-    public CatalogWrapper getCatalogById(String catalogId);
+    CatalogWrapper getCatalogById(String catalogId);
 
-    public Pkg getPackage(String catalogId, String packageName);
+    Pkg getPackage(String catalogId, String packageName);
 
-    public Optional<Chart> getChartByVersion(String catalogId, String chartName, String version);
+    Optional<Chart> getChartByVersion(String catalogId, String chartName, String version);
 
-    public Optional<List<Chart>> getCharts(String catalogId, String chartName);
+    Optional<List<Chart>> getCharts(String catalogId, String chartName);
 }
