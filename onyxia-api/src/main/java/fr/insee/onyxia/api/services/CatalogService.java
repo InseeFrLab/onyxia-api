@@ -13,7 +13,7 @@ public interface CatalogService {
 
     CatalogWrapper getCatalogById(String catalogId);
 
-    Pkg getPackage(String catalogId, String packageName);
+    Optional<Pkg> getPackage(String catalogId, String packageName);
 
     Optional<Chart> getChartByVersion(String catalogId, String chartName, String version);
 

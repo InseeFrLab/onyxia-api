@@ -84,11 +84,11 @@ public class CatalogController {
             })
     @GetMapping("{catalogId}/{packageName}")
     public Pkg getPackage(@PathVariable String catalogId, @PathVariable String packageName) {
-        Pkg pkg = catalogService.getPackage(catalogId, packageName);
+        Pkg pkg =
+                catalogService
+                        .getPackage(catalogId, packageName)
+                        .orElseThrow(NotFoundException::new);
         addCustomOnyxiaProperties(pkg);
-        if (pkg == null) {
-            throw new NotFoundException();
-        }
         return pkg;
     }
 
