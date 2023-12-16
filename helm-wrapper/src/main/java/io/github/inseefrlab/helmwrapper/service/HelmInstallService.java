@@ -154,12 +154,8 @@ public class HelmInstallService {
             } else {
                 return Command.execute(configuration, command.toString()).getOutput().getString();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (TimeoutException e) {
-            e.printStackTrace();
+        } catch (IOException | InterruptedException | TimeoutException e) {
+            logger.warn("Exception occurred", e);
         }
         return "";
     }

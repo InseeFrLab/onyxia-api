@@ -41,18 +41,14 @@ public class CatalogRefresher implements ApplicationRunner {
                                                 c.getCaFile()));
                                 catalogLoader.updateCatalog(c);
                             } catch (Exception e) {
-                                e.printStackTrace();
+                                logger.warn("Exception occurred", e);
                             }
                         });
 
         try {
             helmRepoService.repoUpdate();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (InterruptedException | TimeoutException | IOException e) {
+            logger.warn("Exception occurred", e);
         }
     }
 
