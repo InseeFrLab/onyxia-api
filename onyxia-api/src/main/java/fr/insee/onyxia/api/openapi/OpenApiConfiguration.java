@@ -18,15 +18,11 @@ public class OpenApiConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public OpenAPI customOpenAPI() {
-        final OpenAPI openapi = createOpenAPI();
-        return openapi;
+        return createOpenAPI();
     }
 
     private OpenAPI createOpenAPI() {
         LOGGER.info("surcharge de la configuration swagger");
-        final OpenAPI openapi =
-                new OpenAPI()
-                        .info(new Info().title("Onyxia-api").description("Swagger onyxia-api"));
-        return openapi;
+        return new OpenAPI().info(new Info().title("Onyxia-api").description("Swagger onyxia-api"));
     }
 }
