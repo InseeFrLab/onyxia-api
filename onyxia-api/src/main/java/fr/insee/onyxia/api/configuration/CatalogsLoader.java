@@ -30,7 +30,7 @@ public class CatalogsLoader {
         Catalogs catalogs = new Catalogs();
         catalogs.setCatalogs(catalogsConfiguration.getResolvedCatalogs());
         catalogs.setCatalogs(catalogFilter.filterCatalogs(catalogs.getCatalogs()));
-        LOGGER.info("Serving " + catalogs.getCatalogs().size() + " catalogs");
+        LOGGER.info("Serving {} catalogs", catalogs.getCatalogs().size());
         return catalogs;
     }
 }

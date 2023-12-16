@@ -61,7 +61,7 @@ public class CatalogRefresher implements ApplicationRunner {
                     new TimerTask() {
                         @Override
                         public void run() {
-                            LOGGER.info("refreshing catalogs..");
+                            LOGGER.info("Refreshing catalogs");
                             refresh();
                         }
                     };

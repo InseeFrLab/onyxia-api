@@ -39,7 +39,7 @@ public class CatalogLoader {
     private ObjectMapper mapperHelm;
 
     public void updateCatalog(CatalogWrapper cw) {
-        LOGGER.info("updating catalog with id :" + cw.getId() + " and type " + cw.getType());
+        LOGGER.info("updating catalog with id :{} and type {}", cw.getId(), cw.getType());
         if (cw.getType().equals(Repository.TYPE_HELM)) {
             updateHelmRepository(cw);
         } else {
