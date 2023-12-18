@@ -18,8 +18,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.zeroturnaround.exec.InvalidExitValueException;
 
 /** HelmInstall */
@@ -28,10 +26,7 @@ public class HelmInstallService {
     private final Pattern helmNamePattern =
             Pattern.compile("^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$");
 
-    private static final Logger logger = LoggerFactory.getLogger(HelmInstallService.class);
-
     public HelmInstallService() {}
-
 
     public HelmInstaller installChart(
             HelmConfiguration configuration,
@@ -87,9 +82,7 @@ public class HelmInstallService {
                 Command.executeAndGetResponseAsJson(configuration, command.toString())
                         .getOutput()
                         .getString();
-
-        HelmInstaller helmInstaller = new ObjectMapper().readValue(res, HelmInstaller.class);
-        return helmInstaller;
+        return new ObjectMapper().readValue(res, HelmInstaller.class);
     }
 
     public int uninstaller(HelmConfiguration configuration, String name, String namespace)

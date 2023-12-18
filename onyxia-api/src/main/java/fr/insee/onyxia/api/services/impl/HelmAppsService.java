@@ -8,7 +8,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.configuration.kubernetes.HelmClientProvider;
 import fr.insee.onyxia.api.configuration.kubernetes.KubernetesClientProvider;
 import fr.insee.onyxia.api.controller.exception.NamespaceNotFoundException;
-import fr.insee.onyxia.api.events.InstallServiceEventPublisher;
+import fr.insee.onyxia.api.events.InstallServiceEvent;
+import fr.insee.onyxia.api.events.OnyxiaEventPublisher;
+import fr.insee.onyxia.api.events.UninstallServiceEvent;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.control.AdmissionControllerHelm;
 import fr.insee.onyxia.api.services.control.commons.UrlGenerator;
@@ -71,7 +73,7 @@ public class HelmAppsService implements AppsService {
 
     @Autowired private UrlGenerator urlGenerator;
 
-    @Autowired InstallServiceEventPublisher installServiceEventPublisher;
+    @Autowired OnyxiaEventPublisher onyxiaEventPublisher;
 
     private HelmConfiguration getHelmConfiguration(Region region, User user) {
         return helmClientProvider.getConfiguration(region, user);
@@ -178,7 +180,11 @@ public class HelmAppsService implements AppsService {
                                     null,
                                     skipTlsVerify,
                                     caFile);
-            installServiceEventPublisher.publishInstallServiceEvent(requestDTO);
+            InstallServiceEvent installServiceEvent = new InstallServiceEvent();
+            installServiceEvent.setNamespace(namespaceId);
+            installServiceEvent.setCatalogId(catalogId);
+            installServiceEvent.setName(requestDTO.getName());
+            onyxiaEventPublisher.publishEvent(installServiceEvent);
             return List.of(res.getManifest());
         } catch (IllegalArgumentException e) {
             throw new AccessDeniedException(e.getMessage());
@@ -278,7 +284,10 @@ public class HelmAppsService implements AppsService {
                 kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
         UninstallService result = new UninstallService();
         result.setPath(path);
-        installServiceEventPublisher.publishUninstallServiceEvent(result.getPath());
+        UninstallServiceEvent uninstallServiceEvent = new UninstallServiceEvent();
+        uninstallServiceEvent.setNamespace(project.getNamespace());
+        uninstallServiceEvent.setName(path);
+        onyxiaEventPublisher.publishEvent(uninstallServiceEvent);
         int status = 0;
         if (bulk) {
             // If bulk in kub we ignore the path and delete every helm release
