@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class KubernetesClientProvider {
 
-    private final Logger logger = LoggerFactory.getLogger(KubernetesClientProvider.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KubernetesClientProvider.class);
 
     @Autowired private SecurityConfig securityConfig;
 

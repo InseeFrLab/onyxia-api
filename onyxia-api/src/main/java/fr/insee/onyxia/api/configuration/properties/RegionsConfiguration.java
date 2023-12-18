@@ -29,7 +29,7 @@ import org.springframework.core.io.support.PropertySourceFactory;
 @ConfigurationProperties
 public class RegionsConfiguration {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(RegionsConfiguration.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RegionsConfiguration.class);
     private String regions;
     private List<Region> resolvedRegions;
     @Autowired private ObjectMapper mapper;

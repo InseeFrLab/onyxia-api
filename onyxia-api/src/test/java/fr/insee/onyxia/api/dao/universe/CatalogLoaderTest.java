@@ -84,7 +84,7 @@ public class CatalogLoaderTest {
         cw.setLocation("classpath:/catalog-loader-test");
         catalogLoader.updateCatalog(cw);
 
-        String stdErrLogs = TestUtils.tapSystemErr(() -> catalogLoader.updateCatalog(cw));
+        String stdErrLogs = TestUtils.tapSystemOut(() -> catalogLoader.updateCatalog(cw));
 
         assertThat(
                 stdErrLogs,

@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class CatalogRefresher implements ApplicationRunner {
 
-    private final Logger logger = LoggerFactory.getLogger(CatalogRefresher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CatalogRefresher.class);
 
     @Autowired private Catalogs catalogs;
 
@@ -33,7 +33,7 @@ public class CatalogRefresher implements ApplicationRunner {
                 .forEach(
                         c -> {
                             try {
-                                logger.info(
+                                LOGGER.info(
                                         helmRepoService.addHelmRepo(
                                                 c.getLocation(),
                                                 c.getId(),
@@ -41,18 +41,14 @@ public class CatalogRefresher implements ApplicationRunner {
                                                 c.getCaFile()));
                                 catalogLoader.updateCatalog(c);
                             } catch (Exception e) {
-                                e.printStackTrace();
+                                LOGGER.warn("Exception occurred", e);
                             }
                         });
 
         try {
             helmRepoService.repoUpdate();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (InterruptedException | TimeoutException | IOException e) {
+            LOGGER.warn("Exception occurred", e);
         }
     }
 
@@ -65,7 +61,7 @@ public class CatalogRefresher implements ApplicationRunner {
                     new TimerTask() {
                         @Override
                         public void run() {
-                            logger.info("refreshing catalogs..");
+                            LOGGER.info("Refreshing catalogs");
                             refresh();
                         }
                     };

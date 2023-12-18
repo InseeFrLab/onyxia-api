@@ -25,7 +25,7 @@ import org.zeroturnaround.exec.InvalidExitValueException;
 /** HelmInstall */
 public class HelmInstallService {
 
-    private final Logger logger = LoggerFactory.getLogger(HelmInstallService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HelmInstallService.class);
 
     private final Pattern helmNamePattern =
             Pattern.compile("^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$");
@@ -154,12 +154,8 @@ public class HelmInstallService {
             } else {
                 return Command.execute(configuration, command.toString()).getOutput().getString();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (TimeoutException e) {
-            e.printStackTrace();
+        } catch (IOException | InterruptedException | TimeoutException e) {
+            LOGGER.warn("Exception occurred", e);
         }
         return "";
     }
