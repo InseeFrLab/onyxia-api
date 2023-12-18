@@ -4,6 +4,7 @@ import fr.insee.onyxia.model.helm.Chart;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Schema(description = "A set of packages and charts coming from a same endpoint")
 public abstract class CatalogWrapper {
@@ -28,13 +29,8 @@ public abstract class CatalogWrapper {
         this.packages = packages;
     }
 
-    public Pkg getPackageByName(String name) {
-        for (Pkg pkg : packages) {
-            if (pkg.getName().equals(name)) {
-                return pkg;
-            }
-        }
-        return null;
+    public Optional<Pkg> getPackageByName(String name) {
+        return packages.stream().filter(pkg -> pkg.getName().equals(name)).findFirst();
     }
 
     /**

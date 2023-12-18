@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SecurityRequirement(name = "auth")
 public class QuotaController {
 
-    private final Logger logger = LoggerFactory.getLogger(QuotaController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(QuotaController.class);
 
     @Autowired private KubernetesService kubernetesService;
 
@@ -143,7 +143,7 @@ public class QuotaController {
         if (owner.getType() == Owner.OwnerType.USER) {
             checkUserQuotaIsEnabled(region);
             if (region.getServices().getQuotas().isEnabled()) {
-                logger.warn(
+                LOGGER.warn(
                         "resetting to old enabled style quota, this parameter will be deprecated");
                 kubernetesService.applyQuota(
                         region,
@@ -151,7 +151,7 @@ public class QuotaController {
                         userProvider.getUser(region),
                         region.getServices().getQuotas().getDefaultQuota());
             } else {
-                logger.info("resetting to user enabled style quota");
+                LOGGER.info("resetting to user enabled style quota");
                 kubernetesService.applyQuota(
                         region,
                         project,
@@ -159,7 +159,7 @@ public class QuotaController {
                         region.getServices().getQuotas().getUserQuota());
             }
         } else if (owner.getType() == Owner.OwnerType.GROUP) {
-            logger.info("resetting to group enabled style quota");
+            LOGGER.info("resetting to group enabled style quota");
             checkGroupQuotaIsEnabled(region);
             kubernetesService.applyQuota(
                     region,
