@@ -26,7 +26,7 @@ public class CatalogServiceImpl implements CatalogService {
     }
 
     @Override
-    public Pkg getPackage(String catalogId, String packageName) {
+    public Optional<Pkg> getPackage(String catalogId, String packageName) {
         return catalogs.getCatalogById(catalogId).getCatalog().getPackageByName(packageName);
     }
 

@@ -52,9 +52,11 @@ public class CloudShellController {
         } catch (Exception e) {
             status.setStatus(CloudShellStatus.STATUS_DOWN);
             status.setPackageToDeploy(
-                    catalogService.getPackage(
-                            cloudshellConfiguration.getCatalogId(),
-                            cloudshellConfiguration.getPackageName()));
+                    catalogService
+                            .getPackage(
+                                    cloudshellConfiguration.getCatalogId(),
+                                    cloudshellConfiguration.getPackageName())
+                            .get());
             status.setCatalogId(cloudshellConfiguration.getCatalogId());
             status.setUrl(null);
         }
