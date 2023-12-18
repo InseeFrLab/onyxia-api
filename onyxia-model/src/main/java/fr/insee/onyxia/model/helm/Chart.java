@@ -24,7 +24,7 @@ import java.util.Map;
     "urls",
     "version"
 })
-@Schema(description = "Cloudshell data and health")
+@Schema(description = "")
 public class Chart extends Pkg {
 
     @Schema(description = "")
