@@ -22,6 +22,7 @@ public class ReleaseInfoTest {
                         Paths.get(getClass().getClassLoader().getResource(resultFileName).toURI()));
         HelmReleaseInfo releaseInfo = helmReleaseInfoParser.parseReleaseInfo(input);
         Assertions.assertEquals(1, releaseInfo.getRevision());
+        Assertions.assertNotNull(releaseInfo.getManifest());
         Assertions.assertEquals(releaseInfo.getNotes() != null, hasNotes);
     }
 }

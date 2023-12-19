@@ -36,7 +36,7 @@ public class HelmReleaseInfoParser {
         String end = matcher.group("end");
         String[] splittedEnd = end.split(Pattern.quote("NOTES:"));
         if (splittedEnd.length > 1) {
-            parsedReleaseInfo.setNotes(splittedEnd[0]);
+            parsedReleaseInfo.setManifest(splittedEnd[0]);
             parsedReleaseInfo.setNotes(splittedEnd[1]);
         } else {
             parsedReleaseInfo.setManifest(end);
