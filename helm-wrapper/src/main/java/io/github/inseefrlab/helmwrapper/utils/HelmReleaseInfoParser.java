@@ -13,7 +13,7 @@ public class HelmReleaseInfoParser {
 
     private static final Pattern RELEASE_INFO_PATTERN =
             Pattern.compile(
-                    "^NAME: (?<name>.*)\\RLAST DEPLOYED: (?<lastDeployed>.*)\\RNAMESPACE: (?<namespace>.*)\\RSTATUS: (?<status>.*)\\RREVISION: (?<revision>.*)\\RCHART: (?<chart>.*)\\RVERSION: (?<version>.*)\\RAPP_VERSION:(?<appVersion>.*)\\RUSER-SUPPLIED VALUES:\\R(?<userSuppliedValues>.*)COMPUTED VALUES:\\R(?<computedValues>.*)HOOKS:\\R(?<hooks>.*)MANIFEST:\\R(?<manifest>.*)(NOTES:\\R(?<notes>.*))?$",
+                    "^NAME: (?<name>.*)\\RLAST DEPLOYED: (?<lastDeployed>.*)\\RNAMESPACE: (?<namespace>.*)\\RSTATUS: (?<status>.*)\\RREVISION: (?<revision>.*)\\RCHART: (?<chart>.*)\\RVERSION: (?<version>.*)\\RAPP_VERSION:(?<appVersion>.*)\\RUSER-SUPPLIED VALUES:\\R(?<userSuppliedValues>.*)COMPUTED VALUES:\\R(?<computedValues>.*)HOOKS:\\R(?<hooks>.*)MANIFEST:\\R(?<end>.*)?$",
                     Pattern.DOTALL);
 
     public HelmReleaseInfo parseReleaseInfo(String releaseInfo) throws IllegalArgumentException {
@@ -33,8 +33,14 @@ public class HelmReleaseInfoParser {
         parsedReleaseInfo.setUserSuppliedValues(matcher.group("userSuppliedValues"));
         parsedReleaseInfo.setComputedValues(matcher.group("computedValues"));
         parsedReleaseInfo.setHooks(matcher.group("hooks"));
-        parsedReleaseInfo.setManifest(matcher.group("manifest"));
-        parsedReleaseInfo.setNotes(matcher.group("notes"));
+        String end = matcher.group("end");
+        String[] splittedEnd = end.split(Pattern.quote("NOTES:"));
+        if (splittedEnd.length > 1) {
+            parsedReleaseInfo.setNotes(splittedEnd[0]);
+            parsedReleaseInfo.setNotes(splittedEnd[1]);
+        } else {
+            parsedReleaseInfo.setManifest(end);
+        }
         return parsedReleaseInfo;
     }
 }
