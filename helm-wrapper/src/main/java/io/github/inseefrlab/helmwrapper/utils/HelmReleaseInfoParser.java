@@ -1,17 +1,20 @@
 package io.github.inseefrlab.helmwrapper.utils;
 
 import io.github.inseefrlab.helmwrapper.model.HelmReleaseInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HelmReleaseInfoParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HelmReleaseInfoParser.class);
 
-    private static final Pattern RELEASE_INFO_PATTERN = Pattern.compile("^NAME: (?<name>.*)\\RLAST DEPLOYED: (?<lastDeployed>.*)\\RNAMESPACE: (?<namespace>.*)\\RSTATUS: (?<status>.*)$",Pattern.DOTALL);
+    private static final Pattern RELEASE_INFO_PATTERN =
+            Pattern.compile(
+                    "^NAME: (?<name>.*)\\RLAST DEPLOYED: (?<lastDeployed>.*)\\RNAMESPACE: (?<namespace>.*)\\RSTATUS: (?<status>.*)\\RREVISION: (?<revision>.*)\\RCHART: (?<chart>.*)\\RVERSION: (?<version>.*)\\RAPP_VERSION:(?<appVersion>.*)\\RUSER-SUPPLIED VALUES:\\R(?<userSuppliedValues>.*)COMPUTED VALUES:\\R(?<computedValues>.*)HOOKS:\\R(?<hooks>.*)MANIFEST:\\R(?<manifest>.*)NOTES:\\R(?<notes>.*)$",
+                    Pattern.DOTALL);
 
     public HelmReleaseInfo parseReleaseInfo(String releaseInfo) throws IllegalArgumentException {
         Matcher matcher = RELEASE_INFO_PATTERN.matcher(releaseInfo);
@@ -20,8 +23,18 @@ public class HelmReleaseInfoParser {
         }
         HelmReleaseInfo parsedReleaseInfo = new HelmReleaseInfo();
         parsedReleaseInfo.setName(matcher.group("name"));
-        System.out.println(matcher.group("lastDeployed"));
-        System.out.println(matcher.group("namespace"));
+        parsedReleaseInfo.setLastDeployed(matcher.group("lastDeployed"));
+        parsedReleaseInfo.setNamespace(matcher.group("namespace"));
+        parsedReleaseInfo.setStatus(matcher.group("status"));
+        parsedReleaseInfo.setRevision(Integer.parseInt(matcher.group("revision")));
+        parsedReleaseInfo.setChart(matcher.group("chart"));
+        parsedReleaseInfo.setVersion(matcher.group("version"));
+        parsedReleaseInfo.setAppVersion(StringUtils.trim(matcher.group("appVersion")));
+        parsedReleaseInfo.setUserSuppliedValues(matcher.group("userSuppliedValues"));
+        parsedReleaseInfo.setComputedValues(matcher.group("computedValues"));
+        parsedReleaseInfo.setHooks(matcher.group("hooks"));
+        parsedReleaseInfo.setManifest(matcher.group("manifest"));
+        parsedReleaseInfo.setNotes(matcher.group("notes"));
         return parsedReleaseInfo;
     }
 }
