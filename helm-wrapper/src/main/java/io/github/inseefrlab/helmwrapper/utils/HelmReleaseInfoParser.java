@@ -13,7 +13,7 @@ public class HelmReleaseInfoParser {
 
     private static final Pattern RELEASE_INFO_PATTERN =
             Pattern.compile(
-                    "^NAME: (?<name>.*)\\RLAST DEPLOYED: (?<lastDeployed>.*)\\RNAMESPACE: (?<namespace>.*)\\RSTATUS: (?<status>.*)\\RREVISION: (?<revision>.*)\\RCHART: (?<chart>.*)\\RVERSION: (?<version>.*)\\RAPP_VERSION:(?<appVersion>.*)\\RUSER-SUPPLIED VALUES:\\R(?<userSuppliedValues>.*)COMPUTED VALUES:\\R(?<computedValues>.*)HOOKS:\\R(?<hooks>.*)MANIFEST:\\R(?<manifest>.*)NOTES:\\R(?<notes>.*)$",
+                    "^NAME: (?<name>.*)\\RLAST DEPLOYED: (?<lastDeployed>.*)\\RNAMESPACE: (?<namespace>.*)\\RSTATUS: (?<status>.*)\\RREVISION: (?<revision>.*)\\RCHART: (?<chart>.*)\\RVERSION: (?<version>.*)\\RAPP_VERSION:(?<appVersion>.*)\\RUSER-SUPPLIED VALUES:\\R(?<userSuppliedValues>.*)COMPUTED VALUES:\\R(?<computedValues>.*)HOOKS:\\R(?<hooks>.*)MANIFEST:\\R(?<manifest>.*)(NOTES:\\R(?<notes>.*))?$",
                     Pattern.DOTALL);
 
     public HelmReleaseInfo parseReleaseInfo(String releaseInfo) throws IllegalArgumentException {
