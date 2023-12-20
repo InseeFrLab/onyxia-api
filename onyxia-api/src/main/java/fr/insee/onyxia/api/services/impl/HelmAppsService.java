@@ -40,6 +40,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.FastDateFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +62,7 @@ public class HelmAppsService implements AppsService {
     @Autowired(required = false)
     private List<AdmissionControllerHelm> admissionControllers = new ArrayList<>();
 
-    private SimpleDateFormat helmDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private FastDateFormat helmDateFormat = new FastDateFormat("yyyy-MM-dd HH:mm:ss");
     @Autowired private KubernetesClientProvider kubernetesClientProvider;
 
     @Autowired private HelmClientProvider helmClientProvider;
