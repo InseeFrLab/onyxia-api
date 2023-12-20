@@ -211,25 +211,36 @@ public class HelmAppsService implements AppsService {
         } catch (Exception e) {
             return CompletableFuture.completedFuture(new ServicesListing());
         }
-        List<Service> services = installedCharts.parallelStream().map(release -> getHelmApp(region, user, release)).filter(service -> {
-            boolean canUserSeeThisService = false;
-            if (project.getGroup() == null) {
-                // Personal group
-                canUserSeeThisService = true;
-            } else {
-                if (service.getEnv().containsKey("onyxia.share")
-                        && "true".equals(service.getEnv().get("onyxia.share"))) {
-                    // Service has been intentionally shared
-                    canUserSeeThisService = true;
-                }
-                if (service.getEnv().containsKey("onyxia.owner")
-                        && user.getIdep().equalsIgnoreCase(service.getEnv().get("onyxia.owner"))) {
-                    // User is owner
-                    canUserSeeThisService = true;
-                }
-            }
-            return canUserSeeThisService;
-        }).collect(Collectors.toList());
+        List<Service> services =
+                installedCharts.parallelStream()
+                        .map(release -> getHelmApp(region, user, release))
+                        .filter(
+                                service -> {
+                                    boolean canUserSeeThisService = false;
+                                    if (project.getGroup() == null) {
+                                        // Personal group
+                                        canUserSeeThisService = true;
+                                    } else {
+                                        if (service.getEnv().containsKey("onyxia.share")
+                                                && "true"
+                                                        .equals(
+                                                                service.getEnv()
+                                                                        .get("onyxia.share"))) {
+                                            // Service has been intentionally shared
+                                            canUserSeeThisService = true;
+                                        }
+                                        if (service.getEnv().containsKey("onyxia.owner")
+                                                && user.getIdep()
+                                                        .equalsIgnoreCase(
+                                                                service.getEnv()
+                                                                        .get("onyxia.owner"))) {
+                                            // User is owner
+                                            canUserSeeThisService = true;
+                                        }
+                                    }
+                                    return canUserSeeThisService;
+                                })
+                        .collect(Collectors.toList());
         ServicesListing listing = new ServicesListing();
         listing.setApps(services);
         return CompletableFuture.completedFuture(listing);
