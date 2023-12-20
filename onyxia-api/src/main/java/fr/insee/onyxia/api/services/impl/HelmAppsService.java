@@ -28,6 +28,7 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import io.github.inseefrlab.helmwrapper.configuration.HelmConfiguration;
 import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
 import io.github.inseefrlab.helmwrapper.model.HelmLs;
+import io.github.inseefrlab.helmwrapper.model.HelmReleaseInfo;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService.MultipleServiceFound;
 import java.io.File;
@@ -312,13 +313,14 @@ public class HelmAppsService implements AppsService {
     }
 
     private Service getHelmApp(Region region, User user, HelmLs release) {
-        String manifest =
+        HelmReleaseInfo helmReleaseInfo =
                 getHelmInstallService()
-                        .getManifest(
+                        .getAll(
                                 getHelmConfiguration(region, user),
                                 release.getName(),
                                 release.getNamespace());
-        Service service = getServiceFromRelease(region, release, manifest, user);
+        Service service =
+                getServiceFromRelease(region, release, helmReleaseInfo.getManifest(), user);
         try {
             service.setStartedAt(helmDateFormat.parse(release.getUpdated()).getTime());
         } catch (ParseException e) {
@@ -336,13 +338,8 @@ public class HelmAppsService implements AppsService {
         service.setChart(release.getChart());
         service.setAppVersion(release.getAppVersion());
         try {
-            String values =
-                    getHelmInstallService()
-                            .getValues(
-                                    getHelmConfiguration(region, user),
-                                    release.getName(),
-                                    release.getNamespace());
-            JsonNode node = new ObjectMapper().readTree(values);
+            String values = helmReleaseInfo.getUserSuppliedValues();
+            JsonNode node = mapperHelm.readTree(values);
             Map<String, String> result = new HashMap<>();
             node.fields()
                     .forEachRemaining(
@@ -353,12 +350,7 @@ public class HelmAppsService implements AppsService {
             LOGGER.warn("Exception occurred", e);
         }
         try {
-            String notes =
-                    getHelmInstallService()
-                            .getNotes(
-                                    getHelmConfiguration(region, user),
-                                    release.getName(),
-                                    release.getNamespace());
+            String notes = helmReleaseInfo.getNotes();
             service.setPostInstallInstructions(notes);
         } catch (Exception e) {
             LOGGER.warn("Exception occurred", e);
