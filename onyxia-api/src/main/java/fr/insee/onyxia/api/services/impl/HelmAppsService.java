@@ -34,12 +34,12 @@ import io.github.inseefrlab.helmwrapper.service.HelmInstallService.MultipleServi
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.FastDateFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +61,7 @@ public class HelmAppsService implements AppsService {
     @Autowired(required = false)
     private List<AdmissionControllerHelm> admissionControllers = new ArrayList<>();
 
-    private SimpleDateFormat helmDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private FastDateFormat helmDateFormat = FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss");
     @Autowired private KubernetesClientProvider kubernetesClientProvider;
 
     @Autowired private HelmClientProvider helmClientProvider;
@@ -212,30 +212,36 @@ public class HelmAppsService implements AppsService {
         } catch (Exception e) {
             return CompletableFuture.completedFuture(new ServicesListing());
         }
-        List<Service> services = new ArrayList<>();
-        for (HelmLs release : installedCharts) {
-            Service service = getHelmApp(region, user, release);
-            boolean canUserSeeThisService = false;
-            if (project.getGroup() == null) {
-                // Personal group
-                canUserSeeThisService = true;
-            } else {
-                if (service.getEnv().containsKey("onyxia.share")
-                        && "true".equals(service.getEnv().get("onyxia.share"))) {
-                    // Service has been intentionally shared
-                    canUserSeeThisService = true;
-                }
-                if (service.getEnv().containsKey("onyxia.owner")
-                        && user.getIdep().equalsIgnoreCase(service.getEnv().get("onyxia.owner"))) {
-                    // User is owner
-                    canUserSeeThisService = true;
-                }
-            }
-
-            if (canUserSeeThisService) {
-                services.add(service);
-            }
-        }
+        List<Service> services =
+                installedCharts.parallelStream()
+                        .map(release -> getHelmApp(region, user, release))
+                        .filter(
+                                service -> {
+                                    boolean canUserSeeThisService = false;
+                                    if (project.getGroup() == null) {
+                                        // Personal group
+                                        canUserSeeThisService = true;
+                                    } else {
+                                        if (service.getEnv().containsKey("onyxia.share")
+                                                && "true"
+                                                        .equals(
+                                                                service.getEnv()
+                                                                        .get("onyxia.share"))) {
+                                            // Service has been intentionally shared
+                                            canUserSeeThisService = true;
+                                        }
+                                        if (service.getEnv().containsKey("onyxia.owner")
+                                                && user.getIdep()
+                                                        .equalsIgnoreCase(
+                                                                service.getEnv()
+                                                                        .get("onyxia.owner"))) {
+                                            // User is owner
+                                            canUserSeeThisService = true;
+                                        }
+                                    }
+                                    return canUserSeeThisService;
+                                })
+                        .collect(Collectors.toList());
         ServicesListing listing = new ServicesListing();
         listing.setApps(services);
         return CompletableFuture.completedFuture(listing);
@@ -317,7 +323,7 @@ public class HelmAppsService implements AppsService {
                 getServiceFromRelease(region, release, helmReleaseInfo.getManifest(), user);
         try {
             service.setStartedAt(helmDateFormat.parse(release.getUpdated()).getTime());
-        } catch (ParseException e) {
+        } catch (Exception e) {
             service.setStartedAt(0);
         }
         service.setId(release.getName());
