@@ -199,7 +199,6 @@ public class Region {
         private Expose expose;
         private Server server;
         private Monitoring monitoring;
-        private CloudshellConfiguration cloudshell;
         private String initScript;
         private String allowedURIPattern = "^https://";
         private Quotas quotas = new Quotas();
@@ -311,14 +310,6 @@ public class Region {
 
         public void setServer(Server server) {
             this.server = server;
-        }
-
-        public CloudshellConfiguration getCloudshell() {
-            return cloudshell;
-        }
-
-        public void setCloudshell(CloudshellConfiguration cloudshell) {
-            this.cloudshell = cloudshell;
         }
 
         public Monitoring getMonitoring() {
@@ -728,7 +719,7 @@ public class Region {
         }
     }
 
-    @Schema(description = "Cloudshell data and health")
+    @Schema(description = "")
     public static class Data {
 
         private Atlas atlas;
@@ -1211,7 +1202,7 @@ public class Region {
     }
 
     public static class OnyxiaAPI {
-        @Schema(description = "Cloudshell data and health")
+        @Schema(description = "")
         private String baseURL;
 
         public String getBaseURL() {
@@ -1340,7 +1331,7 @@ public class Region {
         }
     }
 
-    @Schema(description = "Cloudshell data and health")
+    @Schema(description = "")
     public static class Location {
 
         private double lat;
@@ -1372,27 +1363,6 @@ public class Region {
 
         public void setName(String name) {
             this.name = name;
-        }
-    }
-
-    public static class CloudshellConfiguration {
-
-        private String catalogId, packageName;
-
-        public String getCatalogId() {
-            return catalogId;
-        }
-
-        public void setCatalogId(String catalogId) {
-            this.catalogId = catalogId;
-        }
-
-        public String getPackageName() {
-            return packageName;
-        }
-
-        public void setPackageName(String packageName) {
-            this.packageName = packageName;
         }
     }
 

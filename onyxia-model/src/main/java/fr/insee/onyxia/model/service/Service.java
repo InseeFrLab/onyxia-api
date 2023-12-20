@@ -253,19 +253,19 @@ public class Service {
         return postInstallInstructions;
     }
 
-    @Schema(description = "Cloudshell data and health")
+    @Schema(description = "")
     public static enum ServiceStatus {
         DEPLOYING,
         RUNNING,
         STOPPED;
     }
 
-    @Schema(description = "Cloudshell data and health")
+    @Schema(description = "")
     public static enum ServiceType {
         KUBERNETES
     }
 
-    @Schema(description = "Cloudshell data and health")
+    @Schema(description = "")
     public static class Monitoring {
         private String url;
 

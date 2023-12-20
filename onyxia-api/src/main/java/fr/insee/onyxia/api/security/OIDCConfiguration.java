@@ -15,7 +15,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -60,76 +62,63 @@ public class OIDCConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf()
-                .disable()
-                .sessionManagement()
-                // use previously declared bean
-                .sessionAuthenticationStrategy(sessionAuthenticationStrategy())
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                // manage routes securisation here
-                .authorizeRequests()
-                .requestMatchers(HttpMethod.OPTIONS)
-                .permitAll()
-                // configuration pour Swagger
-                .requestMatchers(antMatcher("/"))
-                .permitAll()
-                .requestMatchers(antMatcher("/swagger-ui**"))
-                .permitAll()
-                .requestMatchers(antMatcher("/swagger-ui/**"))
-                .permitAll()
-                .requestMatchers(antMatcher("/v2/api-docs"))
-                .permitAll()
-                .requestMatchers(antMatcher("/v3/api-docs"))
-                .permitAll()
-                .requestMatchers(antMatcher("/v3/api-docs/*"))
-                .permitAll()
-                .requestMatchers(antMatcher("/csrf"))
-                .permitAll()
-                .requestMatchers(antMatcher("/webjars/**"))
-                .permitAll()
-                .requestMatchers(antMatcher("/swagger-resources/**"))
-                .permitAll()
-                .requestMatchers(antMatcher("/actuator/**"))
-                .permitAll()
-                .requestMatchers(antMatcher("/actuator"))
-                .permitAll()
-                .requestMatchers(antMatcher("/api"))
-                .permitAll()
-                .requestMatchers(antMatcher("/api/swagger-ui**"))
-                .permitAll()
-                .requestMatchers(antMatcher("/api/swagger-ui/**"))
-                .permitAll()
-                .requestMatchers(antMatcher("/api/v2/api-docs"))
-                .permitAll()
-                .requestMatchers(antMatcher("/api/v3/api-docs"))
-                .permitAll()
-                .requestMatchers(antMatcher("/api/v3/api-docs/*"))
-                .permitAll()
-                .requestMatchers(antMatcher("/api/csrf"))
-                .permitAll()
-                .requestMatchers(antMatcher("/api/webjars/**"))
-                .permitAll()
-                .requestMatchers(antMatcher("/api/swagger-resources/**"))
-                .permitAll()
-                .requestMatchers(antMatcher("/api/actuator/**"))
-                .permitAll()
-                .requestMatchers(antMatcher("/api/actuator"))
-                .permitAll()
-                .requestMatchers(antMatcher("/configuration/**"))
-                .permitAll()
-                .requestMatchers(antMatcher("/swagger-resources/**"))
-                .permitAll()
-                // configuration pour public
-                .requestMatchers(antMatcher("/public/**"))
-                .permitAll()
-                .requestMatchers(antMatcher("/api/public/**"))
-                .permitAll()
-                .anyRequest()
-                .authenticated()
-                .and()
-                .oauth2ResourceServer()
-                .jwt();
+        http.csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(
+                        configurer -> {
+                            configurer.sessionAuthenticationStrategy(
+                                    sessionAuthenticationStrategy());
+                            configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                        })
+
+                // manage routes security here
+                .authorizeHttpRequests(
+                        configurer -> {
+                            configurer.requestMatchers(HttpMethod.OPTIONS).permitAll();
+                            // configuration pour Swagger
+                            configurer.requestMatchers(antMatcher("/")).permitAll();
+                            configurer.requestMatchers(antMatcher("/swagger-ui**")).permitAll();
+                            configurer.requestMatchers(antMatcher("/swagger-ui/**")).permitAll();
+                            configurer.requestMatchers(antMatcher("/v2/api-docs")).permitAll();
+                            configurer.requestMatchers(antMatcher("/v3/api-docs")).permitAll();
+                            configurer.requestMatchers(antMatcher("/v3/api-docs/*")).permitAll();
+                            configurer.requestMatchers(antMatcher("/csrf")).permitAll();
+                            configurer.requestMatchers(antMatcher("/webjars/**")).permitAll();
+                            configurer
+                                    .requestMatchers(antMatcher("/swagger-resources/**"))
+                                    .permitAll();
+                            configurer.requestMatchers(antMatcher("/actuator/**")).permitAll();
+                            configurer.requestMatchers(antMatcher("/actuator")).permitAll();
+                            configurer.requestMatchers(antMatcher("/api")).permitAll();
+                            configurer.requestMatchers(antMatcher("/api/swagger-ui**")).permitAll();
+                            configurer
+                                    .requestMatchers(antMatcher("/api/swagger-ui/**"))
+                                    .permitAll();
+                            configurer.requestMatchers(antMatcher("/api/v2/api-docs")).permitAll();
+                            configurer.requestMatchers(antMatcher("/api/v3/api-docs")).permitAll();
+                            configurer
+                                    .requestMatchers(antMatcher("/api/v3/api-docs/*"))
+                                    .permitAll();
+                            configurer.requestMatchers(antMatcher("/api/csrf")).permitAll();
+                            configurer.requestMatchers(antMatcher("/api/webjars/**")).permitAll();
+                            configurer
+                                    .requestMatchers(antMatcher("/api/swagger-resources/**"))
+                                    .permitAll();
+                            configurer.requestMatchers(antMatcher("/api/actuator/**")).permitAll();
+                            configurer.requestMatchers(antMatcher("/api/actuator")).permitAll();
+                            configurer.requestMatchers(antMatcher("/configuration/**")).permitAll();
+                            configurer
+                                    .requestMatchers(antMatcher("/swagger-resources/**"))
+                                    .permitAll();
+                            // configuration pour public
+                            configurer.requestMatchers(antMatcher("/public/**")).permitAll();
+                            configurer.requestMatchers(antMatcher("/api/public/**")).permitAll();
+                            configurer.anyRequest().authenticated();
+                        })
+                .oauth2ResourceServer(
+                        httpSecurityOAuth2ResourceServerConfigurer -> {
+                            httpSecurityOAuth2ResourceServerConfigurer.jwt(
+                                    Customizer.withDefaults());
+                        });
         return http.build();
     }
 
