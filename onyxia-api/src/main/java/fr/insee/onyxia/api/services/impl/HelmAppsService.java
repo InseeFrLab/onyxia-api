@@ -61,7 +61,7 @@ public class HelmAppsService implements AppsService {
     @Autowired(required = false)
     private List<AdmissionControllerHelm> admissionControllers = new ArrayList<>();
 
-    private FastDateFormat helmDateFormat = new FastDateFormat("yyyy-MM-dd HH:mm:ss");
+    private FastDateFormat helmDateFormat = FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss");
     @Autowired private KubernetesClientProvider kubernetesClientProvider;
 
     @Autowired private HelmClientProvider helmClientProvider;
