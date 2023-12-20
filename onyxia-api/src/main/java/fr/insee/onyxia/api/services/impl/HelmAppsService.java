@@ -323,7 +323,7 @@ public class HelmAppsService implements AppsService {
                 getServiceFromRelease(region, release, helmReleaseInfo.getManifest(), user);
         try {
             service.setStartedAt(helmDateFormat.parse(release.getUpdated()).getTime());
-        } catch (ParseException e) {
+        } catch (Exception e) {
             service.setStartedAt(0);
         }
         service.setId(release.getName());
