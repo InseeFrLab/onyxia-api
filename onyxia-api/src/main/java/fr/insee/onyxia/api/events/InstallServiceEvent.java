@@ -1,30 +1,52 @@
 package fr.insee.onyxia.api.events;
 
-import org.springframework.stereotype.Component;
-
 public class InstallServiceEvent extends OnyxiaEvent {
 
     public static final String TYPE = "service.install";
     private String namespace;
-    private String name;
+    private String releaseName;
+    private String packageName;
+
+    public String getReleaseName() {
+        return releaseName;
+    }
+
+    public void setReleaseName(String releaseName) {
+        this.releaseName = releaseName;
+    }
+
+    public String getPackageName() {
+        return packageName;
+    }
+
+    public void setPackageName(String packageName) {
+        this.packageName = packageName;
+    }
+
     private String username;
     private String catalogId;
 
     public InstallServiceEvent() {}
 
-    public InstallServiceEvent(String username, String namespace, String name, String catalogId) {
+    public InstallServiceEvent(
+            String username,
+            String namespace,
+            String releaseName,
+            String packageName,
+            String catalogId) {
         this.namespace = namespace;
-        this.name = name;
+        this.releaseName = releaseName;
         this.catalogId = catalogId;
         this.username = username;
+        this.packageName = packageName;
     }
 
     public String getName() {
-        return name;
+        return releaseName;
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.releaseName = name;
     }
 
     public String getUsername() {

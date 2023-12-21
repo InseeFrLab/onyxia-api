@@ -18,7 +18,7 @@ public class LogEventListener {
 
     @Autowired private ObjectMapper objectMapper;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LogEventListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger("onyxia.sh.events");
 
     @Async
     @EventListener

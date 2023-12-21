@@ -182,7 +182,11 @@ public class HelmAppsService implements AppsService {
                                     caFile);
             InstallServiceEvent installServiceEvent =
                     new InstallServiceEvent(
-                            user.getIdep(), namespaceId, requestDTO.getName(), catalogId);
+                            user.getIdep(),
+                            namespaceId,
+                            requestDTO.getName(),
+                            pkg.getName(),
+                            catalogId);
             onyxiaEventPublisher.publishEvent(installServiceEvent);
             return List.of(res.getManifest());
         } catch (IllegalArgumentException e) {
@@ -293,9 +297,6 @@ public class HelmAppsService implements AppsService {
                 kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
         UninstallService result = new UninstallService();
         result.setPath(path);
-        UninstallServiceEvent uninstallServiceEvent =
-                new UninstallServiceEvent(project.getNamespace(), path, user.getIdep());
-        onyxiaEventPublisher.publishEvent(uninstallServiceEvent);
         int status = 0;
         if (bulk) {
             // If bulk in kub we ignore the path and delete every helm release
@@ -311,6 +312,9 @@ public class HelmAppsService implements AppsService {
                                                 getHelmConfiguration(region, user),
                                                 release.getName(),
                                                 namespace));
+                UninstallServiceEvent uninstallServiceEvent =
+                        new UninstallServiceEvent(namespace, release.getName(), user.getIdep());
+                onyxiaEventPublisher.publishEvent(uninstallServiceEvent);
             }
         } else {
             // Strip / if present
@@ -319,6 +323,9 @@ public class HelmAppsService implements AppsService {
                     getHelmInstallService()
                             .uninstaller(
                                     getHelmConfiguration(region, user), cannonicalPath, namespace);
+            UninstallServiceEvent uninstallServiceEvent =
+                    new UninstallServiceEvent(namespace, cannonicalPath, user.getIdep());
+            onyxiaEventPublisher.publishEvent(uninstallServiceEvent);
         }
         result.setSuccess(status == 0);
         return result;
