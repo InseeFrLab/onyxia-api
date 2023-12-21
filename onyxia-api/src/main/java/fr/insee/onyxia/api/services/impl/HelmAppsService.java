@@ -180,9 +180,9 @@ public class HelmAppsService implements AppsService {
                                     null,
                                     skipTlsVerify,
                                     caFile);
-            InstallServiceEvent installServiceEvent = new InstallServiceEvent(user.getIdep(),
-                                                                              namespaceId,
-                                                                              requestDTO.getName(), catalogId);
+            InstallServiceEvent installServiceEvent =
+                    new InstallServiceEvent(
+                            user.getIdep(), namespaceId, requestDTO.getName(), catalogId);
             onyxiaEventPublisher.publishEvent(installServiceEvent);
             return List.of(res.getManifest());
         } catch (IllegalArgumentException e) {
@@ -284,7 +284,7 @@ public class HelmAppsService implements AppsService {
         UninstallService result = new UninstallService();
         result.setPath(path);
         UninstallServiceEvent uninstallServiceEvent =
-              new UninstallServiceEvent(project.getNamespace(), path, user.getIdep());
+                new UninstallServiceEvent(project.getNamespace(), path, user.getIdep());
         onyxiaEventPublisher.publishEvent(uninstallServiceEvent);
         int status = 0;
         if (bulk) {

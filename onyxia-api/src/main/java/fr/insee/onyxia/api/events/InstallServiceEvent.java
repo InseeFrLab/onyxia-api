@@ -11,8 +11,7 @@ public class InstallServiceEvent extends OnyxiaEvent {
     private String username;
     private String catalogId;
 
-    public InstallServiceEvent() {
-    }
+    public InstallServiceEvent() {}
 
     public InstallServiceEvent(String username, String namespace, String name, String catalogId) {
         this.namespace = namespace;
@@ -20,6 +19,7 @@ public class InstallServiceEvent extends OnyxiaEvent {
         this.catalogId = catalogId;
         this.username = username;
     }
+
     public String getName() {
         return name;
     }
@@ -28,9 +28,14 @@ public class InstallServiceEvent extends OnyxiaEvent {
         this.name = name;
     }
 
-    public String getUsername(){ return username; }
+    public String getUsername() {
+        return username;
+    }
 
-    public void setUsername(String username){this.username = username;}
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     public String getCatalogId() {
         return catalogId;
     }
@@ -51,5 +56,4 @@ public class InstallServiceEvent extends OnyxiaEvent {
     public String getType() {
         return TYPE;
     }
-
 }

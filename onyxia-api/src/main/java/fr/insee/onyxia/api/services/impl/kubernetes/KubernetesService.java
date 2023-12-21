@@ -31,8 +31,7 @@ public class KubernetesService {
 
     @Autowired private KubernetesClientProvider kubernetesClientProvider;
 
-    @Autowired
-    OnyxiaEventPublisher onyxiaEventPublisher;
+    @Autowired OnyxiaEventPublisher onyxiaEventPublisher;
     private final Logger logger = LoggerFactory.getLogger(KubernetesService.class);
 
     public String createDefaultNamespace(Region region, Owner owner) {
@@ -154,7 +153,7 @@ public class KubernetesService {
                     !region.getServices().getQuotas().isAllowUserModification());
         }
         InitNamespaceEvent initNamespaceEvent =
-              new InitNamespaceEvent(region.getName(),namespaceId, owner.getId());
+                new InitNamespaceEvent(region.getName(), namespaceId, owner.getId());
         onyxiaEventPublisher.publishEvent(initNamespaceEvent);
 
         return namespaceId;
