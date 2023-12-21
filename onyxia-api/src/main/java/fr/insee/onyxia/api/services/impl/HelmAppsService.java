@@ -28,17 +28,18 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import io.github.inseefrlab.helmwrapper.configuration.HelmConfiguration;
 import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
 import io.github.inseefrlab.helmwrapper.model.HelmLs;
+import io.github.inseefrlab.helmwrapper.model.HelmReleaseInfo;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService.MultipleServiceFound;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.FastDateFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +61,7 @@ public class HelmAppsService implements AppsService {
     @Autowired(required = false)
     private List<AdmissionControllerHelm> admissionControllers = new ArrayList<>();
 
-    private SimpleDateFormat helmDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private FastDateFormat helmDateFormat = FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss");
     @Autowired private KubernetesClientProvider kubernetesClientProvider;
 
     @Autowired private HelmClientProvider helmClientProvider;
@@ -211,30 +212,36 @@ public class HelmAppsService implements AppsService {
         } catch (Exception e) {
             return CompletableFuture.completedFuture(new ServicesListing());
         }
-        List<Service> services = new ArrayList<>();
-        for (HelmLs release : installedCharts) {
-            Service service = getHelmApp(region, user, release);
-            boolean canUserSeeThisService = false;
-            if (project.getGroup() == null) {
-                // Personal group
-                canUserSeeThisService = true;
-            } else {
-                if (service.getEnv().containsKey("onyxia.share")
-                        && "true".equals(service.getEnv().get("onyxia.share"))) {
-                    // Service has been intentionally shared
-                    canUserSeeThisService = true;
-                }
-                if (service.getEnv().containsKey("onyxia.owner")
-                        && user.getIdep().equalsIgnoreCase(service.getEnv().get("onyxia.owner"))) {
-                    // User is owner
-                    canUserSeeThisService = true;
-                }
-            }
-
-            if (canUserSeeThisService) {
-                services.add(service);
-            }
-        }
+        List<Service> services =
+                installedCharts.parallelStream()
+                        .map(release -> getHelmApp(region, user, release))
+                        .filter(
+                                service -> {
+                                    boolean canUserSeeThisService = false;
+                                    if (project.getGroup() == null) {
+                                        // Personal group
+                                        canUserSeeThisService = true;
+                                    } else {
+                                        if (service.getEnv().containsKey("onyxia.share")
+                                                && "true"
+                                                        .equals(
+                                                                service.getEnv()
+                                                                        .get("onyxia.share"))) {
+                                            // Service has been intentionally shared
+                                            canUserSeeThisService = true;
+                                        }
+                                        if (service.getEnv().containsKey("onyxia.owner")
+                                                && user.getIdep()
+                                                        .equalsIgnoreCase(
+                                                                service.getEnv()
+                                                                        .get("onyxia.owner"))) {
+                                            // User is owner
+                                            canUserSeeThisService = true;
+                                        }
+                                    }
+                                    return canUserSeeThisService;
+                                })
+                        .collect(Collectors.toList());
         ServicesListing listing = new ServicesListing();
         listing.setApps(services);
         return CompletableFuture.completedFuture(listing);
@@ -306,16 +313,17 @@ public class HelmAppsService implements AppsService {
     }
 
     private Service getHelmApp(Region region, User user, HelmLs release) {
-        String manifest =
+        HelmReleaseInfo helmReleaseInfo =
                 getHelmInstallService()
-                        .getManifest(
+                        .getAll(
                                 getHelmConfiguration(region, user),
                                 release.getName(),
                                 release.getNamespace());
-        Service service = getServiceFromRelease(region, release, manifest, user);
+        Service service =
+                getServiceFromRelease(region, release, helmReleaseInfo.getManifest(), user);
         try {
             service.setStartedAt(helmDateFormat.parse(release.getUpdated()).getTime());
-        } catch (ParseException e) {
+        } catch (Exception e) {
             service.setStartedAt(0);
         }
         service.setId(release.getName());
@@ -330,13 +338,8 @@ public class HelmAppsService implements AppsService {
         service.setChart(release.getChart());
         service.setAppVersion(release.getAppVersion());
         try {
-            String values =
-                    getHelmInstallService()
-                            .getValues(
-                                    getHelmConfiguration(region, user),
-                                    release.getName(),
-                                    release.getNamespace());
-            JsonNode node = new ObjectMapper().readTree(values);
+            String values = helmReleaseInfo.getUserSuppliedValues();
+            JsonNode node = mapperHelm.readTree(values);
             Map<String, String> result = new HashMap<>();
             node.fields()
                     .forEachRemaining(
@@ -347,12 +350,7 @@ public class HelmAppsService implements AppsService {
             LOGGER.warn("Exception occurred", e);
         }
         try {
-            String notes =
-                    getHelmInstallService()
-                            .getNotes(
-                                    getHelmConfiguration(region, user),
-                                    release.getName(),
-                                    release.getNamespace());
+            String notes = helmReleaseInfo.getNotes();
             service.setPostInstallInstructions(notes);
         } catch (Exception e) {
             LOGGER.warn("Exception occurred", e);
