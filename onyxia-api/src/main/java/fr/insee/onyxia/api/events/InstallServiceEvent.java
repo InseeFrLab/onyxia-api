@@ -2,7 +2,6 @@ package fr.insee.onyxia.api.events;
 
 import org.springframework.stereotype.Component;
 
-@Component
 public class InstallServiceEvent extends OnyxiaEvent {
 
     public static final String TYPE = "service.install";

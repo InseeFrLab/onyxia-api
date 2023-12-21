@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.stereotype.Component;
 
 @Schema(description = "")
-@Component
 public class UninstallService {
 
     @Schema(description = "")
