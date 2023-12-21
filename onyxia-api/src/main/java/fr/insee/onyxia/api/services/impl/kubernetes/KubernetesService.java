@@ -3,6 +3,8 @@ package fr.insee.onyxia.api.services.impl.kubernetes;
 import fr.insee.onyxia.api.configuration.kubernetes.KubernetesClientProvider;
 import fr.insee.onyxia.api.controller.exception.NamespaceAlreadyExistException;
 import fr.insee.onyxia.api.controller.exception.NamespaceNotFoundException;
+import fr.insee.onyxia.api.events.InitNamespaceEvent;
+import fr.insee.onyxia.api.events.OnyxiaEventPublisher;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.project.Project;
 import fr.insee.onyxia.model.region.Region;
@@ -29,6 +31,8 @@ public class KubernetesService {
 
     @Autowired private KubernetesClientProvider kubernetesClientProvider;
 
+    @Autowired
+    OnyxiaEventPublisher onyxiaEventPublisher;
     private final Logger logger = LoggerFactory.getLogger(KubernetesService.class);
 
     public String createDefaultNamespace(Region region, Owner owner) {
@@ -149,6 +153,9 @@ public class KubernetesService {
                     quota,
                     !region.getServices().getQuotas().isAllowUserModification());
         }
+        InitNamespaceEvent initNamespaceEvent =
+              new InitNamespaceEvent(region.getName(),namespaceId, owner.getId());
+        onyxiaEventPublisher.publishEvent(initNamespaceEvent);
 
         return namespaceId;
     }

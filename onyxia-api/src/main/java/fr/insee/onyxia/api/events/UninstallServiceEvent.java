@@ -8,6 +8,16 @@ public class UninstallServiceEvent extends OnyxiaEvent {
 
     private String name;
 
+    private String username;
+    public UninstallServiceEvent() {
+    }
+
+    public UninstallServiceEvent(String namespace, String name, String username) {
+        this.namespace = namespace;
+        this.name = name;
+        this.username = username;
+    }
+
     @Override
     public String getType() {
         return TYPE;
@@ -21,11 +31,19 @@ public class UninstallServiceEvent extends OnyxiaEvent {
         return namespace;
     }
 
+    public String getUsername(){
+        return username;
+    }
+
     public void setNamespace(String namespace) {
         this.namespace = namespace;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setUsername(String username){
+        this.username = username;
     }
 }

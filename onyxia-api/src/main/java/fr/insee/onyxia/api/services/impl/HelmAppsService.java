@@ -180,10 +180,9 @@ public class HelmAppsService implements AppsService {
                                     null,
                                     skipTlsVerify,
                                     caFile);
-            InstallServiceEvent installServiceEvent = new InstallServiceEvent();
-            installServiceEvent.setNamespace(namespaceId);
-            installServiceEvent.setCatalogId(catalogId);
-            installServiceEvent.setName(requestDTO.getName());
+            InstallServiceEvent installServiceEvent = new InstallServiceEvent(user.getIdep(),
+                                                                              namespaceId,
+                                                                              requestDTO.getName(), catalogId);
             onyxiaEventPublisher.publishEvent(installServiceEvent);
             return List.of(res.getManifest());
         } catch (IllegalArgumentException e) {
@@ -284,9 +283,8 @@ public class HelmAppsService implements AppsService {
                 kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
         UninstallService result = new UninstallService();
         result.setPath(path);
-        UninstallServiceEvent uninstallServiceEvent = new UninstallServiceEvent();
-        uninstallServiceEvent.setNamespace(project.getNamespace());
-        uninstallServiceEvent.setName(path);
+        UninstallServiceEvent uninstallServiceEvent =
+              new UninstallServiceEvent(project.getNamespace(), path, user.getIdep());
         onyxiaEventPublisher.publishEvent(uninstallServiceEvent);
         int status = 0;
         if (bulk) {
