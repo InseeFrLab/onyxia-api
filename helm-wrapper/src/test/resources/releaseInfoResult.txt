@@ -1,0 +1,120 @@
+NAME: vscode-python-16160
+LAST DEPLOYED: Mon Dec 18 08:23:59 2023
+NAMESPACE: user-f2wbnp
+STATUS: deployed
+REVISION: 1
+CHART: vscode-python
+VERSION: 1.11.20
+APP_VERSION:
+USER-SUPPLIED VALUES:
+discovery:
+  hive: true
+  metaflow: true
+  mlflow: true
+git:
+  branch: ""
+  cache: "0"
+  email: test.test@example.com
+  enabled: true
+  name: f2wbnp
+  repository: ""
+  token: test
+
+COMPUTED VALUES:
+affinity: {}
+autoscaling:
+  enabled: false
+  maxReplicas: 100
+  minReplicas: 1
+  targetCPUUtilizationPercentage: 80
+vault:
+  configMapName: ""
+  directory: /f2wbnp
+  enabled: true
+  mount: onyxia-kv
+  secret: ""
+  token: redacted.redacted
+  url: https://vault.example.com
+
+HOOKS:
+---
+# Source: vscode-python/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "vscode-python-16160-test-connection"
+  labels:
+    helm.sh/chart: vscode-python-1.11.20
+    app.kubernetes.io/name: vscode-python
+    app.kubernetes.io/instance: vscode-python-16160
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    "helm.sh/hook": test-success
+spec:
+  containers:
+    - name: curl
+      image: curlimages/curl:8.00.1
+      command: ['curl']
+      args: ['http://vscode-python-16160:8080', '-L']
+      resources:
+        limits:
+          cpu: 200m
+          memory: 256Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
+      securityContext:
+        runAsUser: 1000
+        runAsNonRoot: true
+  restartPolicy: Never
+MANIFEST:
+---
+# Source: vscode-python/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vscode-python-16160
+  labels:
+    helm.sh/chart: vscode-python-1.11.20
+    app.kubernetes.io/name: vscode-python
+    app.kubernetes.io/instance: vscode-python-16160
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: vscode-python/templates/secret-git.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: vscode-python-16160-secretgit
+  labels:
+    helm.sh/chart: vscode-python-1.11.20
+    app.kubernetes.io/name: vscode-python
+    app.kubernetes.io/instance: vscode-python-16160
+    app.kubernetes.io/managed-by: Helm
+stringData:
+  GIT_USER_NAME: "f2wbnp"
+  GIT_USER_MAIL: "example@example.com"
+  GIT_CREDENTIALS_CACHE_DURATION: "0"
+  GIT_PERSONAL_ACCESS_TOKEN: "test"
+  GIT_REPOSITORY: ""
+  GIT_BRANCH: ""
+---
+# Source: vscode-python/templates/secret-hive.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: vscode-python-16160-secrethive
+  labels:
+    helm.sh/chart: vscode-python-1.11.20
+    app.kubernetes.io/name: vscode-python
+    app.kubernetes.io/instance: vscode-python-16160
+    app.kubernetes.io/managed-by: Helm
+stringData:
+  hive-site.xml: |
+                 <?xml version="1.0"?>
+                 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+                 <configuration>
+                 </configuration>
+
+NOTES:
+- You can connect to this vscode with your browser on this [link](https://example.example.com)
+- Your access token is **redacted**

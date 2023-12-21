@@ -12,7 +12,7 @@ public interface AdmissionControllerHelm {
      *
      * @return whether the contract is ok to deploy
      */
-    public boolean validateContract(
+    boolean validateContract(
             Region region, Pkg pkg, Map<String, Object> values, User user, PublishContext context);
 
     /**
@@ -20,7 +20,7 @@ public interface AdmissionControllerHelm {
      *
      * @return
      */
-    public default Integer getPriority() {
+    default Integer getPriority() {
         return 0;
     }
 }
