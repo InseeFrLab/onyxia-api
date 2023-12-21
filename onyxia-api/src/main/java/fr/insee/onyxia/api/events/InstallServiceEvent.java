@@ -41,14 +41,6 @@ public class InstallServiceEvent extends OnyxiaEvent {
         this.packageName = packageName;
     }
 
-    public String getName() {
-        return releaseName;
-    }
-
-    public void setName(String name) {
-        this.releaseName = name;
-    }
-
     public String getUsername() {
         return username;
     }
