@@ -742,7 +742,6 @@ public class Region {
         public void setS3(S3 s3) {
             this.s3 = s3;
         }
-
     }
 
     public static class Atlas {
