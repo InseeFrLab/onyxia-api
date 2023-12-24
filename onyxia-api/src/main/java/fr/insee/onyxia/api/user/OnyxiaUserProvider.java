@@ -45,17 +45,6 @@ public class OnyxiaUserProvider {
                                     project.setVaultTopDir(
                                             region.getServices().getGroupNamespacePrefix()
                                                     + projectBaseName);
-                                    if (region.getData() != null
-                                            && region.getData().getS3() != null) {
-                                        project.setBucket(
-                                                (region.getData().getS3().getGroupBucketPrefix()
-                                                                        == null
-                                                                ? ""
-                                                                : region.getData()
-                                                                        .getS3()
-                                                                        .getGroupBucketPrefix())
-                                                        + projectBaseName);
-                                    }
                                     project.setNamespace(
                                             region.getServices().getGroupNamespacePrefix()
                                                     + projectBaseName);
@@ -75,13 +64,6 @@ public class OnyxiaUserProvider {
             userProject.setId("single-project");
             userProject.setGroup(null);
             userProject.setVaultTopDir(user.getUser().getIdep());
-            if (region.getData() != null && region.getData().getS3() != null) {
-                userProject.setBucket(
-                        region.getData().getS3().getBucketPrefix()
-                                + user.getUser()
-                                        .getAttributes()
-                                        .get(region.getData().getS3().getBucketClaim()));
-            }
             userProject.setNamespace(kubernetesService.getCurrentNamespace(region));
             userProject.setName("Single namespace, single project");
         } else {
@@ -89,13 +71,6 @@ public class OnyxiaUserProvider {
             userProject.setVaultTopDir(user.getUser().getIdep());
             userProject.setGroup(null);
             userProject.setName(user.getUser().getIdep() + " personal project");
-            if (region.getData() != null && region.getData().getS3() != null) {
-                userProject.setBucket(
-                        region.getData().getS3().getBucketPrefix()
-                                + user.getUser()
-                                        .getAttributes()
-                                        .get(region.getData().getS3().getBucketClaim()));
-            }
             if (region.getServices().isUserNamespace()) {
                 userProject.setNamespace(
                         region.getServices().getNamespacePrefix() + user.getUser().getIdep());
