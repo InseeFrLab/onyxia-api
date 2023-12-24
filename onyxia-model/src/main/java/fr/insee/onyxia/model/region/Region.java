@@ -1064,7 +1064,61 @@ public class Region {
     }
 
     public static class WorkingDirectory {
-        
+
+        private String bucketMode;
+        private String bucketName;
+        private String prefix;
+        private String prefixGroup;
+        private String bucketNamePrefix;
+        private String bucketNamePrefixGroup;
+
+        public String getBucketMode() {
+            return bucketMode;
+        }
+
+        public void setBucketMode(String bucketMode) {
+            this.bucketMode = bucketMode;
+        }
+
+        public String getBucketName() {
+            return bucketName;
+        }
+
+        public void setBucketName(String bucketName) {
+            this.bucketName = bucketName;
+        }
+
+        public String getPrefix() {
+            return prefix;
+        }
+
+        public void setPrefix(String prefix) {
+            this.prefix = prefix;
+        }
+
+        public String getPrefixGroup() {
+            return prefixGroup;
+        }
+
+        public void setPrefixGroup(String prefixGroup) {
+            this.prefixGroup = prefixGroup;
+        }
+
+        public String getBucketNamePrefix() {
+            return bucketNamePrefix;
+        }
+
+        public void setBucketNamePrefix(String bucketNamePrefix) {
+            this.bucketNamePrefix = bucketNamePrefix;
+        }
+
+        public String getBucketNamePrefixGroup() {
+            return bucketNamePrefixGroup;
+        }
+
+        public void setBucketNamePrefixGroup(String bucketNamePrefixGroup) {
+            this.bucketNamePrefixGroup = bucketNamePrefixGroup;
+        }
     }
 
     public static class OIDCConfiguration {
