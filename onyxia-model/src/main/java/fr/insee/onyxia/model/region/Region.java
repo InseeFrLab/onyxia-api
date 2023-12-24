@@ -727,8 +727,6 @@ public class Region {
         @JsonProperty("S3")
         private S3 s3;
 
-        private ExternalS3 externalS3 = new ExternalS3();
-
         public Atlas getAtlas() {
             return atlas;
         }
@@ -745,13 +743,6 @@ public class Region {
             this.s3 = s3;
         }
 
-        public ExternalS3 getExternalS3() {
-            return externalS3;
-        }
-
-        public void setExternalS3(ExternalS3 externalS3) {
-            this.externalS3 = externalS3;
-        }
     }
 
     public static class Atlas {
@@ -916,31 +907,25 @@ public class Region {
 
     @Schema(description = "Configuration to be used by the S3 client associated to Onyxia")
     public static class S3 {
-        private String type;
 
         @JsonProperty("URL")
         private String url;
 
         private String region;
-        private String roleARN;
-        private String roleSessionName;
+
+        private boolean pathStyleAccess;
+
+        private Sts sts;
+
+        private WorkingDirectory workingDirectory;
+
         private String bucketPrefix;
         private String groupBucketPrefix = "";
         private String bucketClaim = "preferred_username";
-        private long defaultDurationSeconds;
 
-        private OIDCConfiguration oidcConfiguration = null;
 
         private Monitoring monitoring;
         private boolean acceptBucketCreation = true;
-
-        public String getType() {
-            return type;
-        }
-
-        public void setType(String type) {
-            this.type = type;
-        }
 
         public String getUrl() {
             return url;
@@ -958,20 +943,28 @@ public class Region {
             this.region = region;
         }
 
-        public String getRoleARN() {
-            return roleARN;
+        public boolean getPathStyleAcess() {
+            return pathStyleAccess;
         }
 
-        public void setRoleARN(String roleARN) {
-            this.roleARN = roleARN;
+        public void setPathStyleAccess(boolean pathStyleAccess) {
+            this.pathStyleAccess = pathStyleAccess;
         }
 
-        public String getRoleSessionName() {
-            return roleSessionName;
+        public Sts getSts() {
+            return sts;
         }
 
-        public void setRoleSessionName(String roleSessionName) {
-            this.roleSessionName = roleSessionName;
+        public void setSts(Sts sts) {
+            this.sts = sts;
+        }
+
+        public WorkingDirectory getWorkingDirectory() {
+            return workingDirectory;
+        }
+
+        public void setWorkingDirectory(WorkingDirectory workingDirectory) {
+            this.workingDirectory = workingDirectory;
         }
 
         public String getBucketPrefix() {
@@ -998,28 +991,12 @@ public class Region {
             this.bucketClaim = bucketClaim;
         }
 
-        public long getDefaultDurationSeconds() {
-            return defaultDurationSeconds;
-        }
-
-        public void setDefaultDurationSeconds(long defaultDurationSeconds) {
-            this.defaultDurationSeconds = defaultDurationSeconds;
-        }
-
         public Monitoring getMonitoring() {
             return monitoring;
         }
 
         public void setMonitoring(Monitoring monitoring) {
             this.monitoring = monitoring;
-        }
-
-        public OIDCConfiguration getOidcConfiguration() {
-            return oidcConfiguration;
-        }
-
-        public void setOidcConfiguration(OIDCConfiguration oidcConfiguration) {
-            this.oidcConfiguration = oidcConfiguration;
         }
 
         public boolean isAcceptBucketCreation() {
@@ -1031,38 +1008,63 @@ public class Region {
         }
     }
 
-    @Schema(description = "Default Configuration for the unmanaged S3")
-    public static class ExternalS3 {
+    public static class Sts {
 
-        private boolean enabled = true;
+        private long durationSeconds;
 
-        private String defaultURL;
+        private OIDCConfiguration oidcConfiguration = null;
 
-        private String defaultRegion;
+        private Role role;
 
-        public boolean isEnabled() {
-            return enabled;
+        public long getDurationSeconds() {
+            return durationSeconds;
         }
 
-        public void setEnabled(boolean enabled) {
-            this.enabled = enabled;
+        public void setDurationSeconds(long durationSeconds) {
+            this.durationSeconds = durationSeconds;
         }
 
-        public String getDefaultURL() {
-            return defaultURL;
+        public OIDCConfiguration getOidcConfiguration() {
+            return oidcConfiguration;
         }
 
-        public void setDefaultURL(String defaultURL) {
-            this.defaultURL = defaultURL;
+        public void setOidcConfiguration(OIDCConfiguration oidcConfiguration) {
+            this.oidcConfiguration = oidcConfiguration;
         }
 
-        public String getDefaultRegion() {
-            return defaultRegion;
+        public Role getRole() {
+            return role;
         }
 
-        public void setDefaultRegion(String defaultRegion) {
-            this.defaultRegion = defaultRegion;
+        public void setRole(Role role) {
+            this.role = role;
         }
+    }
+
+    public static class Role {
+
+        private String roleARN;
+        private String roleSessionName;
+
+        public String getRoleARN() {
+            return roleARN;
+        }
+
+        public void setRoleARN(String roleARN) {
+            this.roleARN = roleARN;
+        }
+
+        public String getRoleSessionName() {
+            return roleSessionName;
+        }
+
+        public void setRoleSessionName(String roleSessionName) {
+            this.roleSessionName = roleSessionName;
+        }
+    }
+
+    public static class WorkingDirectory {
+        
     }
 
     public static class OIDCConfiguration {
