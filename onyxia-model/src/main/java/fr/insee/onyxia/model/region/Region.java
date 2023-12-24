@@ -919,14 +919,6 @@ public class Region {
 
         private WorkingDirectory workingDirectory;
 
-        private String bucketPrefix;
-        private String groupBucketPrefix = "";
-        private String bucketClaim = "preferred_username";
-
-
-        private Monitoring monitoring;
-        private boolean acceptBucketCreation = true;
-
         public String getUrl() {
             return url;
         }
@@ -965,46 +957,6 @@ public class Region {
 
         public void setWorkingDirectory(WorkingDirectory workingDirectory) {
             this.workingDirectory = workingDirectory;
-        }
-
-        public String getBucketPrefix() {
-            return bucketPrefix;
-        }
-
-        public void setBucketPrefix(String bucketPrefix) {
-            this.bucketPrefix = bucketPrefix;
-        }
-
-        public String getGroupBucketPrefix() {
-            return groupBucketPrefix;
-        }
-
-        public void setGroupBucketPrefix(String groupBucketPrefix) {
-            this.groupBucketPrefix = groupBucketPrefix;
-        }
-
-        public String getBucketClaim() {
-            return bucketClaim;
-        }
-
-        public void setBucketClaim(String bucketClaim) {
-            this.bucketClaim = bucketClaim;
-        }
-
-        public Monitoring getMonitoring() {
-            return monitoring;
-        }
-
-        public void setMonitoring(Monitoring monitoring) {
-            this.monitoring = monitoring;
-        }
-
-        public boolean isAcceptBucketCreation() {
-            return acceptBucketCreation;
-        }
-
-        public void setAcceptBucketCreation(boolean acceptBucketCreation) {
-            this.acceptBucketCreation = acceptBucketCreation;
         }
     }
 
