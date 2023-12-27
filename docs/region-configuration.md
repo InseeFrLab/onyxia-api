@@ -219,10 +219,7 @@ All these properties which configure the access to the storage are intended for 
 | `pathStyleAccess` | true | This option determines the method all our software uses to access S3 buckets. When enabled, it configures the software to use path-style access. This means that S3 bucket names are specified in the URL path rather than in the hostname.   | true |
 | `sts` | | See [sts](#sts) |  |
 | `workingDirectory` | | See [workingDirectory](#workingDirectory) |  |
-| `bucketClaim` | "preferred_username" | Key of the access token used to create bucket name. | "id" |
-| `bucketPrefix` | | User buckets are named bucketPrefix + the value of the user bucketClaim | "user-" |
-| `groupBucketPrefix` | | Group buckets are named groupBucketPrefix + the value of the user bucketClaim | "project-" |
-| `acceptBucketCreation` | true | If true, the S3 client should not create bucket. | true |
+
 
 ### sts
 
