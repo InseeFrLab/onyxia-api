@@ -912,7 +912,7 @@ public class Region {
 
         private String region;
 
-        private boolean pathStyleAccess;
+        private boolean pathStyleAccess = true;
 
         private Sts sts;
 

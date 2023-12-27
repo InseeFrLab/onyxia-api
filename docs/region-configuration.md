@@ -214,32 +214,50 @@ All these properties which configure the access to the storage are intended for 
 
 | Key | Default | Description | Example |
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
-| `type` | | Type of S3 storage implementation. | "minio", "amazon" |
-| `URL` | | URL of the S3 service for the region. Only used when the type is Minio. | "https://minio.lab.sspcloud.fr" |
+| `URL` | | URL of the S3 service for the region. | "https://minio.lab.sspcloud.fr" |
 | `region` | | Name of the region on the S3 service when this service deals with multiple regions. | "us-east-1" |
-| `roleARN` | | Only used when type is "amazon". See [Assume Role With Web Identity Amazon documentation](https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithWebIdentity.html) | |
-| `roleSessionName` | | Only used when type is "amazon". See [Assume Role With Web Identity Amazon documentation](https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithWebIdentity.html) | |
+| `pathStyleAccess` | true | This option determines the method all our software uses to access S3 buckets. When enabled, it configures the software to use path-style access. This means that S3 bucket names are specified in the URL path rather than in the hostname.   | true |
+| `sts` | | See [sts](#sts) |  |
+| `workingDirectory` | | See [workingDirectory](#workingDirectory) |  |
 | `bucketClaim` | "preferred_username" | Key of the access token used to create bucket name. | "id" |
 | `bucketPrefix` | | User buckets are named bucketPrefix + the value of the user bucketClaim | "user-" |
 | `groupBucketPrefix` | | Group buckets are named groupBucketPrefix + the value of the user bucketClaim | "project-" |
-| `defaultDurationSeconds` | | Maximum time to live of the S3 access key | 86400 |
-| `oidcConfiguration` | | Allow override of openidconnect authentication for this specific service. If not defined then global Onyxia authentication will be used. | {clientID: "onyxia", issuerURI: "https://auth.lab.sspcloud.fr/auth"} |
-| `monitoring` | | Defines the URL pattern of the monitoring service of each bucket. | "https://monitoring.sspcloud.fr/$BUCKET_ID" |
 | `acceptBucketCreation` | true | If true, the S3 client should not create bucket. | true |
 
-### ExternalS3
+### sts
 
-There are several implementations of the S3 standard like Minio or AWS.
-
-S3 storage is divided into **buckets** with their own access policy.
-
-All these properties which configure the access to the storage are intended for Onyxia clients apart except properties on bucket naming.
+The STS configuration option specifies how Onyxia obtains security tokens for authenticating and authorizing access to S3 services. If the STS (Security Token Service) option is not configured, it defaults to a mode where users must manually register their tokens for accessing S3 services. This means that the automated retrieval and management of temporary security tokens through STS will not be active.
 
 | Key | Default | Description | Example |
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
-| `enabled` | true | If true, user can user external bucket. | |
-| `defaultURL` | | Default URL for the S3 storage to help users to specify an unmanaged bucket. | "https://minio.lab.sspcloud.fr" |
-| `defaultRegion` | | Default region for the S3 storage to help users to specify an unmanaged bucket. | "us-east-1" |
+| `durationSeconds` | | Maximum time to live of the S3 access key | 86400 |
+| `role` | | See [role](#role) |  |
+| `oidcConfiguration` | | Allow override of openidconnect authentication for this specific service. If not defined then global Onyxia authentication will be used. | {clientID: "onyxia", issuerURI: "https://auth.lab.sspcloud.fr/auth"} |
+
+### role
+
+These parameters are part of the configuration that allows our software to assume an AWS Identity and Access Management (IAM) role for accessing S3 resources. See [Assume Role With Web Identity Amazon documentation](https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithWebIdentity.html) for more documentation.
+
+
+| Key | Default | Description | Example |
+| --------------------- | ------- | ------------------------------------------------------------------ | ---- |
+| `roleARN` | | The roleARN is the Amazon Resource Name of the IAM role that Onyxia will assume when interacting with S3. | 86400 |
+| `roleSessionName` | | The roleSessionName is an identifier for the session when the software assumes the IAM role.  |  |
+
+### workingDirectory
+
+These parameters are part of the configuration that allows our software to assume an AWS Identity and Access Management (IAM) role for accessing S3 resources. See [Assume Role With Web Identity Amazon documentation](https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithWebIdentity.html) for more documentation.
+
+
+| Key | Default | Description | Example |
+| --------------------- | ------- | ------------------------------------------------------------------ | ---- |
+| `bucketMode` | | In the "shared" configuration mode, every user is granted access to a designated path within a single S3 bucket. This path is determined by combining the bucketName, prefix, and prefixGroup parameters. Alternatively, in the "multi" configuration mode, individual S3 buckets are allocated for each user. The names of these user-specific buckets are constructed using the bucketNamePrefix and bucketNamePrefixGroup parameters. | "shared" or "multi" |
+| `bucketName` | | In the shared mode configuration, the bucketName parameter specifies the name of a single S3 bucket that hosts all user working directories. This parameter is not applicable in the multi mode, where individual buckets are used instead. | "onyxia" |
+| `prefix` | | In the shared mode, the prefix is used to establish the base directory for user-specific folders. This base directory will be appended with the user's identity to create unique paths for each user. | "user-" |
+| `prefixGroup` | | In the shared mode, the prefixGroup is used to establish the base directory for project-specific folders. This path will be further extended by appending the project's identity, creating distinct locations for each project. | "project-"  |  |
+| `bucketNamePrefix` | | In multi mode, the bucketNamePrefix sets the initial segment of the bucket name for individual user buckets. This prefix is then combined with the user's identity to generate a unique bucket name for each user. |  |
+| `bucketNamePrefixGroup` | | In multi mode, the bucketNamePrefixGroup sets the initial segment of the bucket name for individual project buckets. This prefix is then combined with the project's identity to generate a unique bucket name for each project. |  |
+
 
 
 ### Atlas
