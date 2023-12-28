@@ -934,7 +934,7 @@ public class Region {
             this.region = region;
         }
 
-        public boolean getPathStyleAcess() {
+        public boolean getPathStyleAccess() {
             return pathStyleAccess;
         }
 
