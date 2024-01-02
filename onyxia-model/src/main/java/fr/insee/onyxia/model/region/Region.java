@@ -727,8 +727,6 @@ public class Region {
         @JsonProperty("S3")
         private S3 s3;
 
-        private ExternalS3 externalS3 = new ExternalS3();
-
         public Atlas getAtlas() {
             return atlas;
         }
@@ -743,14 +741,6 @@ public class Region {
 
         public void setS3(S3 s3) {
             this.s3 = s3;
-        }
-
-        public ExternalS3 getExternalS3() {
-            return externalS3;
-        }
-
-        public void setExternalS3(ExternalS3 externalS3) {
-            this.externalS3 = externalS3;
         }
     }
 
@@ -1028,40 +1018,6 @@ public class Region {
 
         public void setAcceptBucketCreation(boolean acceptBucketCreation) {
             this.acceptBucketCreation = acceptBucketCreation;
-        }
-    }
-
-    @Schema(description = "Default Configuration for the unmanaged S3")
-    public static class ExternalS3 {
-
-        private boolean enabled = true;
-
-        private String defaultURL;
-
-        private String defaultRegion;
-
-        public boolean isEnabled() {
-            return enabled;
-        }
-
-        public void setEnabled(boolean enabled) {
-            this.enabled = enabled;
-        }
-
-        public String getDefaultURL() {
-            return defaultURL;
-        }
-
-        public void setDefaultURL(String defaultURL) {
-            this.defaultURL = defaultURL;
-        }
-
-        public String getDefaultRegion() {
-            return defaultRegion;
-        }
-
-        public void setDefaultRegion(String defaultRegion) {
-            this.defaultRegion = defaultRegion;
         }
     }
 
