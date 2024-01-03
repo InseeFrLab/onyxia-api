@@ -961,11 +961,22 @@ public class Region {
 
     public static class Sts {
 
+        @JsonProperty("URL")
+        private String url;
+
         private long durationSeconds;
 
         private OIDCConfiguration oidcConfiguration = null;
 
         private Role role;
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
 
         public long getDurationSeconds() {
             return durationSeconds;

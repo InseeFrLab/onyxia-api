@@ -228,6 +228,7 @@ The STS configuration option specifies how Onyxia obtains security tokens for au
 | Key | Default | Description | Example |
 | --------------------- | ------- | ------------------------------------------------------------------ | ---- |
 | `durationSeconds` | | Maximum time to live of the S3 access key | 86400 |
+| `URL` | | URL of the STS service. If empty use the same URL as S3 which is the case on premise | "https://sts.amazonaws.com" |
 | `role` | | See [role](#role) |  |
 | `oidcConfiguration` | | Allow override of openidconnect authentication for this specific service. If not defined then global Onyxia authentication will be used. | {clientID: "onyxia", issuerURI: "https://auth.lab.sspcloud.fr/auth"} |
 
