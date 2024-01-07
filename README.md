@@ -88,6 +88,11 @@ Configurable properties :
 | `http.proxyUsername` | | Username if the proxy requires authentication |
 | `http.proxyPassword` | | Password if the proxy requires authentication |
 
+### Events
+| Key | Default | Description                            |
+| --------------------- |---------|----------------------------------------|
+| `event.logging.enabled` | `true`  | whether events should be logged or not |
+
 ### Other configurations
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |

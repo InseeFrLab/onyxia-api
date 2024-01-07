@@ -28,7 +28,6 @@ import org.zeroturnaround.exec.InvalidExitValueException;
 public class HelmInstallService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HelmInstallService.class);
-
     private final Pattern helmNamePattern =
             Pattern.compile("^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$");
 
