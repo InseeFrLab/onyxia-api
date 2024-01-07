@@ -7,6 +7,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.configuration.kubernetes.HelmClientProvider;
 import fr.insee.onyxia.api.configuration.kubernetes.KubernetesClientProvider;
 import fr.insee.onyxia.api.controller.exception.NamespaceNotFoundException;
+import fr.insee.onyxia.api.events.InstallServiceEvent;
+import fr.insee.onyxia.api.events.OnyxiaEventPublisher;
+import fr.insee.onyxia.api.events.UninstallServiceEvent;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.control.AdmissionControllerHelm;
 import fr.insee.onyxia.api.services.control.commons.UrlGenerator;
@@ -69,6 +72,8 @@ public class HelmAppsService implements AppsService {
     @Autowired private XGeneratedProcessor xGeneratedProcessor;
 
     @Autowired private UrlGenerator urlGenerator;
+
+    @Autowired OnyxiaEventPublisher onyxiaEventPublisher;
 
     private HelmConfiguration getHelmConfiguration(Region region, User user) {
         return helmClientProvider.getConfiguration(region, user);
@@ -161,6 +166,7 @@ public class HelmAppsService implements AppsService {
         String namespaceId =
                 kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
         try {
+
             HelmInstaller res =
                     getHelmInstallService()
                             .installChart(
@@ -174,6 +180,14 @@ public class HelmAppsService implements AppsService {
                                     null,
                                     skipTlsVerify,
                                     caFile);
+            InstallServiceEvent installServiceEvent =
+                    new InstallServiceEvent(
+                            user.getIdep(),
+                            namespaceId,
+                            requestDTO.getName(),
+                            pkg.getName(),
+                            catalogId);
+            onyxiaEventPublisher.publishEvent(installServiceEvent);
             return List.of(res.getManifest());
         } catch (IllegalArgumentException e) {
             throw new AccessDeniedException(e.getMessage());
@@ -298,6 +312,9 @@ public class HelmAppsService implements AppsService {
                                                 getHelmConfiguration(region, user),
                                                 release.getName(),
                                                 namespace));
+                UninstallServiceEvent uninstallServiceEvent =
+                        new UninstallServiceEvent(namespace, release.getName(), user.getIdep());
+                onyxiaEventPublisher.publishEvent(uninstallServiceEvent);
             }
         } else {
             // Strip / if present
@@ -306,8 +323,10 @@ public class HelmAppsService implements AppsService {
                     getHelmInstallService()
                             .uninstaller(
                                     getHelmConfiguration(region, user), cannonicalPath, namespace);
+            UninstallServiceEvent uninstallServiceEvent =
+                    new UninstallServiceEvent(namespace, cannonicalPath, user.getIdep());
+            onyxiaEventPublisher.publishEvent(uninstallServiceEvent);
         }
-
         result.setSuccess(status == 0);
         return result;
     }
