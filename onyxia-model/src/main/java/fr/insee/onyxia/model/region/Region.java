@@ -1025,20 +1025,27 @@ public class Region {
         }
     }
 
+    public enum BucketMode {
+        @JsonProperty("multi")
+        MULTI,
+        @JsonProperty("shared")
+        SHARED
+    }
+
     public static class WorkingDirectory {
 
-        private String bucketMode;
+        private BucketMode bucketMode;
         private String bucketName;
         private String prefix;
         private String prefixGroup;
         private String bucketNamePrefix;
         private String bucketNamePrefixGroup;
 
-        public String getBucketMode() {
+        public BucketMode getBucketMode() {
             return bucketMode;
         }
 
-        public void setBucketMode(String bucketMode) {
+        public void setBucketMode(BucketMode bucketMode) {
             this.bucketMode = bucketMode;
         }
 
