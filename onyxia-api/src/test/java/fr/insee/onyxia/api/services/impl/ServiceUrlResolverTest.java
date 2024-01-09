@@ -1,15 +1,13 @@
 package fr.insee.onyxia.api.services.impl;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
+import static fr.insee.onyxia.api.util.TestUtils.getClassPathResource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import fr.insee.onyxia.model.region.Region;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.server.mock.EnableKubernetesMockClient;
-import java.io.IOException;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.springframework.core.io.ClassPathResource;
 
 @EnableKubernetesMockClient
 class ServiceUrlResolverTest {
@@ -25,11 +23,11 @@ class ServiceUrlResolverTest {
     void urls_should_be_empty() {
         Region region = getRegionNoExposed();
         var allManifest =
-                getManifest(ISTIO_VIRTUAL_SERVICE_MANIFEST_PATH)
-                        + "\n---\n"
-                        + getManifest(INGRESS_MANIFEST_PATH)
-                        + "\n---\n"
-                        + getManifest(OPENSHIFT_ROUTE_MANIFEST_PATH);
+                getClassPathResource(ISTIO_VIRTUAL_SERVICE_MANIFEST_PATH)
+                        + YAML_LINE_BREAK
+                        + getClassPathResource(INGRESS_MANIFEST_PATH)
+                        + YAML_LINE_BREAK
+                        + getClassPathResource(OPENSHIFT_ROUTE_MANIFEST_PATH);
 
         List<String> urls =
                 ServiceUrlResolver.getServiceUrls(region, allManifest, kubernetesClient);
@@ -43,11 +41,11 @@ class ServiceUrlResolverTest {
         region.getServices().getExpose().setRoute(true);
         region.getServices().getExpose().getIstio().setEnabled(true);
         var allManifest =
-                getManifest(ISTIO_VIRTUAL_SERVICE_MANIFEST_PATH)
+                getClassPathResource(ISTIO_VIRTUAL_SERVICE_MANIFEST_PATH)
                         + YAML_LINE_BREAK
-                        + getManifest(INGRESS_MANIFEST_PATH)
+                        + getClassPathResource(INGRESS_MANIFEST_PATH)
                         + YAML_LINE_BREAK
-                        + getManifest(OPENSHIFT_ROUTE_MANIFEST_PATH);
+                        + getClassPathResource(OPENSHIFT_ROUTE_MANIFEST_PATH);
 
         List<String> urls =
                 ServiceUrlResolver.getServiceUrls(region, allManifest, kubernetesClient);
@@ -63,29 +61,17 @@ class ServiceUrlResolverTest {
     void k8s_ingress_should_be_included_in_urls() {
         Region region = getRegionNoExposed();
         region.getServices().getExpose().setIngress(true);
-        var manifest = getManifest(INGRESS_MANIFEST_PATH);
+        var manifest = getClassPathResource(INGRESS_MANIFEST_PATH);
 
         List<String> urls = ServiceUrlResolver.getServiceUrls(region, manifest, kubernetesClient);
         assertEquals(List.of("https://jupyter-python-3574-0.example.com/"), urls);
-    }
-
-    private String getManifest(String manifestClassPath) {
-        try {
-            return new String(
-                    new ClassPathResource(manifestClassPath).getInputStream().readAllBytes(),
-                    UTF_8);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Test
     void istio_virtual_service_should_be_included_in_urls() {
         Region region = getRegionNoExposed();
         region.getServices().getExpose().getIstio().setEnabled(true);
-        var manifest = "";
-
-        manifest = getManifest(ISTIO_VIRTUAL_SERVICE_MANIFEST_PATH);
+        var manifest = getClassPathResource(ISTIO_VIRTUAL_SERVICE_MANIFEST_PATH);
 
         List<String> urls = ServiceUrlResolver.getServiceUrls(region, manifest, kubernetesClient);
         assertEquals(List.of("https://jupyter-python-3574-0.example.com"), urls);
@@ -95,9 +81,7 @@ class ServiceUrlResolverTest {
     void openshift_route_should_be_included_in_urls() {
         Region region = getRegionNoExposed();
         region.getServices().getExpose().setRoute(true);
-        var manifest = "";
-
-        manifest = getManifest(OPENSHIFT_ROUTE_MANIFEST_PATH);
+        var manifest = getClassPathResource(OPENSHIFT_ROUTE_MANIFEST_PATH);
 
         List<String> urls = ServiceUrlResolver.getServiceUrls(region, manifest, kubernetesClient);
         assertEquals(List.of("https://hello-openshift.example.com"), urls);
