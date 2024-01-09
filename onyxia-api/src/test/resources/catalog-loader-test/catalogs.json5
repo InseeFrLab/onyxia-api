@@ -1,0 +1,26 @@
+{
+  "catalogs": [
+    {
+      "id": "ide",
+      "name": "IDE",
+      "description": "Services for datascientists.",
+      "maintainer": "innovation@insee.fr",
+      "location": "https://inseefrlab.github.io/helm-charts-interactive-services",
+      "status": "PROD",
+      "highlightedCharts": ["jupyter-python", "rstudio", "vscode-python"],
+      // Single quote
+      "type": 'helm',
+      /* block comment
+      among several
+      lines */
+      "skipTlsVerify": false,
+      "caFile": null,
+      // My comment
+      "allowSharing": false,
+      "visible": {
+        "user": true,
+        "project": true
+      },
+    },
+  ],
+}
