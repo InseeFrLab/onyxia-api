@@ -20,7 +20,7 @@
 
     </distributionManagement>
     <properties>
-        <fabric8io.version>6.9.2</fabric8io.version>
+        <fabric8io.version>6.10.0</fabric8io.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
     </properties>
