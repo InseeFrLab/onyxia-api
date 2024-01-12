@@ -11,15 +11,25 @@ See [regions.json](/onyxia-api/src/main/resources/regions.json) for a complete e
 - [Region configuration](#region-configuration)
   - [Main region properties](#main-region-properties)
   - [Services properties](#services-properties)
+    - [CustomInitScript properties](#custominitscript-properties)
     - [Server properties](#server-properties)
+    - [K8sPublicEndpoint properties](#k8spublicendpoint-properties)
     - [Quotas properties](#quotas-properties)
+    - [Expose properties](#expose-properties)
+      - [istio](#istio)
     - [Default configuration properties](#default-configuration-properties)
-    - [CustomInitScript properties](#custom-init-script-properties)
+      - [Kafka](#kafka)
+      - [Sliders](#sliders)
+      - [Resources](#resources)
   - [Data properties](#data-properties)
     - [S3](#s3)
     - [Atlas](#atlas)
   - [Vault properties](#vault-properties)
   - [Git properties](#git-properties)
+  - [ProxyConfiguration properties](#proxyconfiguration-properties)
+  - [ProxyInjection properties](#proxyinjection-properties)
+  - [PackageRepositoryInjection properties](#packagerepositoryinjection-properties)
+  - [CertificateAuthorityInjection properties](#certificateauthorityinjection-properties)
 
 ## Main region properties
 
@@ -202,61 +212,145 @@ Resources specify some values that may overwrite some defaults.
 
 ## Data properties
 
-Data properties only contain an object storage S3 configuration.
-
 ### S3
 
-There are several implementations of the S3 standard like Minio or AWS.
+Configuration parameters for integrating your Onyxia service with S3.
+This part of the documentation is provided as a commented type definition.  
+When a property has a `?` it means that it's optional, you don't have to provide it.  
 
-S3 storage is divided into **buckets** with their own access policy.
+```ts
+type Region = {
+  // ...
+  data: {
+    S3: {
 
-All these properties which configure the access to the storage are intended for Onyxia clients apart except properties on bucket naming.
+      /**
+       * The URL of the S3 server.
+       * Examples: "https://minio.lab.sspcloud.fr" or "https://s3.amazonaws.com".
+       */
+      URL: string;
 
-| Key | Default | Description | Example |
-| --------------------- | ------- | ------------------------------------------------------------------ | ---- |
-| `URL` | | URL of the S3 service for the region. | "https://minio.lab.sspcloud.fr" |
-| `region` | | Name of the region on the S3 service when this service deals with multiple regions. | "us-east-1" |
-| `pathStyleAccess` | true | This option determines the method all our software uses to access S3 buckets. When enabled, it configures the software to use path-style access. This means that S3 bucket names are specified in the URL path rather than in the hostname.   | true |
-| `sts` | | See [sts](#sts) |  |
-| `workingDirectory` | | See [workingDirectory](#workingDirectory) |  |
+      /**
+       * The AWS S3 region. This parameter is optional if you are configuring
+       * integration with a MinIO server.
+       * Example: "us-east-1"
+       */
+      region?: string;
 
+      /**
+       * This parameter informs Onyxia how to format file download URLs for the configured S3 server.
+       * Default: true
+       * 
+       * Example:  
+       * Assume "https://minio.lab.sspcloud.fr" as the value for region.data.S3.URL.  
+       * For a file "a/b/c/foo.parquet" in the bucket "user-bob":
+       * 
+       * With pathStyleAccess set to true, the download link will be:
+       *   https://minio.lab.sspcloud.fr/user-bob/a/b/c/foo.parquet
+       * 
+       * With pathStyleAccess set to false (virtual-hosted style), the link will be:
+       *   https://user-bob.minio.lab.sspcloud.fr/a/b/c/foo.parquet
+       * 
+       * For MinIO, pathStyleAccess is typically set to true.
+       * For Amazon Web Services S3, is has to be set to false.
+       */
+      pathStyleAccess?: boolean;
 
-### sts
+      /**
+       * Defines where users are permitted to read/write S3 files, 
+       * specifying the allocated storage space in terms of bucket and object name prefixes.
+       *
+       * Example: 
+       * For a user "bob" in the "exploration" group, using the configuration:
+       * 
+       * Single bucket mode:
+       *   "workingDirectory": {
+       *       "bucketMode": "single",
+       *       "bucketName": "onyxia",
+       *       "prefix": "user-",
+       *       "prefixGroup": "project-"
+       *   }
+       * 
+       * In this configuration Onyxia will assumes that Bob has read/write access to objects starting 
+       * with "user-bob/" and "project-exploration/" in the "onyxia" bucket.  
+       * 
+       * Multi bucket mode:
+       *   "workingDirectory": {
+       *       "bucketMode": "multi",
+       *       "bucketNamePrefix": "user-",
+       *       "bucketNamePrefixGroup": "project-",
+       *   }
+       * 
+       * In this configuration Onyxia will assumes that Bob has read/wite access to the entire
+       * "user-bob" and "project-exploration" buckets.  
+       * 
+       * If STS is enabled and a bucket doesn't exist, Onyxia will try to create it.
+       */
+      workingDirectory: {
+        bucketMode: "shared";
+        bucketName: string;
+        prefix: string;
+        prefixGroup: string;
+      } | {
+        bucketMode: "multi";
+        bucketNamePrefix: string;
+        bucketNamePrefixGroup: string;
+      };
 
-The STS configuration option specifies how Onyxia obtains security tokens for authenticating and authorizing access to S3 services. If the STS (Security Token Service) option is not configured, it defaults to a mode where users must manually register their tokens for accessing S3 services. This means that the automated retrieval and management of temporary security tokens through STS will not be active.
+      /**
+       * Configuration for Onyxia to dynamically request S3 tokens on behalf of users.
+       * Enabling S3 allows users to avoid manual configuration of a service account via the Onyxia interface.
+       */
+      sts?: {
+        /**
+         * The STS endpoint URL of your S3 server.
+         * For integration with MinIO, this property is optional as it defaults to region.data.S3.URL.
+         * For Amazon Web Services S3, set this to "https://sts.amazonaws.com".
+         */
+        URL?: string;
 
-| Key | Default | Description | Example |
-| --------------------- | ------- | ------------------------------------------------------------------ | ---- |
-| `durationSeconds` | | Maximum time to live of the S3 access key | 86400 |
-| `URL` | | URL of the STS service. If empty use the same URL as S3 which is the case on premise | "https://sts.amazonaws.com" |
-| `role` | | See [role](#role) |  |
-| `oidcConfiguration` | | Allow override of openidconnect authentication for this specific service. If not defined then global Onyxia authentication will be used. | {clientID: "onyxia", issuerURI: "https://auth.lab.sspcloud.fr/auth"} |
+        /**
+         * The duration for which temporary credentials are valid.
+         * AWS: Maximum of 43200 seconds (12 hours).
+         * MinIO: Maximum of 604800 seconds (7 days).
+         * Without this parameter, Onyxia requests 7-day validity, subject to the S3 server's policy limits.
+         */
+        durationSeconds?: number;
 
-### role
+        /**
+         * Optional parameter to specify RoleARN and RoleSessionName for the STS request.
+         * 
+         * Example:  
+         *   "role": {
+         *     "roleARN": "arn:aws:iam::123456789012:role/onyxia",
+         *     "roleSessionName": "onyxia"
+         *   }
+         */
+        role?: {
+          roleARN: string;
+          roleSessionName: string;
+        };
 
-These parameters are part of the configuration that allows our software to assume an AWS Identity and Access Management (IAM) role for accessing S3 resources. See [Assume Role With Web Identity Amazon documentation](https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithWebIdentity.html) for more documentation.
+        /**
+         * OIDC configuration. Defaults to Onyxia API's configuration if unspecified.
+         * If only the ClientID is provided, the issuer URI defaults to the Onyxia API's configuration.
+         * 
+         * Example:
+         *   "oidcConfiguration": {
+         *     "clientID": "onyxia-minio"
+         *   }
+         */
+        oidcConfiguration?: {
+          issuerURI?: string;
+          clientID: string;
+        };
 
+      };
 
-| Key | Default | Description | Example |
-| --------------------- | ------- | ------------------------------------------------------------------ | ---- |
-| `roleARN` | | The roleARN is the Amazon Resource Name of the IAM role that Onyxia will assume when interacting with S3. | 86400 |
-| `roleSessionName` | | The roleSessionName is an identifier for the session when the software assumes the IAM role.  |  |
-
-### workingDirectory
-
-These parameters are part of the configuration that allows our software to assume an AWS Identity and Access Management (IAM) role for accessing S3 resources. See [Assume Role With Web Identity Amazon documentation](https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithWebIdentity.html) for more documentation.
-
-
-| Key | Default | Description | Example |
-| --------------------- | ------- | ------------------------------------------------------------------ | ---- |
-| `bucketMode` | | In the "shared" configuration mode, every user is granted access to a designated path within a single S3 bucket. This path is determined by combining the bucketName, prefix, and prefixGroup parameters. Alternatively, in the "multi" configuration mode, individual S3 buckets are allocated for each user. The names of these user-specific buckets are constructed using the bucketNamePrefix and bucketNamePrefixGroup parameters. | "shared" or "multi" |
-| `bucketName` | | In the shared mode configuration, the bucketName parameter specifies the name of a single S3 bucket that hosts all user working directories. This parameter is not applicable in the multi mode, where individual buckets are used instead. | "onyxia" |
-| `prefix` | | In the shared mode, the prefix is used to establish the base directory for user-specific folders. This base directory will be appended with the user's identity to create unique paths for each user. | "user-" |
-| `prefixGroup` | | In the shared mode, the prefixGroup is used to establish the base directory for project-specific folders. This path will be further extended by appending the project's identity, creating distinct locations for each project. | "project-"  |  |
-| `bucketNamePrefix` | | In multi mode, the bucketNamePrefix sets the initial segment of the bucket name for individual user buckets. This prefix is then combined with the user's identity to generate a unique bucket name for each user. |  |
-| `bucketNamePrefixGroup` | | In multi mode, the bucketNamePrefixGroup sets the initial segment of the bucket name for individual project buckets. This prefix is then combined with the project's identity to generate a unique bucket name for each project. |  |
-
-
+    };
+  };
+};
+```
 
 ### Atlas
 
