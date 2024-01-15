@@ -10,9 +10,6 @@ public class Project {
     @Schema(description = "If not null, this project belong to this group name.")
     private String group;
 
-    @Schema(description = "If not null, this project have this bucket")
-    private String bucket;
-
     @Schema(description = "If not null, this project have this deployment environment.")
     private String namespace;
 
@@ -39,14 +36,6 @@ public class Project {
 
     public void setGroup(String group) {
         this.group = group;
-    }
-
-    public String getBucket() {
-        return bucket;
-    }
-
-    public void setBucket(String bucket) {
-        this.bucket = bucket;
     }
 
     public String getNamespace() {

@@ -110,19 +110,6 @@
             <artifactId>jackson-databind</artifactId>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/software.amazon.awssdk/s3 -->
-        <dependency>
-            <groupId>software.amazon.awssdk</groupId>
-            <artifactId>s3</artifactId>
-            <version>2.21.38</version>
-        </dependency>
-
-        <dependency>
-            <groupId>software.amazon.awssdk</groupId>
-            <artifactId>sts</artifactId>
-            <version>2.21.38</version>
-        </dependency>
-
         <dependency>
             <groupId>io.fabric8</groupId>
             <artifactId>kubernetes-server-mock</artifactId>
