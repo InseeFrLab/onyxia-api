@@ -259,6 +259,8 @@ type Region = {
       /**
        * Defines where users are permitted to read/write S3 files, 
        * specifying the allocated storage space in terms of bucket and object name prefixes.
+       * 
+       * Mandatory unless data.S3.sts is not defined then it's optional.
        *
        * Example: 
        * For a user "bob" in the "exploration" group, using the configuration:
@@ -286,7 +288,7 @@ type Region = {
        * 
        * If STS is enabled and a bucket doesn't exist, Onyxia will try to create it.
        */
-      workingDirectory: {
+      workingDirectory?: {
         bucketMode: "shared";
         bucketName: string;
         prefix: string;
