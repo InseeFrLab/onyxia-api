@@ -8,8 +8,6 @@ import java.util.List;
 public class Catalogs {
     private List<CatalogWrapper> catalogs = new ArrayList<>();
 
-    public Catalogs() {}
-
     public CatalogWrapper getCatalogById(final String id) {
         for (final CatalogWrapper cw : catalogs) {
             if (cw.getId().equals(id)) {

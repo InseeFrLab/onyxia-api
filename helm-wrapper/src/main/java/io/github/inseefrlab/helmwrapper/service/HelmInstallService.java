@@ -2,8 +2,6 @@ package io.github.inseefrlab.helmwrapper.service;
 
 import static io.github.inseefrlab.helmwrapper.utils.Command.safeConcat;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.inseefrlab.helmwrapper.configuration.HelmConfiguration;
 import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
@@ -31,9 +29,10 @@ public class HelmInstallService {
     private final Pattern helmNamePattern =
             Pattern.compile("^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$");
 
-    private HelmReleaseInfoParser helmReleaseInfoParser = new HelmReleaseInfoParser();
-
-    public HelmInstallService() {}
+    private final HelmReleaseInfoParser helmReleaseInfoParser = new HelmReleaseInfoParser();
+    private static final String VALUES_INFO_TYPE = "values";
+    private static final String MANIFEST_INFO_TYPE = "manifest";
+    private static final String NOTES_INFO_TYPE = "notes";
 
     public HelmInstaller installChart(
             HelmConfiguration configuration,
@@ -104,12 +103,7 @@ public class HelmInstallService {
     }
 
     public HelmLs[] listChartInstall(HelmConfiguration configuration, String namespace)
-            throws JsonMappingException,
-                    InvalidExitValueException,
-                    JsonProcessingException,
-                    IOException,
-                    InterruptedException,
-                    TimeoutException {
+            throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
         StringBuilder command = new StringBuilder("helm ls");
         if (namespace != null) {
             command.append(" -n ");
@@ -124,15 +118,15 @@ public class HelmInstallService {
     }
 
     public String getManifest(HelmConfiguration configuration, String id, String namespace) {
-        return getReleaseInfo(configuration, "manifest", id, namespace);
+        return getReleaseInfo(configuration, MANIFEST_INFO_TYPE, id, namespace);
     }
 
     public String getValues(HelmConfiguration configuration, String id, String namespace) {
-        return getReleaseInfo(configuration, "values", id, namespace);
+        return getReleaseInfo(configuration, VALUES_INFO_TYPE, id, namespace);
     }
 
     public String getNotes(HelmConfiguration configuration, String id, String namespace) {
-        return getReleaseInfo(configuration, "notes", id, namespace);
+        return getReleaseInfo(configuration, NOTES_INFO_TYPE, id, namespace);
     }
 
     public HelmReleaseInfo getAll(HelmConfiguration configuration, String id, String namespace) {
@@ -152,7 +146,7 @@ public class HelmInstallService {
 
     private String getReleaseInfo(
             HelmConfiguration configuration, String infoType, String id, String namespace) {
-        if (!List.of("manifest", "notes", "values").contains(infoType)) {
+        if (!List.of(MANIFEST_INFO_TYPE, NOTES_INFO_TYPE, VALUES_INFO_TYPE).contains(infoType)) {
             throw new IllegalArgumentException(
                     "Invalid info type " + infoType + ", should be manifest, notes or values");
         }
@@ -161,11 +155,11 @@ public class HelmInstallService {
             safeConcat(command, id);
             command.append(" --namespace ");
             safeConcat(command, namespace);
-            if (infoType.equals("notes")) {
+            if (infoType.equals(NOTES_INFO_TYPE)) {
                 return Command.executeAndGetResponseAsRaw(configuration, command.toString())
                         .getOutput()
                         .getString();
-            } else if (infoType.equals("values")) {
+            } else if (infoType.equals(VALUES_INFO_TYPE)) {
                 return Command.executeAndGetResponseAsJson(configuration, command.toString())
                         .getOutput()
                         .getString();
@@ -222,13 +216,12 @@ public class HelmInstallService {
                 | IOException
                 | InterruptedException
                 | TimeoutException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOGGER.warn("Exception occurred when getting app by id", e);
         }
         return null;
     }
 
-    public class MultipleServiceFound extends Exception {
+    public static class MultipleServiceFound extends Exception {
 
         public MultipleServiceFound(String s) {
             super(s);
