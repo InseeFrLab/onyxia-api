@@ -10,10 +10,8 @@ public class HelmVersionService {
 
     public String getVersion()
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        String version =
-                Command.executeAndGetResponseAsRaw("helm version --template={{.Version}}")
-                        .getOutput()
-                        .getString(StandardCharsets.UTF_8.name());
-        return version;
+        return Command.executeAndGetResponseAsRaw("helm version --template={{.Version}}")
+                .getOutput()
+                .getString(StandardCharsets.UTF_8.name());
     }
 }

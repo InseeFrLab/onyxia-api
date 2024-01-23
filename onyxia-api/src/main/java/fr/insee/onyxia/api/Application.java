@@ -3,6 +3,8 @@ package fr.insee.onyxia.api;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
@@ -16,6 +18,9 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @SpringBootApplication(scanBasePackages = {"io.github.inseefrlab", "fr.insee.onyxia"})
 @EnableAsync(proxyTargetClass = true)
 public class Application {
+
+    // logger
+    private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
 
     public static void main(String[] args) {
         ConfigurableApplicationContext context =
@@ -31,16 +36,15 @@ public class Application {
             ConfigurableEnvironment environment = event.getEnvironment();
             MutablePropertySources propertySources = environment.getPropertySources();
             Map<String, Object> myMap = new HashMap<>();
-            System.out.println(environment.getProperty("oidc.jwk-uri"));
-            if (StringUtils.isNotEmpty(environment.getProperty("oidc.issuer-uri"))) {
-                myMap.put(
-                        "spring.security.oauth2.resourceserver.jwt.issuer-uri",
-                        environment.getProperty("oidc.issuer-uri"));
+            String oidcJwkUri = environment.getProperty("oidc.jwk-uri");
+            String oidcIssuerUri = environment.getProperty("oidc.issuer-uri");
+            LOGGER.info("oidc properties, jwk-uri: {}, issuer-uri: {}", oidcJwkUri, oidcIssuerUri);
+
+            if (StringUtils.isNotEmpty(oidcIssuerUri)) {
+                myMap.put("spring.security.oauth2.resourceserver.jwt.issuer-uri", oidcIssuerUri);
             }
-            if (StringUtils.isNotEmpty(environment.getProperty("oidc.jwk-uri"))) {
-                myMap.put(
-                        "spring.security.oauth2.resourceserver.jwt.jwk-set-uri",
-                        environment.getProperty("oidc.jwk-uri"));
+            if (StringUtils.isNotEmpty(oidcJwkUri)) {
+                myMap.put("spring.security.oauth2.resourceserver.jwt.jwk-set-uri", oidcJwkUri);
             }
             propertySources.addFirst(new MapPropertySource("ALIASES", myMap));
         }
