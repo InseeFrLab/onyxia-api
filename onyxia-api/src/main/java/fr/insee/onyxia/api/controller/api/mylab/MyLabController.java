@@ -190,11 +190,11 @@ public class MyLabController {
             @Parameter(hidden = true) Region region,
             @Parameter(hidden = true) Project project,
             @RequestParam(value = "path", required = false) String path,
-            @RequestParam(value = "bulk", required = false) boolean bulk)
+            @RequestParam(value = "bulk", required = false) Optional<Boolean> bulk)
             throws Exception {
         if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
             return helmAppsService.destroyService(
-                    region, project, userProvider.getUser(region), path, bulk);
+                    region, project, userProvider.getUser(region), path, bulk.orElse(false));
         }
         return null;
     }
