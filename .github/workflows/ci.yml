@@ -65,7 +65,7 @@ jobs:
           path: onyxia-api/target
       - id: "auth"
         name: "Authenticate to Google Cloud"
-        uses: "google-github-actions/auth@v1.1.1"
+        uses: "google-github-actions/auth@v2.1.0"
         with:
           workload_identity_provider: "projects/${{ secrets.GAR_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/gh-actions/providers/gh-actions"
           service_account: "gh-actions-dapla-lab@${{ secrets.GAR_PROJECT_ID }}.iam.gserviceaccount.com"
