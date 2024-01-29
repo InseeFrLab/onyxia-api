@@ -8,6 +8,10 @@ import fr.insee.onyxia.model.catalog.Config.Config;
 import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.helm.Chart;
 import fr.insee.onyxia.model.helm.Repository;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.stream.Collectors;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -21,11 +25,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class CatalogLoader {
