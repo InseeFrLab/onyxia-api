@@ -3,12 +3,11 @@ package io.github.inseefrlab.helmwrapper.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.inseefrlab.helmwrapper.model.HelmRepo;
 import io.github.inseefrlab.helmwrapper.utils.Command;
-import org.apache.commons.lang3.StringUtils;
-import org.zeroturnaround.exec.InvalidExitValueException;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
+import org.apache.commons.lang3.StringUtils;
+import org.zeroturnaround.exec.InvalidExitValueException;
 
 /** HelmExecuter */
 public class HelmRepoService {
@@ -43,10 +42,10 @@ public class HelmRepoService {
                             "--ca-file " + System.getenv("CACERTS_DIR") + "/" + caFile + " ");
         }
         if (StringUtils.isNotEmpty(username)) {
-            command = command.concat("--username "+username+" ");
+            command = command.concat("--username " + username + " ");
         }
         if (StringUtils.isNotEmpty(password)) {
-            command = command.concat("--password "+password+" ");
+            command = command.concat("--password " + password + " ");
         }
         command = command.concat(nomRepo + " " + url);
         return Command.execute(command).getOutput().getString();

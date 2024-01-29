@@ -2,6 +2,10 @@ package fr.insee.onyxia.api.dao.universe;
 
 import fr.insee.onyxia.api.configuration.Catalogs;
 import io.github.inseefrlab.helmwrapper.service.HelmRepoService;
+import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,11 +13,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.TimeoutException;
 
 @Service
 public class CatalogRefresher implements ApplicationRunner {
