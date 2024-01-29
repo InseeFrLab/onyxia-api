@@ -121,11 +121,15 @@ public class CatalogLoader {
 
     private InputStream fetchResource(String url, String username, String password)
             throws IOException {
-        Request.Builder builder = new Request.Builder().url(url);
-        if (username != null && password != null) {
-            builder = builder.addHeader("Authorization", Credentials.basic(username, password));
+        if (url.startsWith("http")) {
+            Request.Builder builder = new Request.Builder().url(url);
+            if (username != null && password != null) {
+                builder = builder.addHeader("Authorization", Credentials.basic(username, password));
+            }
+            return httpClient.newCall(builder.build()).execute().body().byteStream();
+        } else {
+            return resourceLoader.getResource(url).getInputStream();
         }
-        return httpClient.newCall(builder.build()).execute().body().byteStream();
     }
 
     private void extractDataFromTgz(InputStream in, Chart chart) throws IOException {

@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.is;
 
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.configuration.CustomObjectMapper;
+import fr.insee.onyxia.api.configuration.HttpClientProvider;
 import fr.insee.onyxia.api.util.TestUtils;
 import fr.insee.onyxia.model.helm.Chart;
 import java.util.List;
@@ -15,17 +16,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.CollectionUtils;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {CatalogLoader.class, CustomObjectMapper.class})
+@SpringBootTest(classes = {CatalogLoader.class, CustomObjectMapper.class, HttpClientProvider.class})
 public class CatalogLoaderTest {
 
     @Autowired CatalogLoader catalogLoader;
-
-    @Autowired ResourceLoader resourceLoader;
 
     @DisplayName(
             "Given a helm catalog wrapper with local charts and excluded charts, "
@@ -88,12 +86,10 @@ public class CatalogLoaderTest {
         catalogLoader.updateCatalog(cw);
 
         String stdErrLogs = TestUtils.tapSystemOut(() -> catalogLoader.updateCatalog(cw));
-
         assertThat(
                 stdErrLogs,
                 containsString(
                         "fr.insee.onyxia.api.dao.universe.CatalogLoaderException: "
-                                + "Exception occurred during loading resource: class path resource "
-                                + "[catalog-loader-test/keepeme1.gz]"));
+                                + "Exception occurred during loading resource: classpath"));
     }
 }
