@@ -1,7 +1,5 @@
 package fr.insee.onyxia.api.dao.universe;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,12 +8,6 @@ import fr.insee.onyxia.model.catalog.Config.Config;
 import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.helm.Chart;
 import fr.insee.onyxia.model.helm.Repository;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
@@ -26,6 +18,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Service
 public class CatalogLoader {
@@ -99,11 +101,14 @@ public class CatalogLoader {
             throw new IllegalArgumentException("Package should be of type Chart");
         }
 
-        // TODO : support multiple urls
-        Resource resource =
-                resourceLoader
-                        .getResource(cw.getLocation() + "/")
-                        .createRelative(chart.getUrls().stream().findFirst().get());
+        // TODO : support multiple URLs
+        String chartUrl = chart.getUrls().stream().findFirst().get();
+        String absoluteUrl = chartUrl;
+        if (!(chartUrl.startsWith("http") || chartUrl.startsWith("https"))) {
+            absoluteUrl = StringUtils.applyRelativePath(cw.getLocation() + "/", chartUrl);
+        }
+
+        Resource resource = resourceLoader.getResource(absoluteUrl);
 
         try (InputStream inputStream = resource.getInputStream()) {
             extractDataFromTgz(inputStream, chart);

@@ -3,13 +3,11 @@ package fr.insee.onyxia.api.dao.universe;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
 
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.configuration.CustomObjectMapper;
 import fr.insee.onyxia.api.util.TestUtils;
 import fr.insee.onyxia.model.helm.Chart;
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.DisplayName;
@@ -17,11 +15,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {CatalogLoader.class, CustomObjectMapper.class})
@@ -99,18 +95,5 @@ public class CatalogLoaderTest {
                         "fr.insee.onyxia.api.dao.universe.CatalogLoaderException: "
                                 + "Exception occurred during loading resource: class path resource "
                                 + "[catalog-loader-test/keepeme1.gz]"));
-    }
-
-    @Test
-    public void buildRelativeURL() throws IOException {
-        String chartURL =
-                "https://github.com/InseeFrLab/helm-charts-interactive-services/releases/download/jupyter-tensorflow-gpu-1.13.12/jupyter-tensorflow-gpu-1.13.12.tgz";
-        CatalogWrapper cw = new CatalogWrapper();
-        cw.setType("helm");
-        cw.setLocation("https://example.com/example");
-        Resource resource =
-                resourceLoader.getResource(
-                        StringUtils.applyRelativePath(cw.getLocation() + "/", chartURL));
-        assertEquals("URL is not well formed", resource.getURL().toString(), chartURL);
     }
 }
