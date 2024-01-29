@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 public class CatalogLoader {
@@ -99,11 +100,20 @@ public class CatalogLoader {
             throw new IllegalArgumentException("Package should be of type Chart");
         }
 
-        // TODO : support multiple urls
-        Resource resource =
-                resourceLoader
-                        .getResource(cw.getLocation() + "/")
-                        .createRelative(chart.getUrls().stream().findFirst().get());
+        // One day we should take a look at the other URLs
+        String chartUrl =
+                chart.getUrls().stream()
+                        .findFirst()
+                        .orElseThrow(
+                                () ->
+                                        new CatalogLoaderException(
+                                                "Package " + cw.getName() + " has no urls"));
+        String absoluteUrl = chartUrl;
+        if (!(chartUrl.startsWith("http") || chartUrl.startsWith("https"))) {
+            absoluteUrl = StringUtils.applyRelativePath(cw.getLocation() + "/", chartUrl);
+        }
+
+        Resource resource = resourceLoader.getResource(absoluteUrl);
 
         try (InputStream inputStream = resource.getInputStream()) {
             extractDataFromTgz(inputStream, chart);
