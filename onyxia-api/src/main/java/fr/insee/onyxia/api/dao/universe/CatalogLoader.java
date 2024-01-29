@@ -1,7 +1,5 @@
 package fr.insee.onyxia.api.dao.universe;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,12 +8,9 @@ import fr.insee.onyxia.model.catalog.Config.Config;
 import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.helm.Chart;
 import fr.insee.onyxia.model.helm.Repository;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.List;
-import java.util.stream.Collectors;
+import okhttp3.Credentials;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
@@ -23,10 +18,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CatalogLoader {
@@ -39,6 +38,8 @@ public class CatalogLoader {
     @Qualifier("helm")
     private ObjectMapper mapperHelm;
 
+    @Autowired private OkHttpClient httpClient;
+
     public void updateCatalog(CatalogWrapper cw) {
         LOGGER.info("updating catalog with id :{} and type {}", cw.getId(), cw.getType());
         if (cw.getType().equals(Repository.TYPE_HELM)) {
@@ -50,14 +51,11 @@ public class CatalogLoader {
 
     /** TODO : move this helm specific logic somewhere else ? */
     private void updateHelmRepository(CatalogWrapper cw) {
-        try {
-            Reader reader =
-                    new InputStreamReader(
-                            resourceLoader
-                                    .getResource(cw.getLocation() + "/index.yaml")
-                                    .getInputStream(),
-                            UTF_8);
-            Repository repository = mapperHelm.readValue(reader, Repository.class);
+        try (InputStream stream =
+                fetchResource(
+                        cw.getLocation() + "/index.yaml", cw.getUsername(), cw.getPassword())) {
+            Repository repository = mapperHelm.readValue(stream, Repository.class);
+
             repository
                     .getEntries()
                     .entrySet()
@@ -113,14 +111,22 @@ public class CatalogLoader {
             absoluteUrl = StringUtils.applyRelativePath(cw.getLocation() + "/", chartUrl);
         }
 
-        Resource resource = resourceLoader.getResource(absoluteUrl);
-
-        try (InputStream inputStream = resource.getInputStream()) {
+        try (InputStream inputStream =
+                fetchResource(absoluteUrl, cw.getUsername(), cw.getPassword())) {
             extractDataFromTgz(inputStream, chart);
         } catch (IOException e) {
             throw new CatalogLoaderException(
-                    "Exception occurred during loading resource: " + resource.getDescription(), e);
+                    "Exception occurred during loading resource: " + absoluteUrl, e);
         }
+    }
+
+    private InputStream fetchResource(String url, String username, String password)
+            throws IOException {
+        Request.Builder builder = new Request.Builder().url(url);
+        if (username != null && password != null) {
+            builder = builder.addHeader("Authorization", Credentials.basic(username, password));
+        }
+        return httpClient.newCall(builder.build()).execute().body().byteStream();
     }
 
     private void extractDataFromTgz(InputStream in, Chart chart) throws IOException {
