@@ -18,7 +18,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,8 +40,8 @@ public class CatalogController {
         Catalogs filteredCatalogs = new Catalogs();
         filteredCatalogs.setCatalogs(
                 catalogService.getCatalogs().getCatalogs().stream()
-                        .filter((catalog) -> isCatalogEnabled(region, catalog))
-                        .collect(Collectors.toList()));
+                        .filter(catalog -> isCatalogEnabled(region, catalog))
+                        .toList());
         return filteredCatalogs;
     }
 
@@ -84,11 +83,11 @@ public class CatalogController {
             })
     @GetMapping("{catalogId}/{packageName}")
     public Pkg getPackage(@PathVariable String catalogId, @PathVariable String packageName) {
-        Pkg pkg = catalogService.getPackage(catalogId, packageName);
+        Pkg pkg =
+                catalogService
+                        .getPackage(catalogId, packageName)
+                        .orElseThrow(NotFoundException::new);
         addCustomOnyxiaProperties(pkg);
-        if (pkg == null) {
-            throw new NotFoundException();
-        }
         return pkg;
     }
 
@@ -170,13 +169,14 @@ public class CatalogController {
         property.setProperties(new HashMap<>());
         Map<String, Property> onyxiaProperties = new HashMap<>();
         Property customName = new Property();
-        customName.setType("string");
+        String stringType = "string";
+        customName.setType(stringType);
         customName.setDescription("Service custom name");
         customName.setDefaut(pkg.getName());
         customName.setTitle("Custom name");
         onyxiaProperties.put("friendlyName", customName);
         Property userDefinedValues = new Property();
-        userDefinedValues.setType("string");
+        userDefinedValues.setType(stringType);
         userDefinedValues.setDescription("Values defined by the end user");
         userDefinedValues.setDefaut("");
         userDefinedValues.setTitle("User defined values");
@@ -185,7 +185,7 @@ public class CatalogController {
         userDefinedValues.setXonyxia(xonyxiaUserDefinedValues);
         onyxiaProperties.put("userDefinedValues", userDefinedValues);
         Property owner = new Property();
-        owner.setType("string");
+        owner.setType(stringType);
         owner.setDescription("Owner of the chart");
         owner.setDefaut("owner");
         owner.setTitle("Owner");

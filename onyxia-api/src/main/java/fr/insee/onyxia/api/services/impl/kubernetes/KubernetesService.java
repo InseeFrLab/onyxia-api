@@ -3,6 +3,8 @@ package fr.insee.onyxia.api.services.impl.kubernetes;
 import fr.insee.onyxia.api.configuration.kubernetes.KubernetesClientProvider;
 import fr.insee.onyxia.api.controller.exception.NamespaceAlreadyExistException;
 import fr.insee.onyxia.api.controller.exception.NamespaceNotFoundException;
+import fr.insee.onyxia.api.events.InitNamespaceEvent;
+import fr.insee.onyxia.api.events.OnyxiaEventPublisher;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.project.Project;
 import fr.insee.onyxia.model.region.Region;
@@ -29,7 +31,8 @@ public class KubernetesService {
 
     @Autowired private KubernetesClientProvider kubernetesClientProvider;
 
-    private final Logger logger = LoggerFactory.getLogger(KubernetesService.class);
+    @Autowired OnyxiaEventPublisher onyxiaEventPublisher;
+    private static final Logger LOGGER = LoggerFactory.getLogger(KubernetesService.class);
 
     public String createDefaultNamespace(Region region, Owner owner) {
         final String namespaceId = getDefaultNamespace(region, owner);
@@ -126,7 +129,7 @@ public class KubernetesService {
 
         if (oldEnabled) {
             final Quota quota = region.getServices().getQuotas().getDefaultQuota();
-            logger.warn("applying old enabled style quota, this parameter will be deprecated");
+            LOGGER.warn("applying old enabled style quota, this parameter will be deprecated");
             applyQuotas(
                     namespaceId,
                     kubClient,
@@ -134,7 +137,7 @@ public class KubernetesService {
                     !region.getServices().getQuotas().isAllowUserModification());
         } else if (userEnabled) {
             final Quota quota = region.getServices().getQuotas().getUserQuota();
-            logger.info("applying user enabled style quota");
+            LOGGER.info("applying user enabled style quota");
             applyQuotas(
                     namespaceId,
                     kubClient,
@@ -142,13 +145,16 @@ public class KubernetesService {
                     !region.getServices().getQuotas().isAllowUserModification());
         } else if (groupEnabled) {
             final Quota quota = region.getServices().getQuotas().getGroupQuota();
-            logger.info("applying user enabled style quota");
+            LOGGER.info("applying group enabled style quota");
             applyQuotas(
                     namespaceId,
                     kubClient,
                     quota,
                     !region.getServices().getQuotas().isAllowUserModification());
         }
+        InitNamespaceEvent initNamespaceEvent =
+                new InitNamespaceEvent(region.getName(), namespaceId, owner.getId());
+        onyxiaEventPublisher.publishEvent(initNamespaceEvent);
 
         return namespaceId;
     }

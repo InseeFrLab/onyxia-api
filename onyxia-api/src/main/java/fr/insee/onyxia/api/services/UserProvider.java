@@ -11,5 +11,5 @@ public interface UserProvider {
      * @param region contextual region of the user
      * @return current user
      */
-    public User getUser(Region region);
+    User getUser(Region region);
 }

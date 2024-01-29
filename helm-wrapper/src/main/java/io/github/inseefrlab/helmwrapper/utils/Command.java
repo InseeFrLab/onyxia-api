@@ -20,7 +20,7 @@ public class Command {
     private static final Pattern safeToConcatenate =
             Pattern.compile(
                     "^[ ]*[a-z0-9]([-a-z0-9 ]*[a-z0-9 ])?(\\.[a-z0-9 ]([-a-z0-9 ]*[a-z0-9 ])?)*[ ]*$");
-    private static Logger LOGGER = LoggerFactory.getLogger(Command.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Command.class);
 
     private static ProcessExecutor getProcessExecutor() {
         ProcessExecutor processExecutor = new ProcessExecutor();

@@ -41,10 +41,13 @@ public class Region {
     private OnyxiaAPI onyxiaAPI;
 
     @Schema(description = "")
-    private Data data;
+    private Data data = new Data();
 
     @Schema(description = "")
     private Vault vault;
+
+    @Schema(description = "")
+    private Git git;
 
     @Schema(description = "")
     private ProxyInjection proxyInjection;
@@ -135,6 +138,14 @@ public class Region {
         this.vault = vault;
     }
 
+    public Git getGit() {
+        return git;
+    }
+
+    public void setGit(Git git) {
+        this.git = git;
+    }
+
     public ProxyInjection getProxyInjection() {
         return proxyInjection;
     }
@@ -188,7 +199,6 @@ public class Region {
         private Expose expose;
         private Server server;
         private Monitoring monitoring;
-        private CloudshellConfiguration cloudshell;
         private String initScript;
         private String allowedURIPattern = "^https://";
         private Quotas quotas = new Quotas();
@@ -300,14 +310,6 @@ public class Region {
 
         public void setServer(Server server) {
             this.server = server;
-        }
-
-        public CloudshellConfiguration getCloudshell() {
-            return cloudshell;
-        }
-
-        public void setCloudshell(CloudshellConfiguration cloudshell) {
-            this.cloudshell = cloudshell;
         }
 
         public Monitoring getMonitoring() {
@@ -717,7 +719,7 @@ public class Region {
         }
     }
 
-    @Schema(description = "Cloudshell data and health")
+    @Schema(description = "")
     public static class Data {
 
         private Atlas atlas;
@@ -904,31 +906,17 @@ public class Region {
 
     @Schema(description = "Configuration to be used by the S3 client associated to Onyxia")
     public static class S3 {
-        private String type;
 
         @JsonProperty("URL")
         private String url;
 
         private String region;
-        private String roleARN;
-        private String roleSessionName;
-        private String bucketPrefix;
-        private String groupBucketPrefix = "";
-        private String bucketClaim = "preferred_username";
-        private long defaultDurationSeconds;
 
-        private OIDCConfiguration oidcConfiguration = null;
+        private boolean pathStyleAccess = true;
 
-        private Monitoring monitoring;
-        private boolean acceptBucketCreation = true;
+        private Sts sts;
 
-        public String getType() {
-            return type;
-        }
-
-        public void setType(String type) {
-            this.type = type;
-        }
+        private WorkingDirectory workingDirectory;
 
         public String getUrl() {
             return url;
@@ -946,6 +934,80 @@ public class Region {
             this.region = region;
         }
 
+        public boolean getPathStyleAccess() {
+            return pathStyleAccess;
+        }
+
+        public void setPathStyleAccess(boolean pathStyleAccess) {
+            this.pathStyleAccess = pathStyleAccess;
+        }
+
+        public Sts getSts() {
+            return sts;
+        }
+
+        public void setSts(Sts sts) {
+            this.sts = sts;
+        }
+
+        public WorkingDirectory getWorkingDirectory() {
+            return workingDirectory;
+        }
+
+        public void setWorkingDirectory(WorkingDirectory workingDirectory) {
+            this.workingDirectory = workingDirectory;
+        }
+    }
+
+    public static class Sts {
+
+        @JsonProperty("URL")
+        private String url;
+
+        private long durationSeconds;
+
+        private OIDCConfiguration oidcConfiguration = null;
+
+        private Role role;
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
+
+        public long getDurationSeconds() {
+            return durationSeconds;
+        }
+
+        public void setDurationSeconds(long durationSeconds) {
+            this.durationSeconds = durationSeconds;
+        }
+
+        public OIDCConfiguration getOidcConfiguration() {
+            return oidcConfiguration;
+        }
+
+        public void setOidcConfiguration(OIDCConfiguration oidcConfiguration) {
+            this.oidcConfiguration = oidcConfiguration;
+        }
+
+        public Role getRole() {
+            return role;
+        }
+
+        public void setRole(Role role) {
+            this.role = role;
+        }
+    }
+
+    public static class Role {
+
+        private String roleARN;
+        private String roleSessionName;
+
         public String getRoleARN() {
             return roleARN;
         }
@@ -961,61 +1023,70 @@ public class Region {
         public void setRoleSessionName(String roleSessionName) {
             this.roleSessionName = roleSessionName;
         }
+    }
 
-        public String getBucketPrefix() {
-            return bucketPrefix;
+    public enum BucketMode {
+        @JsonProperty("multi")
+        MULTI,
+        @JsonProperty("shared")
+        SHARED
+    }
+
+    public static class WorkingDirectory {
+
+        private BucketMode bucketMode;
+        private String bucketName;
+        private String prefix;
+        private String prefixGroup;
+        private String bucketNamePrefix;
+        private String bucketNamePrefixGroup;
+
+        public BucketMode getBucketMode() {
+            return bucketMode;
         }
 
-        public void setBucketPrefix(String bucketPrefix) {
-            this.bucketPrefix = bucketPrefix;
+        public void setBucketMode(BucketMode bucketMode) {
+            this.bucketMode = bucketMode;
         }
 
-        public String getGroupBucketPrefix() {
-            return groupBucketPrefix;
+        public String getBucketName() {
+            return bucketName;
         }
 
-        public void setGroupBucketPrefix(String groupBucketPrefix) {
-            this.groupBucketPrefix = groupBucketPrefix;
+        public void setBucketName(String bucketName) {
+            this.bucketName = bucketName;
         }
 
-        public String getBucketClaim() {
-            return bucketClaim;
+        public String getPrefix() {
+            return prefix;
         }
 
-        public void setBucketClaim(String bucketClaim) {
-            this.bucketClaim = bucketClaim;
+        public void setPrefix(String prefix) {
+            this.prefix = prefix;
         }
 
-        public long getDefaultDurationSeconds() {
-            return defaultDurationSeconds;
+        public String getPrefixGroup() {
+            return prefixGroup;
         }
 
-        public void setDefaultDurationSeconds(long defaultDurationSeconds) {
-            this.defaultDurationSeconds = defaultDurationSeconds;
+        public void setPrefixGroup(String prefixGroup) {
+            this.prefixGroup = prefixGroup;
         }
 
-        public Monitoring getMonitoring() {
-            return monitoring;
+        public String getBucketNamePrefix() {
+            return bucketNamePrefix;
         }
 
-        public void setMonitoring(Monitoring monitoring) {
-            this.monitoring = monitoring;
+        public void setBucketNamePrefix(String bucketNamePrefix) {
+            this.bucketNamePrefix = bucketNamePrefix;
         }
 
-        public OIDCConfiguration getOidcConfiguration() {
-            return oidcConfiguration;
+        public String getBucketNamePrefixGroup() {
+            return bucketNamePrefixGroup;
         }
 
-        public void setOidcConfiguration(OIDCConfiguration oidcConfiguration) {
-            this.oidcConfiguration = oidcConfiguration;
-        }
-
-        public boolean isAcceptBucketCreation() {
-            return acceptBucketCreation;
-        }
-
-        public void setAcceptBucketCreation(boolean acceptBucketCreation) {
-            this.acceptBucketCreation = acceptBucketCreation;
+        public void setBucketNamePrefixGroup(String bucketNamePrefixGroup) {
+            this.bucketNamePrefixGroup = bucketNamePrefixGroup;
         }
     }
 
@@ -1044,7 +1115,8 @@ public class Region {
     public static class Expose {
         private String domain;
         private String ingressClassName;
-
+        private boolean useDefaultCertificate = true;
+        private Map<String, String> annotations = new HashMap<>();
         private boolean ingress = true;
 
         private boolean route = false;
@@ -1065,6 +1137,22 @@ public class Region {
 
         public void setIngressClassName(String ingressClassName) {
             this.ingressClassName = ingressClassName;
+        }
+
+        public boolean getUseDefaultCertificate() {
+            return useDefaultCertificate;
+        }
+
+        public void setUseDefaultCertificate(boolean useDefaultCertificate) {
+            this.useDefaultCertificate = useDefaultCertificate;
+        }
+
+        public void setAnnotations(Map<String, String> annotations) {
+            this.annotations = annotations;
+        }
+
+        public Map<String, String> getAnnotations() {
+            return annotations;
         }
 
         public boolean getIngress() {
@@ -1139,7 +1227,7 @@ public class Region {
     }
 
     public static class OnyxiaAPI {
-        @Schema(description = "Cloudshell data and health")
+        @Schema(description = "")
         private String baseURL;
 
         public String getBaseURL() {
@@ -1268,7 +1356,7 @@ public class Region {
         }
     }
 
-    @Schema(description = "Cloudshell data and health")
+    @Schema(description = "")
     public static class Location {
 
         private double lat;
@@ -1300,27 +1388,6 @@ public class Region {
 
         public void setName(String name) {
             this.name = name;
-        }
-    }
-
-    public static class CloudshellConfiguration {
-
-        private String catalogId, packageName;
-
-        public String getCatalogId() {
-            return catalogId;
-        }
-
-        public void setCatalogId(String catalogId) {
-            this.catalogId = catalogId;
-        }
-
-        public String getPackageName() {
-            return packageName;
-        }
-
-        public void setPackageName(String packageName) {
-            this.packageName = packageName;
         }
     }
 

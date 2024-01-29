@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Schema(description = "Cloudshell data and health")
+@Schema(description = "")
 public class Property {
     @Schema(description = "")
     String type;
@@ -270,7 +270,7 @@ public class Property {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    @Schema(description = "Cloudshell data and health")
+    @Schema(description = "")
     public static class Media {
         String type;
 
@@ -284,7 +284,7 @@ public class Property {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    @Schema(description = "Cloudshell data and health")
+    @Schema(description = "")
     public static class Hidden {
         Object value;
         String path;

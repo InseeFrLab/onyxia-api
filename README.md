@@ -4,7 +4,11 @@ This is the server part of the Onyxia datalab, it interacts with your container 
 Deployable services are listed and configured inside catalogs.  
 Default catalogs are from InseeFrlab : [Interactive services](https://inseefrlab.github.io/helm-charts-interactive-services), [Databases](https://inseefrlab.github.io/helm-charts-databases), [Automation](https://inseefrlab.github.io/helm-charts-automation) but more catalogs (including your own) can be added.
 
-## Quick start
+## Quick start  
+
+Onyxia-api is usually run as a component within the Onyxia stack. See [Onyxia helm chart](https://github.com/InseeFrLab/onyxia/tree/main/helm-chart) and [docs.onyxia.sh](https://docs.onyxia.sh/) for installation instruction.  
+
+## Running Onyxia-API standalone
 
 ### Using docker
 
@@ -20,22 +24,9 @@ cd onyxia-api
 mvn spring-boot:run
 ```
 
-### Using Helm
-
-The [Onyxia helm chart](https://github.com/InseeFrLab/helm-charts/tree/master/charts/onyxia) is available at [inseefrlab](https://github.com/InseeFrLab/helm-charts)
-
-```
-helm repo add inseefrlab https://inseefrlab.github.io/helm-charts
-helm install inseefrlab/onyxia
-```
-
-This will install both the [API](https://github.com/InseeFrLab/onyxia-api) and the [Web](https://github.com/inseefrlab/onyxia-web) components.
-
 ## Usage
 
-Once Onyxia is started, browse to http://localhost:8080 to get the OpenAPI documentation.  
-Onyxia-API is primarly made to work with the webapp [Onyxia-Web](https://github.com/inseefrlab/onyxia-web).  
-If you use it in other ways, we would love to hear from you :)
+Once Onyxia is started, browse to http://localhost:8080 to get started with the OpenAPI documentation.  
 
 ## Contributing
 
@@ -85,7 +76,7 @@ Configurable properties :
 
 | Key | Default | Description |
 | --------------------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `catalogs` | see [onyxia-api/src/main/resources/catalogs.json](onyxia-api/src/main/resources/catalogs.json) | List of catalogs. Each catalog can be of type `universe` or `helm`. Mixing is supported. If there is no region of corresponding type then the catalog will be ignored |
+| `catalogs` | see [onyxia-api/src/main/resources/catalogs.json](onyxia-api/src/main/resources/catalogs.json) | List of helm catalogs. |
 | `catalogs.refresh.ms` | `300000` (5 minutes) | The rate at which the catalogs should be refreshed. `<= 0` means no refreshs after initial loading |
 
 ### HTTP configuration  
@@ -96,6 +87,11 @@ Configurable properties :
 | `http.noProxy` | | Hosts that should not use the proxy (e.g : `localhost,host.example.com`) |
 | `http.proxyUsername` | | Username if the proxy requires authentication |
 | `http.proxyPassword` | | Password if the proxy requires authentication |
+
+### Events
+| Key | Default | Description                            |
+| --------------------- |---------|----------------------------------------|
+| `event.logging.enabled` | `true`  | whether events should be logged or not |
 
 ### Other configurations
 | Key | Default | Description |
@@ -108,11 +104,6 @@ Configurable properties :
 Onyxia-API makes system calls to `helm` using the [helm-wrapper](helm-wrapper) Java library.  
 `helm` is bundled in the `Onyxia API` Docker image, see current version bundled here : [Dockerfile](onyxia-api/Dockerfile).  
 If running `Onyxia API` locally you need to have `helm` available in the `PATH`.  
-
-## Onyxia API compatibility matrix with Kubernetes
-
-In addition of using `helm`, Onyxia API interacts with the Kubernetes cluster thanks to the [fabric8.io Kubernetes client for Java](https://github.com/fabric8io/kubernetes-client).  
-See [here](https://github.com/fabric8io/kubernetes-client#kubernetes-compatibility-matrix) for the compatibility matrix and [here](helm-wrapper/pom.xml#L19) for the current version used by Onyxia.
 
 ## Onyxia Helm format extension
 

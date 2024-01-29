@@ -12,7 +12,7 @@ public class CatalogFilter {
 
     @Autowired private RegionsConfiguration regionsConfiguration;
 
-    private Logger logger = LoggerFactory.getLogger(CatalogFilter.class);
+    private Logger LOGGER = LoggerFactory.getLogger(CatalogFilter.class);
 
     public List<CatalogWrapper> filterCatalogs(List<CatalogWrapper> catalogs) {
         return catalogs;

@@ -15,7 +15,7 @@ import org.springframework.context.event.EventListener;
 @Configuration
 public class CompatibilityChecks {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(RegionsConfiguration.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CompatibilityChecks.class);
     @Autowired RegionsConfiguration regionsConfiguration;
     @Autowired KubernetesClientProvider kubernetesClientProvider;
 
@@ -24,7 +24,7 @@ public class CompatibilityChecks {
     @EventListener(ContextRefreshedEvent.class)
     public void checkHelm() {
         try {
-            LOGGER.info("Using helm " + helmVersionService.getVersion());
+            LOGGER.info("Using helm {}", helmVersionService.getVersion());
         } catch (Exception e) {
             LOGGER.error("Could not determine helm version", e);
             System.exit(0);
@@ -44,18 +44,15 @@ public class CompatibilityChecks {
                                         kubernetesClientProvider.getRootClient(region);
                                 try {
                                     LOGGER.info(
-                                            "Region "
-                                                    + region.getName()
-                                                    + " kubernetes v"
-                                                    + client.getKubernetesVersion().getMajor()
-                                                    + "."
-                                                    + client.getKubernetesVersion().getMinor());
+                                            "Region {} kubernetes v{}.{}",
+                                            region.getName(),
+                                            client.getKubernetesVersion().getMajor(),
+                                            client.getKubernetesVersion().getMinor());
                                 } catch (Exception e) {
                                     LOGGER.error(
-                                            "Could not contact Kubernetes APIServer for region "
-                                                    + region.getName()
-                                                    + " at "
-                                                    + client.getMasterUrl(),
+                                            "Could not contact Kubernetes APIServer for region {} at {}",
+                                            region.getName(),
+                                            client.getMasterUrl(),
                                             e);
                                 }
                             }

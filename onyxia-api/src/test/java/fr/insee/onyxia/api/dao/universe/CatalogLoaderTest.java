@@ -9,7 +9,6 @@ import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.configuration.CustomObjectMapper;
 import fr.insee.onyxia.api.util.TestUtils;
 import fr.insee.onyxia.model.helm.Chart;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,8 +29,7 @@ public class CatalogLoaderTest {
 
     @Autowired CatalogLoader catalogLoader;
 
-    @Autowired
-    ResourceLoader resourceLoader;
+    @Autowired ResourceLoader resourceLoader;
 
     @DisplayName(
             "Given a helm catalog wrapper with local charts and excluded charts, "
@@ -93,7 +91,7 @@ public class CatalogLoaderTest {
         cw.setLocation("classpath:/catalog-loader-test");
         catalogLoader.updateCatalog(cw);
 
-        String stdErrLogs = TestUtils.tapSystemErr(() -> catalogLoader.updateCatalog(cw));
+        String stdErrLogs = TestUtils.tapSystemOut(() -> catalogLoader.updateCatalog(cw));
 
         assertThat(
                 stdErrLogs,
@@ -105,15 +103,14 @@ public class CatalogLoaderTest {
 
     @Test
     public void buildRelativeURL() throws IOException {
-        String chartURL = "https://github.com/InseeFrLab/helm-charts-interactive-services/releases/download/jupyter-tensorflow-gpu-1.13.12/jupyter-tensorflow-gpu-1.13.12.tgz";
+        String chartURL =
+                "https://github.com/InseeFrLab/helm-charts-interactive-services/releases/download/jupyter-tensorflow-gpu-1.13.12/jupyter-tensorflow-gpu-1.13.12.tgz";
         CatalogWrapper cw = new CatalogWrapper();
         cw.setType("helm");
         cw.setLocation("https://example.com/example");
         Resource resource =
-                resourceLoader
-                        .getResource(StringUtils.applyRelativePath(
-                                cw.getLocation() + "/",
-                        chartURL));
-        assertEquals("URL is not well formed",resource.getURL().toString(), chartURL);
+                resourceLoader.getResource(
+                        StringUtils.applyRelativePath(cw.getLocation() + "/", chartURL));
+        assertEquals("URL is not well formed", resource.getURL().toString(), chartURL);
     }
 }

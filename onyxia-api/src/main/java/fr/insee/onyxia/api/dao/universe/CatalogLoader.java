@@ -1,5 +1,7 @@
 package fr.insee.onyxia.api.dao.universe;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
@@ -23,12 +26,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 @Service
 public class CatalogLoader {
 
-    private final Logger logger = LoggerFactory.getLogger(CatalogLoader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CatalogLoader.class);
 
     @Autowired private ResourceLoader resourceLoader;
 
@@ -37,11 +39,11 @@ public class CatalogLoader {
     private ObjectMapper mapperHelm;
 
     public void updateCatalog(CatalogWrapper cw) {
-        logger.info("updating catalog with id :" + cw.getId() + " and type " + cw.getType());
-        switch (cw.getType()) {
-            case Repository.TYPE_HELM:
-                updateHelmRepository(cw);
-                break;
+        LOGGER.info("updating catalog with id :{} and type {}", cw.getId(), cw.getType());
+        if (cw.getType().equals(Repository.TYPE_HELM)) {
+            updateHelmRepository(cw);
+        } else {
+            LOGGER.warn("Unsupported catalog type: id: {}, type: {}", cw.getId(), cw.getType());
         }
     }
 
@@ -53,7 +55,7 @@ public class CatalogLoader {
                             resourceLoader
                                     .getResource(cw.getLocation() + "/index.yaml")
                                     .getInputStream(),
-                            "UTF-8");
+                            UTF_8);
             Repository repository = mapperHelm.readValue(reader, Repository.class);
             repository
                     .getEntries()
@@ -75,19 +77,19 @@ public class CatalogLoader {
                                                         refreshPackage(cw, pkg);
                                                     } catch (CatalogLoaderException
                                                             | IOException e) {
-                                                        e.printStackTrace();
+                                                        LOGGER.info("Exception occurred", e);
                                                     }
                                                 });
                             });
             repository.setPackages(
                     repository.getEntries().values().stream()
-                            .map(charts -> charts.get(0))
+                            .map(List::getFirst)
                             .filter(chart -> "application".equalsIgnoreCase(chart.getType()))
                             .collect(Collectors.toList()));
             cw.setCatalog(repository);
             cw.setLastUpdateTime(System.currentTimeMillis());
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.info("Exception occurred", e);
         }
     }
 
@@ -117,7 +119,7 @@ public class CatalogLoader {
         try (TarArchiveInputStream tarIn = new TarArchiveInputStream(gzipIn)) {
             TarArchiveEntry entry;
 
-            while ((entry = tarIn.getNextTarEntry()) != null) {
+            while ((entry = tarIn.getNextEntry()) != null) {
                 if (entry.getName().endsWith(chart.getName() + "/values.schema.json")
                         && !entry.getName()
                                 .endsWith("charts/" + chart.getName() + "/values.schema.json")) {
@@ -127,12 +129,6 @@ public class CatalogLoader {
                     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                     Config config = mapper.readValue(tarIn, Config.class);
                     chart.setConfig(config);
-                }
-
-                if (entry.isDirectory()) {
-
-                } else {
-
                 }
             }
         }

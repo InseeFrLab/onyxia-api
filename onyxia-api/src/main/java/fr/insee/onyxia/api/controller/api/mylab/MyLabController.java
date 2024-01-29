@@ -1,7 +1,7 @@
 package fr.insee.onyxia.api.controller.api.mylab;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
+import fr.insee.onyxia.api.configuration.NotFoundException;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.api.services.UserProvider;
@@ -19,7 +19,6 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -191,11 +190,11 @@ public class MyLabController {
             @Parameter(hidden = true) Region region,
             @Parameter(hidden = true) Project project,
             @RequestParam(value = "path", required = false) String path,
-            @RequestParam(value = "bulk", required = false) boolean bulk)
+            @RequestParam(value = "bulk", required = false) Optional<Boolean> bulk)
             throws Exception {
         if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
             return helmAppsService.destroyService(
-                    region, project, userProvider.getUser(region), path, bulk);
+                    region, project, userProvider.getUser(region), path, bulk.orElse(false));
         }
         return null;
     }
@@ -223,18 +222,22 @@ public class MyLabController {
             @Parameter(hidden = true) Region region,
             @Parameter(hidden = true) Project project,
             @RequestBody CreateServiceDTO requestDTO)
-            throws JsonProcessingException, IOException, Exception {
+            throws Exception {
         return publishApps(region, project, requestDTO);
     }
 
     private Collection<Object> publishApps(
             Region region, Project project, CreateServiceDTO requestDTO) throws Exception {
         String catalogId = "internal";
-        if (requestDTO.getCatalogId() != null && requestDTO.getCatalogId().length() > 0) {
+        if (requestDTO.getCatalogId() != null && !requestDTO.getCatalogId().isEmpty()) {
             catalogId = requestDTO.getCatalogId();
         }
         CatalogWrapper catalog = catalogService.getCatalogById(catalogId);
-        Pkg pkg = catalog.getCatalog().getPackageByName(requestDTO.getPackageName());
+        Pkg pkg =
+                catalog.getCatalog()
+                        .getPackageByName(requestDTO.getPackageName())
+                        .orElseThrow(NotFoundException::new);
+
         boolean skipTlsVerify = catalog.getSkipTlsVerify();
         String caFile = catalog.getCaFile();
         User user = userProvider.getUser(region);

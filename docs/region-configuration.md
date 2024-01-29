@@ -11,15 +11,25 @@ See [regions.json](/onyxia-api/src/main/resources/regions.json) for a complete e
 - [Region configuration](#region-configuration)
   - [Main region properties](#main-region-properties)
   - [Services properties](#services-properties)
+    - [CustomInitScript properties](#custominitscript-properties)
     - [Server properties](#server-properties)
+    - [K8sPublicEndpoint properties](#k8spublicendpoint-properties)
     - [Quotas properties](#quotas-properties)
+    - [Expose properties](#expose-properties)
+      - [istio](#istio)
     - [Default configuration properties](#default-configuration-properties)
-    - [CustomInitScript properties](#custom-init-script-properties)
+      - [Kafka](#kafka)
+      - [Sliders](#sliders)
+      - [Resources](#resources)
   - [Data properties](#data-properties)
     - [S3](#s3)
     - [Atlas](#atlas)
   - [Vault properties](#vault-properties)
   - [Git properties](#git-properties)
+  - [ProxyConfiguration properties](#proxyconfiguration-properties)
+  - [ProxyInjection properties](#proxyinjection-properties)
+  - [PackageRepositoryInjection properties](#packagerepositoryinjection-properties)
+  - [CertificateAuthorityInjection properties](#certificateauthorityinjection-properties)
 
 ## Main region properties
 
@@ -58,7 +68,6 @@ Users can work on Onyxia as a User or as a Group to which they belong. Each user
 | `authenticationMode` | serviceAccount | serviceAccount, impersonate or tokenPassthrough : on serviceAccount mode Onyxia API uses its own serviceAccount (by default admin or cluster-admin), with impersonate mode Onyxia requests the API with user's permissions (helm option `--kube-as-user`). With tokenPassthrough, the authentication token is passed to the API server. | |
 | `expose` | | When users request to expose their service, only subdomain of this object domain are allowed | See [Expose properties](#expose-properties) |
 | `monitoring` | | Define the URL pattern of the monitoring service that is to be launched with each service. Only for client purposes. | {URLPattern: "https://$NAMESPACE-$INSTANCE.mymonitoring.sspcloud.fr"} |
-| `cloudshell` | | Define the catalog and package name where to fetch the cloudshell in the helm catalog. | {catalogId: "inseefrlab-helm-charts-datascience", packageName: "cloudshell"} |
 | `initScript` | | Define where to fetch a script that will be launched on some service on startup. | "https://inseefrlab.github.io/onyxia/onyxia-init.sh" |
 | `allowedURIPattern` | "^https://" | Init scripts set by the user have to respect this pattern. | |
 | `server` | | Define the configuration of the services provider API server, this value is not served on the API as it contains credentials for the API. | See [Server properties](#server-properties) |
@@ -128,10 +137,12 @@ A quota follows the Kubernetes model which is composed of:
 | Key                | Default | Description                                                                                          |
 |--------------------|---------|------------------------------------------------------------------------------------------------------|
 | `domain`           |         | When users request to expose their service, only the subdomain of this object will be created.       |
-| `ingressClassName` | ''      | Ingress Class Name: useful if you want to use a specific ingress controller instead of a default one |
 | `ingress`          | true    | Whether or not Kubernetes Ingress is enabled                                                         |
 | `route`            | false   | Whether or not OpenShift Route is enabled                                                            |
 | `istio`            |         | See [Istio](#istio)                                                                                  |
+| `ingressClassName` | ''      | Ingress Class Name: useful if you want to use a specific ingress controller instead of a default one |
+| `annotations` |  | Annotations to add at ingress creation {"cert-manager.io/cluster-issuer": "nameOfClusterIssuer"} |
+| `useDefaultCertificate`           | true      | When true, no TLS secret name will be generated, specify false if you want ingress certificate to be managed by CertManager|
 
 
 #### istio
@@ -201,30 +212,147 @@ Resources specify some values that may overwrite some defaults.
 
 ## Data properties
 
-Data properties only contain an object storage S3 configuration.
-
 ### S3
 
-There are several implementations of the S3 standard like Minio or AWS.
+Configuration parameters for integrating your Onyxia service with S3.
+This part of the documentation is provided as a commented type definition.  
+When a property has a `?` it means that it's optional, you don't have to provide it.  
 
-S3 storage is divided into **buckets** with their own access policy.
+```ts
+type Region = {
+  // ...
+  data: {
+    S3: {
 
-All these properties which configure the access to the storage are intended for Onyxia clients apart except properties on bucket naming.
+      /**
+       * The URL of the S3 server.
+       * Examples: "https://minio.lab.sspcloud.fr" or "https://s3.amazonaws.com".
+       */
+      URL: string;
 
-| Key | Default | Description | Example |
-| --------------------- | ------- | ------------------------------------------------------------------ | ---- |
-| `type` | | Type of S3 storage implementation. | "minio", "amazon" |
-| `URL` | | URL of the S3 service for the region. Only used when the type is Minio. | "https://minio.lab.sspcloud.fr" |
-| `region` | | Name of the region on the S3 service when this service deals with multiple regions. | "us-east-1" |
-| `roleARN` | | Only used when type is "amazon". See [Assume Role With Web Identity Amazon documentation](https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithWebIdentity.html) | |
-| `roleSessionName` | | Only used when type is "amazon". See [Assume Role With Web Identity Amazon documentation](https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithWebIdentity.html) | |
-| `bucketClaim` | "preferred_username" | Key of the access token used to create bucket name. | "id" |
-| `bucketPrefix` | | User buckets are named bucketPrefix + the value of the user bucketClaim | "user-" |
-| `groupBucketPrefix` | | Group buckets are named groupBucketPrefix + the value of the user bucketClaim | "project-" |
-| `defaultDurationSeconds` | | Maximum time to live of the S3 access key | 86400 |
-| `oidcConfiguration` | | Allow override of openidconnect authentication for this specific service. If not defined then global Onyxia authentication will be used. | {clientID: "onyxia", issuerURI: "https://auth.lab.sspcloud.fr/auth"} |
-| `monitoring` | | Defines the URL pattern of the monitoring service of each bucket. | "https://monitoring.sspcloud.fr/$BUCKET_ID" |
-| `acceptBucketCreation` | true | If true, the S3 client should not create bucket. | true |
+      /**
+       * The AWS S3 region. This parameter is optional if you are configuring
+       * integration with a MinIO server.
+       * Example: "us-east-1"
+       */
+      region?: string;
+
+      /**
+       * This parameter informs Onyxia how to format file download URLs for the configured S3 server.
+       * Default: true
+       * 
+       * Example:  
+       * Assume "https://minio.lab.sspcloud.fr" as the value for region.data.S3.URL.  
+       * For a file "a/b/c/foo.parquet" in the bucket "user-bob":
+       * 
+       * With pathStyleAccess set to true, the download link will be:
+       *   https://minio.lab.sspcloud.fr/user-bob/a/b/c/foo.parquet
+       * 
+       * With pathStyleAccess set to false (virtual-hosted style), the link will be:
+       *   https://user-bob.minio.lab.sspcloud.fr/a/b/c/foo.parquet
+       * 
+       * For MinIO, pathStyleAccess is typically set to true.
+       * For Amazon Web Services S3, is has to be set to false.
+       */
+      pathStyleAccess?: boolean;
+
+      /**
+       * Defines where users are permitted to read/write S3 files, 
+       * specifying the allocated storage space in terms of bucket and object name prefixes.
+       * 
+       * Mandatory unless data.S3.sts is not defined then it's optional.
+       *
+       * Example: 
+       * For a user "bob" in the "exploration" group, using the configuration:
+       * 
+       * Single bucket mode:
+       *   "workingDirectory": {
+       *       "bucketMode": "single",
+       *       "bucketName": "onyxia",
+       *       "prefix": "user-",
+       *       "prefixGroup": "project-"
+       *   }
+       * 
+       * In this configuration Onyxia will assumes that Bob has read/write access to objects starting 
+       * with "user-bob/" and "project-exploration/" in the "onyxia" bucket.  
+       * 
+       * Multi bucket mode:
+       *   "workingDirectory": {
+       *       "bucketMode": "multi",
+       *       "bucketNamePrefix": "user-",
+       *       "bucketNamePrefixGroup": "project-",
+       *   }
+       * 
+       * In this configuration Onyxia will assumes that Bob has read/wite access to the entire
+       * "user-bob" and "project-exploration" buckets.  
+       * 
+       * If STS is enabled and a bucket doesn't exist, Onyxia will try to create it.
+       */
+      workingDirectory?: {
+        bucketMode: "shared";
+        bucketName: string;
+        prefix: string;
+        prefixGroup: string;
+      } | {
+        bucketMode: "multi";
+        bucketNamePrefix: string;
+        bucketNamePrefixGroup: string;
+      };
+
+      /**
+       * Configuration for Onyxia to dynamically request S3 tokens on behalf of users.
+       * Enabling S3 allows users to avoid manual configuration of a service account via the Onyxia interface.
+       */
+      sts?: {
+        /**
+         * The STS endpoint URL of your S3 server.
+         * For integration with MinIO, this property is optional as it defaults to region.data.S3.URL.
+         * For Amazon Web Services S3, set this to "https://sts.amazonaws.com".
+         */
+        URL?: string;
+
+        /**
+         * The duration for which temporary credentials are valid.
+         * AWS: Maximum of 43200 seconds (12 hours).
+         * MinIO: Maximum of 604800 seconds (7 days).
+         * Without this parameter, Onyxia requests 7-day validity, subject to the S3 server's policy limits.
+         */
+        durationSeconds?: number;
+
+        /**
+         * Optional parameter to specify RoleARN and RoleSessionName for the STS request.
+         * 
+         * Example:  
+         *   "role": {
+         *     "roleARN": "arn:aws:iam::123456789012:role/onyxia",
+         *     "roleSessionName": "onyxia"
+         *   }
+         */
+        role?: {
+          roleARN: string;
+          roleSessionName: string;
+        };
+
+        /**
+         * OIDC configuration. Defaults to Onyxia API's configuration if unspecified.
+         * If only the ClientID is provided, the issuer URI defaults to the Onyxia API's configuration.
+         * 
+         * Example:
+         *   "oidcConfiguration": {
+         *     "clientID": "onyxia-minio"
+         *   }
+         */
+        oidcConfiguration?: {
+          issuerURI?: string;
+          clientID: string;
+        };
+
+      };
+
+    };
+  };
+};
+```
 
 ### Atlas
 
