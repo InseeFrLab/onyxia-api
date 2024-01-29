@@ -38,7 +38,9 @@ public class CatalogRefresher implements ApplicationRunner {
                                                 c.getLocation(),
                                                 c.getId(),
                                                 c.getSkipTlsVerify(),
-                                                c.getCaFile()));
+                                                c.getCaFile(),
+                                                c.getUsername(),
+                                                c.getPassword()));
                                 catalogLoader.updateCatalog(c);
                             } catch (Exception e) {
                                 LOGGER.warn("Exception occurred", e);

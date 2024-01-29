@@ -15,7 +15,9 @@
       "visible": {
         "user": true,
         "project": true
-      }
+      },
+      "username": null,
+      "password": null
     },
     {
       "id": "databases",
@@ -32,7 +34,9 @@
       "visible": {
         "user": true,
         "project": true
-      }
+      },
+      "username": null,
+      "password": null
     },
     {
       "id": "automation",
@@ -49,7 +53,9 @@
       "visible": {
         "user": true,
         "project": true
-      }
+      },
+      "username": null,
+      "password": null
     }
   ]
 }

@@ -58,6 +58,12 @@ public class CatalogWrapper {
     @Schema(description = "Should this catalog be visible in user context ? Project context ?")
     private CatalogVisibility visible = new CatalogVisibility();
 
+    @Schema(description = "Username for basic authentication")
+    private String username = null;
+
+    @Schema(description = "Password for basic authentication")
+    private String password = null;
+
     /**
      * @return the type
      */
@@ -193,6 +199,22 @@ public class CatalogWrapper {
 
     public void setVisible(CatalogVisibility visible) {
         this.visible = visible;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public static class CatalogVisibility {

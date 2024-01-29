@@ -6,6 +6,7 @@ import io.github.inseefrlab.helmwrapper.utils.Command;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
+import org.apache.commons.lang3.StringUtils;
 import org.zeroturnaround.exec.InvalidExitValueException;
 
 /** HelmExecuter */
@@ -28,7 +29,9 @@ public class HelmRepoService {
             final String url,
             final String nomRepo,
             final boolean skipTlsVerify,
-            final String caFile)
+            final String caFile,
+            final String username,
+            final String password)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
         String command = "helm repo add ";
         if (skipTlsVerify) {
@@ -37,6 +40,12 @@ public class HelmRepoService {
             command =
                     command.concat(
                             "--ca-file " + System.getenv("CACERTS_DIR") + "/" + caFile + " ");
+        }
+        if (StringUtils.isNotEmpty(username)) {
+            command = command.concat("--username " + username + " ");
+        }
+        if (StringUtils.isNotEmpty(password)) {
+            command = command.concat("--password " + password + " ");
         }
         command = command.concat(nomRepo + " " + url);
         return Command.execute(command).getOutput().getString();
