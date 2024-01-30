@@ -56,7 +56,7 @@ public class CatalogLoaderTest {
         catalogLoader.updateCatalog(cw);
         List<List<Chart.Maintainer>> maintainers =
                 cw.getCatalog().getEntries().entrySet().stream()
-                        .map(entry -> entry.getValue())
+                        .map(entry -> entry.getValue().stream().findFirst().get().getMaintainers())
                         .collect(Collectors.toList());
         assertThat(
                 "Maintainers have been loaded",
