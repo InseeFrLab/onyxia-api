@@ -37,6 +37,7 @@ public class CatalogLoaderTest {
         cw.setType("helm");
         cw.setLocation("classpath:/catalog-loader-test");
         cw.setExcludedCharts(List.of("excludemetoo", "excludeme"));
+        cw.setMultipleServicesMode(CatalogWrapper.MultipleServicesMode.ALL);
         catalogLoader.updateCatalog(cw);
         assertThat(
                 "cw has the not excluded entries",
