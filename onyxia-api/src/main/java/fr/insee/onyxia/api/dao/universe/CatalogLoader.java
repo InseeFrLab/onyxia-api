@@ -1,7 +1,5 @@
 package fr.insee.onyxia.api.dao.universe;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,10 +8,6 @@ import fr.insee.onyxia.model.catalog.Config.Config;
 import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.helm.Chart;
 import fr.insee.onyxia.model.helm.Repository;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
@@ -25,6 +19,15 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.Iterator;
+import java.util.List;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Service
 public class CatalogLoader {
@@ -56,6 +59,7 @@ public class CatalogLoader {
                                     .getInputStream(),
                             UTF_8);
             Repository repository = mapperHelm.readValue(reader, Repository.class);
+            // Remove excluded services from list
             repository
                     .getEntries()
                     .entrySet()
@@ -66,19 +70,13 @@ public class CatalogLoader {
                                                     excludedChart ->
                                                             excludedChart.equalsIgnoreCase(
                                                                     entry.getKey())));
+            // For each service, filter the multiple versions if needed then refresh remaining
+            // versions
             repository.getEntries().values().parallelStream()
                     .forEach(
-                            entry -> {
-                                entry.parallelStream()
-                                        .forEach(
-                                                pkg -> {
-                                                    try {
-                                                        refreshPackage(cw, pkg);
-                                                    } catch (CatalogLoaderException
-                                                            | IOException e) {
-                                                        LOGGER.info("Exception occurred", e);
-                                                    }
-                                                });
+                            charts -> {
+                                epurateChartsList(charts, cw);
+                                refreshChartsList(charts, cw);
                             });
             cw.setCatalog(repository);
             cw.setLastUpdateTime(System.currentTimeMillis());
@@ -87,11 +85,52 @@ public class CatalogLoader {
         }
     }
 
+    private void epurateChartsList(List<Chart> charts, CatalogWrapper cw) {
+        if (cw.getMultipleServicesMode() == CatalogWrapper.MultipleServicesMode.ALL) {
+            return;
+        }
+        int i = 0;
+        Iterator<Chart> iterator = charts.iterator();
+        while (iterator.hasNext()) {
+            Chart chart = iterator.next();
+            if (cw.getMultipleServicesMode() == CatalogWrapper.MultipleServicesMode.LATEST
+                    && i > 0) {
+                iterator.remove();
+            } else if (cw.getMultipleServicesMode()
+                            == CatalogWrapper.MultipleServicesMode.MAX_NUMBER
+                    && i >= cw.getMaxNumberOfVersions()) {
+                iterator.remove();
+            } else if (cw.getMultipleServicesMode()
+                    == CatalogWrapper.MultipleServicesMode.SKIP_PATCHES) {
+                // TODO : implement this logic
+            }
+            i++;
+        }
+    }
+
+    private void refreshChartsList(List<Chart> charts, CatalogWrapper cw) {
+        charts.parallelStream()
+                .forEach(
+                        pkg -> {
+                            try {
+                                refreshPackage(cw, pkg);
+                            } catch (CatalogLoaderException | IOException e) {
+                                LOGGER.info("Exception occurred", e);
+                            }
+                        });
+    }
+
     private void refreshPackage(CatalogWrapper cw, Pkg pkg)
             throws CatalogLoaderException, IOException {
         if (!(pkg instanceof Chart chart)) {
             throw new IllegalArgumentException("Package should be of type Chart");
         }
+
+        LOGGER.info(
+                "Refreshing package {} version {} in catalog {}",
+                pkg.getName(),
+                pkg.getVersion(),
+                cw.getName());
 
         // One day we should take a look at the other URLs
         String chartUrl =
