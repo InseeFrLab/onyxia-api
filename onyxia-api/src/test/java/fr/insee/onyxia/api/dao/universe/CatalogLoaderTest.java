@@ -43,16 +43,8 @@ public class CatalogLoaderTest {
                 cw.getCatalog().getEntries().get("keepme").size(),
                 is(2));
         assertThat(
-                "cw has the not excluded package",
-                cw.getCatalog().getPackages().stream()
-                        .anyMatch(p -> p.getName().equalsIgnoreCase("keepme")));
-        assertThat(
                 "cw does not have the excluded entries",
                 !cw.getCatalog().getEntries().containsKey("excludeme"));
-        assertThat(
-                "cw does not have the excluded packages",
-                cw.getCatalog().getPackages().stream()
-                        .noneMatch(p -> p.getName().equalsIgnoreCase("excludeme")));
     }
 
     @Test
@@ -63,8 +55,8 @@ public class CatalogLoaderTest {
         cw.setExcludedCharts(List.of("excludemetoo", "excludeme"));
         catalogLoader.updateCatalog(cw);
         List<List<Chart.Maintainer>> maintainers =
-                cw.getCatalog().getPackages().stream()
-                        .map(p -> ((Chart) p).getMaintainers())
+                cw.getCatalog().getEntries().entrySet().stream()
+                        .map(entry -> entry.getValue().stream().findFirst().get().getMaintainers())
                         .collect(Collectors.toList());
         assertThat(
                 "Maintainers have been loaded",

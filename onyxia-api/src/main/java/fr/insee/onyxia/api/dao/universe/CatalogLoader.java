@@ -14,8 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
@@ -82,11 +80,6 @@ public class CatalogLoader {
                                                     }
                                                 });
                             });
-            repository.setPackages(
-                    repository.getEntries().values().stream()
-                            .map(List::getFirst)
-                            .filter(chart -> "application".equalsIgnoreCase(chart.getType()))
-                            .collect(Collectors.toList()));
             cw.setCatalog(repository);
             cw.setLastUpdateTime(System.currentTimeMillis());
         } catch (Exception e) {

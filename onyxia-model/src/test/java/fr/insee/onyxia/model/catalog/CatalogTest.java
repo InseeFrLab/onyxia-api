@@ -25,7 +25,7 @@ public class CatalogTest {
         InputStream inputStream =
                 resourceLoader.getResource("classpath:index.yaml").getInputStream();
         Repository repo = mapper.readValue(inputStream, Repository.class);
-        assertEquals(1, repo.getPackages().size());
+        assertEquals(1, repo.getEntries().size());
     }
 
     @SpringBootApplication
