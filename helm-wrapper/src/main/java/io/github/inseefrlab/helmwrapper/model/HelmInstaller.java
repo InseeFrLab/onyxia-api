@@ -1,6 +1,8 @@
 package io.github.inseefrlab.helmwrapper.model;
 
 import java.util.ArrayList;
+import java.util.List;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 
@@ -54,13 +56,13 @@ public class HelmInstaller {
         this.chart = chart;
     }
 
-    public ArrayList<Object> getManifest() {
+    public List<Object> getManifest() {
         return manifest;
     }
 
     public void setManifest(String manifest) {
         ArrayList<Object> res = new ArrayList<>();
-        Yaml yaml = new Yaml(new SafeConstructor());
+        Yaml yaml = new Yaml(new SafeConstructor(new LoaderOptions()));
         yaml.loadAll(manifest).forEach(file -> res.add(file));
         this.manifest = res;
     }

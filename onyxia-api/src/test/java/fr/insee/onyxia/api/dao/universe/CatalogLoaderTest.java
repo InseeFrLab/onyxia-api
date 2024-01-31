@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.CollectionUtils;
 
@@ -23,6 +24,8 @@ import org.springframework.util.CollectionUtils;
 public class CatalogLoaderTest {
 
     @Autowired CatalogLoader catalogLoader;
+
+    @Autowired ResourceLoader resourceLoader;
 
     @DisplayName(
             "Given a helm catalog wrapper with local charts and excluded charts, "

@@ -34,11 +34,14 @@ public class CatalogsConfiguration {
     @PostConstruct
     public void load() throws Exception {
         resolvedCatalogs = Arrays.asList(mapper.readValue(catalogs, CatalogWrapper[].class));
-        System.out.println("Serving " + resolvedCatalogs.size() + " catalogs");
     }
 
     public List<CatalogWrapper> getResolvedCatalogs() {
         return resolvedCatalogs;
+    }
+
+    public void setResolvedCatalogs(List<CatalogWrapper> resolvedCatalogs) {
+        this.resolvedCatalogs = resolvedCatalogs;
     }
 
     public String getCatalogs() {
@@ -47,10 +50,6 @@ public class CatalogsConfiguration {
 
     public void setCatalogs(String catalogs) {
         this.catalogs = catalogs;
-    }
-
-    public void setResolvedCatalogs(List<CatalogWrapper> resolvedCatalogs) {
-        this.resolvedCatalogs = resolvedCatalogs;
     }
 
     public static class JsonLoader implements PropertySourceFactory {
