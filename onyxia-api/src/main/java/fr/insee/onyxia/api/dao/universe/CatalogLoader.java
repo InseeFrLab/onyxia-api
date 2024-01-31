@@ -5,6 +5,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.zafarkhaja.semver.Version;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.model.catalog.Config.Config;
 import fr.insee.onyxia.model.catalog.Pkg;
@@ -16,6 +17,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
@@ -89,6 +91,7 @@ public class CatalogLoader {
             return;
         }
         int i = 0;
+        Optional<Version> previousVersion = Optional.empty();
         Iterator<Chart> iterator = charts.iterator();
         while (iterator.hasNext()) {
             Chart chart = iterator.next();
@@ -101,8 +104,16 @@ public class CatalogLoader {
                 iterator.remove();
             } else if (cw.getMultipleServicesMode()
                     == CatalogWrapper.MultipleServicesMode.SKIP_PATCHES) {
-                // TODO : implement this logic
+                Optional<Version> version = Version.tryParse(chart.getVersion());
+                if (version.isPresent() && previousVersion.isPresent()) {
+                    if (version.get().isSameMajorVersionAs(previousVersion.get())
+                            && version.get().isSameMinorVersionAs(previousVersion.get())) {
+                        iterator.remove();
+                    }
+                }
+                previousVersion = version;
             }
+
             i++;
         }
     }
