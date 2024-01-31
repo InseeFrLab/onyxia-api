@@ -65,7 +65,7 @@ public class CatalogWrapper {
     @Schema(description = "If multipleServicesMode is set to maxNumber, how many versions to keep")
     private int maxNumberOfVersions = 5;
 
-    public static enum MultipleServicesMode {
+    public enum MultipleServicesMode {
         @JsonProperty("all")
         ALL,
         @JsonProperty("latest")
