@@ -74,10 +74,10 @@ Configurable properties :
 
 ### Catalogs configuration :
 
-| Key | Default | Description |
-| --------------------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `catalogs` | see [onyxia-api/src/main/resources/catalogs.json](onyxia-api/src/main/resources/catalogs.json) | List of helm catalogs. |
-| `catalogs.refresh.ms` | `300000` (5 minutes) | The rate at which the catalogs should be refreshed. `<= 0` means no refreshs after initial loading |
+| Key | Default                                                                                        | Description                                                                                                                                                                                                                                                                               |
+| --------------------- |------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `catalogs` | see [onyxia-api/src/main/resources/catalogs.json](onyxia-api/src/main/resources/catalogs.json) | List of helm catalogs.                                                                                                                                                                                                                                                                    |
+| `catalogs.refresh.ms` | `0` (disabled)                                                                                 | The rate (in milliseconds) at which the catalogs should be refreshed. `<= 0` means no refreshs after initial loading. Note that this refresh comes with some caveats, especially if you have multiple API pods. See https://github.com/InseeFrLab/onyxia-api/issues/360 for more details. |
 
 ### HTTP configuration  
 | Key | Default | Description |
