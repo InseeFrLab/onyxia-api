@@ -32,13 +32,12 @@ The project architecture is divided in three packages, where `helm-wrapper` and 
 - `onyxia-api`: main module for the REST API application (Onyxia API), exposes endpoints, computes logic, uses `onyxia-model` for objects, and uses `helm-wrapper` for Helm service calls.
     - `src/main/java/fr/insee/onyxia/api`
         - `configuration`: configuration classes for our Bean production.
-        - `controller`: REST controllers to manage the API requests, and route them to the correct service logic.
+        - `controller`: REST controllers to manage health check, API requests, and route them to the correct service logic.
         - `dao`: *legacy code*
         - `openapi`: open API specification configuration.
         - `security`: security configurations, for deployment with (`SpringKeycloakSecurityConfiguration`) and without (`NoSecurityConfiguration`) an authentication provider.
         - `services`: logic behind the API requests.
         - `user`: service for the user providing.   
-    - `src/main/kotlin/fr/insee/onyxia/api`: health check endpoint.
     - `src/main/resources`: the default application properties, Catalog and Region configurations.
     - `src/test`: the `onyxia-api` tests code.
 
