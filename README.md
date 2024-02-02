@@ -43,6 +43,13 @@ Each variable can be overridden using environment variables.
 | --------------------- | ------- | ------------------------------------------------------------------ |
 | `regions` | [onyxia-api/src/main/resources/regions.json](onyxia-api/src/main/resources/regions.json) | List of regions, see [Region configuration](docs/region-configuration.md) |
 
+### Catalogs configuration :
+
+| Key | Default | Description |
+| --------------------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `catalogs` | [onyxia-api/src/main/resources/catalogs.json](onyxia-api/src/main/resources/catalogs.json) | List of helm catalogs, see [Admin doc](https://docs.onyxia.sh/admin-doc/catalog-of-services) |
+| `catalogs.refresh.ms` | `300000` (5 minutes) | The rate at which the catalogs should be refreshed. `<= 0` means no refreshs after initial loading |
+
 ### Authentication configuration
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
@@ -71,13 +78,6 @@ Configurable properties :
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
 | `security.cors.allowed_origins` | | To indicate which origins are allowed by [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) |
-
-### Catalogs configuration :
-
-| Key | Default | Description |
-| --------------------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `catalogs` | see [onyxia-api/src/main/resources/catalogs.json](onyxia-api/src/main/resources/catalogs.json) | List of helm catalogs. |
-| `catalogs.refresh.ms` | `300000` (5 minutes) | The rate at which the catalogs should be refreshed. `<= 0` means no refreshs after initial loading |
 
 ### HTTP configuration  
 | Key | Default | Description |
