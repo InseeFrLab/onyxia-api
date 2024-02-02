@@ -3,6 +3,7 @@ package fr.insee.onyxia.api.dao.universe;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.configuration.CustomObjectMapper;
@@ -42,10 +43,64 @@ public class CatalogLoaderTest {
         assertThat(
                 "cw has the not excluded entries",
                 cw.getCatalog().getEntries().get("keepme").size(),
-                is(2));
+                is(3));
         assertThat(
                 "cw does not have the excluded entries",
                 !cw.getCatalog().getEntries().containsKey("excludeme"));
+    }
+
+    @Test
+    public void multipleVersionsAllTest() {
+        CatalogWrapper cw = new CatalogWrapper();
+        cw.setType("helm");
+        cw.setLocation("classpath:/catalog-loader-test");
+        cw.setMultipleServicesMode(CatalogWrapper.MultipleServicesMode.ALL);
+        catalogLoader.updateCatalog(cw);
+        assertEquals(cw.getCatalog().getEntries().get("keepme").size(), 3);
+    }
+
+    @Test
+    public void multipleVersionsLatestTest() {
+        CatalogWrapper cw = new CatalogWrapper();
+        cw.setType("helm");
+        cw.setLocation("classpath:/catalog-loader-test");
+        cw.setMultipleServicesMode(CatalogWrapper.MultipleServicesMode.LATEST);
+        catalogLoader.updateCatalog(cw);
+        assertEquals(cw.getCatalog().getEntries().get("keepme").size(), 1);
+        assertEquals(cw.getCatalog().getEntries().get("keepme").getFirst().getVersion(), "2.5.1");
+        assertEquals(cw.getCatalog().getEntries().get("excludeme").size(), 1);
+        assertEquals(
+                cw.getCatalog().getEntries().get("excludeme").getFirst().getVersion(), "2.4.1");
+    }
+
+    @Test
+    public void multipleVersionsSkipPatchesTest() {
+        CatalogWrapper cw = new CatalogWrapper();
+        cw.setType("helm");
+        cw.setLocation("classpath:/catalog-loader-test");
+        cw.setMultipleServicesMode(CatalogWrapper.MultipleServicesMode.SKIP_PATCHES);
+        catalogLoader.updateCatalog(cw);
+        assertEquals(cw.getCatalog().getEntries().get("keepme").size(), 2);
+        assertEquals(cw.getCatalog().getEntries().get("keepme").get(0).getVersion(), "2.5.1");
+        assertEquals(cw.getCatalog().getEntries().get("keepme").get(1).getVersion(), "2.4.1");
+        assertEquals(cw.getCatalog().getEntries().get("excludeme").size(), 1);
+        assertEquals(cw.getCatalog().getEntries().get("excludeme").get(0).getVersion(), "2.4.1");
+    }
+
+    @Test
+    public void multipleVersionsMaxNumberTest() {
+        CatalogWrapper cw = new CatalogWrapper();
+        cw.setType("helm");
+        cw.setLocation("classpath:/catalog-loader-test");
+        cw.setMultipleServicesMode(CatalogWrapper.MultipleServicesMode.MAX_NUMBER);
+        cw.setMaxNumberOfVersions(2);
+        catalogLoader.updateCatalog(cw);
+        assertEquals(cw.getCatalog().getEntries().get("keepme").size(), 2);
+        assertEquals(cw.getCatalog().getEntries().get("keepme").get(0).getVersion(), "2.5.1");
+        assertEquals(cw.getCatalog().getEntries().get("keepme").get(1).getVersion(), "2.4.1");
+        assertEquals(cw.getCatalog().getEntries().get("excludeme").size(), 2);
+        assertEquals(cw.getCatalog().getEntries().get("excludeme").get(0).getVersion(), "2.4.1");
+        assertEquals(cw.getCatalog().getEntries().get("excludeme").get(1).getVersion(), "2.4.0");
     }
 
     @Test
