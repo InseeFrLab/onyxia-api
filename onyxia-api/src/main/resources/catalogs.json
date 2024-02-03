@@ -34,7 +34,7 @@
         "user": true,
         "project": true
       },
-      "multipleServicesMode" : "skipPatches"
+      "multipleServicesMode" : "latest"
     },
     {
       "id": "automation",
