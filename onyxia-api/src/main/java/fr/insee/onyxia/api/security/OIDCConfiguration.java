@@ -136,8 +136,7 @@ public class OIDCConfiguration {
     @Scope(scopeName = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.NO)
     public Jwt getUserInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Jwt jwt = (Jwt) authentication.getPrincipal();
-        return jwt;
+        return (Jwt) authentication.getPrincipal();
     }
 
     @Bean

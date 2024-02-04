@@ -37,7 +37,7 @@ public class CatalogRefresher implements ApplicationRunner {
     }
 
     private void refresh() {
-        catalogs.getCatalogs().stream()
+        catalogs.getCatalogs()
                 .forEach(
                         c -> {
                             try {

@@ -92,7 +92,7 @@ public class ConfigurationController {
     }
 
     @Schema(description = "")
-    public class BuildInfo {
+    public static class BuildInfo {
         @Schema(description = "")
         private String version;
 

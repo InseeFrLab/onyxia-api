@@ -30,8 +30,7 @@ public class RegionResolver implements HandlerMethodArgumentResolver {
             MethodParameter methodParameter,
             ModelAndViewContainer modelAndViewContainer,
             NativeWebRequest nativeWebRequest,
-            WebDataBinderFactory webDataBinderFactory)
-            throws Exception {
+            WebDataBinderFactory webDataBinderFactory) {
         String region = nativeWebRequest.getHeader("ONYXIA-REGION");
         Region defaultRegion = regionsConfiguration.getDefaultRegion();
         if (region != null) {

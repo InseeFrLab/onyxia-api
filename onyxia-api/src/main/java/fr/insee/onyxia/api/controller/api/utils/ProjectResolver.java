@@ -50,7 +50,7 @@ public class ProjectResolver implements HandlerMethodArgumentResolver {
                                         webDataBinderFactory));
 
         if (StringUtils.isBlank(project)) {
-            return user.getProjects().get(0);
+            return user.getProjects().getFirst();
         } else {
             Project resolvedProject =
                     user.getProjects().stream()

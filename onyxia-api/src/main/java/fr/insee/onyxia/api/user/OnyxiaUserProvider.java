@@ -35,7 +35,9 @@ public class OnyxiaUserProvider {
         Pattern includedGroupPattern = getPrecompiledIncludedGroupPattern(region);
 
         if (!region.getServices().isSingleNamespace()) {
-            userProvider.getUser(region).getGroups().stream()
+            userProvider
+                    .getUser(region)
+                    .getGroups()
                     .forEach(
                             group -> {
                                 String projectBaseName =

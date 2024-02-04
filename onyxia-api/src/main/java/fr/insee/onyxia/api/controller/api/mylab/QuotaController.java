@@ -112,8 +112,7 @@ public class QuotaController {
     public void applyQuota(
             @Parameter(hidden = true) Region region,
             @Parameter(hidden = true) Project project,
-            @RequestBody Quota quota)
-            throws IllegalAccessException {
+            @RequestBody Quota quota) {
         checkQuotaModificationIsAllowed(region);
         final Owner owner = getOwner(region, project);
         if (owner.getType() == Owner.OwnerType.USER) {

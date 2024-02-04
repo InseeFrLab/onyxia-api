@@ -26,14 +26,13 @@ public class XGeneratedProcessor {
 
     public XGeneratedContext readContext(Pkg pkg) {
         XGeneratedContext xGeneratedContext = new XGeneratedContext();
-        pkg.getConfig().getProperties().getProperties().entrySet().stream()
+        pkg.getConfig()
+                .getProperties()
+                .getProperties()
                 .forEach(
-                        (entry) -> {
-                            xGeneratedReader.readXGenerated(
-                                    Arrays.asList(entry.getKey()),
-                                    entry.getValue(),
-                                    xGeneratedContext);
-                        });
+                        (key, value) ->
+                                xGeneratedReader.readXGenerated(
+                                        List.of(key), value, xGeneratedContext));
         return xGeneratedContext;
     }
 
