@@ -29,10 +29,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class KubernetesService {
 
-    @Autowired private KubernetesClientProvider kubernetesClientProvider;
+    private final KubernetesClientProvider kubernetesClientProvider;
 
-    @Autowired OnyxiaEventPublisher onyxiaEventPublisher;
+    final OnyxiaEventPublisher onyxiaEventPublisher;
     private static final Logger LOGGER = LoggerFactory.getLogger(KubernetesService.class);
+
+    @Autowired
+    public KubernetesService(
+            KubernetesClientProvider kubernetesClientProvider,
+            OnyxiaEventPublisher onyxiaEventPublisher) {
+        this.kubernetesClientProvider = kubernetesClientProvider;
+        this.onyxiaEventPublisher = onyxiaEventPublisher;
+    }
 
     public String createDefaultNamespace(Region region, Owner owner) {
         final String namespaceId = getDefaultNamespace(region, owner);

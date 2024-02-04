@@ -19,14 +19,22 @@ public class CatalogRefresher implements ApplicationRunner {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CatalogRefresher.class);
 
-    @Autowired private Catalogs catalogs;
+    private final Catalogs catalogs;
+    private final CatalogLoader catalogLoader;
+    private final long refreshTime;
+    private final HelmRepoService helmRepoService;
 
-    @Autowired private CatalogLoader catalogLoader;
-
-    @Value("${catalogs.refresh.ms}")
-    private long refreshTime;
-
-    @Autowired private HelmRepoService helmRepoService;
+    @Autowired
+    public CatalogRefresher(
+            Catalogs catalogs,
+            CatalogLoader catalogLoader,
+            HelmRepoService helmRepoService,
+            @Value("${catalogs.refresh.ms}") long refreshTime) {
+        this.catalogs = catalogs;
+        this.catalogLoader = catalogLoader;
+        this.helmRepoService = helmRepoService;
+        this.refreshTime = refreshTime;
+    }
 
     private void refresh() {
         catalogs.getCatalogs().stream()

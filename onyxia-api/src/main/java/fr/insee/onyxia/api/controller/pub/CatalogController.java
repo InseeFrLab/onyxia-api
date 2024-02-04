@@ -29,7 +29,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class CatalogController {
 
-    @Autowired private CatalogService catalogService;
+    private final CatalogService catalogService;
+
+    @Autowired
+    public CatalogController(CatalogService catalogService) {
+        this.catalogService = catalogService;
+    }
 
     @Operation(
             summary = "List available catalogs and packages for installing.",

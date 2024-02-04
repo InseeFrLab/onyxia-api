@@ -35,9 +35,15 @@ public class QuotaController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(QuotaController.class);
 
-    @Autowired private KubernetesService kubernetesService;
+    private final KubernetesService kubernetesService;
 
-    @Autowired private UserProvider userProvider;
+    private final UserProvider userProvider;
+
+    @Autowired
+    public QuotaController(KubernetesService kubernetesService, UserProvider userProvider) {
+        this.kubernetesService = kubernetesService;
+        this.userProvider = userProvider;
+    }
 
     @Operation(
             summary = "Obtain the quota for a namespace.",
@@ -211,15 +217,7 @@ public class QuotaController {
         return kubernetesService;
     }
 
-    public void setKubernetesService(KubernetesService kubernetesService) {
-        this.kubernetesService = kubernetesService;
-    }
-
     public UserProvider getUserProvider() {
         return userProvider;
-    }
-
-    public void setUserProvider(UserProvider userProvider) {
-        this.userProvider = userProvider;
     }
 }

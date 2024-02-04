@@ -58,7 +58,12 @@ public class OIDCConfiguration {
     @Value("${oidc.clientID}")
     private String clientID;
 
-    @Autowired private HttpRequestUtils httpRequestUtils;
+    private final HttpRequestUtils httpRequestUtils;
+
+    @Autowired
+    public OIDCConfiguration(HttpRequestUtils httpRequestUtils) {
+        this.httpRequestUtils = httpRequestUtils;
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -164,10 +169,6 @@ public class OIDCConfiguration {
 
     public void setUsernameClaim(String usernameClaim) {
         this.usernameClaim = usernameClaim;
-    }
-
-    public void setHttpRequestUtils(HttpRequestUtils httpRequestUtils) {
-        this.httpRequestUtils = httpRequestUtils;
     }
 
     public String getGroupsClaim() {

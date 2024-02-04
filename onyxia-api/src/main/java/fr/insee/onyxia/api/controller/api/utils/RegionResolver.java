@@ -2,7 +2,6 @@ package fr.insee.onyxia.api.controller.api.utils;
 
 import fr.insee.onyxia.api.configuration.properties.RegionsConfiguration;
 import fr.insee.onyxia.model.region.Region;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Service;
@@ -14,9 +13,12 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 @Service
 public class RegionResolver implements HandlerMethodArgumentResolver {
 
-    @Autowired private HttpServletRequest request;
+    private final RegionsConfiguration regionsConfiguration;
 
-    @Autowired private RegionsConfiguration regionsConfiguration;
+    @Autowired
+    public RegionResolver(RegionsConfiguration regionsConfiguration) {
+        this.regionsConfiguration = regionsConfiguration;
+    }
 
     @Override
     public boolean supportsParameter(MethodParameter methodParameter) {

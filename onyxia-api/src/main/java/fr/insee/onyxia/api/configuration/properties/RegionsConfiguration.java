@@ -32,7 +32,12 @@ public class RegionsConfiguration {
     private static final Logger LOGGER = LoggerFactory.getLogger(RegionsConfiguration.class);
     private String regions;
     private List<Region> resolvedRegions;
-    @Autowired private ObjectMapper mapper;
+    private final ObjectMapper mapper;
+
+    @Autowired
+    public RegionsConfiguration(ObjectMapper mapper) {
+        this.mapper = mapper;
+    }
 
     @PostConstruct
     public void load() throws Exception {

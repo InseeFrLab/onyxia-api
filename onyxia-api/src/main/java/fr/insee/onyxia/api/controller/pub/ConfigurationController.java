@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,13 +19,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/public")
 public class ConfigurationController {
 
-    @Autowired(required = false)
-    private BuildProperties build;
+    private final BuildProperties build;
 
-    @Autowired(required = false)
-    private OIDCConfiguration oidcConfiguration;
+    private final OIDCConfiguration oidcConfiguration;
 
-    @Autowired private RegionsConfiguration regionsConfiguration;
+    private final RegionsConfiguration regionsConfiguration;
+
+    @Autowired
+    public ConfigurationController(
+            BuildProperties build,
+            Optional<OIDCConfiguration> oidcConfiguration,
+            RegionsConfiguration regionsConfiguration) {
+        this.build = build;
+        this.oidcConfiguration = oidcConfiguration.orElse(null);
+        this.regionsConfiguration = regionsConfiguration;
+    }
 
     @Operation(
             summary = "Get this Onyxia API full configuration description.",
@@ -47,14 +56,6 @@ public class ConfigurationController {
             appInfo.setOidcConfiguration(OIDCConfiguration);
         }
         return appInfo;
-    }
-
-    public OIDCConfiguration getOidcConfiguration() {
-        return oidcConfiguration;
-    }
-
-    public void setOidcConfiguration(OIDCConfiguration oidcConfiguration) {
-        this.oidcConfiguration = oidcConfiguration;
     }
 
     @Schema(description = "")

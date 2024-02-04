@@ -12,7 +12,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class CatalogServiceImpl implements CatalogService {
 
-    @Autowired private Catalogs catalogs;
+    private final Catalogs catalogs;
+
+    @Autowired
+    public CatalogServiceImpl(Catalogs catalogs) {
+        this.catalogs = catalogs;
+    }
 
     @Override
     public Catalogs getCatalogs() {

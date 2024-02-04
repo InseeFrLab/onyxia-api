@@ -10,7 +10,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class DisableCORS implements WebMvcConfigurer {
 
-    @Autowired private SecurityConfig securityConfig;
+    private final SecurityConfig securityConfig;
+
+    @Autowired
+    public DisableCORS(SecurityConfig securityConfig) {
+        this.securityConfig = securityConfig;
+    }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {

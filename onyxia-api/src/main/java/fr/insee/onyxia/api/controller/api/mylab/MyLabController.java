@@ -29,11 +29,19 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @SecurityRequirement(name = "auth")
 public class MyLabController {
-    @Autowired private AppsService helmAppsService;
+    private final AppsService helmAppsService;
 
-    @Autowired private UserProvider userProvider;
+    private final UserProvider userProvider;
 
-    @Autowired private CatalogService catalogService;
+    private final CatalogService catalogService;
+
+    @Autowired
+    public MyLabController(
+            AppsService helmAppsService, UserProvider userProvider, CatalogService catalogService) {
+        this.helmAppsService = helmAppsService;
+        this.userProvider = userProvider;
+        this.catalogService = catalogService;
+    }
 
     @Operation(
             summary = "List the services installed in a namespace.",
