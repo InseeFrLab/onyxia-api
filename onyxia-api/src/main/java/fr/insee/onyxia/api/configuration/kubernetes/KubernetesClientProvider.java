@@ -1,6 +1,5 @@
 package fr.insee.onyxia.api.configuration.kubernetes;
 
-import fr.insee.onyxia.api.configuration.SecurityConfig;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.region.Region;
 import io.fabric8.kubernetes.client.Config;
@@ -10,15 +9,12 @@ import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class KubernetesClientProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KubernetesClientProvider.class);
-
-    @Autowired private SecurityConfig securityConfig;
 
     /**
      * This returns the root client which has extended permissions. Currently cluster-admin. User

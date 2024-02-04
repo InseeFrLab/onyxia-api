@@ -29,7 +29,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class CatalogController {
 
-    @Autowired private CatalogService catalogService;
+    private final CatalogService catalogService;
+
+    @Autowired
+    public CatalogController(CatalogService catalogService) {
+        this.catalogService = catalogService;
+    }
 
     @Operation(
             summary = "List available catalogs and packages for installing.",
@@ -145,7 +150,7 @@ public class CatalogController {
     public List<Chart> getCharts(@PathVariable String catalogId, @PathVariable String chartName) {
         List<Chart> charts =
                 catalogService.getCharts(catalogId, chartName).orElseThrow(NotFoundException::new);
-        charts.stream().forEach(this::addCustomOnyxiaProperties);
+        charts.forEach(this::addCustomOnyxiaProperties);
         return charts;
     }
 
