@@ -53,12 +53,6 @@ public class CatalogRefresher implements ApplicationRunner {
         }
     }
 
-    @PostConstruct
-    private void initializeCatalogs() {
-        LOGGER.info("Catalogs initialization");
-        refresh();
-    }
-
     @Override
     public void run(ApplicationArguments args) throws Exception {
         this.refresh();
