@@ -1,6 +1,7 @@
 package fr.insee.onyxia.api.controller.api.mylab;
 
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
+import fr.insee.onyxia.api.configuration.Catalogs;
 import fr.insee.onyxia.api.configuration.NotFoundException;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.CatalogService;
@@ -85,6 +86,16 @@ public class MyLabController {
             dto.getGroups().addAll(listing.getGroups());
         }
         return dto;
+    }
+
+    @Operation(
+            summary = "List available catalogs and packages for installing for the user.",
+            description =
+                    "List available catalogs and packages for installing by the user in the first Region configuration of this Onyxia API. This may differ from the catalogs returned from the public endpoint based on the catalog configuration.")
+    @GetMapping("/catalogs")
+    public Catalogs getMyCatalogs(@Parameter(hidden = true) Region region) {
+        User user = userProvider.getUser(region);
+        return catalogService.getCatalogs(region, user);
     }
 
     @Operation(
@@ -240,6 +251,7 @@ public class MyLabController {
         if (requestDTO.getCatalogId() != null && !requestDTO.getCatalogId().isEmpty()) {
             catalogId = requestDTO.getCatalogId();
         }
+        User user = userProvider.getUser(region);
         CatalogWrapper catalog = catalogService.getCatalogById(catalogId);
         Pkg pkg =
                 catalog.getCatalog()
@@ -248,7 +260,6 @@ public class MyLabController {
 
         boolean skipTlsVerify = catalog.getSkipTlsVerify();
         String caFile = catalog.getCaFile();
-        User user = userProvider.getUser(region);
         Map<String, Object> fusion = new HashMap<>();
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
         return helmAppsService.installApp(
