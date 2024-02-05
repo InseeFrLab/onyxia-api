@@ -24,7 +24,7 @@ public class HealthcheckController {
 
     @Autowired
     public HealthcheckController(Catalogs catalogs) {
-        catalogs = this.catalogs;
+        this.catalogs = catalogs;
     }
 
     @GetMapping("/healthcheck")

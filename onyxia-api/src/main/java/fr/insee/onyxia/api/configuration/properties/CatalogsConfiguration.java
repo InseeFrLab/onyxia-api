@@ -33,7 +33,7 @@ public class CatalogsConfiguration {
 
     @Autowired
     public CatalogsConfiguration(ObjectMapper mapper) {
-        mapper = this.mapper;
+        this.mapper = mapper;
     }
 
     @PostConstruct
