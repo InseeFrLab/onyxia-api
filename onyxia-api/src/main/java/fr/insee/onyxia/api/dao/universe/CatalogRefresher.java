@@ -2,7 +2,6 @@ package fr.insee.onyxia.api.dao.universe;
 
 import fr.insee.onyxia.api.configuration.Catalogs;
 import io.github.inseefrlab.helmwrapper.service.HelmRepoService;
-import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;

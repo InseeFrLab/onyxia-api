@@ -29,14 +29,13 @@ public class HealthcheckController {
                 catalogs.getCatalogs().stream()
                         .filter(catalogWrapper -> catalogWrapper.getLastUpdateTime() == 0)
                         .toList();
-        if (! uninitializedCatalogs.isEmpty()) {
+        if (!uninitializedCatalogs.isEmpty()) {
 
-            String notInitializedCatalogs = uninitializedCatalogs.stream()
-                                                                 .map(CatalogWrapper::getId)
-                                                                 .collect(Collectors.joining(", "));
-            LOGGER.info(
-                    "Uninitialized catalogs : {}", notInitializedCatalogs
-                    );
+            String notInitializedCatalogs =
+                    uninitializedCatalogs.stream()
+                            .map(CatalogWrapper::getId)
+                            .collect(Collectors.joining(", "));
+            LOGGER.info("Uninitialized catalogs : {}", notInitializedCatalogs);
             return ResponseEntity.status(500).build();
         }
         return ResponseEntity.status(200).build();
