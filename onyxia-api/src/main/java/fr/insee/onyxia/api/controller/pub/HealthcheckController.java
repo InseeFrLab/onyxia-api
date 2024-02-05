@@ -20,11 +20,15 @@ public class HealthcheckController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HealthcheckController.class);
 
-    @Autowired private Catalogs catalogs;
+    private Catalogs catalogs;
+
+    @Autowired
+    public HealthcheckController(Catalogs catalogs) {
+        catalogs = this.catalogs;
+    }
 
     @GetMapping("/healthcheck")
-    public ResponseEntity healthcheck() {
-
+    public ResponseEntity<Void> healthcheck() {
         List<CatalogWrapper> uninitializedCatalogs =
                 catalogs.getCatalogs().stream()
                         .filter(catalogWrapper -> catalogWrapper.getLastUpdateTime() == 0)

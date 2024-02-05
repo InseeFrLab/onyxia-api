@@ -29,7 +29,12 @@ public class CatalogsConfiguration {
 
     private List<CatalogWrapper> resolvedCatalogs;
 
-    @Autowired private ObjectMapper mapper;
+    private ObjectMapper mapper;
+
+    @Autowired
+    public CatalogsConfiguration(ObjectMapper mapper) {
+        mapper = this.mapper;
+    }
 
     @PostConstruct
     public void load() throws Exception {
