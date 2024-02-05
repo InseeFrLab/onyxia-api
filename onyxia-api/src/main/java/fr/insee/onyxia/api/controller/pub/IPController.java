@@ -16,7 +16,12 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @RequestMapping("/public")
 public class IPController {
 
-    @Autowired HttpRequestUtils httpRequestUtils;
+    private final HttpRequestUtils httpRequestUtils;
+
+    @Autowired
+    public IPController(HttpRequestUtils httpRequestUtils) {
+        this.httpRequestUtils = httpRequestUtils;
+    }
 
     @Operation(
             summary = "Get your public IP address.",
@@ -30,14 +35,6 @@ public class IPController {
                         ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
                                 .getRequest()));
         return ip;
-    }
-
-    public HttpRequestUtils getHttpRequestUtils() {
-        return httpRequestUtils;
-    }
-
-    public void setHttpRequestUtils(HttpRequestUtils httpRequestUtils) {
-        this.httpRequestUtils = httpRequestUtils;
     }
 
     @Schema(description = "")

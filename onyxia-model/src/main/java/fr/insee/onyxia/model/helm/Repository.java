@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Repository extends CatalogWrapper {
@@ -56,10 +55,5 @@ public class Repository extends CatalogWrapper {
     @JsonProperty("entries")
     public void setEntries(Map<String, List<Chart>> entries) {
         super.setEntries(entries);
-        setPackages(
-                entries.values().stream()
-                        .map(charts -> charts.get(0))
-                        .filter(chart -> "application".equalsIgnoreCase(chart.getType()))
-                        .collect(Collectors.toList()));
     }
 }

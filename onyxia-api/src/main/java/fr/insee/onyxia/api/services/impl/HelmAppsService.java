@@ -55,25 +55,42 @@ public class HelmAppsService implements AppsService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HelmAppsService.class);
 
+    private final ObjectMapper mapperHelm;
+
+    private final KubernetesService kubernetesService;
+
+    private final List<AdmissionControllerHelm> admissionControllers;
+
+    private final FastDateFormat helmDateFormat = FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss");
+    private final KubernetesClientProvider kubernetesClientProvider;
+
+    private final HelmClientProvider helmClientProvider;
+
+    private final XGeneratedProcessor xGeneratedProcessor;
+
+    private final UrlGenerator urlGenerator;
+
+    final OnyxiaEventPublisher onyxiaEventPublisher;
+
     @Autowired
-    @Qualifier("helm")
-    ObjectMapper mapperHelm;
-
-    @Autowired private KubernetesService kubernetesService;
-
-    @Autowired(required = false)
-    private List<AdmissionControllerHelm> admissionControllers = new ArrayList<>();
-
-    private FastDateFormat helmDateFormat = FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss");
-    @Autowired private KubernetesClientProvider kubernetesClientProvider;
-
-    @Autowired private HelmClientProvider helmClientProvider;
-
-    @Autowired private XGeneratedProcessor xGeneratedProcessor;
-
-    @Autowired private UrlGenerator urlGenerator;
-
-    @Autowired OnyxiaEventPublisher onyxiaEventPublisher;
+    public HelmAppsService(
+            @Qualifier("helm") ObjectMapper mapperHelm,
+            KubernetesService kubernetesService,
+            List<AdmissionControllerHelm> admissionControllers,
+            KubernetesClientProvider kubernetesClientProvider,
+            HelmClientProvider helmClientProvider,
+            XGeneratedProcessor xGeneratedProcessor,
+            UrlGenerator urlGenerator,
+            OnyxiaEventPublisher onyxiaEventPublisher) {
+        this.mapperHelm = mapperHelm;
+        this.kubernetesService = kubernetesService;
+        this.admissionControllers = admissionControllers;
+        this.kubernetesClientProvider = kubernetesClientProvider;
+        this.helmClientProvider = helmClientProvider;
+        this.xGeneratedProcessor = xGeneratedProcessor;
+        this.urlGenerator = urlGenerator;
+        this.onyxiaEventPublisher = onyxiaEventPublisher;
+    }
 
     private HelmConfiguration getHelmConfiguration(Region region, User user) {
         return helmClientProvider.getConfiguration(region, user);

@@ -3,6 +3,7 @@ package fr.insee.onyxia.api.dao.universe;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.configuration.CustomObjectMapper;
@@ -32,39 +33,86 @@ public class CatalogLoaderTest {
                     + "when we update the catalog, "
                     + "then the excluded chart is not set")
     @Test
-    public void excludeChartTest() {
+    void excludeChartTest() {
         CatalogWrapper cw = new CatalogWrapper();
         cw.setType("helm");
         cw.setLocation("classpath:/catalog-loader-test");
         cw.setExcludedCharts(List.of("excludemetoo", "excludeme"));
+        cw.setMultipleServicesMode(CatalogWrapper.MultipleServicesMode.ALL);
         catalogLoader.updateCatalog(cw);
         assertThat(
                 "cw has the not excluded entries",
                 cw.getCatalog().getEntries().get("keepme").size(),
-                is(2));
-        assertThat(
-                "cw has the not excluded package",
-                cw.getCatalog().getPackages().stream()
-                        .anyMatch(p -> p.getName().equalsIgnoreCase("keepme")));
+                is(3));
         assertThat(
                 "cw does not have the excluded entries",
                 !cw.getCatalog().getEntries().containsKey("excludeme"));
-        assertThat(
-                "cw does not have the excluded packages",
-                cw.getCatalog().getPackages().stream()
-                        .noneMatch(p -> p.getName().equalsIgnoreCase("excludeme")));
     }
 
     @Test
-    public void loadMaintainers() {
+    void multipleVersionsAllTest() {
+        CatalogWrapper cw = new CatalogWrapper();
+        cw.setType("helm");
+        cw.setLocation("classpath:/catalog-loader-test");
+        cw.setMultipleServicesMode(CatalogWrapper.MultipleServicesMode.ALL);
+        catalogLoader.updateCatalog(cw);
+        assertEquals(3, cw.getCatalog().getEntries().get("keepme").size());
+    }
+
+    @Test
+    void multipleVersionsLatestTest() {
+        CatalogWrapper cw = new CatalogWrapper();
+        cw.setType("helm");
+        cw.setLocation("classpath:/catalog-loader-test");
+        cw.setMultipleServicesMode(CatalogWrapper.MultipleServicesMode.LATEST);
+        catalogLoader.updateCatalog(cw);
+        assertEquals(1, cw.getCatalog().getEntries().get("keepme").size());
+        assertEquals("2.5.1", cw.getCatalog().getEntries().get("keepme").getFirst().getVersion());
+        assertEquals(1, cw.getCatalog().getEntries().get("excludeme").size());
+        assertEquals(
+                "2.4.1", cw.getCatalog().getEntries().get("excludeme").getFirst().getVersion());
+    }
+
+    @Test
+    void multipleVersionsSkipPatchesTest() {
+        CatalogWrapper cw = new CatalogWrapper();
+        cw.setType("helm");
+        cw.setLocation("classpath:/catalog-loader-test");
+        cw.setMultipleServicesMode(CatalogWrapper.MultipleServicesMode.SKIP_PATCHES);
+        catalogLoader.updateCatalog(cw);
+        assertEquals(2, cw.getCatalog().getEntries().get("keepme").size());
+        assertEquals("2.5.1", cw.getCatalog().getEntries().get("keepme").get(0).getVersion());
+        assertEquals("2.4.1", cw.getCatalog().getEntries().get("keepme").get(1).getVersion());
+        assertEquals(1, cw.getCatalog().getEntries().get("excludeme").size());
+        assertEquals("2.4.1", cw.getCatalog().getEntries().get("excludeme").get(0).getVersion());
+    }
+
+    @Test
+    void multipleVersionsMaxNumberTest() {
+        CatalogWrapper cw = new CatalogWrapper();
+        cw.setType("helm");
+        cw.setLocation("classpath:/catalog-loader-test");
+        cw.setMultipleServicesMode(CatalogWrapper.MultipleServicesMode.MAX_NUMBER);
+        cw.setMaxNumberOfVersions(2);
+        catalogLoader.updateCatalog(cw);
+        assertEquals(2, cw.getCatalog().getEntries().get("keepme").size());
+        assertEquals("2.5.1", cw.getCatalog().getEntries().get("keepme").get(0).getVersion());
+        assertEquals("2.4.1", cw.getCatalog().getEntries().get("keepme").get(1).getVersion());
+        assertEquals(2, cw.getCatalog().getEntries().get("excludeme").size());
+        assertEquals("2.4.1", cw.getCatalog().getEntries().get("excludeme").get(0).getVersion());
+        assertEquals("2.4.0", cw.getCatalog().getEntries().get("excludeme").get(1).getVersion());
+    }
+
+    @Test
+    void loadMaintainers() {
         CatalogWrapper cw = new CatalogWrapper();
         cw.setType("helm");
         cw.setLocation("classpath:/catalog-loader-test");
         cw.setExcludedCharts(List.of("excludemetoo", "excludeme"));
         catalogLoader.updateCatalog(cw);
         List<List<Chart.Maintainer>> maintainers =
-                cw.getCatalog().getPackages().stream()
-                        .map(p -> ((Chart) p).getMaintainers())
+                cw.getCatalog().getEntries().entrySet().stream()
+                        .map(entry -> entry.getValue().stream().findFirst().get().getMaintainers())
                         .collect(Collectors.toList());
         assertThat(
                 "Maintainers have been loaded",
@@ -81,7 +129,7 @@ public class CatalogLoaderTest {
                     + "when we update the catalog, "
                     + "then failed packages should be logged")
     @Test
-    public void packageOnClassPathNotFound() {
+    void packageOnClassPathNotFound() {
         CatalogWrapper cw = new CatalogWrapper();
         cw.setType("helm");
         cw.setLocation("classpath:/catalog-loader-test");

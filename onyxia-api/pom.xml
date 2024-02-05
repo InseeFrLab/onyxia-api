@@ -106,6 +106,12 @@
             <artifactId>kubernetes-server-mock</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.github.zafarkhaja</groupId>
+            <artifactId>java-semver</artifactId>
+            <version>0.10.2</version>
+        </dependency>
     </dependencies>
 
     <properties>

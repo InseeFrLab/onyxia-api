@@ -1,6 +1,7 @@
 package fr.insee.onyxia.api.configuration;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.insee.onyxia.model.catalog.CatalogStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
@@ -57,6 +58,23 @@ public class CatalogWrapper {
 
     @Schema(description = "Should this catalog be visible in user context ? Project context ?")
     private CatalogVisibility visible = new CatalogVisibility();
+
+    @Schema(description = "If a chart has multiple versions, which one(s) to keep")
+    private MultipleServicesMode multipleServicesMode = MultipleServicesMode.LATEST;
+
+    @Schema(description = "If multipleServicesMode is set to maxNumber, how many versions to keep")
+    private int maxNumberOfVersions = 5;
+
+    public enum MultipleServicesMode {
+        @JsonProperty("all")
+        ALL,
+        @JsonProperty("latest")
+        LATEST,
+        @JsonProperty("skipPatches")
+        SKIP_PATCHES,
+        @JsonProperty("maxNumber")
+        MAX_NUMBER
+    }
 
     /**
      * @return the type
@@ -193,6 +211,22 @@ public class CatalogWrapper {
 
     public void setVisible(CatalogVisibility visible) {
         this.visible = visible;
+    }
+
+    public MultipleServicesMode getMultipleServicesMode() {
+        return multipleServicesMode;
+    }
+
+    public void setMultipleServicesMode(MultipleServicesMode multipleServicesMode) {
+        this.multipleServicesMode = multipleServicesMode;
+    }
+
+    public int getMaxNumberOfVersions() {
+        return maxNumberOfVersions;
+    }
+
+    public void setMaxNumberOfVersions(int maxNumberOfVersions) {
+        this.maxNumberOfVersions = maxNumberOfVersions;
     }
 
     public static class CatalogVisibility {

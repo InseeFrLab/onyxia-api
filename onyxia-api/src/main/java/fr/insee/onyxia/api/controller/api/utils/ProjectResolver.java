@@ -4,7 +4,6 @@ import fr.insee.onyxia.api.user.OnyxiaUserProvider;
 import fr.insee.onyxia.model.OnyxiaUser;
 import fr.insee.onyxia.model.project.Project;
 import fr.insee.onyxia.model.region.Region;
-import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
@@ -18,11 +17,15 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 @Service
 public class ProjectResolver implements HandlerMethodArgumentResolver {
 
-    @Autowired private HttpServletRequest request;
+    private final RegionResolver regionResolver;
 
-    @Autowired private RegionResolver regionResolver;
+    private final OnyxiaUserProvider userProvider;
 
-    private OnyxiaUserProvider userProvider;
+    @Autowired
+    public ProjectResolver(RegionResolver regionResolver, OnyxiaUserProvider userProvider) {
+        this.regionResolver = regionResolver;
+        this.userProvider = userProvider;
+    }
 
     @Override
     public boolean supportsParameter(MethodParameter methodParameter) {
@@ -47,7 +50,7 @@ public class ProjectResolver implements HandlerMethodArgumentResolver {
                                         webDataBinderFactory));
 
         if (StringUtils.isBlank(project)) {
-            return user.getProjects().get(0);
+            return user.getProjects().getFirst();
         } else {
             Project resolvedProject =
                     user.getProjects().stream()
@@ -60,14 +63,5 @@ public class ProjectResolver implements HandlerMethodArgumentResolver {
             }
             return resolvedProject;
         }
-    }
-
-    @Autowired
-    public void setUserProvider(OnyxiaUserProvider userProvider) {
-        this.userProvider = userProvider;
-    }
-
-    public OnyxiaUserProvider getUserProvider() {
-        return userProvider;
     }
 }

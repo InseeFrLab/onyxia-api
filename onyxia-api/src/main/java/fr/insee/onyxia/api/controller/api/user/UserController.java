@@ -17,7 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 @SecurityRequirement(name = "auth")
 public class UserController {
 
-    @Autowired private OnyxiaUserProvider userProvider;
+    private final OnyxiaUserProvider userProvider;
+
+    @Autowired
+    public UserController(OnyxiaUserProvider userProvider) {
+        this.userProvider = userProvider;
+    }
 
     @GetMapping("/info")
     public OnyxiaUser userInfo(@Parameter(hidden = true) Region region) {

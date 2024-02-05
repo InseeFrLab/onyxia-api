@@ -6,7 +6,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class OnyxiaEventPublisher {
-    @Autowired private ApplicationEventPublisher applicationEventPublisher;
+    private final ApplicationEventPublisher applicationEventPublisher;
+
+    @Autowired
+    public OnyxiaEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+        this.applicationEventPublisher = applicationEventPublisher;
+    }
 
     public void publishEvent(OnyxiaEvent onyxiaEvent) {
         applicationEventPublisher.publishEvent(onyxiaEvent);

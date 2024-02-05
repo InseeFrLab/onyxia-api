@@ -40,16 +40,16 @@ public class CatalogsConfiguration {
         return resolvedCatalogs;
     }
 
-    public void setResolvedCatalogs(List<CatalogWrapper> resolvedCatalogs) {
-        this.resolvedCatalogs = resolvedCatalogs;
-    }
-
     public String getCatalogs() {
         return catalogs;
     }
 
     public void setCatalogs(String catalogs) {
         this.catalogs = catalogs;
+    }
+
+    public void setResolvedCatalogs(List<CatalogWrapper> resolvedCatalogs) {
+        this.resolvedCatalogs = resolvedCatalogs;
     }
 
     public static class JsonLoader implements PropertySourceFactory {
