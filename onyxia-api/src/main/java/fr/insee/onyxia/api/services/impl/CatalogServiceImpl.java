@@ -3,7 +3,6 @@ package fr.insee.onyxia.api.services.impl;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.configuration.Catalogs;
 import fr.insee.onyxia.api.services.CatalogService;
-import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.helm.Chart;
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +12,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class CatalogServiceImpl implements CatalogService {
 
-    @Autowired private Catalogs catalogs;
+    private final Catalogs catalogs;
+
+    @Autowired
+    public CatalogServiceImpl(Catalogs catalogs) {
+        this.catalogs = catalogs;
+    }
 
     @Override
     public Catalogs getCatalogs() {
@@ -26,7 +30,7 @@ public class CatalogServiceImpl implements CatalogService {
     }
 
     @Override
-    public Optional<Pkg> getPackage(String catalogId, String packageName) {
+    public Optional<Chart> getPackage(String catalogId, String packageName) {
         return catalogs.getCatalogById(catalogId).getCatalog().getPackageByName(packageName);
     }
 

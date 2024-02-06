@@ -19,15 +19,6 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-reflect</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib-jdk8</artifactId>
-        </dependency>
-
         <!-- tag::test[] -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -115,11 +106,16 @@
             <artifactId>kubernetes-server-mock</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.github.zafarkhaja</groupId>
+            <artifactId>java-semver</artifactId>
+            <version>0.10.2</version>
+        </dependency>
     </dependencies>
 
     <properties>
         <java.version>21</java.version>
-        <kotlin.version>1.9.21</kotlin.version>
     </properties>
 
     <build>
@@ -132,52 +128,6 @@
                         <enabled>true</enabled>
                     </layers>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-maven-plugin</artifactId>
-                <version>${kotlin.version}</version>
-                <configuration>
-                    <args>
-                        <arg>-Xjsr305=strict</arg>
-                    </args>
-                    <compilerPlugins>
-                        <plugin>spring</plugin>
-                    </compilerPlugins>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>compile</id>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                        <configuration>
-                            <sourceDirs>
-                                <sourceDir>src/main/kotlin</sourceDir>
-                                <sourceDir>src/main/java</sourceDir>
-                            </sourceDirs>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>test-compile</id>
-                        <goals>
-                            <goal>test-compile</goal>
-                        </goals>
-                        <configuration>
-                            <sourceDirs>
-                                <sourceDir>src/test/kotlin</sourceDir>
-                                <sourceDir>src/test/java</sourceDir>
-                            </sourceDirs>
-                        </configuration>
-                    </execution>
-                </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.jetbrains.kotlin</groupId>
-                        <artifactId>kotlin-maven-allopen</artifactId>
-                        <version>${kotlin.version}</version>
-                    </dependency>
-                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -194,7 +144,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.12.0</version>
+                <version>3.12.1</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>

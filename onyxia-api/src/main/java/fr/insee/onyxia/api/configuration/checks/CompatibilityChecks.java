@@ -16,10 +16,20 @@ import org.springframework.context.event.EventListener;
 public class CompatibilityChecks {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CompatibilityChecks.class);
-    @Autowired RegionsConfiguration regionsConfiguration;
-    @Autowired KubernetesClientProvider kubernetesClientProvider;
+    private final RegionsConfiguration regionsConfiguration;
+    private final KubernetesClientProvider kubernetesClientProvider;
 
-    @Autowired HelmVersionService helmVersionService;
+    private final HelmVersionService helmVersionService;
+
+    @Autowired
+    public CompatibilityChecks(
+            RegionsConfiguration regionsConfiguration,
+            KubernetesClientProvider kubernetesClientProvider,
+            HelmVersionService helmVersionService) {
+        this.regionsConfiguration = regionsConfiguration;
+        this.kubernetesClientProvider = kubernetesClientProvider;
+        this.helmVersionService = helmVersionService;
+    }
 
     @EventListener(ContextRefreshedEvent.class)
     public void checkHelm() {

@@ -24,9 +24,15 @@ import org.springframework.web.bind.annotation.RestController;
 @SecurityRequirement(name = "auth")
 public class OnboardingController {
 
-    @Autowired private KubernetesService kubernetesService;
+    private final KubernetesService kubernetesService;
 
-    @Autowired private UserProvider userProvider;
+    private final UserProvider userProvider;
+
+    @Autowired
+    public OnboardingController(KubernetesService kubernetesService, UserProvider userProvider) {
+        this.kubernetesService = kubernetesService;
+        this.userProvider = userProvider;
+    }
 
     @Operation(
             summary = "Init a namespace for a user or a group.",
