@@ -111,7 +111,7 @@ public class MyLabController {
                         in = ParameterIn.QUERY)
             })
     @GetMapping("/app")
-    public @ResponseBody Service getApp(
+    public Service getApp(
             @Parameter(hidden = true) Region region,
             @Parameter(hidden = true) Project project,
             @RequestParam("serviceId") String serviceId)
@@ -152,7 +152,7 @@ public class MyLabController {
                         in = ParameterIn.QUERY)
             })
     @GetMapping("/app/logs")
-    public @ResponseBody String getLogs(
+    public String getLogs(
             @Parameter(hidden = true) Region region,
             @Parameter(hidden = true) Project project,
             @RequestParam("serviceId") String serviceId,
