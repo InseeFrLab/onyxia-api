@@ -81,8 +81,7 @@ public class OnboardingController {
                     "Specification on which namespace to create. If group is provided, create a group namespace, otherwise create the user namespace.")
     public static class OnboardingRequest {
 
-        @Schema
-        private String group;
+        @Schema private String group;
 
         public String getGroup() {
             return group;

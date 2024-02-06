@@ -22,8 +22,7 @@ public class CreateServiceDTO {
                     "Version of the helm package, passe la version dans la création, si pas null")
     String packageVersion;
 
-    @Schema(
-            description = "A chosen name for the service, si null un nom est généré par helm")
+    @Schema(description = "A chosen name for the service, si null un nom est généré par helm")
     String name;
 
     @Schema(description = "Contenu du values.yaml", required = true)

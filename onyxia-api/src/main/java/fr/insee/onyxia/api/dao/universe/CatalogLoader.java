@@ -38,7 +38,8 @@ public class CatalogLoader {
 
     private final ObjectMapper mapperHelm;
 
-    public CatalogLoader(ResourceLoader resourceLoader, @Qualifier("helm") ObjectMapper mapperHelm) {
+    public CatalogLoader(
+            ResourceLoader resourceLoader, @Qualifier("helm") ObjectMapper mapperHelm) {
         this.resourceLoader = resourceLoader;
         this.mapperHelm = mapperHelm;
     }
