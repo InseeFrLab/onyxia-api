@@ -15,7 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class RegionsController {
 
-    @Autowired private RegionsConfiguration regionsConfiguration;
+    private final RegionsConfiguration regionsConfiguration;
+
+    @Autowired
+    public RegionsController(RegionsConfiguration regionsConfiguration) {
+        this.regionsConfiguration = regionsConfiguration;
+    }
 
     @Operation(
             summary = "Get Onyxia API regions configurations.",

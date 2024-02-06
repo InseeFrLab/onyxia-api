@@ -14,10 +14,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class OnyxiaUserProvider {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(OnyxiaUserProvider.class);
+
     Pattern rfc1123Pattern = Pattern.compile("[a-z0-9]([-a-z0-9]*[a-z0-9])?");
-    @Autowired private UserProvider userProvider;
-    @Autowired private KubernetesService kubernetesService; // TODO : cleanup
-    private Logger LOGGER = LoggerFactory.getLogger(OnyxiaUserProvider.class);
+    private final UserProvider userProvider;
+    private final KubernetesService kubernetesService; // TODO : cleanup
+
+    @Autowired
+    public OnyxiaUserProvider(UserProvider userProvider, KubernetesService kubernetesService) {
+        this.userProvider = userProvider;
+        this.kubernetesService = kubernetesService;
+    }
 
     public OnyxiaUser getUser(Region region) {
         OnyxiaUser user = new OnyxiaUser(userProvider.getUser(region));
@@ -28,7 +35,9 @@ public class OnyxiaUserProvider {
         Pattern includedGroupPattern = getPrecompiledIncludedGroupPattern(region);
 
         if (!region.getServices().isSingleNamespace()) {
-            userProvider.getUser(region).getGroups().stream()
+            userProvider
+                    .getUser(region)
+                    .getGroups()
                     .forEach(
                             group -> {
                                 String projectBaseName =

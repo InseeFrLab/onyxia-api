@@ -16,9 +16,14 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty(name = "event.logging.enabled", havingValue = "true")
 public class LogEventListener {
 
-    @Autowired private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
     private static final Logger LOGGER = LoggerFactory.getLogger("onyxia.sh.events");
+
+    @Autowired
+    public LogEventListener(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     @Async
     @EventListener

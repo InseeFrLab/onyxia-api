@@ -5,6 +5,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.zafarkhaja.semver.Version;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.model.catalog.Config.Config;
 import fr.insee.onyxia.model.catalog.Pkg;
@@ -14,8 +15,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
@@ -26,6 +28,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 public class CatalogLoader {
@@ -57,6 +60,7 @@ public class CatalogLoader {
                                     .getInputStream(),
                             UTF_8);
             Repository repository = mapperHelm.readValue(reader, Repository.class);
+            // Remove excluded services from list
             repository
                     .getEntries()
                     .entrySet()
@@ -67,30 +71,67 @@ public class CatalogLoader {
                                                     excludedChart ->
                                                             excludedChart.equalsIgnoreCase(
                                                                     entry.getKey())));
+            // For each service, filter the multiple versions if needed then refresh remaining
+            // versions
             repository.getEntries().values().parallelStream()
                     .forEach(
-                            entry -> {
-                                entry.parallelStream()
-                                        .forEach(
-                                                pkg -> {
-                                                    try {
-                                                        refreshPackage(cw, pkg);
-                                                    } catch (CatalogLoaderException
-                                                            | IOException e) {
-                                                        LOGGER.info("Exception occurred", e);
-                                                    }
-                                                });
+                            charts -> {
+                                epurateChartsList(charts, cw);
+                                refreshChartsList(charts, cw);
                             });
-            repository.setPackages(
-                    repository.getEntries().values().stream()
-                            .map(List::getFirst)
-                            .filter(chart -> "application".equalsIgnoreCase(chart.getType()))
-                            .collect(Collectors.toList()));
             cw.setCatalog(repository);
             cw.setLastUpdateTime(System.currentTimeMillis());
         } catch (Exception e) {
             LOGGER.info("Exception occurred", e);
         }
+    }
+
+    private void epurateChartsList(List<Chart> charts, CatalogWrapper cw) {
+        if (cw.getMultipleServicesMode() == CatalogWrapper.MultipleServicesMode.ALL) {
+            return;
+        }
+        int i = 0;
+        Optional<Version> previousVersion = Optional.empty();
+        Iterator<Chart> iterator = charts.iterator();
+        while (iterator.hasNext()) {
+            Chart chart = iterator.next();
+            if (cw.getMultipleServicesMode() == CatalogWrapper.MultipleServicesMode.LATEST
+                    && i > 0) {
+                iterator.remove();
+            } else if (cw.getMultipleServicesMode()
+                            == CatalogWrapper.MultipleServicesMode.MAX_NUMBER
+                    && i >= cw.getMaxNumberOfVersions()) {
+                iterator.remove();
+            } else if (cw.getMultipleServicesMode()
+                    == CatalogWrapper.MultipleServicesMode.SKIP_PATCHES) {
+                Optional<Version> version = Version.tryParse(chart.getVersion());
+                if (version.isPresent()
+                        && previousVersion.isPresent()
+                        && versionsAreSameMajorAndMinor(version.get(), previousVersion.get())) {
+                    iterator.remove();
+                }
+                previousVersion = version;
+            }
+
+            i++;
+        }
+    }
+
+    private boolean versionsAreSameMajorAndMinor(Version version, Version previousVersion) {
+        return version.isSameMajorVersionAs(previousVersion)
+                && version.isSameMinorVersionAs(previousVersion);
+    }
+
+    private void refreshChartsList(List<Chart> charts, CatalogWrapper cw) {
+        charts.parallelStream()
+                .forEach(
+                        pkg -> {
+                            try {
+                                refreshPackage(cw, pkg);
+                            } catch (CatalogLoaderException | IOException e) {
+                                LOGGER.info("Exception occurred", e);
+                            }
+                        });
     }
 
     private void refreshPackage(CatalogWrapper cw, Pkg pkg)
@@ -99,11 +140,26 @@ public class CatalogLoader {
             throw new IllegalArgumentException("Package should be of type Chart");
         }
 
-        // TODO : support multiple urls
-        Resource resource =
-                resourceLoader
-                        .getResource(cw.getLocation() + "/")
-                        .createRelative(chart.getUrls().stream().findFirst().get());
+        LOGGER.info(
+                "Refreshing package {} version {} in catalog {}",
+                pkg.getName(),
+                pkg.getVersion(),
+                cw.getName());
+
+        // One day we should take a look at the other URLs
+        String chartUrl =
+                chart.getUrls().stream()
+                        .findFirst()
+                        .orElseThrow(
+                                () ->
+                                        new CatalogLoaderException(
+                                                "Package " + cw.getName() + " has no urls"));
+        String absoluteUrl = chartUrl;
+        if (!(chartUrl.startsWith("http") || chartUrl.startsWith("https"))) {
+            absoluteUrl = StringUtils.applyRelativePath(cw.getLocation() + "/", chartUrl);
+        }
+
+        Resource resource = resourceLoader.getResource(absoluteUrl);
 
         try (InputStream inputStream = resource.getInputStream()) {
             extractDataFromTgz(inputStream, chart);

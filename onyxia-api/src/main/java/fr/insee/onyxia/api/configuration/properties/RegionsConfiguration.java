@@ -32,7 +32,12 @@ public class RegionsConfiguration {
     private static final Logger LOGGER = LoggerFactory.getLogger(RegionsConfiguration.class);
     private String regions;
     private List<Region> resolvedRegions;
-    @Autowired private ObjectMapper mapper;
+    private final ObjectMapper mapper;
+
+    @Autowired
+    public RegionsConfiguration(ObjectMapper mapper) {
+        this.mapper = mapper;
+    }
 
     @PostConstruct
     public void load() throws Exception {
@@ -44,27 +49,24 @@ public class RegionsConfiguration {
                                 .getAuthenticationMode()
                                 .equals(Region.Services.AuthenticationMode.SERVICEACCOUNT)) {
                             LOGGER.warn(
-                                    "Using serviceAccount authentication for region "
-                                            + region.getId()
-                                            + ". Onyxia will deploy services using it's own global permissions, this may be a security issue.");
+                                    "Using serviceAccount authentication for region {}. Onyxia will deploy services using it's own global permissions, this may be a security issue.",
+                                    region.getId());
                         }
 
                         if (region.getServices()
                                 .getAuthenticationMode()
                                 .equals(Region.Services.AuthenticationMode.IMPERSONATE)) {
                             LOGGER.info(
-                                    "Using impersonation authentication for region "
-                                            + region.getId()
-                                            + ".");
+                                    "Using impersonation authentication for region {}.",
+                                    region.getId());
                         }
 
                         if (region.getServices()
                                 .getAuthenticationMode()
                                 .equals(Region.Services.AuthenticationMode.TOKEN_PASSTHROUGH)) {
                             LOGGER.info(
-                                    "Using token passthrough authentication for region "
-                                            + region.getId()
-                                            + ". User token will be used by Onyxia to interact with the API Server.");
+                                    "Using token passthrough authentication for region {}. User token will be used by Onyxia to interact with the API Server.",
+                                    region.getId());
                         }
                     }
                 });
@@ -77,7 +79,7 @@ public class RegionsConfiguration {
     }
 
     public Region getDefaultRegion() {
-        return resolvedRegions.get(0);
+        return resolvedRegions.getFirst();
     }
 
     public String getRegions() {

@@ -1,20 +1,16 @@
 package fr.insee.onyxia.api.configuration.kubernetes;
 
-import fr.insee.onyxia.api.configuration.SecurityConfig;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.region.Region;
 import io.github.inseefrlab.helmwrapper.configuration.HelmConfiguration;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService;
 import io.github.inseefrlab.helmwrapper.service.HelmRepoService;
 import io.github.inseefrlab.helmwrapper.service.HelmVersionService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class HelmClientProvider {
-
-    @Autowired private final SecurityConfig securityConfig = new SecurityConfig();
 
     @Bean
     public HelmRepoService defaultHelmRepoService() {

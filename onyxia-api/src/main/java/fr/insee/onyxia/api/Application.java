@@ -19,7 +19,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableAsync(proxyTargetClass = true)
 public class Application {
 
-    // logger
     private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
 
     public static void main(String[] args) {

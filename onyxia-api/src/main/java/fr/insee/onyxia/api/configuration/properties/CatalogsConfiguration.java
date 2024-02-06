@@ -29,12 +29,16 @@ public class CatalogsConfiguration {
 
     private List<CatalogWrapper> resolvedCatalogs;
 
-    @Autowired private ObjectMapper mapper;
+    private ObjectMapper mapper;
+
+    @Autowired
+    public CatalogsConfiguration(ObjectMapper mapper) {
+        this.mapper = mapper;
+    }
 
     @PostConstruct
     public void load() throws Exception {
         resolvedCatalogs = Arrays.asList(mapper.readValue(catalogs, CatalogWrapper[].class));
-        System.out.println("Serving " + resolvedCatalogs.size() + " catalogs");
     }
 
     public List<CatalogWrapper> getResolvedCatalogs() {
