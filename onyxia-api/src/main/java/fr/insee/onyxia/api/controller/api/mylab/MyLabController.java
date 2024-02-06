@@ -49,7 +49,6 @@ public class MyLabController {
                     "List the services installed in a namespace. With a Kubernetes backend, utilize Helm to list all installed services in a namespace.",
             parameters = {
                 @Parameter(
-                        required = false,
                         name = "ONYXIA-PROJECT",
                         description =
                                 "Project associated with the namespace, defaults to user project.",
@@ -61,7 +60,6 @@ public class MyLabController {
                                         description = "Generated project id.",
                                         example = "project-id-example")),
                 @Parameter(
-                        required = false,
                         name = "groupId",
                         description = "Deprectated.",
                         deprecated = true,
@@ -93,7 +91,6 @@ public class MyLabController {
                     "Get the description of an installed service in the namespace. With Kubernetes backend, an installed service can be seen as a Helm chart. Its unique identifier will be the release name on the namespace.",
             parameters = {
                 @Parameter(
-                        required = false,
                         name = "ONYXIA-PROJECT",
                         description =
                                 "Project associated with the namespace, defaults to user project.",
@@ -129,7 +126,6 @@ public class MyLabController {
                     "Get the logs of a task in an installed service. With Kubernetes backend, it can be seen as the logs of a pod in the service.",
             parameters = {
                 @Parameter(
-                        required = false,
                         name = "ONYXIA-PROJECT",
                         description =
                                 "Project associated with the namespace, defaults to user project.",
@@ -170,7 +166,6 @@ public class MyLabController {
                     "Delete an installed service launched through Onyxia on the namespace given the path, or delete *ALL* installed services on the namespace on bulk deletes. It will prioritize the bulk parameter.",
             parameters = {
                 @Parameter(
-                        required = false,
                         name = "ONYXIA-PROJECT",
                         description =
                                 "Project associated with the namespace, defaults to user project.",
@@ -184,13 +179,11 @@ public class MyLabController {
                 @Parameter(
                         name = "path",
                         description = "Path to the installed service in that namespace.",
-                        required = false,
                         in = ParameterIn.QUERY),
                 @Parameter(
                         name = "bulk",
                         description =
                                 "Wheather to delete all services in a namespace, if set to true, or to look at path.",
-                        required = false,
                         in = ParameterIn.QUERY)
             })
     @DeleteMapping("/app")
@@ -213,7 +206,6 @@ public class MyLabController {
                     "Launch a service package through Onyxia in the namespace, given its catalog, package and configurations out of the available services in this Onyxia instance. More information of available catalogs and packages can be found in the public endpoints.",
             parameters = {
                 @Parameter(
-                        required = false,
                         name = "ONYXIA-PROJECT",
                         description =
                                 "Project associated with the namespace, defaults to user project.",
