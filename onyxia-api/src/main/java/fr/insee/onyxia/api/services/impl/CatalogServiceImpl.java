@@ -2,6 +2,7 @@ package fr.insee.onyxia.api.services.impl;
 
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.configuration.Catalogs;
+import fr.insee.onyxia.api.services.CatalogRestrictionService;
 import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.helm.Chart;

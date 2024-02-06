@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
+import fr.insee.onyxia.api.services.CatalogRestrictionService;
 import fr.insee.onyxia.model.User;
 import java.util.List;
 import java.util.Map;
@@ -16,13 +17,12 @@ class CatalogRestrictionServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new CatalogRestrictionService();
+        service = new CatalogRestrictionServiceImpl();
     }
 
     @Test
     void shouldReturnAllCatalogsWhenNoRestrictions() {
         CatalogWrapper catalogWrapper = catalogWithRestriction("1");
-        CatalogRestrictionService service = new CatalogRestrictionService();
         boolean result =
                 service.isCatalogVisibleToUser(getUserWithAttributes(Map.of()), catalogWrapper);
         assertTrue(result);
@@ -31,7 +31,6 @@ class CatalogRestrictionServiceTest {
     @Test
     void shouldReturnAllCatalogsWhenNoRestrictionsAndNoUser() {
         CatalogWrapper catalogWrapper = catalogWithRestriction("1");
-        CatalogRestrictionService service = new CatalogRestrictionService();
         boolean result = service.isCatalogVisibleToUser(null, catalogWrapper);
         assertTrue(result);
     }
@@ -110,8 +109,6 @@ class CatalogRestrictionServiceTest {
         restrictionAttribute.setMatches(match);
         restrictions.setUserAttribute(restrictionAttribute);
 
-        CatalogRestrictionService service = new CatalogRestrictionService();
-
         var catalog = catalogWithRestriction("0", restrictions);
         boolean result =
                 service.isCatalogVisibleToUser(
@@ -132,7 +129,6 @@ class CatalogRestrictionServiceTest {
         restrictionAttribute.setMatches(match);
         restrictions.setUserAttribute(restrictionAttribute);
 
-        CatalogRestrictionService service = new CatalogRestrictionService();
         var catalog = catalogWithRestriction("0", restrictions);
         boolean result =
                 service.isCatalogVisibleToUser(
@@ -153,7 +149,6 @@ class CatalogRestrictionServiceTest {
         restrictionAttribute.setMatches(match);
         restrictions.setUserAttribute(restrictionAttribute);
 
-        CatalogRestrictionService service = new CatalogRestrictionService();
         var catalog = catalogWithRestriction("0", restrictions);
         boolean result =
                 service.isCatalogVisibleToUser(
@@ -174,7 +169,6 @@ class CatalogRestrictionServiceTest {
         restrictionAttribute.setMatches(match);
         restrictions.setUserAttribute(restrictionAttribute);
 
-        CatalogRestrictionService service = new CatalogRestrictionService();
         var catalog = catalogWithRestriction("0", restrictions);
         boolean result =
                 service.isCatalogVisibleToUser(
@@ -195,7 +189,6 @@ class CatalogRestrictionServiceTest {
         restrictionAttribute.setMatches(match);
         restrictions.setUserAttribute(restrictionAttribute);
 
-        CatalogRestrictionService service = new CatalogRestrictionService();
         var catalog = catalogWithRestriction("0", restrictions);
         boolean result =
                 service.isCatalogVisibleToUser(
@@ -216,7 +209,6 @@ class CatalogRestrictionServiceTest {
         restrictionAttribute.setMatches(match);
         restrictions.setUserAttribute(restrictionAttribute);
 
-        CatalogRestrictionService service = new CatalogRestrictionService();
         var catalog = catalogWithRestriction("0", restrictions);
         boolean result =
                 service.isCatalogVisibleToUser(
@@ -237,7 +229,6 @@ class CatalogRestrictionServiceTest {
         restrictionAttribute.setMatches(match);
         restrictions.setUserAttribute(restrictionAttribute);
 
-        CatalogRestrictionService service = new CatalogRestrictionService();
         var catalog = catalogWithRestriction("0", restrictions);
         boolean result =
                 service.isCatalogVisibleToUser(
@@ -258,7 +249,6 @@ class CatalogRestrictionServiceTest {
         restrictionAttribute.setMatches(match);
         restrictions.setUserAttribute(restrictionAttribute);
 
-        CatalogRestrictionService service = new CatalogRestrictionService();
         var catalog = catalogWithRestriction("0", restrictions);
         boolean result =
                 service.isCatalogVisibleToUser(

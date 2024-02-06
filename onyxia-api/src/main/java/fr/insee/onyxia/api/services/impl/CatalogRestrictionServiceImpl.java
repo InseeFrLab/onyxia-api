@@ -1,6 +1,7 @@
 package fr.insee.onyxia.api.services.impl;
 
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
+import fr.insee.onyxia.api.services.CatalogRestrictionService;
 import fr.insee.onyxia.model.User;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -9,10 +10,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CatalogRestrictionService {
+public class CatalogRestrictionServiceImpl implements CatalogRestrictionService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CatalogRestrictionService.class);
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(CatalogRestrictionServiceImpl.class);
 
+    @Override
     public boolean isCatalogVisibleToUser(User user, CatalogWrapper catalog) {
         var catalogRestrictions = catalog.getRestrictions();
         if (catalogRestrictions.isEmpty()) {
