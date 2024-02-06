@@ -57,11 +57,7 @@ public class CatalogController {
             })
     @GetMapping("{catalogId}")
     public CatalogWrapper getCatalogById(@PathVariable String catalogId) {
-        CatalogWrapper wrapper = catalogService.getCatalogById(catalogId);
-        if (wrapper == null) {
-            throw new NotFoundException();
-        }
-        return wrapper;
+        return catalogService.getCatalogById(catalogId).orElseThrow(NotFoundException::new);
     }
 
     @Operation(

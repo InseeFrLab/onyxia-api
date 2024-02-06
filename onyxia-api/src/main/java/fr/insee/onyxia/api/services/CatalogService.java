@@ -20,7 +20,11 @@ public interface CatalogService {
 
     Catalogs getCatalogs(Region region, User user);
 
-    CatalogWrapper getCatalogById(String catalogId);
+    default Optional<CatalogWrapper> getCatalogById(String catalogId) {
+        return getCatalogById(catalogId, null);
+    }
+
+    Optional<CatalogWrapper> getCatalogById(String catalogId, User user);
 
     Optional<Chart> getPackage(String catalogId, String packageName);
 

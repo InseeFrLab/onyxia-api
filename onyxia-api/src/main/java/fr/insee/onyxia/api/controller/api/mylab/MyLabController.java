@@ -252,7 +252,9 @@ public class MyLabController {
             catalogId = requestDTO.getCatalogId();
         }
         User user = userProvider.getUser(region);
-        CatalogWrapper catalog = catalogService.getCatalogById(catalogId);
+        CatalogWrapper catalog =
+                catalogService.getCatalogById(catalogId, user).orElseThrow(NotFoundException::new);
+
         Pkg pkg =
                 catalog.getCatalog()
                         .getPackageByName(requestDTO.getPackageName())
