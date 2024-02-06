@@ -29,6 +29,14 @@ class CatalogRestrictionServiceTest {
     }
 
     @Test
+    void shouldReturnAllCatalogsWhenNoRestrictionsAndNoUser() {
+        CatalogWrapper catalogWrapper = catalogWithRestriction("1");
+        CatalogRestrictionService service = new CatalogRestrictionService();
+        boolean result = service.isCatalogVisibleToUser(null, catalogWrapper);
+        assertTrue(result);
+    }
+
+    @Test
     void shouldReturnNoCatalogsWhenRestrictionsDontMatch() {
         String key = "KEY";
         String match = "match-this";
@@ -45,6 +53,24 @@ class CatalogRestrictionServiceTest {
         boolean result =
                 service.isCatalogVisibleToUser(
                         getUserWithAttributes(Map.of(key, userAttributeValue)), catalog);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void shouldReturnNoCatalogsWhenRestrictionsAndNoUser() {
+        String key = "KEY";
+        String match = "match-this";
+
+        var restrictions = new CatalogWrapper.CatalogRestrictions();
+        var restrictionAttribute = new CatalogWrapper.CatalogRestrictions.UserAttribute();
+        restrictionAttribute.setKey(key);
+        restrictionAttribute.setMatches(match);
+        restrictions.setUserAttribute(restrictionAttribute);
+
+        CatalogWrapper catalog = catalogWithRestriction("0", restrictions);
+
+        boolean result = service.isCatalogVisibleToUser(null, catalog);
 
         assertFalse(result);
     }
