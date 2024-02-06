@@ -3,6 +3,7 @@ package fr.insee.onyxia.api.configuration;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.insee.onyxia.model.catalog.CatalogStatus;
+import fr.insee.onyxia.model.helm.Repository;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.List;
 public class CatalogWrapper {
 
     @Schema(description = "Catalog")
-    private fr.insee.onyxia.model.catalog.CatalogWrapper catalog;
+    private fr.insee.onyxia.model.catalog.CatalogWrapper catalog = new Repository();
 
     @Schema(description = "Catalog id")
     private String id;
