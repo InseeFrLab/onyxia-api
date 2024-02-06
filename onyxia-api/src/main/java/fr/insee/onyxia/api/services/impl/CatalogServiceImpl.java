@@ -8,22 +8,20 @@ import fr.insee.onyxia.model.helm.Chart;
 import fr.insee.onyxia.model.region.Region;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Pattern;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CatalogServiceImpl implements CatalogService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CatalogServiceImpl.class);
-
     private final Catalogs catalogs;
+    private final CatalogRestrictionService catalogRestrictionService;
 
     @Autowired
-    public CatalogServiceImpl(Catalogs catalogs) {
+    public CatalogServiceImpl(
+            Catalogs catalogs, CatalogRestrictionService catalogRestrictionService) {
         this.catalogs = catalogs;
+        this.catalogRestrictionService = catalogRestrictionService;
     }
 
     @Override
@@ -35,49 +33,11 @@ public class CatalogServiceImpl implements CatalogService {
     public Catalogs getCatalogs(Region region, User user) {
         return new Catalogs(
                 catalogs.getCatalogs().stream()
-                        .filter(catalog -> isCatalogVisibleToUser(user, catalog))
+                        .filter(
+                                catalog ->
+                                        catalogRestrictionService.isCatalogVisibleToUser(
+                                                user, catalog))
                         .toList());
-    }
-
-    private boolean isCatalogVisibleToUser(User user, CatalogWrapper catalog) {
-        var catalogRestrictions = catalog.getRestrictions();
-        if (catalogRestrictions.isEmpty()) {
-            return true;
-        }
-
-        // As of now the only restrictions possible are related to users
-        if (user == null) {
-            return false;
-        }
-
-        return catalogRestrictions.stream()
-                .allMatch(
-                        restriction -> {
-                            if (restriction.getUserAttribute() == null) return false;
-
-                            String key = restriction.getUserAttribute().getKey();
-                            Pattern regex = restriction.getUserAttribute().getMatches();
-
-                            if (user.getAttributes().containsKey(key)) {
-
-                                Object attribute = user.getAttributes().get(key);
-                                if (attribute instanceof List<?> claims) {
-                                    return claims.stream()
-                                            .filter(String.class::isInstance)
-                                            .map(String.class::cast)
-                                            .anyMatch(
-                                                    claimValue ->
-                                                            regex.matcher(claimValue).matches());
-                                } else if (attribute instanceof String claimValue) {
-                                    return regex.matcher(claimValue).matches();
-                                } else if (attribute instanceof Boolean claimValue) {
-                                    return claimValue.toString().equalsIgnoreCase(regex.pattern());
-                                }
-                                LOGGER.info("claim {} was found, but type is not supported", key);
-                            }
-
-                            return false;
-                        });
     }
 
     @Override
