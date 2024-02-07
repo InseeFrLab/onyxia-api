@@ -14,4 +14,4 @@ jobs:
 
       # Reads labels from .github/labels.yml
       - name: Run Labeler
-        uses: crazy-max/ghaction-github-labeler@v4
+        uses: crazy-max/ghaction-github-labeler@v5
