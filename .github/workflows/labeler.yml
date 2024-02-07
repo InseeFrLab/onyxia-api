@@ -1,0 +1,19 @@
+name: Labeler
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  labeler:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v3
+
+      # Reads labels from .github/labels.yml
+      - name: Run Labeler
+        uses: crazy-max/ghaction-github-labeler@v4
+        with:
+          skip-delete: true
