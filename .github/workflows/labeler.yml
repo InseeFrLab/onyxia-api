@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - release-drafter-version
 
 jobs:
   labeler:
@@ -15,5 +16,3 @@ jobs:
       # Reads labels from .github/labels.yml
       - name: Run Labeler
         uses: crazy-max/ghaction-github-labeler@v4
-        with:
-          skip-delete: true
