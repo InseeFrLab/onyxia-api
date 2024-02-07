@@ -28,9 +28,6 @@
 - name: enhancement
   description: New feature or request
   color: a2eeef
-- name: github_actions
-  description: Pull requests that update GitHub Actions code
-  color: "000000"
 - name: help wanted
   description: Extra attention is needed
   color: 008672
@@ -49,7 +46,7 @@
 - name: removal
   description: Removals and Deprecations
   color: 9ae7ea
-- name: 'helm-wrapper'
+- name: "helm-wrapper"
   description: Related to the helm-wrapper library
   color: 10f9fd
 - name: testing
