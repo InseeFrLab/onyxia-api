@@ -1,5 +1,7 @@
 package fr.insee.onyxia.api.configuration;
 
+import static fr.insee.onyxia.model.helm.Repository.TYPE_HELM;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.insee.onyxia.model.catalog.CatalogStatus;
@@ -7,6 +9,7 @@ import fr.insee.onyxia.model.helm.Repository;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Schema(description = "A catalog with its metadatas")
@@ -40,7 +43,7 @@ public class CatalogWrapper {
     private String scm;
 
     @Schema(description = "helm or catalog will not be considered as enabled")
-    private String type;
+    private String type = TYPE_HELM;
 
     @Schema(description = "name of the charts that will not be fetch or reload")
     private List<String> excludedCharts = new ArrayList<>();
@@ -59,6 +62,12 @@ public class CatalogWrapper {
 
     @Schema(description = "Should this catalog be visible in user context ? Project context ?")
     private CatalogVisibility visible = new CatalogVisibility();
+
+    @Schema(
+            description =
+                    "Users must meet the restrictions in order to view and launch services from catalog")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private List<CatalogRestrictions> restrictions = new ArrayList<>();
 
     @Schema(description = "If a chart has multiple versions, which one(s) to keep")
     private MultipleServicesMode multipleServicesMode = MultipleServicesMode.LATEST;
@@ -228,6 +237,48 @@ public class CatalogWrapper {
 
     public void setMaxNumberOfVersions(int maxNumberOfVersions) {
         this.maxNumberOfVersions = maxNumberOfVersions;
+    }
+
+    public List<CatalogRestrictions> getRestrictions() {
+        return restrictions;
+    }
+
+    public void setRestrictions(List<CatalogRestrictions> restrictions) {
+        this.restrictions = restrictions;
+    }
+
+    public static class CatalogRestrictions {
+
+        private UserAttribute userAttribute;
+
+        public UserAttribute getUserAttribute() {
+            return userAttribute;
+        }
+
+        public void setUserAttribute(UserAttribute userAttribute) {
+            this.userAttribute = userAttribute;
+        }
+
+        public static class UserAttribute {
+            private String key;
+            private Pattern matches;
+
+            public String getKey() {
+                return key;
+            }
+
+            public void setKey(String key) {
+                this.key = key;
+            }
+
+            public Pattern getMatches() {
+                return matches;
+            }
+
+            public void setMatches(String matches) {
+                this.matches = Pattern.compile(matches);
+            }
+        }
     }
 
     public static class CatalogVisibility {
