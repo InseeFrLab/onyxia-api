@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public class CreateServiceDTO {
     @Schema(
             description = "Catalog where the package of the service is taken from.",
-            required = false,
             defaultValue = "internal")
     String catalogId;
 
@@ -20,13 +19,10 @@ public class CreateServiceDTO {
 
     @Schema(
             description =
-                    "Version of the helm package, passe la version dans la création, si pas null",
-            required = false)
+                    "Version of the helm package, passe la version dans la création, si pas null")
     String packageVersion;
 
-    @Schema(
-            description = "A chosen name for the service, si null un nom est généré par helm",
-            required = false)
+    @Schema(description = "A chosen name for the service, si null un nom est généré par helm")
     String name;
 
     @Schema(description = "Contenu du values.yaml", required = true)
@@ -34,7 +30,6 @@ public class CreateServiceDTO {
 
     @Schema(
             description = "when true nothing is run (mode dry run de helm) faux par défaut",
-            required = false,
             defaultValue = "false")
     boolean dryRun = false;
 

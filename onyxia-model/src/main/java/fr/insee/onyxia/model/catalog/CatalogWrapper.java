@@ -10,7 +10,7 @@ import java.util.Optional;
 public abstract class CatalogWrapper {
 
     @Schema(description = "This entries are those from a standard helm repository")
-    private Map<String, List<Chart>> entries;
+    private Map<String, List<Chart>> entries = Map.of();
 
     public Optional<Chart> getPackageByName(String name) {
         return entries.get(name).stream().findFirst();

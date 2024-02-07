@@ -40,7 +40,6 @@ public class OnboardingController {
                     "create or replace the namespace of the user or the namespace of a group if the user is in the requested group and the according rbac policies. with the group prefix / user prefix of the region",
             parameters = {
                 @Parameter(
-                        required = false,
                         name = "ONYXIA-REGION",
                         description =
                                 "The region used by the user, if not provided default to the first region configured.",
@@ -82,8 +81,7 @@ public class OnboardingController {
                     "Specification on which namespace to create. If group is provided, create a group namespace, otherwise create the user namespace.")
     public static class OnboardingRequest {
 
-        @Schema(required = false)
-        private String group;
+        @Schema private String group;
 
         public String getGroup() {
             return group;
