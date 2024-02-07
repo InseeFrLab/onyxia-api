@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - test-draft-releaser
 
 jobs:
   labeler:
