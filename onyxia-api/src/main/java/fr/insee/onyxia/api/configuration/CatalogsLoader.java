@@ -1,6 +1,7 @@
 package fr.insee.onyxia.api.configuration;
 
 import fr.insee.onyxia.api.configuration.properties.CatalogsConfiguration;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -14,12 +15,9 @@ public class CatalogsLoader {
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
-    public Catalogs catalogs(
-            CatalogFilter catalogFilter, CatalogsConfiguration catalogsConfiguration) {
-        Catalogs catalogs = new Catalogs();
-        catalogs.setCatalogs(catalogsConfiguration.getResolvedCatalogs());
-        catalogs.setCatalogs(catalogFilter.filterCatalogs(catalogs.getCatalogs()));
-        LOGGER.info("Serving {} catalogs", catalogs.getCatalogs().size());
-        return catalogs;
+    public Catalogs catalogs(CatalogsConfiguration catalogsConfiguration) {
+        List<CatalogWrapper> resolvedCatalogs = catalogsConfiguration.getResolvedCatalogs();
+        LOGGER.info("Serving {} catalogs", resolvedCatalogs.size());
+        return new Catalogs(resolvedCatalogs);
     }
 }
