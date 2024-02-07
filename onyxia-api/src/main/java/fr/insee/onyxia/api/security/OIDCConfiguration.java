@@ -62,7 +62,7 @@ public class OIDCConfiguration {
 
     private final HttpRequestUtils httpRequestUtils;
 
-    private Map<String, String> extraParams = new HashMap<>();
+    private Map<String, String> extraQueryParams = new HashMap<>();
 
     @Autowired
     public OIDCConfiguration(HttpRequestUtils httpRequestUtils) {
@@ -214,12 +214,12 @@ public class OIDCConfiguration {
         this.clientID = clientID;
     }
 
-    public Map<String, String> getExtraParams() {
-        return extraParams;
+    public Map<String, String> getExtraQueryParams() {
+        return extraQueryParams;
     }
 
-    public void setExtraParams(Map<String, String> extraParams) {
-        this.extraParams = extraParams;
+    public void setExtraQueryParams(Map<String, String> extraQueryParams) {
+        this.extraQueryParams = extraQueryParams;
     }
 
     @Bean
