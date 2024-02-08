@@ -6,8 +6,6 @@ import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.api.services.utils.HttpRequestUtils;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.region.Region;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -60,9 +58,10 @@ public class OIDCConfiguration {
     @Value("${oidc.clientID}")
     private String clientID;
 
-    private final HttpRequestUtils httpRequestUtils;
+    @Value("${oidc.extra-query-params}")
+    private String extraQueryParams;
 
-    private Map<String, String> extraQueryParams = new HashMap<>();
+    private final HttpRequestUtils httpRequestUtils;
 
     @Autowired
     public OIDCConfiguration(HttpRequestUtils httpRequestUtils) {
@@ -214,11 +213,11 @@ public class OIDCConfiguration {
         this.clientID = clientID;
     }
 
-    public Map<String, String> getExtraQueryParams() {
+    public String getExtraQueryParams() {
         return extraQueryParams;
     }
 
-    public void setExtraQueryParams(Map<String, String> extraQueryParams) {
+    public void setExtraQueryParams(String extraQueryParams) {
         this.extraQueryParams = extraQueryParams;
     }
 
