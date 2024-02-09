@@ -1095,6 +1095,8 @@ public class Region {
         private String issuerURI;
         private String clientID;
 
+        private String extraQueryParams;
+
         public String getIssuerURI() {
             return issuerURI;
         }
@@ -1109,6 +1111,14 @@ public class Region {
 
         public void setClientID(String clientID) {
             this.clientID = clientID;
+        }
+
+        public String getExtraQueryParams() {
+            return extraQueryParams;
+        }
+
+        public void setExtraQueryParams(String extraQueryParams) {
+            this.extraQueryParams = extraQueryParams;
         }
     }
 
