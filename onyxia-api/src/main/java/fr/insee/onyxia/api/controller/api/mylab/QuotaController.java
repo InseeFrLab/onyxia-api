@@ -51,7 +51,6 @@ public class QuotaController {
                     "Obtain both the quota limit for a namespace and the current quota usage, if quota limits are enabled on Onyxia.",
             parameters = {
                 @Parameter(
-                        required = false,
                         name = "ONYXIA-PROJECT",
                         description =
                                 "Project associated with the namespace, defaults to user project.",
@@ -97,7 +96,6 @@ public class QuotaController {
                     "Change the quota for a namespace if the quota changing option is enabled.",
             parameters = {
                 @Parameter(
-                        required = false,
                         name = "ONYXIA-PROJECT",
                         description =
                                 "Project associated with the namespace, defaults to user project.",
@@ -129,7 +127,6 @@ public class QuotaController {
                     "Reset the quota for a namespace to the default value if the quota changing option is enabled.",
             parameters = {
                 @Parameter(
-                        required = false,
                         name = "ONYXIA-PROJECT",
                         description =
                                 "Project associated with the namespace, defaults to user project.",

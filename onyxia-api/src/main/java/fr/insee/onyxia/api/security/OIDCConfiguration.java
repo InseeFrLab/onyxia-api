@@ -58,6 +58,9 @@ public class OIDCConfiguration {
     @Value("${oidc.clientID}")
     private String clientID;
 
+    @Value("${oidc.extra-query-params}")
+    private String extraQueryParams;
+
     private final HttpRequestUtils httpRequestUtils;
 
     @Autowired
@@ -208,6 +211,14 @@ public class OIDCConfiguration {
 
     public void setClientID(String clientID) {
         this.clientID = clientID;
+    }
+
+    public String getExtraQueryParams() {
+        return extraQueryParams;
+    }
+
+    public void setExtraQueryParams(String extraQueryParams) {
+        this.extraQueryParams = extraQueryParams;
     }
 
     @Bean

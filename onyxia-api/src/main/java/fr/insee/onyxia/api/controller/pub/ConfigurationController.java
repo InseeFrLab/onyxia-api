@@ -53,6 +53,7 @@ public class ConfigurationController {
         if (oidcConfiguration != null) {
             OIDCConfiguration.setIssuerURI(oidcConfiguration.getIssuerUri());
             OIDCConfiguration.setClientID(oidcConfiguration.getClientID());
+            OIDCConfiguration.setExtraQueryParams(oidcConfiguration.getExtraQueryParams());
             appInfo.setOidcConfiguration(OIDCConfiguration);
         }
         return appInfo;
