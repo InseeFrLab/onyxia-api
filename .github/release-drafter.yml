@@ -1,4 +1,81 @@
+name-template: 'v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+
+categories:
+  - title: ":boom: Breaking Changes"
+    label: "breaking"
+  - title: ":beetle: Fixes"
+    label: "bug"
+  - title: ":rocket: Features"
+    label: "enhancement"
+  - title: ":fire: Removals and Deprecations"
+    label: "removal"
+  - title: ":racehorse: Performance"
+    label: "performance"
+  - title: ":rotating_light: Testing"
+    label: "testing"
+  - title: ":construction_worker: Continuous Integration"
+    label: "ci"
+  - title: ":books: Documentation"
+    label: "documentation"
+  - title: ":hammer: Refactoring"
+    label: "refactoring"
+  - title: ":lipstick: Style"
+    label: "style"
+  - title: ":gift: Helm wrapper"
+    label: "helm-wrapper"
+  - title: ":package: Dependencies"
+    labels:
+      - "dependencies"
+      - "build"
+
+autolabeler:
+  - label: 'documentation'
+    files:
+      - 'README.md'
+      - 'docs/**'
+  - label: 'bug'
+    branch:
+      - '/fix\/.+/'
+    title:
+      - '/fix/i'
+  - label: 'enhancement'
+    branch:
+      - '/feat\/.+/'
+  - label: 'refactoring'
+    branch:
+      - '/refactor\/.+/'
+    title:
+      - '/^refactor/i'
+  - label: 'testing'
+    branch:
+      - '/test\/.+/'
+  - label: 'breaking'
+    title:
+      - '/breaking change/i'
+  - label: 'ci'
+    files:
+      - '.github/*'
+  - label: 'helm-wrapper'
+    files:
+      - 'helm-wrapper/**'
+  - label: 'dependencies'
+    files: 
+      - '**/pom.xml'
+
 template: |
-  ## What’s Changed
+  ## Changes
 
   $CHANGES
+
+version-resolver:
+  major:
+    labels:
+      - 'major'
+  minor:
+    labels:
+      - 'minor'
+  patch:
+    labels:
+      - 'patch'
+  default: minor

@@ -10,7 +10,6 @@ import fr.insee.onyxia.model.catalog.Config.Property.XOnyxia;
 import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.helm.Chart;
 import fr.insee.onyxia.model.region.Region;
-import fr.insee.onyxia.model.service.Service;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -42,12 +41,7 @@ public class CatalogController {
                     "List available catalogs and packages for installing in the first Region configuration of this Onyxia API.")
     @GetMapping
     public Catalogs getCatalogs(@Parameter(hidden = true) Region region) {
-        Catalogs filteredCatalogs = new Catalogs();
-        filteredCatalogs.setCatalogs(
-                catalogService.getCatalogs().getCatalogs().stream()
-                        .filter(catalog -> isCatalogEnabled(region, catalog))
-                        .toList());
-        return filteredCatalogs;
+        return catalogService.getCatalogs(region);
     }
 
     @Operation(
@@ -63,11 +57,7 @@ public class CatalogController {
             })
     @GetMapping("{catalogId}")
     public CatalogWrapper getCatalogById(@PathVariable String catalogId) {
-        CatalogWrapper wrapper = catalogService.getCatalogById(catalogId);
-        if (wrapper == null) {
-            throw new NotFoundException();
-        }
-        return wrapper;
+        return catalogService.getCatalogById(catalogId).orElseThrow(NotFoundException::new);
     }
 
     @Operation(
@@ -152,18 +142,6 @@ public class CatalogController {
                 catalogService.getCharts(catalogId, chartName).orElseThrow(NotFoundException::new);
         charts.forEach(this::addCustomOnyxiaProperties);
         return charts;
-    }
-
-    private boolean isCatalogEnabled(Region region, CatalogWrapper catalog) {
-        if (region == null) {
-            return true;
-        }
-
-        if (catalog.getType().equalsIgnoreCase("HELM")) {
-            return region.getServices().getType().equals(Service.ServiceType.KUBERNETES);
-        }
-
-        return false;
     }
 
     private void addCustomOnyxiaProperties(Pkg pkg) {
