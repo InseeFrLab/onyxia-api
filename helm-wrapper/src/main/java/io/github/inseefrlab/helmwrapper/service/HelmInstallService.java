@@ -1,7 +1,5 @@
 package io.github.inseefrlab.helmwrapper.service;
 
-import static io.github.inseefrlab.helmwrapper.utils.Command.safeConcat;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.inseefrlab.helmwrapper.configuration.HelmConfiguration;
 import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
@@ -9,6 +7,11 @@ import io.github.inseefrlab.helmwrapper.model.HelmLs;
 import io.github.inseefrlab.helmwrapper.model.HelmReleaseInfo;
 import io.github.inseefrlab.helmwrapper.utils.Command;
 import io.github.inseefrlab.helmwrapper.utils.HelmReleaseInfoParser;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.zeroturnaround.exec.InvalidExitValueException;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -17,10 +20,8 @@ import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.zeroturnaround.exec.InvalidExitValueException;
+
+import static io.github.inseefrlab.helmwrapper.utils.Command.safeConcat;
 
 /** HelmInstall */
 public class HelmInstallService {
@@ -104,7 +105,7 @@ public class HelmInstallService {
 
     public HelmLs[] listChartInstall(HelmConfiguration configuration, String namespace)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        StringBuilder command = new StringBuilder("helm ls");
+        StringBuilder command = new StringBuilder("helm ls -a");
         if (namespace != null) {
             command.append(" -n ");
             safeConcat(command, namespace);

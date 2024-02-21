@@ -1,11 +1,11 @@
 package io.github.inseefrlab.helmwrapper;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import io.github.inseefrlab.helmwrapper.utils.Command;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 public class UtilsCommandTest {
@@ -20,7 +20,7 @@ public class UtilsCommandTest {
                 " rstudio"
             })
     public void shouldAllowConcatenate(String toConcatenate) {
-        Command.safeConcat(new StringBuilder("helm ls "), toConcatenate);
+        Command.safeConcat(new StringBuilder("helm ls -a"), toConcatenate);
     }
 
     @ParameterizedTest
@@ -41,7 +41,7 @@ public class UtilsCommandTest {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> {
-                    Command.safeConcat(new StringBuilder("helm ls "), toConcatenate);
+                    Command.safeConcat(new StringBuilder("helm ls -a"), toConcatenate);
                 });
     }
 }
