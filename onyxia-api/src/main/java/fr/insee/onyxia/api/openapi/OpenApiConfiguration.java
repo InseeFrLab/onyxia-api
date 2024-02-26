@@ -17,7 +17,7 @@ public class OpenApiConfiguration {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenApiConfiguration.class);
 
-    @Value("${oidc.issuer-uri:}")
+    @Value("${oidc.issuer-uri:#{null}}")
     private String issuerUri;
 
     @Bean
