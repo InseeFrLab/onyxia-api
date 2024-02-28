@@ -20,7 +20,7 @@ public class UtilsCommandTest {
                 " rstudio"
             })
     public void shouldAllowConcatenate(String toConcatenate) {
-        Command.safeConcat(new StringBuilder("helm ls "), toConcatenate);
+        Command.safeConcat(new StringBuilder("helm ls -a"), toConcatenate);
     }
 
     @ParameterizedTest
@@ -41,7 +41,7 @@ public class UtilsCommandTest {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> {
-                    Command.safeConcat(new StringBuilder("helm ls "), toConcatenate);
+                    Command.safeConcat(new StringBuilder("helm ls -a"), toConcatenate);
                 });
     }
 }
