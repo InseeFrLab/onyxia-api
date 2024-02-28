@@ -12,8 +12,6 @@ categories:
     label: "removal"
   - title: ":racehorse: Performance"
     label: "performance"
-  - title: ":rotating_light: Testing"
-    label: "testing"
   - title: ":construction_worker: Continuous Integration"
     label: "ci"
   - title: ":books: Documentation"
@@ -24,6 +22,8 @@ categories:
     label: "style"
   - title: ":gift: Helm wrapper"
     label: "helm-wrapper"
+  - title: ":microscope: Testing"
+    label: "testing"
   - title: ":package: Dependencies"
     labels:
       - "dependencies"
