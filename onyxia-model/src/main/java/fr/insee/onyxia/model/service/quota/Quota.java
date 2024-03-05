@@ -84,6 +84,8 @@ public class Quota {
         setCpuRequests(data.get("requests.cpu"));
         setMemoryLimits(data.get("limits.memory"));
         setCpuLimits(data.get("limits.cpu"));
+        setEphemeralStorageRequests(data.get("requests.ephemeral-storage"));
+        setEphemeralStorageLimits(data.get("limits.ephemeral-storage"));
         setStorageRequests(data.get("requests.storage"));
         if (data.containsKey("requests.nvidia.com/gpu")) {
             setNvidiaGpuRequests(Integer.parseInt(data.get("requests.nvidia.com/gpu")));
