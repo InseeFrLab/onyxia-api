@@ -7,7 +7,7 @@ import java.util.Map;
 
 @Schema(
         description =
-                "In the namespace en suivant les notations kubernetes https://kubernetes.io/docs/concepts/policy/resource-quotas/ . Si laissé vide pas de changement stays untouched")
+                "In the namespace folowwing the kubernetes notations https://kubernetes.io/docs/concepts/policy/resource-quotas/ . If left empty no changes stays untouched")
 public class Quota {
 
     @JsonProperty("requests.memory")
@@ -48,7 +48,7 @@ public class Quota {
     @JsonProperty("requests.ephemeral-storage")
     private String ephemeralStorageRequests;
 
-    @Schema(description = "The request ephemeralStorage allowed")
+    @Schema(description = "The limit ephemeralStorage allowed")
     @JsonProperty("limits.ephemeral-storage")
     private String ephemeralStorageLimits;
 
