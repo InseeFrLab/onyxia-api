@@ -7,7 +7,7 @@ import java.util.Map;
 
 @Schema(
         description =
-                "In the namespace folowwing the kubernetes notations https://kubernetes.io/docs/concepts/policy/resource-quotas/ . If left empty no changes stays untouched")
+                "Resource quotas are a tool for administrators to address the fair sharing of cluster resources between namespaces https://kubernetes.io/docs/concepts/policy/resource-quotas/")
 public class Quota {
 
     @JsonProperty("requests.memory")
