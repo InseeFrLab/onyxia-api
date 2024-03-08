@@ -6,10 +6,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public class QuotaUsage {
 
     @Schema(description = "")
-    private Quota spec;
+    private Quota spec = new Quota();
 
     @Schema(description = "")
-    private Quota usage;
+    private Quota usage = new Quota();
 
     public Quota getSpec() {
         return spec;
