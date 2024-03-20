@@ -24,12 +24,13 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 @Tag(name = "My lab", description = "My services")
 @RequestMapping("/my-lab")
@@ -183,6 +184,22 @@ public class MyLabController {
         return null;
     }
 
+    @Operation(
+            summary = "Stream events for the entire user namespace",
+            description = "Stream events for the entire user namespace.",
+            parameters = {
+                @Parameter(
+                        name = "ONYXIA-PROJECT",
+                        description =
+                                "Project associated with the namespace, defaults to user project.",
+                        in = ParameterIn.HEADER,
+                        schema =
+                                @Schema(
+                                        name = "ONYXIA-PROJECT",
+                                        type = "string",
+                                        description = "Generated project id.",
+                                        example = "project-id-example"))
+            })
     @GetMapping("/events")
     public SseEmitter getEvents(
             @Parameter(hidden = true) Region region, @Parameter(hidden = true) Project project)
