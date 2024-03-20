@@ -8,7 +8,11 @@ import fr.insee.onyxia.model.project.Project;
 import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.Service;
 import fr.insee.onyxia.model.service.UninstallService;
+import io.fabric8.kubernetes.api.model.Event;
+import io.fabric8.kubernetes.client.Watcher;
+import io.github.inseefrlab.helmwrapper.service.HelmInstallService;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -44,4 +48,7 @@ public interface AppsService {
             Region region, Project project, User user, String path, boolean bulk) throws Exception;
 
     String getLogs(Region region, Project project, User user, String serviceId, String taskId);
+
+    void getEvents(Region region, Project project, User user, Watcher<Event> watcher)
+            throws HelmInstallService.MultipleServiceFound, ParseException;
 }
