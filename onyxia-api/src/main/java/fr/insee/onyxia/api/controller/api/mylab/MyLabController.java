@@ -183,7 +183,7 @@ public class MyLabController {
         return null;
     }
 
-    @GetMapping("/app/events")
+    @GetMapping("/events")
     public SseEmitter getEvents(
             @Parameter(hidden = true) Region region, @Parameter(hidden = true) Project project)
             throws Exception {
