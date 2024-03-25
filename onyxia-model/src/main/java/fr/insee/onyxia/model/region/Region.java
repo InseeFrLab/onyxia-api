@@ -778,6 +778,26 @@ public class Region {
         private String role;
         private String authPath = "jwt";
 
+        private String prefix;
+
+        private String groupPrefix;
+
+        public String getPrefix() {
+            return prefix;
+        }
+
+        public void setPrefix(String prefix) {
+            this.prefix = prefix;
+        }
+
+        public void setGroupPrefix(String groupPrefix) {
+            this.groupPrefix = groupPrefix;
+        }
+
+        public String getGroupPrefix() {
+            return groupPrefix;
+        }
+
         private OIDCConfiguration oidcConfiguration = null;
 
         public String getUrl() {
