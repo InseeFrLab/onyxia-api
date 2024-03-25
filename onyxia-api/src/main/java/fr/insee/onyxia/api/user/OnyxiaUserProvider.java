@@ -5,12 +5,11 @@ import fr.insee.onyxia.api.services.impl.kubernetes.KubernetesService;
 import fr.insee.onyxia.model.OnyxiaUser;
 import fr.insee.onyxia.model.project.Project;
 import fr.insee.onyxia.model.region.Region;
+import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.regex.Pattern;
 
 @Service
 public class OnyxiaUserProvider {
@@ -53,11 +52,13 @@ public class OnyxiaUserProvider {
                                             region.getServices().getGroupNamespacePrefix()
                                                     + projectBaseName);
                                     String vaultPrefix = "";
-                                    if (region.getVault() != null && region.getVault().getGroupPrefix() != null) {
+                                    if (region.getVault() != null
+                                            && region.getVault().getGroupPrefix() != null) {
                                         vaultPrefix = region.getVault().getGroupPrefix();
                                     }
-                                    project.setVaultTopDir(vaultPrefix+
-                                            region.getServices().getGroupNamespacePrefix()
+                                    project.setVaultTopDir(
+                                            vaultPrefix
+                                                    + region.getServices().getGroupNamespacePrefix()
                                                     + projectBaseName);
                                     project.setNamespace(
                                             region.getServices().getGroupNamespacePrefix()
@@ -81,12 +82,12 @@ public class OnyxiaUserProvider {
         if (region.getServices().isSingleNamespace()) {
             userProject.setId("single-project");
             userProject.setGroup(null);
-            userProject.setVaultTopDir(vaultPrefix+user.getUser().getIdep());
+            userProject.setVaultTopDir(vaultPrefix + user.getUser().getIdep());
             userProject.setNamespace(kubernetesService.getCurrentNamespace(region));
             userProject.setName("Single namespace, single project");
         } else {
             userProject.setId(region.getServices().getNamespacePrefix() + user.getUser().getIdep());
-            userProject.setVaultTopDir(vaultPrefix+user.getUser().getIdep());
+            userProject.setVaultTopDir(vaultPrefix + user.getUser().getIdep());
             userProject.setGroup(null);
             userProject.setName(user.getUser().getIdep() + " personal project");
             if (region.getServices().isUserNamespace()) {
