@@ -41,6 +41,9 @@ public class Region {
     private OnyxiaAPI onyxiaAPI;
 
     @Schema(description = "")
+    private CertManager certManager;
+
+    @Schema(description = "")
     private Data data = new Data();
 
     @Schema(description = "")
@@ -170,6 +173,14 @@ public class Region {
     public void setCertificateAuthorityInjection(
             CertificateAuthorityInjection certificateAuthorityInjection) {
         this.certificateAuthorityInjection = certificateAuthorityInjection;
+    }
+
+    public CertManager getCertManager() {
+        return certManager;
+    }
+
+    public void setCertManager(CertManager certManager) {
+        this.certManager = certManager;
     }
 
     public OnyxiaAPI getOnyxiaAPI() {
@@ -1427,6 +1438,28 @@ public class Region {
 
         public void setPassword(String password) {
             this.password = password;
+        }
+    }
+
+    public static class CertManager {
+        private boolean useCertManager;
+
+        private String certManagerClusterIssuer;
+
+        public boolean isUseCertManager() {
+            return useCertManager;
+        }
+
+        public void setUseCertManager(boolean useCertManager) {
+            this.useCertManager = useCertManager;
+        }
+
+        public String getCertManagerClusterIssuer() {
+            return certManagerClusterIssuer;
+        }
+
+        public void setCertManagerClusterIssuer(String certManagerClusterIssuer) {
+            this.certManagerClusterIssuer = certManagerClusterIssuer;
         }
     }
 }
