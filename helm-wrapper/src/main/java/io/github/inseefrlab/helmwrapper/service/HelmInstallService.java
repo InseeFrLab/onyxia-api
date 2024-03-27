@@ -104,7 +104,7 @@ public class HelmInstallService {
 
     public HelmLs[] listChartInstall(HelmConfiguration configuration, String namespace)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        StringBuilder command = new StringBuilder("helm ls");
+        StringBuilder command = new StringBuilder("helm ls -a");
         if (namespace != null) {
             command.append(" -n ");
             safeConcat(command, namespace);
