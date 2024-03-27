@@ -76,8 +76,8 @@ public class OnyxiaUserProvider {
     private Project getUserProject(Region region, OnyxiaUser user) {
         Project userProject = new Project();
         String vaultPrefix = "";
-        if (region.getVault() != null && region.getVault().getGroupPrefix() != null) {
-            vaultPrefix = region.getVault().getGroupPrefix();
+        if (region.getVault() != null && region.getVault().getPrefix() != null) {
+            vaultPrefix = region.getVault().getPrefix();
         }
         if (region.getServices().isSingleNamespace()) {
             userProject.setId("single-project");
