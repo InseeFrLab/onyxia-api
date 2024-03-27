@@ -41,9 +41,6 @@ public class Region {
     private OnyxiaAPI onyxiaAPI;
 
     @Schema(description = "")
-    private CertManager certManager;
-
-    @Schema(description = "")
     private Data data = new Data();
 
     @Schema(description = "")
@@ -173,14 +170,6 @@ public class Region {
     public void setCertificateAuthorityInjection(
             CertificateAuthorityInjection certificateAuthorityInjection) {
         this.certificateAuthorityInjection = certificateAuthorityInjection;
-    }
-
-    public CertManager getCertManager() {
-        return certManager;
-    }
-
-    public void setCertManager(CertManager certManager) {
-        this.certManager = certManager;
     }
 
     public OnyxiaAPI getOnyxiaAPI() {
@@ -1143,6 +1132,7 @@ public class Region {
         private boolean route = false;
 
         private IstioIngress istio;
+        private CertManager certManager;
 
         public String getDomain() {
             return domain;
@@ -1198,6 +1188,14 @@ public class Region {
 
         public void setIstio(IstioIngress istio) {
             this.istio = istio;
+        }
+
+        public CertManager getCertManager() {
+            return certManager;
+        }
+
+        public void setCertManager(CertManager certManager) {
+            this.certManager = certManager;
         }
     }
 

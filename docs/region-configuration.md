@@ -17,6 +17,7 @@ See [regions.json](/onyxia-api/src/main/resources/regions.json) for a complete e
     - [Quotas properties](#quotas-properties)
     - [Expose properties](#expose-properties)
       - [istio](#istio)
+      - [CertManager](#certManager)
     - [Default configuration properties](#default-configuration-properties)
       - [Kafka](#kafka)
       - [Sliders](#sliders)
@@ -30,7 +31,6 @@ See [regions.json](/onyxia-api/src/main/resources/regions.json) for a complete e
   - [ProxyInjection properties](#proxyinjection-properties)
   - [PackageRepositoryInjection properties](#packagerepositoryinjection-properties)
   - [CertificateAuthorityInjection properties](#certificateauthorityinjection-properties)
-  - [CertManager properties](#certManager-properties)
 
 ## Main region properties
 
@@ -136,15 +136,16 @@ A quota follows the Kubernetes model which is composed of:
 
  with **expose**.
 
-| Key                | Default | Description                                                                                          |
-|--------------------|---------|------------------------------------------------------------------------------------------------------|
-| `domain`           |         | When users request to expose their service, only the subdomain of this object will be created.       |
-| `ingress`          | true    | Whether or not Kubernetes Ingress is enabled                                                         |
-| `route`            | false   | Whether or not OpenShift Route is enabled                                                            |
-| `istio`            |         | See [Istio](#istio)                                                                                  |
-| `ingressClassName` | ''      | Ingress Class Name: useful if you want to use a specific ingress controller instead of a default one |
-| `annotations` |  | Annotations to add at ingress creation {"cert-manager.io/cluster-issuer": "nameOfClusterIssuer"} |
-| `useDefaultCertificate`           | true      | When true, no TLS secret name will be generated, specify false if you want ingress certificate to be managed by CertManager|
+| Key                     | Default | Description                                                                                                                 |
+|-------------------------|-------|-----------------------------------------------------------------------------------------------------------------------------|
+| `domain`                |       | When users request to expose their service, only the subdomain of this object will be created.                              |
+| `ingress`               | true  | Whether or not Kubernetes Ingress is enabled                                                                                |
+| `route`                 | false | Whether or not OpenShift Route is enabled                                                                                   |
+| `istio`                 |       | See [Istio](#istio)                                                                                                         |
+| `ingressClassName`      | ''    | Ingress Class Name: useful if you want to use a specific ingress controller instead of a default one                        |
+| `annotations`           |       | Annotations to add at ingress creation {"cert-manager.io/cluster-issuer": "nameOfClusterIssuer"}                            |
+| `useDefaultCertificate` | true  | When true, no TLS secret name will be generated, specify false if you want ingress certificate to be managed by CertManager |
+| `certManager`           |       | See [CertManager](#certManager)                                                                                             |
 
 
 #### istio
@@ -379,7 +380,7 @@ It can be used to add additional features to Onyxia. It helps users to keep thei
 | `authPath` | "jwt" | path of the jwt auth method. | "jwt" |
 | `oidcConfiguration` | | Allow override of openidconnect authentication for this specific service. If not defined then global Onyxia authentication will be used. | {clientID: "onyxia", issuerURI: "https://auth.lab.sspcloud.fr/auth"} |
 
-## CertManager properties
+## CertManager
 
 It can be used to generate a certManager certificate.
 
