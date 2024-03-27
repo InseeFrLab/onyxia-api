@@ -172,7 +172,7 @@ public class CatalogLoader {
         }
     }
 
-    private void extractDataFromTgz(InputStream in, Chart chart) throws IOException {
+    public void extractDataFromTgz(InputStream in, Chart chart) throws IOException {
         GzipCompressorInputStream gzipIn = new GzipCompressorInputStream(in);
         // HelmConfig config = null;
         try (TarArchiveInputStream tarIn = new TarArchiveInputStream(gzipIn)) {

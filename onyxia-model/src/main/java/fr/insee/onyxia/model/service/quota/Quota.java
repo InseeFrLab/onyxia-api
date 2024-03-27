@@ -7,7 +7,7 @@ import java.util.Map;
 
 @Schema(
         description =
-                "In the namespace en suivant les notations kubernetes https://kubernetes.io/docs/concepts/policy/resource-quotas/ . Si laissé vide pas de changement stays untouched")
+                "Resource quotas are a tool for administrators to address the fair sharing of cluster resources between namespaces https://kubernetes.io/docs/concepts/policy/resource-quotas/")
 public class Quota {
 
     @JsonProperty("requests.memory")
@@ -48,7 +48,7 @@ public class Quota {
     @JsonProperty("requests.ephemeral-storage")
     private String ephemeralStorageRequests;
 
-    @Schema(description = "The request ephemeralStorage allowed")
+    @Schema(description = "The limit ephemeralStorage allowed")
     @JsonProperty("limits.ephemeral-storage")
     private String ephemeralStorageLimits;
 
@@ -84,6 +84,8 @@ public class Quota {
         setCpuRequests(data.get("requests.cpu"));
         setMemoryLimits(data.get("limits.memory"));
         setCpuLimits(data.get("limits.cpu"));
+        setEphemeralStorageRequests(data.get("requests.ephemeral-storage"));
+        setEphemeralStorageLimits(data.get("limits.ephemeral-storage"));
         setStorageRequests(data.get("requests.storage"));
         if (data.containsKey("requests.nvidia.com/gpu")) {
             setNvidiaGpuRequests(Integer.parseInt(data.get("requests.nvidia.com/gpu")));
