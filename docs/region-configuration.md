@@ -17,6 +17,7 @@ See [regions.json](/onyxia-api/src/main/resources/regions.json) for a complete e
     - [Quotas properties](#quotas-properties)
     - [Expose properties](#expose-properties)
       - [istio](#istio)
+      - [CertManager](#certManager)
     - [Default configuration properties](#default-configuration-properties)
       - [Kafka](#kafka)
       - [Sliders](#sliders)
@@ -33,19 +34,20 @@ See [regions.json](/onyxia-api/src/main/resources/regions.json) for a complete e
 
 ## Main region properties
 
-| Key | Description | Example |
-| --------------------- | ------------------------------------------------------------------ | ----- |
-| `id` | Unique name of the region | "mycloud" |
-| `name` | Descriptive name for the region | "mycloud region" |
-| `description` | Description of the region | "This region is in an awesome cloud" |
-| `location` | Geographical position of the data center on which the region is supposed to run. | {lat: 48.864716, longitude: 2.349014, name: "Paris" } |
-| `includedGroupPattern` | Pattern of user groups considered for the user in the region. Patterns are case-sensitive. | ".*_Onyxia" |
-| `excludedGroupPattern` | Pattern of user groups that will not be considered for the user in the region. Patterns are case-sensitive. | ".*_BadGroup" |
-| `transformGroupPattern` | Indicate how to transform a group based on `includedGroupPattern` to make a project name used for a namespace or S3 bucket for example. For example with an `includedGroupPattern` of "(.*)_Onxyia" and a `transformGroupPattern` of "$1-k8s", a mygroup_Onyxia will generate a mygroup-k8s namespace. | "$1-k8s" |
-| `onyxiaAPI` | Contains the base url of an onyxia api | {baseURL: "http://localhost:8080"} |
-| `services` | Configuration of Onyxia services provider platform | See [Services properties](#services-properties) |
-| `data` | Configuration of the S3 Object Storage | See [S3](#data-properties) |
-| `vault` | Configuration of the Vault API | See [Vault properties](#vault-properties) |
+| Key                     | Description                                                                                                                                                                                                                                                                                            | Example                                               |
+|-------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------|
+| `id`                    | Unique name of the region                                                                                                                                                                                                                                                                              | "mycloud"                                             |
+| `name`                  | Descriptive name for the region                                                                                                                                                                                                                                                                        | "mycloud region"                                      |
+| `description`           | Description of the region                                                                                                                                                                                                                                                                              | "This region is in an awesome cloud"                  |
+| `location`              | Geographical position of the data center on which the region is supposed to run.                                                                                                                                                                                                                       | {lat: 48.864716, longitude: 2.349014, name: "Paris" } |
+| `includedGroupPattern`  | Pattern of user groups considered for the user in the region. Patterns are case-sensitive.                                                                                                                                                                                                             | ".*_Onyxia"                                           |
+| `excludedGroupPattern`  | Pattern of user groups that will not be considered for the user in the region. Patterns are case-sensitive.                                                                                                                                                                                            | ".*_BadGroup"                                         |
+| `transformGroupPattern` | Indicate how to transform a group based on `includedGroupPattern` to make a project name used for a namespace or S3 bucket for example. For example with an `includedGroupPattern` of "(.*)_Onxyia" and a `transformGroupPattern` of "$1-k8s", a mygroup_Onyxia will generate a mygroup-k8s namespace. | "$1-k8s"                                              |
+| `onyxiaAPI`             | Contains the base url of an onyxia api                                                                                                                                                                                                                                                                 | {baseURL: "http://localhost:8080"}                    |
+| `services`              | Configuration of Onyxia services provider platform                                                                                                                                                                                                                                                     | See [Services properties](#services-properties)       |
+| `data`                  | Configuration of the S3 Object Storage                                                                                                                                                                                                                                                                 | See [S3](#data-properties)                            |
+| `vault`                 | Configuration of the Vault API                                                                                                                                                                                                                                                                         | See [Vault properties](#vault-properties)             |
+| `certManager`           | Configuration on the use of CertManager                                                                                                                                                                                                                                                                | See [CertManager properties](#certManager-properties)  |
 
 ## Services properties
 
@@ -134,15 +136,16 @@ A quota follows the Kubernetes model which is composed of:
 
  with **expose**.
 
-| Key                | Default | Description                                                                                          |
-|--------------------|---------|------------------------------------------------------------------------------------------------------|
-| `domain`           |         | When users request to expose their service, only the subdomain of this object will be created.       |
-| `ingress`          | true    | Whether or not Kubernetes Ingress is enabled                                                         |
-| `route`            | false   | Whether or not OpenShift Route is enabled                                                            |
-| `istio`            |         | See [Istio](#istio)                                                                                  |
-| `ingressClassName` | ''      | Ingress Class Name: useful if you want to use a specific ingress controller instead of a default one |
-| `annotations` |  | Annotations to add at ingress creation {"cert-manager.io/cluster-issuer": "nameOfClusterIssuer"} |
-| `useDefaultCertificate`           | true      | When true, no TLS secret name will be generated, specify false if you want ingress certificate to be managed by CertManager|
+| Key                     | Default | Description                                                                                                                 |
+|-------------------------|-------|-----------------------------------------------------------------------------------------------------------------------------|
+| `domain`                |       | When users request to expose their service, only the subdomain of this object will be created.                              |
+| `ingress`               | true  | Whether or not Kubernetes Ingress is enabled                                                                                |
+| `route`                 | false | Whether or not OpenShift Route is enabled                                                                                   |
+| `istio`                 |       | See [Istio](#istio)                                                                                                         |
+| `ingressClassName`      | ''    | Ingress Class Name: useful if you want to use a specific ingress controller instead of a default one                        |
+| `annotations`           |       | Annotations to add at ingress creation {"cert-manager.io/cluster-issuer": "nameOfClusterIssuer"}                            |
+| `useDefaultCertificate` | true  | When true, no TLS secret name will be generated, specify false if you want ingress certificate to be managed by CertManager |
+| `certManager`           |       | See [CertManager](#certManager)                                                                                             |
 
 
 #### istio
@@ -378,6 +381,15 @@ It can be used to add additional features to Onyxia. It helps users to keep thei
 | `prefix`            | | Prefix for user space.                                                                                                                   | "user-"                                                              |
 | `groupPrefix`       | | Prefix for group space.                                                                                                                  | "group-"                                                             |
 | `oidcConfiguration` | | Allow override of openidconnect authentication for this specific service. If not defined then global Onyxia authentication will be used. | {clientID: "onyxia", issuerURI: "https://auth.lab.sspcloud.fr/auth"} |
+
+## CertManager
+
+It can be used to generate a certManager certificate.
+
+| Key                        | Default | Description                                                                                       |
+|----------------------------|---------|---------------------------------------------------------------------------------------------------|
+| `useCertManager`           | false   | When true, a secret name will be generated and ingress certificate will be managed by CertManager |
+| `certManagerClusterIssuer` | ""      |                                                                                                   |
 
 ## Git properties
 
