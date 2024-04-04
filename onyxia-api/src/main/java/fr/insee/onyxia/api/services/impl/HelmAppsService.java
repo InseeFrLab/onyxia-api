@@ -28,6 +28,7 @@ import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.*;
 import io.fabric8.kubernetes.api.model.EventList;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.Watcher;
 import io.github.inseefrlab.helmwrapper.configuration.HelmConfiguration;
 import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
 import io.github.inseefrlab.helmwrapper.model.HelmLs;
@@ -288,6 +289,21 @@ public class HelmAppsService implements AppsService {
                                 region, project, user))
                 .withName(taskId)
                 .getLog();
+    }
+
+    @Override
+    public void getEvents(
+            Region region,
+            Project project,
+            User user,
+            Watcher<io.fabric8.kubernetes.api.model.Event> watcher) {
+        KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
+        client.v1()
+                .events()
+                .inNamespace(
+                        kubernetesService.determineNamespaceAndCreateIfNeeded(
+                                region, project, user))
+                .watch(watcher);
     }
 
     @Override

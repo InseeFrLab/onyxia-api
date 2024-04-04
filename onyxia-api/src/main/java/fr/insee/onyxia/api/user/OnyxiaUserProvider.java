@@ -51,8 +51,14 @@ public class OnyxiaUserProvider {
                                     project.setId(
                                             region.getServices().getGroupNamespacePrefix()
                                                     + projectBaseName);
+                                    String vaultPrefix = "";
+                                    if (region.getVault() != null
+                                            && region.getVault().getGroupPrefix() != null) {
+                                        vaultPrefix = region.getVault().getGroupPrefix();
+                                    }
                                     project.setVaultTopDir(
-                                            region.getServices().getGroupNamespacePrefix()
+                                            vaultPrefix
+                                                    + region.getServices().getGroupNamespacePrefix()
                                                     + projectBaseName);
                                     project.setNamespace(
                                             region.getServices().getGroupNamespacePrefix()
@@ -69,15 +75,19 @@ public class OnyxiaUserProvider {
 
     private Project getUserProject(Region region, OnyxiaUser user) {
         Project userProject = new Project();
+        String vaultPrefix = "";
+        if (region.getVault() != null && region.getVault().getPrefix() != null) {
+            vaultPrefix = region.getVault().getPrefix();
+        }
         if (region.getServices().isSingleNamespace()) {
             userProject.setId("single-project");
             userProject.setGroup(null);
-            userProject.setVaultTopDir(user.getUser().getIdep());
+            userProject.setVaultTopDir(vaultPrefix + user.getUser().getIdep());
             userProject.setNamespace(kubernetesService.getCurrentNamespace(region));
             userProject.setName("Single namespace, single project");
         } else {
             userProject.setId(region.getServices().getNamespacePrefix() + user.getUser().getIdep());
-            userProject.setVaultTopDir(user.getUser().getIdep());
+            userProject.setVaultTopDir(vaultPrefix + user.getUser().getIdep());
             userProject.setGroup(null);
             userProject.setName(user.getUser().getIdep() + " personal project");
             if (region.getServices().isUserNamespace()) {
