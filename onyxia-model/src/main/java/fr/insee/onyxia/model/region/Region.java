@@ -778,6 +778,26 @@ public class Region {
         private String role;
         private String authPath = "jwt";
 
+        private String prefix;
+
+        private String groupPrefix;
+
+        public String getPrefix() {
+            return prefix;
+        }
+
+        public void setPrefix(String prefix) {
+            this.prefix = prefix;
+        }
+
+        public void setGroupPrefix(String groupPrefix) {
+            this.groupPrefix = groupPrefix;
+        }
+
+        public String getGroupPrefix() {
+            return groupPrefix;
+        }
+
         private OIDCConfiguration oidcConfiguration = null;
 
         public String getUrl() {
@@ -1132,6 +1152,7 @@ public class Region {
         private boolean route = false;
 
         private IstioIngress istio;
+        private CertManager certManager;
 
         public String getDomain() {
             return domain;
@@ -1187,6 +1208,14 @@ public class Region {
 
         public void setIstio(IstioIngress istio) {
             this.istio = istio;
+        }
+
+        public CertManager getCertManager() {
+            return certManager;
+        }
+
+        public void setCertManager(CertManager certManager) {
+            this.certManager = certManager;
         }
     }
 
@@ -1427,6 +1456,28 @@ public class Region {
 
         public void setPassword(String password) {
             this.password = password;
+        }
+    }
+
+    public static class CertManager {
+        private boolean useCertManager;
+
+        private String certManagerClusterIssuer;
+
+        public boolean isUseCertManager() {
+            return useCertManager;
+        }
+
+        public void setUseCertManager(boolean useCertManager) {
+            this.useCertManager = useCertManager;
+        }
+
+        public String getCertManagerClusterIssuer() {
+            return certManagerClusterIssuer;
+        }
+
+        public void setCertManagerClusterIssuer(String certManagerClusterIssuer) {
+            this.certManagerClusterIssuer = certManagerClusterIssuer;
         }
     }
 }
