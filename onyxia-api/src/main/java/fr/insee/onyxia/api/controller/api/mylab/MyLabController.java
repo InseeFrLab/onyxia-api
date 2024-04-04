@@ -1,5 +1,6 @@
 package fr.insee.onyxia.api.controller.api.mylab;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.configuration.Catalogs;
 import fr.insee.onyxia.api.configuration.NotFoundException;
@@ -14,16 +15,21 @@ import fr.insee.onyxia.model.project.Project;
 import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.Service;
 import fr.insee.onyxia.model.service.UninstallService;
+import io.fabric8.kubernetes.api.model.Event;
+import io.fabric8.kubernetes.client.Watcher;
+import io.fabric8.kubernetes.client.WatcherException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Tag(name = "My lab", description = "My services")
 @RequestMapping("/my-lab")
@@ -36,12 +42,18 @@ public class MyLabController {
 
     private final CatalogService catalogService;
 
+    private ObjectMapper objectMapper;
+
     @Autowired
     public MyLabController(
-            AppsService helmAppsService, UserProvider userProvider, CatalogService catalogService) {
+            AppsService helmAppsService,
+            UserProvider userProvider,
+            CatalogService catalogService,
+            ObjectMapper objectMapper) {
         this.helmAppsService = helmAppsService;
         this.userProvider = userProvider;
         this.catalogService = catalogService;
+        this.objectMapper = objectMapper;
     }
 
     @Operation(
@@ -167,6 +179,52 @@ public class MyLabController {
         if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
             return helmAppsService.getLogs(
                     region, project, userProvider.getUser(region), serviceId, taskId);
+        }
+        return null;
+    }
+
+    @Operation(
+            summary = "Stream events for the entire user namespace",
+            description = "Stream events for the entire user namespace.",
+            parameters = {
+                @Parameter(
+                        name = "ONYXIA-PROJECT",
+                        description =
+                                "Project associated with the namespace, defaults to user project.",
+                        in = ParameterIn.HEADER,
+                        schema =
+                                @Schema(
+                                        name = "ONYXIA-PROJECT",
+                                        type = "string",
+                                        description = "Generated project id.",
+                                        example = "project-id-example"))
+            })
+    @GetMapping("/events")
+    public SseEmitter getEvents(
+            @Parameter(hidden = true) Region region, @Parameter(hidden = true) Project project)
+            throws Exception {
+
+        if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
+            final SseEmitter emitter = new SseEmitter();
+
+            Watcher<Event> watcher =
+                    new Watcher<Event>() {
+                        @Override
+                        public void eventReceived(Action action, Event event) {
+                            try {
+                                emitter.send(objectMapper.writeValueAsString(event));
+                            } catch (IOException e) {
+                                // Response is already commited
+                            }
+                        }
+
+                        @Override
+                        public void onClose(WatcherException e) {
+                            emitter.complete();
+                        }
+                    };
+            helmAppsService.getEvents(region, project, userProvider.getUser(region), watcher);
+            return emitter;
         }
         return null;
     }
