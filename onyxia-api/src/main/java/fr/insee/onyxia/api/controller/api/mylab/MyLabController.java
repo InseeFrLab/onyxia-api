@@ -24,12 +24,14 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Tag(name = "My lab", description = "My services")
 @RequestMapping("/my-lab")
@@ -141,6 +143,77 @@ public class MyLabController {
                     region, project, userProvider.getUser(region), serviceId);
         }
         return null;
+    }
+
+    @PostMapping("/app/pause")
+    public void pauseApp(
+            @Parameter(hidden = true) Region region,
+            @Parameter(hidden = true) Project project,
+            @RequestParam("serviceId") String serviceId)
+            throws Exception {
+        pauseOrResume(region, project, serviceId, true);
+    }
+
+    @PostMapping("/app/resume")
+    public void resumeApp(
+            @Parameter(hidden = true) Region region,
+            @Parameter(hidden = true) Project project,
+            @RequestParam("serviceId") String serviceId)
+            throws Exception {
+        pauseOrResume(region, project, serviceId, false);
+    }
+
+    private void pauseOrResume(Region region, Project project, String serviceId, boolean pause)
+            throws Exception {
+        if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
+            User user = userProvider.getUser(region);
+            Service userService =
+                    helmAppsService.getUserService(
+                            region, project, userProvider.getUser(region), serviceId);
+            String chart = userService.getChart();
+            int split = chart.lastIndexOf('-');
+            String chartName = chart.substring(0, split);
+            String version = chart.substring(split + 1);
+            List<CatalogWrapper> elligibleCatalogs =
+                    catalogService.getCatalogs(region, user).getCatalogs().stream()
+                            .filter(
+                                    catalog ->
+                                            catalog.getCatalog()
+                                                    .getPackageByNameAndVersion(chartName, version)
+                                                    .isPresent())
+                            .collect(Collectors.toList());
+            if (elligibleCatalogs.isEmpty()) {
+                throw new NotFoundException();
+            }
+            if (elligibleCatalogs.size() > 1) {
+                throw new IllegalStateException("");
+            }
+            CatalogWrapper catalog = elligibleCatalogs.getFirst();
+            Pkg pkg = catalog.getCatalog().getPackageByNameAndVersion(chartName, version).get();
+            if (pause) {
+                helmAppsService.pause(
+                        region,
+                        project,
+                        catalog.getId(),
+                        pkg,
+                        user,
+                        serviceId,
+                        catalog.getSkipTlsVerify(),
+                        catalog.getCaFile(),
+                        false);
+            } else {
+                helmAppsService.resume(
+                        region,
+                        project,
+                        catalog.getId(),
+                        pkg,
+                        user,
+                        serviceId,
+                        catalog.getSkipTlsVerify(),
+                        catalog.getCaFile(),
+                        false);
+            }
+        }
     }
 
     @Operation(

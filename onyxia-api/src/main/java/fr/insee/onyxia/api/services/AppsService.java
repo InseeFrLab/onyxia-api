@@ -16,6 +16,7 @@ import java.text.ParseException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeoutException;
 import org.springframework.scheduling.annotation.Async;
 
 public interface AppsService {
@@ -51,4 +52,28 @@ public interface AppsService {
 
     void getEvents(Region region, Project project, User user, Watcher<Event> watcher)
             throws HelmInstallService.MultipleServiceFound, ParseException;
+
+    void resume(
+            Region region,
+            Project project,
+            String catalogId,
+            Pkg pkg,
+            User user,
+            String serviceId,
+            boolean skipTlsVerify,
+            String caFile,
+            boolean dryRun)
+            throws IOException, InterruptedException, TimeoutException;
+
+    void pause(
+            Region region,
+            Project project,
+            String catalogId,
+            Pkg pkg,
+            User user,
+            String serviceId,
+            boolean skipTlsVerify,
+            String caFile,
+            boolean dryRun)
+            throws IOException, InterruptedException, TimeoutException;
 }
