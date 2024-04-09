@@ -44,9 +44,6 @@ public class Service {
     @Schema(description = "Task represents pods running. This should be re-ingeneer in v1.0")
     private List<Task> tasks = new ArrayList<>();
 
-    @Schema(description = "This should be re-ingeneer in v1.0")
-    private List<Event> events = new ArrayList<>();
-
     @Schema(description = "This should be removed in v1.0")
     private String subtitle;
 
@@ -179,14 +176,6 @@ public class Service {
 
     public void setSubtitle(String subtitle) {
         this.subtitle = subtitle;
-    }
-
-    public List<Event> getEvents() {
-        return events;
-    }
-
-    public void setEvents(List<Event> events) {
-        this.events = events;
     }
 
     public List<String> getInternalUrls() {
