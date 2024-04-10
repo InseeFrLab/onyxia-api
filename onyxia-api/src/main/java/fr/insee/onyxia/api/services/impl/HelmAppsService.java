@@ -62,7 +62,7 @@ public class HelmAppsService implements AppsService {
     private final List<AdmissionControllerHelm> admissionControllers;
 
     public static final FastDateFormat HELM_DATE_FORMAT =
-            FastDateFormat.getInstance("EE MMM  d HH:mm:ss yyyy");
+            FastDateFormat.getInstance("EE MMM  d HH:mm:ss yyyy", TimeZone.getTimeZone("UTC"));
     private final KubernetesClientProvider kubernetesClientProvider;
 
     private final HelmClientProvider helmClientProvider;
