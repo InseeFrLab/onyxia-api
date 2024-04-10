@@ -169,12 +169,11 @@ public class KubernetesService {
 
     private boolean isNamespaceAlreadyExisting(Region region, String namespaceId) {
         return kubernetesClientProvider
-                .getRootClient(region)
-                .namespaces()
-                .list()
-                .getItems()
-                .stream()
-                .anyMatch(ns -> ns.getMetadata().getName().equals(namespaceId));
+                        .getRootClient(region)
+                        .namespaces()
+                        .withName(namespaceId)
+                        .get()
+                != null;
     }
 
     private void applyQuotas(

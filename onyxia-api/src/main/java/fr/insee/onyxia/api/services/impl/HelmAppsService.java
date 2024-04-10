@@ -24,7 +24,6 @@ import fr.insee.onyxia.model.dto.ServicesListing;
 import fr.insee.onyxia.model.project.Project;
 import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.*;
-import io.fabric8.kubernetes.api.model.EventList;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.Watcher;
 import io.github.inseefrlab.helmwrapper.configuration.HelmConfiguration;
@@ -574,34 +573,6 @@ public class HelmAppsService implements AppsService {
                                     return currentTask;
                                 })
                         .collect(Collectors.toList()));
-
-        EventList eventList = client.v1().events().inNamespace(release.getNamespace()).list();
-        List<Event> events =
-                eventList.getItems().stream()
-                        .filter(
-                                event ->
-                                        event.getInvolvedObject() != null
-                                                && event.getInvolvedObject().getName() != null
-                                                && event.getInvolvedObject()
-                                                        .getName()
-                                                        .contains(release.getName()))
-                        .map(
-                                event -> {
-                                    Event newEvent = new Event();
-                                    newEvent.setMessage(event.getMessage());
-                                    try {
-                                        // TODO : use kubernetes time format instead of helm
-                                        newEvent.setTimestamp(
-                                                helmDateFormat
-                                                        .parse(event.getEventTime().getTime())
-                                                        .getTime());
-                                    } catch (Exception e) {
-
-                                    }
-                                    return newEvent;
-                                })
-                        .collect(Collectors.toList());
-        service.setEvents(events);
 
         return service;
     }
