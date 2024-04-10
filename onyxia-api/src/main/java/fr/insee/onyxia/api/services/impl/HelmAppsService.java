@@ -61,7 +61,8 @@ public class HelmAppsService implements AppsService {
 
     private final List<AdmissionControllerHelm> admissionControllers;
 
-    private final FastDateFormat helmDateFormat = FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss");
+    public static final FastDateFormat HELM_DATE_FORMAT =
+            FastDateFormat.getInstance("EE MMM  d HH:mm:ss yyyy");
     private final KubernetesClientProvider kubernetesClientProvider;
 
     private final HelmClientProvider helmClientProvider;
@@ -245,7 +246,13 @@ public class HelmAppsService implements AppsService {
         }
         List<Service> services =
                 installedCharts.parallelStream()
-                        .map(release -> getHelmApp(region, user, release))
+                        .map(
+                                release ->
+                                        getHelmApp(
+                                                region,
+                                                user,
+                                                release.getName(),
+                                                release.getNamespace()))
                         .filter(
                                 service -> {
                                     boolean canUserSeeThisService = false;
@@ -311,14 +318,11 @@ public class HelmAppsService implements AppsService {
         if (serviceId.startsWith("/")) {
             serviceId = serviceId.substring(1);
         }
-        HelmLs result =
-                getHelmInstallService()
-                        .getAppById(
-                                getHelmConfiguration(region, user),
-                                serviceId,
-                                kubernetesService.determineNamespaceAndCreateIfNeeded(
-                                        region, project, user));
-        return getHelmApp(region, user, result);
+        return getHelmApp(
+                region,
+                user,
+                kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user),
+                serviceId);
     }
 
     @Override
@@ -363,31 +367,28 @@ public class HelmAppsService implements AppsService {
         return result;
     }
 
-    private Service getHelmApp(Region region, User user, HelmLs release) {
+    private Service getHelmApp(Region region, User user, String name, String namespace) {
         HelmReleaseInfo helmReleaseInfo =
-                getHelmInstallService()
-                        .getAll(
-                                getHelmConfiguration(region, user),
-                                release.getName(),
-                                release.getNamespace());
+                getHelmInstallService().getAll(getHelmConfiguration(region, user), name, namespace);
         Service service =
-                getServiceFromRelease(region, release, helmReleaseInfo.getManifest(), user);
+                getServiceFromRelease(region, helmReleaseInfo, helmReleaseInfo.getManifest(), user);
         try {
-            service.setStartedAt(helmDateFormat.parse(release.getUpdated()).getTime());
+            service.setStartedAt(
+                    HELM_DATE_FORMAT.parse(helmReleaseInfo.getLastDeployed()).getTime());
         } catch (Exception e) {
             service.setStartedAt(0);
         }
-        service.setId(release.getName());
-        service.setName(release.getName());
-        service.setSubtitle(release.getChart());
+        service.setId(helmReleaseInfo.getName());
+        service.setName(helmReleaseInfo.getName());
+        service.setSubtitle(helmReleaseInfo.getChart());
         service.setType(Service.ServiceType.KUBERNETES);
-        service.setName(release.getName());
-        service.setNamespace(release.getNamespace());
-        service.setRevision(release.getRevision());
-        service.setStatus(release.getStatus());
-        service.setUpdated(release.getUpdated());
-        service.setChart(release.getChart());
-        service.setAppVersion(release.getAppVersion());
+        service.setName(helmReleaseInfo.getName());
+        service.setNamespace(helmReleaseInfo.getNamespace());
+        service.setRevision(String.valueOf(helmReleaseInfo.getRevision()));
+        service.setStatus(helmReleaseInfo.getStatus());
+        service.setUpdated(helmReleaseInfo.getLastDeployed());
+        service.setChart(helmReleaseInfo.getChart());
+        service.setAppVersion(helmReleaseInfo.getAppVersion());
         try {
             String values = helmReleaseInfo.getUserSuppliedValues();
             JsonNode node = mapperHelm.readTree(values);
@@ -424,7 +425,7 @@ public class HelmAppsService implements AppsService {
     }
 
     private Service getServiceFromRelease(
-            Region region, HelmLs release, String manifest, User user) {
+            Region region, HelmReleaseInfo release, String manifest, User user) {
         KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
 
         Service service = new Service();

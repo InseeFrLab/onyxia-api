@@ -182,45 +182,6 @@ public class HelmInstallService {
         return "";
     }
 
-    /**
-     * @param appId
-     * @param namespace
-     * @return
-     * @throws MultipleServiceFound
-     */
-    public HelmLs getAppById(HelmConfiguration configuration, String appId, String namespace)
-            throws MultipleServiceFound {
-        StringBuilder command = new StringBuilder("helm list --filter ");
-        safeConcat(command, appId);
-        command.append(" -n ");
-        safeConcat(command, namespace);
-        try {
-            HelmLs[] result =
-                    new ObjectMapper()
-                            .readValue(
-                                    Command.executeAndGetResponseAsJson(
-                                                    configuration, command.toString())
-                                            .getOutput()
-                                            .getString(),
-                                    HelmLs[].class);
-            if (result.length == 0) {
-                return null;
-
-            } else if (result.length == 1) {
-                return result[0];
-            } else {
-                throw new MultipleServiceFound(
-                        "One service was expected but " + result.length + " were found");
-            }
-        } catch (InvalidExitValueException
-                | IOException
-                | InterruptedException
-                | TimeoutException e) {
-            LOGGER.warn("Exception occurred when getting app by id", e);
-        }
-        return null;
-    }
-
     public static class MultipleServiceFound extends Exception {
 
         public MultipleServiceFound(String s) {
