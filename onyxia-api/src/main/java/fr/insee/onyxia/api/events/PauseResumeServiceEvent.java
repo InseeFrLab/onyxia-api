@@ -1,8 +1,8 @@
 package fr.insee.onyxia.api.events;
 
-public class PauseServiceEvent extends OnyxiaEvent {
+public class PauseResumeServiceEvent extends OnyxiaEvent {
 
-    public static final String TYPE = "service.pause";
+    private String type;
     private String namespace;
     private String releaseName;
     private String packageName;
@@ -26,19 +26,25 @@ public class PauseServiceEvent extends OnyxiaEvent {
     private String username;
     private String catalogId;
 
-    public PauseServiceEvent() {}
+    public PauseResumeServiceEvent() {}
 
-    public PauseServiceEvent(
+    public PauseResumeServiceEvent(
             String username,
             String namespace,
             String releaseName,
             String packageName,
-            String catalogId) {
+            String catalogId,
+            boolean pause) {
         this.namespace = namespace;
         this.releaseName = releaseName;
         this.catalogId = catalogId;
         this.username = username;
         this.packageName = packageName;
+        if (pause) {
+            type = "service.pause";
+        } else {
+            type = "service.resume";
+        }
     }
 
     public String getUsername() {
@@ -67,6 +73,6 @@ public class PauseServiceEvent extends OnyxiaEvent {
 
     @Override
     public String getType() {
-        return TYPE;
+        return type;
     }
 }

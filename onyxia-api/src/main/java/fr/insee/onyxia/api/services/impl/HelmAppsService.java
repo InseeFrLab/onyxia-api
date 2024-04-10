@@ -494,16 +494,9 @@ public class HelmAppsService implements AppsService {
                             skipTlsVerify,
                             caFile);
         }
-        OnyxiaEvent event = null;
-        if (pause) {
-            event =
-                    new PauseServiceEvent(
-                            user.getIdep(), namespaceId, serviceId, pkg.getName(), catalogId);
-        } else {
-            event =
-                    new ResumeServiceEvent(
-                            user.getIdep(), namespaceId, serviceId, pkg.getName(), catalogId);
-        }
+        PauseResumeServiceEvent event =
+                new PauseResumeServiceEvent(
+                        user.getIdep(), namespaceId, serviceId, pkg.getName(), catalogId, pause);
         onyxiaEventPublisher.publishEvent(event);
     }
 
