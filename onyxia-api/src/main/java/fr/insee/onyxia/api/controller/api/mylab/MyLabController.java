@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.configuration.Catalogs;
 import fr.insee.onyxia.api.configuration.NotFoundException;
+import fr.insee.onyxia.api.controller.exception.ServiceNotPausableException;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.api.services.UserProvider;
@@ -169,6 +170,9 @@ public class MyLabController {
             Service userService =
                     helmAppsService.getUserService(
                             region, project, userProvider.getUser(region), serviceId);
+            if (!userService.isPausable()) {
+                throw new ServiceNotPausableException();
+            }
             String chart = userService.getChart();
             int split = chart.lastIndexOf('-');
             String chartName = chart.substring(0, split);

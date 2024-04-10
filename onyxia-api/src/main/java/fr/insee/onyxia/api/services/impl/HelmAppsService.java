@@ -7,7 +7,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.configuration.kubernetes.HelmClientProvider;
 import fr.insee.onyxia.api.configuration.kubernetes.KubernetesClientProvider;
 import fr.insee.onyxia.api.controller.exception.NamespaceNotFoundException;
-import fr.insee.onyxia.api.events.*;
+import fr.insee.onyxia.api.events.InstallServiceEvent;
+import fr.insee.onyxia.api.events.OnyxiaEventPublisher;
+import fr.insee.onyxia.api.events.PauseResumeServiceEvent;
+import fr.insee.onyxia.api.events.UninstallServiceEvent;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.control.AdmissionControllerHelm;
 import fr.insee.onyxia.api.services.control.commons.UrlGenerator;
@@ -50,6 +53,8 @@ import org.springframework.security.access.AccessDeniedException;
 @org.springframework.stereotype.Service
 @Qualifier("Helm")
 public class HelmAppsService implements AppsService {
+
+    public static final String PAUSE_KEY = "global.suspend";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HelmAppsService.class);
 
@@ -394,6 +399,10 @@ public class HelmAppsService implements AppsService {
                             currentNode ->
                                     mapAppender(result, currentNode, new ArrayList<String>()));
             service.setEnv(result);
+            service.setPausable(service.getEnv().containsKey(PAUSE_KEY));
+            if (service.getEnv().containsKey(PAUSE_KEY)) {
+                service.setPaused(Boolean.parseBoolean(service.getEnv().get(PAUSE_KEY)));
+            }
         } catch (Exception e) {
             LOGGER.warn("Exception occurred", e);
         }

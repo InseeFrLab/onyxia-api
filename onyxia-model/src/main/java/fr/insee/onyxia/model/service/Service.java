@@ -71,6 +71,12 @@ public class Service {
     @Schema(description = "This should be removed in v1.0 ")
     private long startedAt;
 
+    @Schema(description = "Is this service pausable ?")
+    private boolean pausable = false;
+
+    @Schema(description = "Is this service paused ?")
+    private boolean paused = false;
+
     @Schema(description = "")
     private Map<String, String> labels;
 
@@ -240,6 +246,22 @@ public class Service {
 
     public String getPostInstallInstructions() {
         return postInstallInstructions;
+    }
+
+    public boolean isPausable() {
+        return pausable;
+    }
+
+    public boolean isPaused() {
+        return paused;
+    }
+
+    public void setPausable(boolean pausable) {
+        this.pausable = pausable;
+    }
+
+    public void setPaused(boolean paused) {
+        this.paused = paused;
     }
 
     @Schema(description = "")
