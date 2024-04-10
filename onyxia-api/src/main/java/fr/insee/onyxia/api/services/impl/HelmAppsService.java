@@ -504,7 +504,7 @@ public class HelmAppsService implements AppsService {
                     new ResumeServiceEvent(
                             user.getIdep(), namespaceId, serviceId, pkg.getName(), catalogId);
         }
-        onyxiaEventPublisher.publishEvent(installServiceEvent);
+        onyxiaEventPublisher.publishEvent(event);
     }
 
     private void mapAppender(
