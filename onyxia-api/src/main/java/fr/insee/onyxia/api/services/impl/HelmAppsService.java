@@ -7,9 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.configuration.kubernetes.HelmClientProvider;
 import fr.insee.onyxia.api.configuration.kubernetes.KubernetesClientProvider;
 import fr.insee.onyxia.api.controller.exception.NamespaceNotFoundException;
-import fr.insee.onyxia.api.events.InstallServiceEvent;
-import fr.insee.onyxia.api.events.OnyxiaEventPublisher;
-import fr.insee.onyxia.api.events.UninstallServiceEvent;
+import fr.insee.onyxia.api.events.*;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.control.AdmissionControllerHelm;
 import fr.insee.onyxia.api.services.control.commons.UrlGenerator;
@@ -496,7 +494,17 @@ public class HelmAppsService implements AppsService {
                             skipTlsVerify,
                             caFile);
         }
-        // TODO : events
+        OnyxiaEvent event = null;
+        if (pause) {
+            event =
+                    new PauseServiceEvent(
+                            user.getIdep(), namespaceId, serviceId, pkg.getName(), catalogId);
+        } else {
+            event =
+                    new ResumeServiceEvent(
+                            user.getIdep(), namespaceId, serviceId, pkg.getName(), catalogId);
+        }
+        onyxiaEventPublisher.publishEvent(installServiceEvent);
     }
 
     private void mapAppender(

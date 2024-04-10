@@ -185,7 +185,7 @@ public class MyLabController {
                 throw new NotFoundException();
             }
             if (elligibleCatalogs.size() > 1) {
-                throw new IllegalStateException("");
+                throw new IllegalStateException("Chart is present in multiple catalogs, abort");
             }
             CatalogWrapper catalog = elligibleCatalogs.getFirst();
             Pkg pkg = catalog.getCatalog().getPackageByNameAndVersion(chartName, version).get();
