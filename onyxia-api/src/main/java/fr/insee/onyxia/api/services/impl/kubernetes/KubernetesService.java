@@ -18,13 +18,14 @@ import io.fabric8.kubernetes.api.model.rbac.RoleBindingBuilder;
 import io.fabric8.kubernetes.api.model.rbac.SubjectBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientException;
-import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 @Service
 public class KubernetesService {
@@ -171,10 +172,8 @@ public class KubernetesService {
         return kubernetesClientProvider
                 .getRootClient(region)
                 .namespaces()
-                .list()
-                .getItems()
-                .stream()
-                .anyMatch(ns -> ns.getMetadata().getName().equals(namespaceId));
+                .withName(namespaceId)
+                .get() != null;
     }
 
     private void applyQuotas(
