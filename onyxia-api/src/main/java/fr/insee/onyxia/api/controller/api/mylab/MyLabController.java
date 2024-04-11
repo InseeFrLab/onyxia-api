@@ -17,6 +17,7 @@ import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.Service;
 import fr.insee.onyxia.model.service.UninstallService;
 import io.fabric8.kubernetes.api.model.Event;
+import io.fabric8.kubernetes.client.Watch;
 import io.fabric8.kubernetes.client.Watcher;
 import io.fabric8.kubernetes.client.WatcherException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,10 +26,9 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
+import java.util.function.Consumer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -184,7 +184,7 @@ public class MyLabController {
                                             catalog.getCatalog()
                                                     .getPackageByNameAndVersion(chartName, version)
                                                     .isPresent())
-                            .collect(Collectors.toList());
+                            .toList();
             if (elligibleCatalogs.isEmpty()) {
                 throw new NotFoundException();
             }
@@ -282,27 +282,65 @@ public class MyLabController {
 
         if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
             final SseEmitter emitter = new SseEmitter();
-
-            Watcher<Event> watcher =
-                    new Watcher<Event>() {
+            final CustomWatcher watcher = new CustomWatcher(emitter, objectMapper);
+            final Watch watch =
+                    helmAppsService.getEvents(
+                            region, project, userProvider.getUser(region), watcher);
+            emitter.onCompletion(
+                    new Runnable() {
                         @Override
-                        public void eventReceived(Action action, Event event) {
-                            try {
-                                emitter.send(objectMapper.writeValueAsString(event));
-                            } catch (IOException e) {
-                                // Response is already commited
-                            }
+                        public void run() {
+                            watch.close();
                         }
-
+                    });
+            emitter.onError(
+                    new Consumer<Throwable>() {
                         @Override
-                        public void onClose(WatcherException e) {
-                            emitter.complete();
+                        public void accept(Throwable throwable) {
+                            watch.close();
                         }
-                    };
-            helmAppsService.getEvents(region, project, userProvider.getUser(region), watcher);
+                    });
+            emitter.onTimeout(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            watch.close();
+                        }
+                    });
             return emitter;
         }
         return null;
+    }
+
+    public static class CustomWatcher implements Watcher<Event> {
+
+        private final SseEmitter emitter;
+
+        private final ObjectMapper objectMapper;
+
+        public CustomWatcher(SseEmitter emitter, ObjectMapper objectMapper) {
+            this.emitter = emitter;
+            this.objectMapper = objectMapper;
+        }
+
+        @Override
+        public void eventReceived(Action action, Event event) {
+            try {
+                emitter.send(objectMapper.writeValueAsString(event));
+            } catch (Exception ignored) {
+
+            }
+        }
+
+        @Override
+        public void onClose() {
+            emitter.complete();
+        }
+
+        @Override
+        public void onClose(WatcherException e) {
+            emitter.complete();
+        }
     }
 
     @Operation(
