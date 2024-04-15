@@ -145,25 +145,25 @@ public class MyLabController {
         return null;
     }
 
-    @PostMapping("/app/pause")
-    public void pauseApp(
+    @PostMapping("/app/suspend")
+    public void suspendApp(
             @Parameter(hidden = true) Region region,
             @Parameter(hidden = true) Project project,
-            @RequestParam("serviceId") String serviceId)
+            @RequestBody SuspendOrResumeRequestDTO request)
             throws Exception {
-        pauseOrResume(region, project, serviceId, true);
+        suspendOrResume(region, project, request.getServiceID(), true);
     }
 
     @PostMapping("/app/resume")
     public void resumeApp(
             @Parameter(hidden = true) Region region,
             @Parameter(hidden = true) Project project,
-            @RequestParam("serviceId") String serviceId)
+            @RequestBody SuspendOrResumeRequestDTO request)
             throws Exception {
-        pauseOrResume(region, project, serviceId, false);
+        suspendOrResume(region, project, request.getServiceID(), false);
     }
 
-    private void pauseOrResume(Region region, Project project, String serviceId, boolean pause)
+    private void suspendOrResume(Region region, Project project, String serviceId, boolean suspend)
             throws Exception {
         if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
             User user = userProvider.getUser(region);
@@ -193,8 +193,8 @@ public class MyLabController {
             }
             CatalogWrapper catalog = elligibleCatalogs.getFirst();
             Pkg pkg = catalog.getCatalog().getPackageByNameAndVersion(chartName, version).get();
-            if (pause) {
-                helmAppsService.pause(
+            if (suspend) {
+                helmAppsService.suspend(
                         region,
                         project,
                         catalog.getId(),
@@ -430,5 +430,17 @@ public class MyLabController {
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
         return helmAppsService.installApp(
                 region, project, requestDTO, catalogId, pkg, user, fusion, skipTlsVerify, caFile);
+    }
+
+    public static class SuspendOrResumeRequestDTO {
+        private String serviceID;
+
+        public String getServiceID() {
+            return serviceID;
+        }
+
+        public void setServiceID(String serviceID) {
+            this.serviceID = serviceID;
+        }
     }
 }

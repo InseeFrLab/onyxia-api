@@ -1,24 +1,24 @@
 package fr.insee.onyxia.api.events;
 
-public class PauseResumeServiceEvent extends InstallServiceEvent {
+public class SuspendResumeServiceEvent extends InstallServiceEvent {
 
-    private boolean isPause;
+    private boolean isSuspend;
 
-    public PauseResumeServiceEvent() {}
+    public SuspendResumeServiceEvent() {}
 
-    public PauseResumeServiceEvent(
+    public SuspendResumeServiceEvent(
             String username,
             String namespace,
             String releaseName,
             String packageName,
             String catalogId,
-            boolean pause) {
+            boolean suspend) {
         super(username, namespace, releaseName, packageName, catalogId);
-        this.isPause = pause;
+        this.isSuspend = suspend;
     }
 
     @Override
     public String getType() {
-        return isPause ? "service.pause" : "service.install";
+        return isSuspend ? "service.suspend" : "service.install";
     }
 }

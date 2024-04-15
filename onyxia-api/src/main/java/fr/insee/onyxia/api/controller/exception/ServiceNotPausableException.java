@@ -9,7 +9,7 @@ public class ServiceNotPausableException extends RuntimeException {
     public ServiceNotPausableException() {
         super(
                 "This service is not pausable. To be pausable, a service must define "
-                        + HelmAppsService.PAUSE_KEY
+                        + HelmAppsService.SUSPEND_KEY
                         + " as a key in values.schema.json");
     }
 }

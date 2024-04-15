@@ -9,7 +9,7 @@ import fr.insee.onyxia.api.configuration.kubernetes.KubernetesClientProvider;
 import fr.insee.onyxia.api.controller.exception.NamespaceNotFoundException;
 import fr.insee.onyxia.api.events.InstallServiceEvent;
 import fr.insee.onyxia.api.events.OnyxiaEventPublisher;
-import fr.insee.onyxia.api.events.PauseResumeServiceEvent;
+import fr.insee.onyxia.api.events.SuspendResumeServiceEvent;
 import fr.insee.onyxia.api.events.UninstallServiceEvent;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.control.AdmissionControllerHelm;
@@ -55,7 +55,7 @@ import org.springframework.security.access.AccessDeniedException;
 @Qualifier("Helm")
 public class HelmAppsService implements AppsService {
 
-    public static final String PAUSE_KEY = "global.suspend";
+    public static final String SUSPEND_KEY = "global.suspend";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HelmAppsService.class);
 
@@ -400,9 +400,9 @@ public class HelmAppsService implements AppsService {
                             currentNode ->
                                     mapAppender(result, currentNode, new ArrayList<String>()));
             service.setEnv(result);
-            service.setPausable(service.getEnv().containsKey(PAUSE_KEY));
-            if (service.getEnv().containsKey(PAUSE_KEY)) {
-                service.setPaused(Boolean.parseBoolean(service.getEnv().get(PAUSE_KEY)));
+            service.setPausable(service.getEnv().containsKey(SUSPEND_KEY));
+            if (service.getEnv().containsKey(SUSPEND_KEY)) {
+                service.setSuspended(Boolean.parseBoolean(service.getEnv().get(SUSPEND_KEY)));
             }
         } catch (Exception e) {
             LOGGER.warn("Exception occurred", e);
@@ -417,7 +417,7 @@ public class HelmAppsService implements AppsService {
     }
 
     @Override
-    public void pause(
+    public void suspend(
             Region region,
             Project project,
             String catalogId,
@@ -428,7 +428,7 @@ public class HelmAppsService implements AppsService {
             String caFile,
             boolean dryRun)
             throws IOException, InterruptedException, TimeoutException {
-        pauseOrResume(
+        suspendOrResume(
                 region,
                 project,
                 catalogId,
@@ -453,7 +453,7 @@ public class HelmAppsService implements AppsService {
             String caFile,
             boolean dryRun)
             throws IOException, InterruptedException, TimeoutException {
-        pauseOrResume(
+        suspendOrResume(
                 region,
                 project,
                 catalogId,
@@ -466,7 +466,7 @@ public class HelmAppsService implements AppsService {
                 false);
     }
 
-    public void pauseOrResume(
+    public void suspendOrResume(
             Region region,
             Project project,
             String catalogId,
@@ -476,13 +476,13 @@ public class HelmAppsService implements AppsService {
             boolean skipTlsVerify,
             String caFile,
             boolean dryRun,
-            boolean pause)
+            boolean suspend)
             throws IOException, InterruptedException, TimeoutException {
         String namespaceId =
                 kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
-        if (pause) {
+        if (suspend) {
             getHelmInstallService()
-                    .pause(
+                    .suspend(
                             getHelmConfiguration(region, user),
                             catalogId + "/" + pkg.getName(),
                             namespaceId,
@@ -503,9 +503,9 @@ public class HelmAppsService implements AppsService {
                             skipTlsVerify,
                             caFile);
         }
-        PauseResumeServiceEvent event =
-                new PauseResumeServiceEvent(
-                        user.getIdep(), namespaceId, serviceId, pkg.getName(), catalogId, pause);
+        SuspendResumeServiceEvent event =
+                new SuspendResumeServiceEvent(
+                        user.getIdep(), namespaceId, serviceId, pkg.getName(), catalogId, suspend);
         onyxiaEventPublisher.publishEvent(event);
     }
 

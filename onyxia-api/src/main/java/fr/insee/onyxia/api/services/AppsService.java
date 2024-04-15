@@ -66,7 +66,7 @@ public interface AppsService {
             boolean dryRun)
             throws IOException, InterruptedException, TimeoutException;
 
-    void pause(
+    void suspend(
             Region region,
             Project project,
             String catalogId,

@@ -62,7 +62,7 @@ public class HelmInstallService {
                 true);
     }
 
-    public void pause(
+    public void suspend(
             HelmConfiguration configuration,
             String chart,
             String namespace,

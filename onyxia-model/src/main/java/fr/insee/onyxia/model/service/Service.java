@@ -74,8 +74,8 @@ public class Service {
     @Schema(description = "Is this service pausable ?")
     private boolean pausable = false;
 
-    @Schema(description = "Is this service paused ?")
-    private boolean paused = false;
+    @Schema(description = "Is this service suspended ?")
+    private boolean suspended = false;
 
     @Schema(description = "")
     private Map<String, String> labels;
@@ -252,16 +252,16 @@ public class Service {
         return pausable;
     }
 
-    public boolean isPaused() {
-        return paused;
+    public boolean isSuspended() {
+        return suspended;
     }
 
     public void setPausable(boolean pausable) {
         this.pausable = pausable;
     }
 
-    public void setPaused(boolean paused) {
-        this.paused = paused;
+    public void setSuspended(boolean suspended) {
+        this.suspended = suspended;
     }
 
     @Schema(description = "")
