@@ -400,7 +400,7 @@ public class HelmAppsService implements AppsService {
                             currentNode ->
                                     mapAppender(result, currentNode, new ArrayList<String>()));
             service.setEnv(result);
-            service.setPausable(service.getEnv().containsKey(SUSPEND_KEY));
+            service.setSuspendable(service.getEnv().containsKey(SUSPEND_KEY));
             if (service.getEnv().containsKey(SUSPEND_KEY)) {
                 service.setSuspended(Boolean.parseBoolean(service.getEnv().get(SUSPEND_KEY)));
             }

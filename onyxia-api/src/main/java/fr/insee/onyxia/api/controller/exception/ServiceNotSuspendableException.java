@@ -5,10 +5,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-public class ServiceNotPausableException extends RuntimeException {
-    public ServiceNotPausableException() {
+public class ServiceNotSuspendableException extends RuntimeException {
+    public ServiceNotSuspendableException() {
         super(
-                "This service is not pausable. To be pausable, a service must define "
+                "This service is not suspendable. To be suspendable, a service must define "
                         + HelmAppsService.SUSPEND_KEY
                         + " as a key in values.schema.json");
     }
