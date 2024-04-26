@@ -9,6 +9,7 @@ import fr.insee.onyxia.api.configuration.kubernetes.KubernetesClientProvider;
 import fr.insee.onyxia.api.controller.exception.NamespaceNotFoundException;
 import fr.insee.onyxia.api.events.InstallServiceEvent;
 import fr.insee.onyxia.api.events.OnyxiaEventPublisher;
+import fr.insee.onyxia.api.events.SuspendResumeServiceEvent;
 import fr.insee.onyxia.api.events.UninstallServiceEvent;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.control.AdmissionControllerHelm;
@@ -53,6 +54,8 @@ import org.springframework.security.access.AccessDeniedException;
 @org.springframework.stereotype.Service
 @Qualifier("Helm")
 public class HelmAppsService implements AppsService {
+
+    public static final String SUSPEND_KEY = "global.suspend";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HelmAppsService.class);
 
@@ -184,7 +187,6 @@ public class HelmAppsService implements AppsService {
         String namespaceId =
                 kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
         try {
-
             HelmInstaller res =
                     getHelmInstallService()
                             .installChart(
@@ -398,6 +400,10 @@ public class HelmAppsService implements AppsService {
                             currentNode ->
                                     mapAppender(result, currentNode, new ArrayList<String>()));
             service.setEnv(result);
+            service.setSuspendable(service.getEnv().containsKey(SUSPEND_KEY));
+            if (service.getEnv().containsKey(SUSPEND_KEY)) {
+                service.setSuspended(Boolean.parseBoolean(service.getEnv().get(SUSPEND_KEY)));
+            }
         } catch (Exception e) {
             LOGGER.warn("Exception occurred", e);
         }
@@ -408,6 +414,99 @@ public class HelmAppsService implements AppsService {
             LOGGER.warn("Exception occurred", e);
         }
         return service;
+    }
+
+    @Override
+    public void suspend(
+            Region region,
+            Project project,
+            String catalogId,
+            Pkg pkg,
+            User user,
+            String serviceId,
+            boolean skipTlsVerify,
+            String caFile,
+            boolean dryRun)
+            throws IOException, InterruptedException, TimeoutException {
+        suspendOrResume(
+                region,
+                project,
+                catalogId,
+                pkg,
+                user,
+                serviceId,
+                skipTlsVerify,
+                caFile,
+                dryRun,
+                true);
+    }
+
+    @Override
+    public void resume(
+            Region region,
+            Project project,
+            String catalogId,
+            Pkg pkg,
+            User user,
+            String serviceId,
+            boolean skipTlsVerify,
+            String caFile,
+            boolean dryRun)
+            throws IOException, InterruptedException, TimeoutException {
+        suspendOrResume(
+                region,
+                project,
+                catalogId,
+                pkg,
+                user,
+                serviceId,
+                skipTlsVerify,
+                caFile,
+                dryRun,
+                false);
+    }
+
+    public void suspendOrResume(
+            Region region,
+            Project project,
+            String catalogId,
+            Pkg pkg,
+            User user,
+            String serviceId,
+            boolean skipTlsVerify,
+            String caFile,
+            boolean dryRun,
+            boolean suspend)
+            throws IOException, InterruptedException, TimeoutException {
+        String namespaceId =
+                kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
+        if (suspend) {
+            getHelmInstallService()
+                    .suspend(
+                            getHelmConfiguration(region, user),
+                            catalogId + "/" + pkg.getName(),
+                            namespaceId,
+                            serviceId,
+                            pkg.getVersion(),
+                            dryRun,
+                            skipTlsVerify,
+                            caFile);
+        } else {
+            getHelmInstallService()
+                    .resume(
+                            getHelmConfiguration(region, user),
+                            catalogId + "/" + pkg.getName(),
+                            namespaceId,
+                            serviceId,
+                            pkg.getVersion(),
+                            dryRun,
+                            skipTlsVerify,
+                            caFile);
+        }
+        SuspendResumeServiceEvent event =
+                new SuspendResumeServiceEvent(
+                        user.getIdep(), namespaceId, serviceId, pkg.getName(), catalogId, suspend);
+        onyxiaEventPublisher.publishEvent(event);
     }
 
     private void mapAppender(
