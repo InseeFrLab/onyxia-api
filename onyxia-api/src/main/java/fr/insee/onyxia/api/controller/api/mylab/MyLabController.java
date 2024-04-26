@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.configuration.Catalogs;
 import fr.insee.onyxia.api.configuration.NotFoundException;
+import fr.insee.onyxia.api.controller.exception.ServiceNotSuspendableException;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.api.services.UserProvider;
@@ -142,6 +143,80 @@ public class MyLabController {
                     region, project, userProvider.getUser(region), serviceId);
         }
         return null;
+    }
+
+    @PostMapping("/app/suspend")
+    public void suspendApp(
+            @Parameter(hidden = true) Region region,
+            @Parameter(hidden = true) Project project,
+            @RequestBody SuspendOrResumeRequestDTO request)
+            throws Exception {
+        suspendOrResume(region, project, request.getServiceID(), true);
+    }
+
+    @PostMapping("/app/resume")
+    public void resumeApp(
+            @Parameter(hidden = true) Region region,
+            @Parameter(hidden = true) Project project,
+            @RequestBody SuspendOrResumeRequestDTO request)
+            throws Exception {
+        suspendOrResume(region, project, request.getServiceID(), false);
+    }
+
+    private void suspendOrResume(Region region, Project project, String serviceId, boolean suspend)
+            throws Exception {
+        if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
+            User user = userProvider.getUser(region);
+            Service userService =
+                    helmAppsService.getUserService(
+                            region, project, userProvider.getUser(region), serviceId);
+            if (!userService.isSuspendable()) {
+                throw new ServiceNotSuspendableException();
+            }
+            String chart = userService.getChart();
+            int split = chart.lastIndexOf('-');
+            String chartName = chart.substring(0, split);
+            String version = chart.substring(split + 1);
+            List<CatalogWrapper> elligibleCatalogs =
+                    catalogService.getCatalogs(region, user).getCatalogs().stream()
+                            .filter(
+                                    catalog ->
+                                            catalog.getCatalog()
+                                                    .getPackageByNameAndVersion(chartName, version)
+                                                    .isPresent())
+                            .toList();
+            if (elligibleCatalogs.isEmpty()) {
+                throw new NotFoundException();
+            }
+            if (elligibleCatalogs.size() > 1) {
+                throw new IllegalStateException("Chart is present in multiple catalogs, abort");
+            }
+            CatalogWrapper catalog = elligibleCatalogs.getFirst();
+            Pkg pkg = catalog.getCatalog().getPackageByNameAndVersion(chartName, version).get();
+            if (suspend) {
+                helmAppsService.suspend(
+                        region,
+                        project,
+                        catalog.getId(),
+                        pkg,
+                        user,
+                        serviceId,
+                        catalog.getSkipTlsVerify(),
+                        catalog.getCaFile(),
+                        false);
+            } else {
+                helmAppsService.resume(
+                        region,
+                        project,
+                        catalog.getId(),
+                        pkg,
+                        user,
+                        serviceId,
+                        catalog.getSkipTlsVerify(),
+                        catalog.getCaFile(),
+                        false);
+            }
+        }
     }
 
     @Operation(
@@ -355,5 +430,17 @@ public class MyLabController {
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
         return helmAppsService.installApp(
                 region, project, requestDTO, catalogId, pkg, user, fusion, skipTlsVerify, caFile);
+    }
+
+    public static class SuspendOrResumeRequestDTO {
+        private String serviceID;
+
+        public String getServiceID() {
+            return serviceID;
+        }
+
+        public void setServiceID(String serviceID) {
+            this.serviceID = serviceID;
+        }
     }
 }

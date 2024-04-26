@@ -34,6 +34,62 @@ public class HelmInstallService {
     private static final String MANIFEST_INFO_TYPE = "manifest";
     private static final String NOTES_INFO_TYPE = "notes";
 
+    public void resume(
+            HelmConfiguration configuration,
+            String chart,
+            String namespace,
+            String name,
+            String version,
+            boolean dryRun,
+            final boolean skipTlsVerify,
+            String caFile)
+            throws InvalidExitValueException,
+                    IOException,
+                    InterruptedException,
+                    TimeoutException,
+                    IllegalArgumentException {
+        installChart(
+                configuration,
+                chart,
+                namespace,
+                name,
+                version,
+                dryRun,
+                null,
+                Map.of("global.suspend", "false"),
+                skipTlsVerify,
+                caFile,
+                true);
+    }
+
+    public void suspend(
+            HelmConfiguration configuration,
+            String chart,
+            String namespace,
+            String name,
+            String version,
+            boolean dryRun,
+            final boolean skipTlsVerify,
+            String caFile)
+            throws InvalidExitValueException,
+                    IOException,
+                    InterruptedException,
+                    TimeoutException,
+                    IllegalArgumentException {
+        installChart(
+                configuration,
+                chart,
+                namespace,
+                name,
+                version,
+                dryRun,
+                null,
+                Map.of("global.suspend", "true"),
+                skipTlsVerify,
+                caFile,
+                true);
+    }
+
     public HelmInstaller installChart(
             HelmConfiguration configuration,
             String chart,
@@ -45,6 +101,37 @@ public class HelmInstallService {
             Map<String, String> env,
             final boolean skipTlsVerify,
             String caFile)
+            throws InvalidExitValueException,
+                    IOException,
+                    InterruptedException,
+                    TimeoutException,
+                    IllegalArgumentException {
+        return installChart(
+                configuration,
+                chart,
+                namespace,
+                name,
+                version,
+                dryRun,
+                values,
+                env,
+                skipTlsVerify,
+                caFile,
+                false);
+    }
+
+    public HelmInstaller installChart(
+            HelmConfiguration configuration,
+            String chart,
+            String namespace,
+            String name,
+            String version,
+            boolean dryRun,
+            File values,
+            Map<String, String> env,
+            final boolean skipTlsVerify,
+            String caFile,
+            boolean reuseValues)
             throws InvalidExitValueException,
                     IOException,
                     InterruptedException,
@@ -85,6 +172,9 @@ public class HelmInstallService {
         }
         if (dryRun) {
             command.append(" --dry-run");
+        }
+        if (reuseValues) {
+            command.append(" --reuse-values");
         }
         String res =
                 Command.executeAndGetResponseAsJson(configuration, command.toString())
@@ -176,7 +266,7 @@ public class HelmInstallService {
         if (env != null) {
             Set<String> envKeys = env.keySet();
             return envKeys.stream()
-                    .map(key -> "--set " + key + "=" + env.get(key))
+                    .map(key -> " --set " + key + "=" + env.get(key))
                     .collect(Collectors.joining(" "));
         }
         return "";
