@@ -16,6 +16,15 @@ public abstract class CatalogWrapper {
         return entries.get(name).stream().findFirst();
     }
 
+    public Optional<Chart> getPackageByNameAndVersion(String name, String version) {
+        if (!entries.containsKey(name)) {
+            return Optional.empty();
+        }
+        return entries.get(name).stream()
+                .filter(p -> version.equalsIgnoreCase(p.getVersion()))
+                .findFirst();
+    }
+
     /**
      * @return the packages
      */
