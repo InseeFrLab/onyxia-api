@@ -208,6 +208,7 @@ public class HelmAppsService implements AppsService {
                             pkg.getName(),
                             catalogId);
             onyxiaEventPublisher.publishEvent(installServiceEvent);
+            kubernetesService.createOnyxiaSecret(namespaceId,requestDTO.getName());
             return List.of(res.getManifest());
         } catch (IllegalArgumentException e) {
             throw new AccessDeniedException(e.getMessage());

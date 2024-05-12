@@ -219,6 +219,38 @@ public class KubernetesService {
         }
     }
 
+    private void createOnyxiaSecret(
+            String namespaceId,
+            String releaseName) {
+
+        final KubernetesClient kubClient = kubernetesClientProvider.getRootClient(region);
+        String ownerSecretName = "sh.helm.release.v1."+releaseName+".v1"; // Name of the Secret managed by Helm
+
+        // Fetch the existing secret managed by Helm
+        Secret ownerSecret = kubClient.secrets().inNamespace(namespace).withName(ownerSecretName).get();
+ 
+        // Create owner reference
+        OwnerReference ownerReference = new OwnerReferenceBuilder()
+            .withApiVersion(ownerSecret.getApiVersion())
+            .withKind(ownerSecret.getKind())
+            .withName(ownerSecret.getMetadata().getName())
+            .withUid(ownerSecret.getMetadata().getUid())
+            .withController(true) // Optional: Specifies that this owner is a controller
+            .build();
+
+        // Define the new secret
+        Secret newSecret = new SecretBuilder()
+            .withNewMetadata()
+                .withName("sh.onyxia.release.v1"+releaseName)
+                .addNewOwnerReferenceLike(ownerReference).endOwnerReference()
+                .endMetadata()
+            .addToData("key", "dmFsdWU=") // Your secret data here, base64 encoded
+            .build();
+
+        // Create the secret in Kubernetes
+        newSecret = client.secrets().inNamespace(namespace).create(newSecret);
+    }
+
     private String getNameFromOwner(Region region, Owner owner) {
         String username = owner.getId();
         if (owner.getType() == Owner.OwnerType.USER
