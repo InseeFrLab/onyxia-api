@@ -253,7 +253,7 @@ public class KubernetesService {
             .build();
 
         // Create the secret in Kubernetes
-        newSecret = kubClient.secrets().inNamespace(namespace).create(newSecret);
+        newSecret = kubClient.secrets().inNamespace(namespaceId).create(newSecret);
     }
 
     private String getNameFromOwner(Region region, Owner owner) {
