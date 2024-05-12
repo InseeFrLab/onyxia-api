@@ -223,7 +223,7 @@ public class KubernetesService {
         }
     }
 
-    private void createOnyxiaSecret(
+    public void createOnyxiaSecret(
             Region region,
             String namespaceId,
             String releaseName) {
@@ -233,7 +233,7 @@ public class KubernetesService {
 
         // Fetch the existing secret managed by Helm
         Secret ownerSecret = kubClient.secrets().inNamespace(namespaceId).withName(ownerSecretName).get();
- 
+
         // Create owner reference
         OwnerReference ownerReference = new OwnerReferenceBuilder()
             .withApiVersion(ownerSecret.getApiVersion())
