@@ -246,7 +246,7 @@ public class KubernetesService {
         // Define the new secret
         Secret newSecret = new SecretBuilder()
             .withNewMetadata()
-                .withName("sh.onyxia.release.v1"+releaseName)
+                .withName("sh.onyxia.release.v1."+releaseName)
                 .addNewOwnerReferenceLike(ownerReference).endOwnerReference()
                 .endMetadata()
             .addToData("key", "dmFsdWU=") // Your secret data here, base64 encoded
