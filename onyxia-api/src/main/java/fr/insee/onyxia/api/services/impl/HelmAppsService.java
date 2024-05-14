@@ -448,6 +448,73 @@ public class HelmAppsService implements AppsService {
         return service;
     }
 
+
+    @Override
+    public void rename(
+            Region region,
+            Project project,
+            User user,
+            String serviceId,
+            String friendlyName)
+            throws IOException, InterruptedException, TimeoutException {
+        String namespaceId = kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
+        KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
+        Secret secret = client.secrets().inNamespace(release.getNamespace()).withName("sh.onyxia.release.v1."+release.getName()).get();
+        if (secret != null) {
+            Map<String, String> secretData = secret.getData();
+            if (secretData == null) {
+                // Initialize the map if it's null
+                secretData = new HashMap<>();
+            }
+            // Add the new key with its value encoded in Base64
+            secretData.put("friendlyName", Base64.getEncoder().encodeToString(friendlyName.getBytes()));
+            // Update the secret with the new data map
+            secret.setData(secretData);
+            // Save the updated secret back to Kubernetes
+            client.secrets().inNamespace(namespace).createOrReplace(secret);
+        }
+        else {
+            Map<String, String> metadata = new HashMap<>();
+            metadata.put("friendlyName", Base64.getEncoder().encodeToString(friendlyName.getBytes()));
+            kubernetesService.createOnyxiaSecret(region,namespaceId,serviceId,metadata);
+        }
+    }
+
+    @Override
+    public void share(
+            Region region,
+            Project project,
+            User user,
+            String serviceId,
+            boolean share)
+            throws IOException, InterruptedException, TimeoutException {
+        String namespaceId = kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
+        KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
+        Secret secret = client.secrets().inNamespace(release.getNamespace()).withName("sh.onyxia.release.v1."+release.getName()).get();
+        if (secret != null) {
+            Map<String, String> secretData = secret.getData();
+            if (secretData == null) {
+                // Initialize the map if it's null
+                secretData = new HashMap<>();
+            }
+            // Add the new key with its value encoded in Base64
+            byte[] byteArray = new byte[1];
+            byteArray[0] = (byte) (share() ? 1 : 0);
+            secretData.put("share", Base64.getEncoder().encodeToString(byteArray));
+            // Update the secret with the new data map
+            secret.setData(secretData);
+            // Save the updated secret back to Kubernetes
+            client.secrets().inNamespace(namespace).createOrReplace(secret);
+        }
+        else {
+            Map<String, String> metadata = new HashMap<>();
+            byte[] byteArray = new byte[1];
+            byteArray[0] = (byte) (share() ? 1 : 0);
+            metadata.put("share", Base64.getEncoder().encodeToString(byteArray));
+            metadata.put("owner", Base64.getEncoder().encodeToString(user.getIdep().getBytes()));
+            kubernetesService.createOnyxiaSecret(region,namespaceId,serviceId,metadata);
+        }
+    }
     @Override
     public void suspend(
             Region region,

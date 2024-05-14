@@ -145,6 +145,30 @@ public class MyLabController {
         return null;
     }
 
+    @PostMapping("/app/rename")
+    public void renameApp(
+            @Parameter(hidden = true) Region region,
+            @Parameter(hidden = true) Project project,
+            @RequestBody RenameRequestDTO request)
+            throws Exception {
+        if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
+            User user = userProvider.getUser(region);
+            helmAppsService.rename(region, project, userProvider.getUser(region), serviceId, request.getFriendlyName());
+        }
+    }
+
+    @PostMapping("/app/share")
+    public void shareApp(
+            @Parameter(hidden = true) Region region,
+            @Parameter(hidden = true) Project project,
+            @RequestBody ShareRequestDTO request)
+            throws Exception {
+        if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
+            User user = userProvider.getUser(region);
+            helmAppsService.share(region, project, userProvider.getUser(region), serviceId, request.isShare());
+        }
+    }
+
     @PostMapping("/app/suspend")
     public void suspendApp(
             @Parameter(hidden = true) Region region,
@@ -441,6 +465,47 @@ public class MyLabController {
 
         public void setServiceID(String serviceID) {
             this.serviceID = serviceID;
+        }
+    }
+
+    public static class RenameRequestDTO {
+        private String serviceID;
+        private String friendlyName;
+
+        public String getServiceID() {
+            return serviceID;
+        }
+
+        public void setServiceID(String serviceID) {
+            this.serviceID = serviceID;
+        }
+
+        public String getFriendlyName() {
+            return friendlyName;
+        }
+
+        public void setFriendlyName(String friendlyName) {
+            this.friendlyName = friendlyName;
+        }
+    }
+
+    public static class ShareRequestDTO {
+        private String serviceID;
+        private boolean share;
+
+        public String getServiceID() {
+            return serviceID;
+        }
+
+        public void setServiceID(String serviceID) {
+            this.serviceID = serviceID;
+        }
+        public boolean isShare() {
+            return share;
+        }
+
+        public void setShare(boolean share) {
+            this.share = share;
         }
     }
 }
