@@ -499,7 +499,7 @@ public class HelmAppsService implements AppsService {
             }
             // Add the new key with its value encoded in Base64
             byte[] byteArray = new byte[1];
-            byteArray[0] = (byte) (share() ? 1 : 0);
+            byteArray[0] = (byte) (share ? 1 : 0);
             secretData.put("share", Base64.getEncoder().encodeToString(byteArray));
             // Update the secret with the new data map
             secret.setData(secretData);
@@ -509,7 +509,7 @@ public class HelmAppsService implements AppsService {
         else {
             Map<String, String> metadata = new HashMap<>();
             byte[] byteArray = new byte[1];
-            byteArray[0] = (byte) (share() ? 1 : 0);
+            byteArray[0] = (byte) (share ? 1 : 0);
             metadata.put("share", Base64.getEncoder().encodeToString(byteArray));
             metadata.put("owner", Base64.getEncoder().encodeToString(user.getIdep().getBytes()));
             kubernetesService.createOnyxiaSecret(region,namespaceId,serviceId,metadata);
