@@ -476,6 +476,7 @@ public class HelmAppsService implements AppsService {
         else {
             Map<String, String> metadata = new HashMap<>();
             metadata.put("friendlyName", Base64.getEncoder().encodeToString(friendlyName.getBytes()));
+            metadata.put("owner", Base64.getEncoder().encodeToString(user.getIdep().getBytes()));
             kubernetesService.createOnyxiaSecret(region,namespaceId,serviceId,metadata);
         }
     }
