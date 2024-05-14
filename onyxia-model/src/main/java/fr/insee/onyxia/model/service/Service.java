@@ -284,7 +284,7 @@ public class Service {
         this.catalogId = catalogId;
     }
 
-    public void isShare() {
+    public boolean isShare() {
         return share;
     }
 
