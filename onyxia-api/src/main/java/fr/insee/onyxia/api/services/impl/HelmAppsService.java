@@ -211,7 +211,9 @@ public class HelmAppsService implements AppsService {
             Map<String, String> metadata = new HashMap<>();
             metadata.put("catalog", Base64.getEncoder().encodeToString(catalogId.getBytes()));
             metadata.put("owner", Base64.getEncoder().encodeToString(user.getIdep().getBytes()));
-            metadata.put("friendlyName", Base64.getEncoder().encodeToString(requestDTO.getFriendlyName().getBytes()));
+            if (requestDTO.getFriendlyName()!=null){
+                metadata.put("friendlyName", Base64.getEncoder().encodeToString(requestDTO.getFriendlyName().getBytes()));
+            }
             byte[] byteArray = new byte[1];
             byteArray[0] = (byte) (requestDTO.isShare() ? 1 : 0);
             metadata.put("share", Base64.getEncoder().encodeToString(byteArray));
