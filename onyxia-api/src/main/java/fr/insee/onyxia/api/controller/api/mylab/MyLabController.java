@@ -153,7 +153,7 @@ public class MyLabController {
             throws Exception {
         if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
             User user = userProvider.getUser(region);
-            helmAppsService.rename(region, project, userProvider.getUser(region), serviceId, request.getFriendlyName());
+            helmAppsService.rename(region, project, userProvider.getUser(region), request.getServiceID(), request.getFriendlyName());
         }
     }
 
@@ -165,7 +165,7 @@ public class MyLabController {
             throws Exception {
         if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
             User user = userProvider.getUser(region);
-            helmAppsService.share(region, project, userProvider.getUser(region), serviceId, request.isShare());
+            helmAppsService.share(region, project, userProvider.getUser(region), request.getServiceID(), request.isShare());
         }
     }
 

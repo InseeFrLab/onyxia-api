@@ -459,7 +459,7 @@ public class HelmAppsService implements AppsService {
             throws IOException, InterruptedException, TimeoutException {
         String namespaceId = kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
         KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
-        Secret secret = client.secrets().inNamespace(release.getNamespace()).withName("sh.onyxia.release.v1."+release.getName()).get();
+        Secret secret = client.secrets().inNamespace(release.getNamespace()).withName("sh.onyxia.release.v1."+serviceId).get();
         if (secret != null) {
             Map<String, String> secretData = secret.getData();
             if (secretData == null) {
@@ -471,7 +471,7 @@ public class HelmAppsService implements AppsService {
             // Update the secret with the new data map
             secret.setData(secretData);
             // Save the updated secret back to Kubernetes
-            client.secrets().inNamespace(namespace).createOrReplace(secret);
+            client.secrets().inNamespace(namespaceId).createOrReplace(secret);
         }
         else {
             Map<String, String> metadata = new HashMap<>();
@@ -490,7 +490,7 @@ public class HelmAppsService implements AppsService {
             throws IOException, InterruptedException, TimeoutException {
         String namespaceId = kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
         KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
-        Secret secret = client.secrets().inNamespace(release.getNamespace()).withName("sh.onyxia.release.v1."+release.getName()).get();
+        Secret secret = client.secrets().inNamespace(release.getNamespace()).withName("sh.onyxia.release.v1."+serviceId).get();
         if (secret != null) {
             Map<String, String> secretData = secret.getData();
             if (secretData == null) {
@@ -504,7 +504,7 @@ public class HelmAppsService implements AppsService {
             // Update the secret with the new data map
             secret.setData(secretData);
             // Save the updated secret back to Kubernetes
-            client.secrets().inNamespace(namespace).createOrReplace(secret);
+            client.secrets().inNamespace(namespaceId).createOrReplace(secret);
         }
         else {
             Map<String, String> metadata = new HashMap<>();
