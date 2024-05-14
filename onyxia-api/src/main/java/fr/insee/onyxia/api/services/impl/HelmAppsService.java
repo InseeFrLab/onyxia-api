@@ -390,6 +390,17 @@ public class HelmAppsService implements AppsService {
         } catch (Exception e) {
             service.setStartedAt(0);
         }
+        try {
+            KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
+            Secret secret = client.secrets().inNamespace(release.getNamespace()).withName("sh.onyxia.release.v1."+release.getName()).get();
+            service.setFriendlyName(new String(Base64.getDecoder().decode(secret.getData().get("friendlyName"))));
+            service.setOwner(new String(Base64.getDecoder().decode(secret.getData().get("owner"))));
+            service.setCatalogId(new String(Base64.getDecoder().decode(secret.getData().get("catalog"))));
+            byte[] byteArray = Base64.getDecoder().decode(secret.getData().get("share"));
+            service.setShare(byteArray[0] != 0);                
+        } catch (Exception e) {
+            LOGGER.warn("Exception occurred", e);
+        }
         service.setId(release.getName());
         service.setName(release.getName());
         service.setSubtitle(release.getChart());
