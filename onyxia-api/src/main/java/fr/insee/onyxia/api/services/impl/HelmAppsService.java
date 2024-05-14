@@ -213,7 +213,7 @@ public class HelmAppsService implements AppsService {
             metadata.put("owner", Base64.getEncoder().encodeToString(user.getIdep().getBytes()));
             metadata.put("friendlyName", Base64.getEncoder().encodeToString(requestDTO.getFriendlyName().getBytes()));
             byte[] byteArray = new byte[1];
-            byteArray[0] = (byte) (requestDTO.getShare() ? 1 : 0);
+            byteArray[0] = (byte) (requestDTO.isShare() ? 1 : 0);
             metadata.put("share", Base64.getEncoder().encodeToString(byteArray));
             kubernetesService.createOnyxiaSecret(region,namespaceId,requestDTO.getName(),metadata);
             return List.of(res.getManifest());

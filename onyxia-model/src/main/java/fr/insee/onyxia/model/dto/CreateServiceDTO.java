@@ -99,7 +99,7 @@ public class CreateServiceDTO {
         return friendlyName;
     }
 
-    public void setName(String nafriendlyNameme) {
+    public void setFriendlyName(String friendlyName) {
         this.friendlyName = friendlyName;
     }
 }
