@@ -394,11 +394,21 @@ public class HelmAppsService implements AppsService {
         try {
             KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
             Secret secret = client.secrets().inNamespace(release.getNamespace()).withName("sh.onyxia.release.v1."+release.getName()).get();
-            service.setFriendlyName(new String(Base64.getDecoder().decode(secret.getData().get("friendlyName"))));
-            service.setOwner(new String(Base64.getDecoder().decode(secret.getData().get("owner"))));
-            service.setCatalogId(new String(Base64.getDecoder().decode(secret.getData().get("catalog"))));
-            byte[] byteArray = Base64.getDecoder().decode(secret.getData().get("share"));
-            service.setShare(byteArray[0] != 0);                
+            if (secret!=null && secret.getData() != null){
+                if ( secret.getData().containsKey("friendlyName")) {
+                   service.setFriendlyName(new String(Base64.getDecoder().decode(secret.getData().get("friendlyName"))));
+                }
+                if ( secret.getData().containsKey("owner")) {
+                   service.setOwner(new String(Base64.getDecoder().decode(secret.getData().get("owner"))));
+                }
+                if ( secret.getData().containsKey("catalog")) {
+                   service.setCatalogId(new String(Base64.getDecoder().decode(secret.getData().get("catalog"))));
+                }
+                if ( secret.getData().containsKey("share")) {
+                    byte[] byteArray = Base64.getDecoder().decode(secret.getData().get("share"));
+                    service.setShare(byteArray[0] != 0);     
+                }
+            }           
         } catch (Exception e) {
             LOGGER.warn("Exception occurred", e);
         }
