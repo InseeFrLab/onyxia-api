@@ -459,7 +459,7 @@ public class HelmAppsService implements AppsService {
             throws IOException, InterruptedException, TimeoutException {
         String namespaceId = kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
         KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
-        Secret secret = client.secrets().inNamespace(release.getNamespace()).withName("sh.onyxia.release.v1."+serviceId).get();
+        Secret secret = client.secrets().inNamespace(namespaceId).withName("sh.onyxia.release.v1."+serviceId).get();
         if (secret != null) {
             Map<String, String> secretData = secret.getData();
             if (secretData == null) {
@@ -490,7 +490,7 @@ public class HelmAppsService implements AppsService {
             throws IOException, InterruptedException, TimeoutException {
         String namespaceId = kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
         KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
-        Secret secret = client.secrets().inNamespace(release.getNamespace()).withName("sh.onyxia.release.v1."+serviceId).get();
+        Secret secret = client.secrets().inNamespace(namespaceId).withName("sh.onyxia.release.v1."+serviceId).get();
         if (secret != null) {
             Map<String, String> secretData = secret.getData();
             if (secretData == null) {
