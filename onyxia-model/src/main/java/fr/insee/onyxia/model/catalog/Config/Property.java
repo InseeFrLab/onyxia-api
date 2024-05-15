@@ -357,7 +357,7 @@ public class Property {
 
         boolean hidden = false;
         boolean readonly = false;
-        String overwriteDefaultWith;
+        Object overwriteDefaultWith;
         String useRegionSliderConfig;
         Object formFieldLabel;
         Object formFieldHelperText;
@@ -378,11 +378,11 @@ public class Property {
             this.readonly = readonly;
         }
 
-        public String getOverwriteDefaultWith() {
+        public Object getOverwriteDefaultWith() {
             return overwriteDefaultWith;
         }
 
-        public void setOverwriteDefaultWith(String overwriteDefaultWith) {
+        public void setOverwriteDefaultWith(Object overwriteDefaultWith) {
             this.overwriteDefaultWith = overwriteDefaultWith;
         }
 
