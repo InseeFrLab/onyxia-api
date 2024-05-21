@@ -10,16 +10,16 @@ import fr.insee.onyxia.model.project.Project;
 import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.quota.Quota;
 import io.fabric8.kubernetes.api.model.NamespaceBuilder;
+import io.fabric8.kubernetes.api.model.OwnerReference;
+import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.ResourceQuota;
 import io.fabric8.kubernetes.api.model.ResourceQuotaBuilder;
+import io.fabric8.kubernetes.api.model.Secret;
+import io.fabric8.kubernetes.api.model.SecretBuilder;
 import io.fabric8.kubernetes.api.model.rbac.RoleBinding;
 import io.fabric8.kubernetes.api.model.rbac.RoleBindingBuilder;
 import io.fabric8.kubernetes.api.model.rbac.SubjectBuilder;
-import io.fabric8.kubernetes.api.model.OwnerReference;
-import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
-import io.fabric8.kubernetes.api.model.Secret;
-import io.fabric8.kubernetes.api.model.SecretBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import java.util.Map;
@@ -224,35 +224,37 @@ public class KubernetesService {
     }
 
     public void createOnyxiaSecret(
-            Region region,
-            String namespaceId,
-            String releaseName,
-            Map<String, String> secretData) {
+            Region region, String namespaceId, String releaseName, Map<String, String> secretData) {
 
         final KubernetesClient kubClient = kubernetesClientProvider.getRootClient(region);
-        String ownerSecretName = "sh.helm.release.v1."+releaseName+".v1"; // Name of the Secret managed by Helm
+        String ownerSecretName =
+                "sh.helm.release.v1." + releaseName + ".v1"; // Name of the Secret managed by Helm
 
         // Fetch the existing secret managed by Helm
-        Secret ownerSecret = kubClient.secrets().inNamespace(namespaceId).withName(ownerSecretName).get();
+        Secret ownerSecret =
+                kubClient.secrets().inNamespace(namespaceId).withName(ownerSecretName).get();
 
         // Create owner reference
-        OwnerReference ownerReference = new OwnerReferenceBuilder()
-            .withApiVersion(ownerSecret.getApiVersion())
-            .withKind(ownerSecret.getKind())
-            .withName(ownerSecret.getMetadata().getName())
-            .withUid(ownerSecret.getMetadata().getUid())
-            .withController(true) // Optional: Specifies that this owner is a controller
-            .build();
+        OwnerReference ownerReference =
+                new OwnerReferenceBuilder()
+                        .withApiVersion(ownerSecret.getApiVersion())
+                        .withKind(ownerSecret.getKind())
+                        .withName(ownerSecret.getMetadata().getName())
+                        .withUid(ownerSecret.getMetadata().getUid())
+                        .withController(true) // Optional: Specifies that this owner is a controller
+                        .build();
 
         // Define the new secret
-        Secret newSecret = new SecretBuilder()
-            .withNewMetadata()
-                .withName("sh.onyxia.release.v1."+releaseName)
-                .addNewOwnerReferenceLike(ownerReference).endOwnerReference()
-                .endMetadata()
-            .addToData(secretData) // Your secret data here, base64 encoded
-            .withType("onyxia.sh/release.v1")
-            .build();
+        Secret newSecret =
+                new SecretBuilder()
+                        .withNewMetadata()
+                        .withName("sh.onyxia.release.v1." + releaseName)
+                        .addNewOwnerReferenceLike(ownerReference)
+                        .endOwnerReference()
+                        .endMetadata()
+                        .addToData(secretData) // Your secret data here, base64 encoded
+                        .withType("onyxia.sh/release.v1")
+                        .build();
 
         // Create the secret in Kubernetes
         newSecret = kubClient.secrets().inNamespace(namespaceId).create(newSecret);

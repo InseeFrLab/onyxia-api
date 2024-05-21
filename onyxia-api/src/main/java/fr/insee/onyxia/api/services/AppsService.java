@@ -54,20 +54,10 @@ public interface AppsService {
     Watch getEvents(Region region, Project project, User user, Watcher<Event> watcher)
             throws HelmInstallService.MultipleServiceFound, ParseException;
 
-    void rename(
-            Region region,
-            Project project,
-            User user,
-            String serviceId,
-            String friendlyName)
+    void rename(Region region, Project project, User user, String serviceId, String friendlyName)
             throws IOException, InterruptedException, TimeoutException;
 
-    void share(
-            Region region,
-            Project project,
-            User user,
-            String serviceId,
-            boolean share)
+    void share(Region region, Project project, User user, String serviceId, boolean share)
             throws IOException, InterruptedException, TimeoutException;
 
     void resume(

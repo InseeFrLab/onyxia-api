@@ -78,13 +78,13 @@ public class Service {
     private boolean suspended = false;
 
     @Schema(description = "CatalogId")
-    private String catalogId ;
+    private String catalogId;
 
     @Schema(description = "userID who starts the service")
-    private String owner ;
+    private String owner;
 
     @Schema(description = "friendly name of the service")
-    private String friendlyName ;
+    private String friendlyName;
 
     @Schema(description = "Is this service shared ?")
     private boolean share = false;

@@ -32,7 +32,8 @@ public class CreateServiceDTO {
     boolean dryRun = false;
 
     @Schema(
-            description = "When true, all users of the namespace will list this service, false by default",
+            description =
+                    "When true, all users of the namespace will list this service, false by default",
             defaultValue = "false")
     boolean share = false;
 
