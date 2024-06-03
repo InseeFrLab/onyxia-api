@@ -370,7 +370,7 @@ public class HelmAppsService implements AppsService {
             podInfo.put("owners", getOwnerReferences(pod,client));
             podInfoList.add(podInfo);
         }
-        res.setPodsAndOwners(filterPodsByOwnerReferences(podInfoList, hasMetadata));                                                             
+        res.setPodsAndOwners(filterPodsByOwnerReferences(podInfoList, hasMetadata,namespace));                                                             
         return res;
     }
 
@@ -416,18 +416,27 @@ public class HelmAppsService implements AppsService {
         }
     }
 
-    private List<Map<String, Object>> filterPodsByOwnerReferences(List<Map<String, Object>> podInfoList, List<HasMetadata> resourceList) {
-        Set<String> resourceUids = resourceList.stream()
-                .map(resource -> resource.getMetadata().getUid())
+    private List<Map<String, Object>> filterPodsByTopLevelOwnerReferences(List<Map<String, Object>> podInfoList, List<HasMetadata> resourceList, String namespace) {
+        Set<String> resourceNamesAndKinds = resourceList.stream()
+                .map(resource -> resource.getKind() + "/" + resource.getMetadata().getName())
                 .collect(Collectors.toSet());
 
         return podInfoList.stream()
                 .filter(podInfo -> {
                     List<Map<String, Object>> owners = (List<Map<String, Object>>) podInfo.get("owners");
                     return owners.stream()
-                            .anyMatch(owner -> resourceUids.contains(owner.get("uid")));
+                            .anyMatch(owner -> resourceNamesAndKinds.contains(findTopLevelOwner((String) owner.get("kind"), (String) owner.get("name"), namespace)));
                 })
                 .collect(Collectors.toList());
+    }
+
+    private String findTopLevelOwner(String kind, String name, String namespace,KubernetesClient client) {
+        HasMetadata resource = fetchOwnerResource(namespace, kind, name,client);
+        while (resource != null && !resource.getMetadata().getOwnerReferences().isEmpty()) {
+            OwnerReference ownerReference = resource.getMetadata().getOwnerReferences().get(0);
+            resource = fetchOwnerResource(namespace, ownerReference.getKind(), ownerReference.getName(),client);
+        }
+        return resource != null ? resource.getKind() + "/" + resource.getMetadata().getName() : null;
     }
 
     @Override
