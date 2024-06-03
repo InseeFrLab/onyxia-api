@@ -220,7 +220,7 @@ public class MyLabController {
     }
 
     @GetMapping("/app/details")
-    public Service getApp(
+    public Service getAppDetails(
             @Parameter(hidden = true) Region region,
             @Parameter(hidden = true) Project project,
             @RequestParam("serviceId") String serviceId)
