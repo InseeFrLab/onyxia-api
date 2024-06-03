@@ -344,17 +344,18 @@ public class HelmAppsService implements AppsService {
                                 kubernetesService.determineNamespaceAndCreateIfNeeded(
                                         region, project, user));
         Service res = getHelmApp(region, user, result);
-
+        KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
         List<HasMetadata> hasMetadata;
         try (InputStream inputStream =
-                new ByteArrayInputStream(manifest.getBytes(StandardCharsets.UTF_8))) {
+                new ByteArrayInputStream(res.getManifest().getBytes(StandardCharsets.UTF_8))) {
             hasMetadata = client.load(inputStream).items();
         } catch (IOException e) {
             throw new RuntimeException("Exception during loading manifest", e);
         }
-        res.setTemplates(hasMetadata);
+        List<Object> manifests = new ArrayList<Object>(hasMetadata); 
+        res.setTemplates(manifests);
         List<Map<String, Object>> podInfoList = new ArrayList<>();
-        KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
+        
         List<Pod> pods = client.pods().inNamespace(kubernetesService.determineNamespaceAndCreateIfNeeded(
                                         region, project, user)).list().getItems();
         for (Pod pod : pods) {
