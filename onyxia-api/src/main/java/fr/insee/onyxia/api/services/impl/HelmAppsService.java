@@ -370,7 +370,7 @@ public class HelmAppsService implements AppsService {
             podInfo.put("owners", getOwnerReferences(pod,client));
             podInfoList.add(podInfo);
         }
-        res.setPodsAndOwners(filterPodsByOwnerReferences(podInfoList, hasMetadata,namespace,client));                                                             
+        res.setPodsAndOwners(filterPodsByTopLevelOwnerReferences(podInfoList, hasMetadata, namespace, client));                                                             
         return res;
     }
 
