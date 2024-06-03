@@ -343,11 +343,17 @@ public class HelmAppsService implements AppsService {
                                 serviceId,
                                 kubernetesService.determineNamespaceAndCreateIfNeeded(
                                         region, project, user));
+        HelmReleaseInfo helmReleaseInfo =
+                getHelmInstallService()
+                        .getAll(
+                                getHelmConfiguration(region, user),
+                                result.getName(),
+                                result.getNamespace());
         Service res = getHelmApp(region, user, result);
         KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
         List<HasMetadata> hasMetadata;
         try (InputStream inputStream =
-                new ByteArrayInputStream(res.getManifest().getBytes(StandardCharsets.UTF_8))) {
+                new ByteArrayInputStream(helmReleaseInfo.getManifest().getBytes(StandardCharsets.UTF_8))) {
             hasMetadata = client.load(inputStream).items();
         } catch (IOException e) {
             throw new RuntimeException("Exception during loading manifest", e);
