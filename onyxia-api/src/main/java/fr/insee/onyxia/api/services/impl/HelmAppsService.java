@@ -348,7 +348,7 @@ public class HelmAppsService implements AppsService {
         for (Pod pod : pods) {
             Map<String, Object> podInfo = new HashMap<>();
             podInfo.put("podName", pod.getMetadata().getName());
-            podInfo.put("owners", getOwnerReferences(pod));
+            podInfo.put("owners", getOwnerReferences(pod,client));
             podInfoList.add(podInfo);
         }
         res.setPodsAndOwners(podInfoList);                                                             
@@ -370,7 +370,7 @@ public class HelmAppsService implements AppsService {
                     Map<String, Object> ownerInfo = new HashMap<>();
                     ownerInfo.put("kind", kind);
                     ownerInfo.put("name", name);
-                    ownerInfo.put("owners", getOwnerReferences(ownerResource));
+                    ownerInfo.put("owners", getOwnerReferences(ownerResource,client));
 
                     owners.add(ownerInfo);
                 }
