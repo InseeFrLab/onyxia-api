@@ -336,13 +336,14 @@ public class HelmAppsService implements AppsService {
         if (serviceId.startsWith("/")) {
             serviceId = serviceId.substring(1);
         }
+        String namespace = kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
         HelmLs result =
                 getHelmInstallService()
                         .getAppById(
                                 getHelmConfiguration(region, user),
                                 serviceId,
-                                kubernetesService.determineNamespaceAndCreateIfNeeded(
-                                        region, project, user));
+                                namespace
+                                );
         HelmReleaseInfo helmReleaseInfo =
                 getHelmInstallService()
                         .getAll(
@@ -362,8 +363,7 @@ public class HelmAppsService implements AppsService {
         res.setTemplates(manifests);
         List<Map<String, Object>> podInfoList = new ArrayList<>();
         
-        List<Pod> pods = client.pods().inNamespace(kubernetesService.determineNamespaceAndCreateIfNeeded(
-                                        region, project, user)).list().getItems();
+        List<Pod> pods = client.pods().inNamespace(namespace).list().getItems();
         for (Pod pod : pods) {
             Map<String, Object> podInfo = new HashMap<>();
             podInfo.put("podName", pod.getMetadata().getName());
@@ -416,7 +416,7 @@ public class HelmAppsService implements AppsService {
         }
     }
 
-    private List<Map<String, Object>> filterPodsByTopLevelOwnerReferences(List<Map<String, Object>> podInfoList, List<HasMetadata> resourceList, String namespace) {
+    private List<Map<String, Object>> filterPodsByTopLevelOwnerReferences(List<Map<String, Object>> podInfoList, List<HasMetadata> resourceList, String namespace,KubernetesClient client) {
         Set<String> resourceNamesAndKinds = resourceList.stream()
                 .map(resource -> resource.getKind() + "/" + resource.getMetadata().getName())
                 .collect(Collectors.toSet());
@@ -425,7 +425,7 @@ public class HelmAppsService implements AppsService {
                 .filter(podInfo -> {
                     List<Map<String, Object>> owners = (List<Map<String, Object>>) podInfo.get("owners");
                     return owners.stream()
-                            .anyMatch(owner -> resourceNamesAndKinds.contains(findTopLevelOwner((String) owner.get("kind"), (String) owner.get("name"), namespace)));
+                            .anyMatch(owner -> resourceNamesAndKinds.contains(findTopLevelOwner((String) owner.get("kind"), (String) owner.get("name"), namespace, client)));
                 })
                 .collect(Collectors.toList());
     }
