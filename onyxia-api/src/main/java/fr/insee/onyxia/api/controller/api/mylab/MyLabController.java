@@ -219,6 +219,19 @@ public class MyLabController {
         }
     }
 
+    @GetMapping("/app/details")
+    public Service getApp(
+            @Parameter(hidden = true) Region region,
+            @Parameter(hidden = true) Project project,
+            @RequestParam("serviceId") String serviceId)
+            throws Exception {
+        if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
+            return helmAppsService.getUserServiceDetails(
+                    region, project, userProvider.getUser(region), serviceId);
+        }
+        return null;
+    }
+
     @Operation(
             summary = "Get the logs of a task in an installed service.",
             description =

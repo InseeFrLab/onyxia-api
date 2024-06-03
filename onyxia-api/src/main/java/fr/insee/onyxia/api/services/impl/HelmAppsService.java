@@ -30,6 +30,9 @@ import fr.insee.onyxia.model.service.*;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.Watch;
 import io.fabric8.kubernetes.client.Watcher;
+import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.fabric8.kubernetes.api.model.OwnerReference;
+import io.fabric8.kubernetes.api.model.Pod;
 import io.github.inseefrlab.helmwrapper.configuration.HelmConfiguration;
 import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
 import io.github.inseefrlab.helmwrapper.model.HelmLs;
@@ -324,6 +327,75 @@ public class HelmAppsService implements AppsService {
         return getHelmApp(region, user, result);
     }
 
+    @Override
+    public Service getUserServiceDetails(Region region, Project project, User user, String serviceId)
+            throws MultipleServiceFound, ParseException {
+        if (serviceId.startsWith("/")) {
+            serviceId = serviceId.substring(1);
+        }
+        HelmLs result =
+                getHelmInstallService()
+                        .getAppById(
+                                getHelmConfiguration(region, user),
+                                serviceId,
+                                kubernetesService.determineNamespaceAndCreateIfNeeded(
+                                        region, project, user));
+        Service res = getHelmApp(region, user, result);
+        List<Map<String, Object>> podInfoList = new ArrayList<>();
+        KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
+        List<Pod> pods = client.pods().inNamespace(kubernetesService.determineNamespaceAndCreateIfNeeded(
+                                        region, project, user)).list().getItems();
+        for (Pod pod : pods) {
+            Map<String, Object> podInfo = new HashMap<>();
+            podInfo.put("podName", pod.getMetadata().getName());
+            podInfo.put("owners", getOwnerReferences(pod));
+            podInfoList.add(podInfo);
+        }
+        res.setPodsAndOwners(podInfoList);                                                             
+        return res;
+    }
+
+    private List<Map<String, Object>> getOwnerReferences(HasMetadata resource, KubernetesClient client) {
+        List<Map<String, Object>> owners = new ArrayList<>();
+
+        List<OwnerReference> ownerReferences = resource.getMetadata().getOwnerReferences();
+        if (ownerReferences != null) {
+            for (OwnerReference ownerReference : ownerReferences) {
+                String kind = ownerReference.getKind();
+                String name = ownerReference.getName();
+
+                // Fetch the owner resource
+                HasMetadata ownerResource = fetchOwnerResource(resource.getMetadata().getNamespace(), kind, name, client);
+                if (ownerResource != null) {
+                    Map<String, Object> ownerInfo = new HashMap<>();
+                    ownerInfo.put("kind", kind);
+                    ownerInfo.put("name", name);
+                    ownerInfo.put("owners", getOwnerReferences(ownerResource));
+
+                    owners.add(ownerInfo);
+                }
+            }
+        }
+
+        return owners;
+    }
+
+    private HasMetadata fetchOwnerResource(String namespace, String kind, String name, KubernetesClient client) {
+        switch (kind) {
+            case "ReplicaSet":
+                return client.apps().replicaSets().inNamespace(namespace).withName(name).get();
+            case "Deployment":
+                return client.apps().deployments().inNamespace(namespace).withName(name).get();
+            case "StatefulSet":
+                return client.apps().statefulSets().inNamespace(namespace).withName(name).get();
+            case "DaemonSet":
+                return client.apps().daemonSets().inNamespace(namespace).withName(name).get();
+            case "Pod":
+                return client.pods().inNamespace(namespace).withName(name).get();
+            default:
+                return null; // Handle other kinds if needed
+        }
+    }
     @Override
     public UninstallService destroyService(
             Region region, Project project, User user, final String path, boolean bulk)

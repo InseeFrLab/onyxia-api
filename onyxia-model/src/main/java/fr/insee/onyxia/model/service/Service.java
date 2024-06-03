@@ -80,6 +80,9 @@ public class Service {
     @Schema(description = "")
     private Map<String, String> labels;
 
+    @Schema(description = "")
+    private List<Map<String, Object>> podsAndOwners;
+
     public String getId() {
         return id;
     }
@@ -262,6 +265,14 @@ public class Service {
 
     public void setSuspended(boolean suspended) {
         this.suspended = suspended;
+    }
+
+    public List<Map<String, Object>> getPodsAndOwners() {
+        return podsAndOwners;
+    }
+
+    public void setPodsAndOwners(List<Map<String, Object>> podsAndOwners) {
+        this.podsAndOwners = podsAndOwners;
     }
 
     @Schema(description = "")
