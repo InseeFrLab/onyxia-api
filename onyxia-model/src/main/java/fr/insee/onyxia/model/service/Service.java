@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import io.fabric8.kubernetes.api.model.HasMetadata;
 
 @Schema(description = "")
 public class Service {
@@ -82,6 +83,8 @@ public class Service {
 
     @Schema(description = "")
     private List<Map<String, Object>> podsAndOwners;
+
+    private List<HasMetadata> templates;
 
     public String getId() {
         return id;
@@ -273,6 +276,14 @@ public class Service {
 
     public void setPodsAndOwners(List<Map<String, Object>> podsAndOwners) {
         this.podsAndOwners = podsAndOwners;
+    }
+
+    public List<HasMetadata> getTemplates() {
+        return templates;
+    }
+
+    public void setTemplates(List<HasMetadata> templates) {
+        this.templates = templates;
     }
 
     @Schema(description = "")

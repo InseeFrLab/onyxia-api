@@ -42,7 +42,9 @@ import io.github.inseefrlab.helmwrapper.service.HelmInstallService.MultipleServi
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
@@ -341,6 +343,15 @@ public class HelmAppsService implements AppsService {
                                 kubernetesService.determineNamespaceAndCreateIfNeeded(
                                         region, project, user));
         Service res = getHelmApp(region, user, result);
+
+        List<HasMetadata> hasMetadata;
+        try (InputStream inputStream =
+                new ByteArrayInputStream(manifest.getBytes(StandardCharsets.UTF_8))) {
+            hasMetadata = client.load(inputStream).items();
+        } catch (IOException e) {
+            throw new RuntimeException("Exception during loading manifest", e);
+        }
+        res.setTemplates(hasMetadata);
         List<Map<String, Object>> podInfoList = new ArrayList<>();
         KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
         List<Pod> pods = client.pods().inNamespace(kubernetesService.determineNamespaceAndCreateIfNeeded(
@@ -351,7 +362,7 @@ public class HelmAppsService implements AppsService {
             podInfo.put("owners", getOwnerReferences(pod,client));
             podInfoList.add(podInfo);
         }
-        res.setPodsAndOwners(podInfoList);                                                             
+        res.setPodsAndOwners(filterPodsByOwnerReferences(podInfoList, hasMetadata));                                                             
         return res;
     }
 
@@ -396,6 +407,21 @@ public class HelmAppsService implements AppsService {
                 return null; // Handle other kinds if needed
         }
     }
+
+    private List<Map<String, Object>> filterPodsByOwnerReferences(List<Map<String, Object>> podInfoList, List<HasMetadata> resourceList) {
+        Set<String> resourceUids = resourceList.stream()
+                .map(resource -> resource.getMetadata().getUid())
+                .collect(Collectors.toSet());
+
+        return podInfoList.stream()
+                .filter(podInfo -> {
+                    List<Map<String, Object>> owners = (List<Map<String, Object>>) podInfo.get("owners");
+                    return owners.stream()
+                            .anyMatch(owner -> resourceUids.contains(owner.get("uid")));
+                })
+                .collect(Collectors.toList());
+    }
+
     @Override
     public UninstallService destroyService(
             Region region, Project project, User user, final String path, boolean bulk)
