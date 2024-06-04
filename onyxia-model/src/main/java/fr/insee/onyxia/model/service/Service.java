@@ -80,6 +80,9 @@ public class Service {
     @Schema(description = "")
     private Map<String, String> labels;
 
+    @Schema(description = "")
+    private List<HealthCheckResult> controllers;
+
     public String getId() {
         return id;
     }
@@ -262,6 +265,14 @@ public class Service {
 
     public void setSuspended(boolean suspended) {
         this.suspended = suspended;
+    }
+
+    public List<HealthCheckResult> getControllers() {
+        return controllers;
+    }
+
+    public void setTasks(List<HealthCheckResult> controllers) {
+        this.controllers = controllers;
     }
 
     @Schema(description = "")

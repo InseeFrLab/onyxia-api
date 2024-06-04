@@ -541,6 +541,17 @@ public class HelmAppsService implements AppsService {
             service.setUrls(List.of());
         }
 
+        try {
+            List<HealthCheckResult> controllers = checkHelmReleaseHealth(release.getNamespace(), manifest, client);
+            service.setControllers(controllers);
+        } catch (Exception e) {
+            LOGGER.warn(
+                    "Failed to retrieve controllers for release {} namespace {}",
+                    release.getName(),
+                    release.getNamespace(),
+                    e);
+            service.setControllers(List.of());
+        }
         service.setInstances(1);
 
         service.setTasks(
