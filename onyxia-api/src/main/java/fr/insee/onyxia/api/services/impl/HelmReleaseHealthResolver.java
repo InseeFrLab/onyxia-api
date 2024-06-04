@@ -48,13 +48,13 @@ public final class HelmReleaseHealthResolver {
                 .collect(Collectors.toList());
 
         for (HasMetadata deployment : deployments) {
-            int availableReplicas = Utils.getSafeInt(
+            int availableReplicas = getSafeInt(
                     () -> kubernetesClient.apps().deployments()
                             .inNamespace(namespace).withName(deployment.getMetadata().getName())
                             .get().getStatus().getAvailableReplicas()
             );
 
-            int desiredReplicas = Utils.getSafeInt(
+            int desiredReplicas = getSafeInt(
                     () -> kubernetesClient.apps().deployments()
                             .inNamespace(namespace).withName(deployment.getMetadata().getName())
                             .get().getSpec().getReplicas()
