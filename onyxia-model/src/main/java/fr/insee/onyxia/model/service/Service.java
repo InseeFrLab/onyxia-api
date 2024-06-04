@@ -271,7 +271,7 @@ public class Service {
         return controllers;
     }
 
-    public void setTasks(List<HealthCheckResult> controllers) {
+    public void setControllers(List<HealthCheckResult> controllers) {
         this.controllers = controllers;
     }
 
