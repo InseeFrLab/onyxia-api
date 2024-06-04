@@ -16,7 +16,6 @@ import java.util.HashMap;
 
 import fr.insee.onyxia.model.service.*;
 
-@Service
 public final class HelmReleaseHealthResolver {
 
     static List<HealthCheckResult> checkHelmReleaseHealth(String namespace, String manifest, KubernetesClient kubernetesClient) {
@@ -31,30 +30,11 @@ public final class HelmReleaseHealthResolver {
 
         // Check the health of all resources and collect detailed results
         List<HealthCheckResult> results = new ArrayList<>();
-        results.addAll(checkPodsHealth(resources));
         results.addAll(checkDeploymentsHealth(namespace, resources, kubernetesClient));
         results.addAll(checkStatefulSetsHealth(namespace, resources, kubernetesClient));
         results.addAll(checkDaemonSetsHealth(namespace, resources, kubernetesClient));
         results.addAll(checkReplicaSetsHealth(namespace, resources, kubernetesClient));
 
-        return results;
-    }
-
-    private static List<HealthCheckResult> checkPodsHealth(List<HasMetadata> resources, KubernetesClient kubernetesClient) {
-        List<HealthCheckResult> results = new ArrayList<>();
-        List<Pod> pods = resources.stream()
-                .filter(resource -> resource instanceof Pod)
-                .map(resource -> (Pod) resource)
-                .collect(Collectors.toList());
-
-        for (Pod pod : pods) {
-            String podPhase = pod.getStatus().getPhase();
-            boolean healthy = "Running".equals(podPhase);
-            Map<String, Object> details = new HashMap<>();
-            details.put("phase", podPhase);
-
-            results.add(new HealthCheckResult(healthy, pod.getMetadata().getName(), "Pod", details));
-        }
         return results;
     }
 
