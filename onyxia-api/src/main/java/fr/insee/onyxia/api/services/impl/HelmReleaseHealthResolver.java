@@ -41,7 +41,7 @@ public final class HelmReleaseHealthResolver {
         return results;
     }
 
-    private List<HealthCheckResult> checkPodsHealth(List<HasMetadata> resources, KubernetesClient kubernetesClient) {
+    private static List<HealthCheckResult> checkPodsHealth(List<HasMetadata> resources, KubernetesClient kubernetesClient) {
         List<HealthCheckResult> results = new ArrayList<>();
         List<Pod> pods = resources.stream()
                 .filter(resource -> resource instanceof Pod)
@@ -59,7 +59,7 @@ public final class HelmReleaseHealthResolver {
         return results;
     }
 
-    private List<HealthCheckResult> checkDeploymentsHealth(String namespace, List<HasMetadata> resources, KubernetesClient kubernetesClient) {
+    private static List<HealthCheckResult> checkDeploymentsHealth(String namespace, List<HasMetadata> resources, KubernetesClient kubernetesClient) {
         List<HealthCheckResult> results = new ArrayList<>();
         List<HasMetadata> deployments = resources.stream()
                 .filter(resource -> "Deployment".equals(resource.getKind()))
@@ -84,7 +84,7 @@ public final class HelmReleaseHealthResolver {
         return results;
     }
 
-    private List<HealthCheckResult> checkStatefulSetsHealth(String namespace, List<HasMetadata> resources, KubernetesClient kubernetesClient) {
+    private static List<HealthCheckResult> checkStatefulSetsHealth(String namespace, List<HasMetadata> resources, KubernetesClient kubernetesClient) {
         List<HealthCheckResult> results = new ArrayList<>();
         List<HasMetadata> statefulSets = resources.stream()
                 .filter(resource -> "StatefulSet".equals(resource.getKind()))
@@ -109,7 +109,7 @@ public final class HelmReleaseHealthResolver {
         return results;
     }
 
-    private List<HealthCheckResult> checkDaemonSetsHealth(String namespace, List<HasMetadata> resources, KubernetesClient kubernetesClient) {
+    private static List<HealthCheckResult> checkDaemonSetsHealth(String namespace, List<HasMetadata> resources, KubernetesClient kubernetesClient) {
         List<HealthCheckResult> results = new ArrayList<>();
         List<HasMetadata> daemonSets = resources.stream()
                 .filter(resource -> "DaemonSet".equals(resource.getKind()))
@@ -134,7 +134,7 @@ public final class HelmReleaseHealthResolver {
         return results;
     }
 
-    private List<HealthCheckResult> checkReplicaSetsHealth(String namespace, List<HasMetadata> resources, KubernetesClient kubernetesClient) {
+    private static List<HealthCheckResult> checkReplicaSetsHealth(String namespace, List<HasMetadata> resources, KubernetesClient kubernetesClient) {
         List<HealthCheckResult> results = new ArrayList<>();
         List<HasMetadata> replicaSets = resources.stream()
                 .filter(resource -> "ReplicaSet".equals(resource.getKind()))
