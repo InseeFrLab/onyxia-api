@@ -1,3 +1,5 @@
+package fr.insee.onyxia.api.services.impl;
+
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Secret;
