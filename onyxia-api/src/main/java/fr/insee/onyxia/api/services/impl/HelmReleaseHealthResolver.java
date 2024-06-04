@@ -23,7 +23,7 @@ public final class HelmReleaseHealthResolver {
         List<HasMetadata> resources;
         try (InputStream inputStream =
                 new ByteArrayInputStream(manifest.getBytes(StandardCharsets.UTF_8))) {
-            resources = client.load(inputStream).items();
+            resources = kubernetesClient.load(inputStream).items();
         } catch (IOException e) {
             throw new RuntimeException("Exception during loading manifest", e);
         }

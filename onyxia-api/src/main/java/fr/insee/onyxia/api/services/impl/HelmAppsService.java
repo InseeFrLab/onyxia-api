@@ -1,6 +1,7 @@
 package fr.insee.onyxia.api.services.impl;
 
 import static fr.insee.onyxia.api.services.impl.ServiceUrlResolver.getServiceUrls;
+import static fr.insee.onyxia.api.services.impl.HelmReleaseHealthResolver.checkHelmReleaseHealth;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
