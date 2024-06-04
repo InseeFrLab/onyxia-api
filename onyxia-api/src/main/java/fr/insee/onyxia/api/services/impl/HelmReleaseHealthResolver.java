@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.function.Supplier;
 
 import fr.insee.onyxia.model.service.*;
 
@@ -47,14 +48,17 @@ public final class HelmReleaseHealthResolver {
                 .collect(Collectors.toList());
 
         for (HasMetadata deployment : deployments) {
-            int availableReplicas = kubernetesClient.apps().deployments()
-                    .inNamespace(namespace).withName(deployment.getMetadata().getName())
-                    .get().getStatus().getAvailableReplicas();
+            int availableReplicas = Utils.getSafeInt(
+                    () -> kubernetesClient.apps().deployments()
+                            .inNamespace(namespace).withName(deployment.getMetadata().getName())
+                            .get().getStatus().getAvailableReplicas()
+            );
 
-            int desiredReplicas = kubernetesClient.apps().deployments()
-                    .inNamespace(namespace).withName(deployment.getMetadata().getName())
-                    .get().getSpec().getReplicas();
-
+            int desiredReplicas = Utils.getSafeInt(
+                    () -> kubernetesClient.apps().deployments()
+                            .inNamespace(namespace).withName(deployment.getMetadata().getName())
+                            .get().getSpec().getReplicas()
+            );
             boolean healthy = availableReplicas >= desiredReplicas;
             Map<String, Object> details = new HashMap<>();
             details.put("availableReplicas", availableReplicas);
@@ -72,13 +76,17 @@ public final class HelmReleaseHealthResolver {
                 .collect(Collectors.toList());
 
         for (HasMetadata statefulSet : statefulSets) {
-            int readyReplicas = kubernetesClient.apps().statefulSets()
-                    .inNamespace(namespace).withName(statefulSet.getMetadata().getName())
-                    .get().getStatus().getReadyReplicas();
+            int readyReplicas = getSafeInt(
+                    () -> kubernetesClient.apps().statefulSets()
+                            .inNamespace(namespace).withName(statefulSet.getMetadata().getName())
+                            .get().getStatus().getReadyReplicas()
+            );
 
-            int desiredReplicas = kubernetesClient.apps().statefulSets()
-                    .inNamespace(namespace).withName(statefulSet.getMetadata().getName())
-                    .get().getSpec().getReplicas();
+            int desiredReplicas = getSafeInt(
+                    () -> kubernetesClient.apps().statefulSets()
+                            .inNamespace(namespace).withName(statefulSet.getMetadata().getName())
+                            .get().getSpec().getReplicas()
+            );
 
             boolean healthy = readyReplicas >= desiredReplicas;
             Map<String, Object> details = new HashMap<>();
@@ -97,13 +105,17 @@ public final class HelmReleaseHealthResolver {
                 .collect(Collectors.toList());
 
         for (HasMetadata daemonSet : daemonSets) {
-            int desiredNumberScheduled = kubernetesClient.apps().daemonSets()
-                    .inNamespace(namespace).withName(daemonSet.getMetadata().getName())
-                    .get().getStatus().getDesiredNumberScheduled();
+            int desiredNumberScheduled = getSafeInt(
+                    () -> kubernetesClient.apps().daemonSets()
+                            .inNamespace(namespace).withName(daemonSet.getMetadata().getName())
+                            .get().getStatus().getDesiredNumberScheduled()
+            );
 
-            int numberAvailable = kubernetesClient.apps().daemonSets()
-                    .inNamespace(namespace).withName(daemonSet.getMetadata().getName())
-                    .get().getStatus().getNumberAvailable();
+            int numberAvailable = getSafeInt(
+                    () -> kubernetesClient.apps().daemonSets()
+                            .inNamespace(namespace).withName(daemonSet.getMetadata().getName())
+                            .get().getStatus().getNumberAvailable()
+            );
 
             boolean healthy = numberAvailable >= desiredNumberScheduled;
             Map<String, Object> details = new HashMap<>();
@@ -122,14 +134,17 @@ public final class HelmReleaseHealthResolver {
                 .collect(Collectors.toList());
 
         for (HasMetadata replicaSet : replicaSets) {
-            int readyReplicas = kubernetesClient.apps().replicaSets()
-                    .inNamespace(namespace).withName(replicaSet.getMetadata().getName())
-                    .get().getStatus().getReadyReplicas();
+            int readyReplicas = getSafeInt(
+                    () -> kubernetesClient.apps().replicaSets()
+                            .inNamespace(namespace).withName(replicaSet.getMetadata().getName())
+                            .get().getStatus().getReadyReplicas()
+            );
 
-            int desiredReplicas = kubernetesClient.apps().replicaSets()
-                    .inNamespace(namespace).withName(replicaSet.getMetadata().getName())
-                    .get().getSpec().getReplicas();
-
+            int desiredReplicas = getSafeInt(
+                    () -> kubernetesClient.apps().replicaSets()
+                            .inNamespace(namespace).withName(replicaSet.getMetadata().getName())
+                            .get().getSpec().getReplicas()
+            );
             boolean healthy = readyReplicas >= desiredReplicas;
             Map<String, Object> details = new HashMap<>();
             details.put("readyReplicas", readyReplicas);
@@ -138,5 +153,14 @@ public final class HelmReleaseHealthResolver {
             results.add(new HealthCheckResult(healthy, replicaSet.getMetadata().getName(), "ReplicaSet", details));
         }
         return results;
+    }
+
+    private static int getSafeInt(Supplier<Integer> supplier) {
+        try {
+            Integer value = supplier.get();
+            return value != null ? value : 0;
+        } catch (Exception e) {
+            return 0;
+        }
     }
 }
