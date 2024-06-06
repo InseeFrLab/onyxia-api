@@ -90,8 +90,7 @@ public class KubernetesService {
                     "onyxia_last_login_timestamp", String.valueOf(System.currentTimeMillis()));
             for (String claim : namespaceMetadata.getClaims()) {
                 String claimValue = String.valueOf(user.getAttributes().getOrDefault(claim, ""));
-                // Labels are limited to 63 characters so truncate to ensure that
-                userMetadata.put("onyxia_" + claim, StringUtils.left(claimValue, 63));
+                userMetadata.put("onyxia_" + claim, claimValue);
             }
         }
 
