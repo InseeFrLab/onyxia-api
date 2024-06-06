@@ -1,7 +1,6 @@
 package fr.insee.onyxia.api.services.impl.kubernetes;
 
 import fr.insee.onyxia.api.configuration.kubernetes.KubernetesClientProvider;
-import fr.insee.onyxia.api.controller.exception.NamespaceAlreadyExistException;
 import fr.insee.onyxia.api.controller.exception.NamespaceNotFoundException;
 import fr.insee.onyxia.api.events.InitNamespaceEvent;
 import fr.insee.onyxia.api.events.OnyxiaEventPublisher;
@@ -18,6 +17,7 @@ import io.fabric8.kubernetes.api.model.rbac.RoleBindingBuilder;
 import io.fabric8.kubernetes.api.model.rbac.SubjectBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientException;
+import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -42,12 +42,9 @@ public class KubernetesService {
         this.onyxiaEventPublisher = onyxiaEventPublisher;
     }
 
-    public String createDefaultNamespace(Region region, Owner owner) {
+    public String createOrUpdateNamespace(Region region, Owner owner, User user) {
         final String namespaceId = getDefaultNamespace(region, owner);
-        if (isNamespaceAlreadyExisting(region, namespaceId)) {
-            throw new NamespaceAlreadyExistException();
-        }
-        return createNamespace(region, namespaceId, owner);
+        return createNamespace(region, namespaceId, owner, user);
     }
 
     @NotNull
@@ -70,7 +67,7 @@ public class KubernetesService {
                     owner.setId(user.getIdep());
                     owner.setType(KubernetesService.Owner.OwnerType.USER);
                 }
-                createNamespace(region, project.getNamespace(), owner);
+                createNamespace(region, project.getNamespace(), owner, user);
             }
         }
         return project.getNamespace();
@@ -80,10 +77,22 @@ public class KubernetesService {
         return kubernetesClientProvider.getRootClient(region).getNamespace();
     }
 
-    private String createNamespace(Region region, String namespaceId, Owner owner) {
+    private String createNamespace(Region region, String namespaceId, Owner owner, User user) {
         final String name = getNameFromOwner(region, owner);
 
         final KubernetesClient kubClient = kubernetesClientProvider.getRootClient(region);
+
+        Map<String, String> userMetadata = new HashMap<>();
+        Region.Services.NamespaceMetadata namespaceMetadata =
+                region.getServices().getNamespaceMetadata();
+        if (namespaceMetadata.isEnabled() && user != null) {
+            userMetadata.put(
+                    "onyxia_last_login_timestamp", String.valueOf(System.currentTimeMillis()));
+            for (String claim : namespaceMetadata.getClaims()) {
+                String claimValue = String.valueOf(user.getAttributes().getOrDefault(claim, ""));
+                userMetadata.put("onyxia_" + claim, claimValue);
+            }
+        }
 
         kubClient
                 .namespaces()
@@ -93,6 +102,7 @@ public class KubernetesService {
                                 .withName(namespaceId)
                                 .withLabels(region.getServices().getNamespaceLabels())
                                 .addToLabels("onyxia_owner", owner.getId())
+                                .addToLabels(userMetadata)
                                 .withAnnotations(region.getServices().getNamespaceAnnotations())
                                 .endMetadata()
                                 .build())

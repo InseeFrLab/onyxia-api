@@ -208,6 +208,8 @@ public class Region {
 
         private Map<String, Object> customValues = new HashMap<>();
 
+        private NamespaceMetadata namespaceMetadata = new NamespaceMetadata();
+
         public DefaultConfiguration getDefaultConfiguration() {
             return defaultConfiguration;
         }
@@ -246,6 +248,14 @@ public class Region {
 
         public void setAllowNamespaceCreation(boolean allowNamespaceCreation) {
             this.allowNamespaceCreation = allowNamespaceCreation;
+        }
+
+        public NamespaceMetadata getNamespaceMetadata() {
+            return namespaceMetadata;
+        }
+
+        public void setNamespaceMetadata(NamespaceMetadata namespaceMetadata) {
+            this.namespaceMetadata = namespaceMetadata;
         }
 
         public Map<String, String> getNamespaceLabels() {
@@ -385,6 +395,28 @@ public class Region {
 
             @JsonProperty("tokenPassthrough")
             TOKEN_PASSTHROUGH
+        }
+
+        public static class NamespaceMetadata {
+            private boolean enabled = true;
+
+            private List<String> claims = new ArrayList<>();
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
+            }
+
+            public List<String> getClaims() {
+                return claims;
+            }
+
+            public void setClaims(List<String> claims) {
+                this.claims = claims;
+            }
         }
 
         public static class DefaultConfiguration {

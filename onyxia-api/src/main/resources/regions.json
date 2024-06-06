@@ -15,6 +15,10 @@
         "usernamePrefix": "oidc-",
         "groupNamespacePrefix": "projet-",
         "authenticationMode": "serviceAccount",
+        "namespaceMetadata": {
+          "enabled": true,
+          "claims": ["email","locale","groups"]
+        },
         "quotas": {
           "allowUserModification": true,
           "enabled": false,
