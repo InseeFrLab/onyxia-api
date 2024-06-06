@@ -106,7 +106,7 @@ public class KubernetesService {
                                 .withAnnotations(region.getServices().getNamespaceAnnotations())
                                 .endMetadata()
                                 .build())
-                .create();
+                .serverSideApply();
 
         final RoleBinding bindingToCreate =
                 kubClient
