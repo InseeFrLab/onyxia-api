@@ -208,7 +208,8 @@ public class Region {
 
         private Map<String, Object> customValues = new HashMap<>();
 
-        private NamespaceMetadata namespaceMetadata = new NamespaceMetadata();
+        private NamespaceAnnotationsDynamic namespaceAnnotationsDynamic =
+                new NamespaceAnnotationsDynamic();
 
         public DefaultConfiguration getDefaultConfiguration() {
             return defaultConfiguration;
@@ -250,12 +251,13 @@ public class Region {
             this.allowNamespaceCreation = allowNamespaceCreation;
         }
 
-        public NamespaceMetadata getNamespaceMetadata() {
-            return namespaceMetadata;
+        public NamespaceAnnotationsDynamic getNamespaceAnnotationsDynamic() {
+            return namespaceAnnotationsDynamic;
         }
 
-        public void setNamespaceMetadata(NamespaceMetadata namespaceMetadata) {
-            this.namespaceMetadata = namespaceMetadata;
+        public void setNamespaceAnnotationsDynamic(
+                NamespaceAnnotationsDynamic namespaceAnnotationsDynamic) {
+            this.namespaceAnnotationsDynamic = namespaceAnnotationsDynamic;
         }
 
         public Map<String, String> getNamespaceLabels() {
@@ -397,10 +399,10 @@ public class Region {
             TOKEN_PASSTHROUGH
         }
 
-        public static class NamespaceMetadata {
+        public static class NamespaceAnnotationsDynamic {
             private boolean enabled = true;
 
-            private List<String> claims = new ArrayList<>();
+            private List<String> userAttributes = new ArrayList<>();
 
             public boolean isEnabled() {
                 return enabled;
@@ -410,12 +412,12 @@ public class Region {
                 this.enabled = enabled;
             }
 
-            public List<String> getClaims() {
-                return claims;
+            public List<String> getUserAttributes() {
+                return userAttributes;
             }
 
-            public void setClaims(List<String> claims) {
-                this.claims = claims;
+            public void setUserAttributes(List<String> userAttributes) {
+                this.userAttributes = userAttributes;
             }
         }
 

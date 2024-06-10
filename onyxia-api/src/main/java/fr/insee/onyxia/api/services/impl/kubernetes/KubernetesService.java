@@ -83,12 +83,12 @@ public class KubernetesService {
         final KubernetesClient kubClient = kubernetesClientProvider.getRootClient(region);
 
         Map<String, String> userMetadata = new HashMap<>();
-        Region.Services.NamespaceMetadata namespaceMetadata =
-                region.getServices().getNamespaceMetadata();
-        if (namespaceMetadata.isEnabled() && user != null) {
+        Region.Services.NamespaceAnnotationsDynamic namespaceAnnotationsDynamic =
+                region.getServices().getNamespaceAnnotationsDynamic();
+        if (namespaceAnnotationsDynamic.isEnabled() && user != null) {
             userMetadata.put(
                     "onyxia_last_login_timestamp", String.valueOf(System.currentTimeMillis()));
-            for (String claim : namespaceMetadata.getClaims()) {
+            for (String claim : namespaceAnnotationsDynamic.getUserAttributes()) {
                 String claimValue = String.valueOf(user.getAttributes().getOrDefault(claim, ""));
                 userMetadata.put("onyxia_" + claim, claimValue);
             }
