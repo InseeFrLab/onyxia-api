@@ -5,18 +5,12 @@ import fr.insee.onyxia.api.controller.exception.NamespaceAlreadyExistException;
 import fr.insee.onyxia.api.controller.exception.NamespaceNotFoundException;
 import fr.insee.onyxia.api.events.InitNamespaceEvent;
 import fr.insee.onyxia.api.events.OnyxiaEventPublisher;
+import fr.insee.onyxia.api.services.impl.HelmAppsService;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.project.Project;
 import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.quota.Quota;
-import io.fabric8.kubernetes.api.model.NamespaceBuilder;
-import io.fabric8.kubernetes.api.model.OwnerReference;
-import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
-import io.fabric8.kubernetes.api.model.Quantity;
-import io.fabric8.kubernetes.api.model.ResourceQuota;
-import io.fabric8.kubernetes.api.model.ResourceQuotaBuilder;
-import io.fabric8.kubernetes.api.model.Secret;
-import io.fabric8.kubernetes.api.model.SecretBuilder;
+import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.rbac.RoleBinding;
 import io.fabric8.kubernetes.api.model.rbac.RoleBindingBuilder;
 import io.fabric8.kubernetes.api.model.rbac.SubjectBuilder;
@@ -248,7 +242,7 @@ public class KubernetesService {
         Secret newSecret =
                 new SecretBuilder()
                         .withNewMetadata()
-                        .withName("sh.onyxia.release.v1." + releaseName)
+                        .withName(HelmAppsService.ONYXIA_SECRET_PREFIX + releaseName)
                         .addNewOwnerReferenceLike(ownerReference)
                         .endOwnerReference()
                         .endMetadata()
@@ -257,7 +251,7 @@ public class KubernetesService {
                         .build();
 
         // Create the secret in Kubernetes
-        newSecret = kubClient.secrets().inNamespace(namespaceId).create(newSecret);
+        newSecret = kubClient.secrets().inNamespace(namespaceId).resource(newSecret).create();
     }
 
     private String getNameFromOwner(Region region, Owner owner) {
