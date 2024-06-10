@@ -31,6 +31,15 @@ public class CreateServiceDTO {
             defaultValue = "false")
     boolean dryRun = false;
 
+    @Schema(
+            description =
+                    "When true, all users of the namespace will list this service, false by default",
+            defaultValue = "false")
+    boolean share = false;
+
+    @Schema(description = "A friendly name for the service")
+    String friendlyName;
+
     public String getCatalogId() {
         return catalogId;
     }
@@ -77,5 +86,21 @@ public class CreateServiceDTO {
 
     public void setDryRun(boolean dryRun) {
         this.dryRun = dryRun;
+    }
+
+    public boolean isShare() {
+        return share;
+    }
+
+    public void setShare(boolean share) {
+        this.share = share;
+    }
+
+    public String getFriendlyName() {
+        return friendlyName;
+    }
+
+    public void setFriendlyName(String friendlyName) {
+        this.friendlyName = friendlyName;
     }
 }

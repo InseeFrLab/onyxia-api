@@ -27,6 +27,7 @@ import fr.insee.onyxia.model.dto.ServicesListing;
 import fr.insee.onyxia.model.project.Project;
 import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.*;
+import io.fabric8.kubernetes.api.model.Secret;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.Watch;
 import io.fabric8.kubernetes.client.Watcher;
@@ -75,6 +76,8 @@ public class HelmAppsService implements AppsService {
     private final UrlGenerator urlGenerator;
 
     final OnyxiaEventPublisher onyxiaEventPublisher;
+
+    public static final String ONYXIA_SECRET_PREFIX = "sh.onyxia.release.v1.";
 
     @Autowired
     public HelmAppsService(
@@ -208,6 +211,15 @@ public class HelmAppsService implements AppsService {
                             pkg.getName(),
                             catalogId);
             onyxiaEventPublisher.publishEvent(installServiceEvent);
+            Map<String, String> metadata = new HashMap<>();
+            metadata.put("catalog", catalogId);
+            metadata.put("owner", user.getIdep());
+            if (requestDTO.getFriendlyName() != null) {
+                metadata.put("friendlyName", requestDTO.getFriendlyName());
+            }
+            metadata.put("share", String.valueOf(requestDTO.isShare()));
+            kubernetesService.createOnyxiaSecret(
+                    region, namespaceId, requestDTO.getName(), metadata);
             return List.of(res.getManifest());
         } catch (IllegalArgumentException e) {
             throw new AccessDeniedException(e.getMessage());
@@ -380,6 +392,31 @@ public class HelmAppsService implements AppsService {
         } catch (Exception e) {
             service.setStartedAt(0);
         }
+        try {
+            KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
+            Secret secret =
+                    client.secrets()
+                            .inNamespace(release.getNamespace())
+                            .withName(ONYXIA_SECRET_PREFIX + release.getName())
+                            .get();
+            if (secret != null && secret.getStringData() != null) {
+                Map<String, String> stringData = secret.getStringData();
+                if (stringData.containsKey("friendlyName")) {
+                    service.setFriendlyName(stringData.get("friendlyName"));
+                }
+                if (stringData.containsKey("owner")) {
+                    service.setOwner(stringData.get("owner"));
+                }
+                if (stringData.containsKey("catalog")) {
+                    service.setCatalogId(stringData.get("catalog"));
+                }
+                if (stringData.containsKey("share")) {
+                    service.setShare(Boolean.parseBoolean(stringData.get("share")));
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.warn("Exception occurred", e);
+        }
         service.setId(release.getName());
         service.setName(release.getName());
         service.setSubtitle(release.getChart());
@@ -414,6 +451,46 @@ public class HelmAppsService implements AppsService {
             LOGGER.warn("Exception occurred", e);
         }
         return service;
+    }
+
+    @Override
+    public void rename(
+            Region region, Project project, User user, String serviceId, String friendlyName)
+            throws IOException, InterruptedException, TimeoutException {
+        patchOnyxiaSecret(region, project, user, serviceId, Map.of("friendlyName", friendlyName));
+    }
+
+    @Override
+    public void share(Region region, Project project, User user, String serviceId, boolean share)
+            throws IOException, InterruptedException, TimeoutException {
+        patchOnyxiaSecret(region, project, user, serviceId, Map.of("share", String.valueOf(share)));
+    }
+
+    private void patchOnyxiaSecret(
+            Region region, Project project, User user, String serviceId, Map<String, String> data) {
+        String namespaceId =
+                kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
+        KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
+        Secret secret =
+                client.secrets()
+                        .inNamespace(namespaceId)
+                        .withName(ONYXIA_SECRET_PREFIX + serviceId)
+                        .get();
+        if (secret != null) {
+            Map<String, String> secretData = secret.getStringData();
+            if (secretData == null) {
+                // Initialize the map if it's null
+                secretData = new HashMap<>();
+            }
+            secretData.putAll(data);
+            secret.setStringData(secretData);
+            client.secrets().inNamespace(namespaceId).resource(secret).serverSideApply();
+        } else {
+            Map<String, String> metadata = new HashMap<>();
+            metadata.put("owner", user.getIdep());
+            metadata.putAll(data);
+            kubernetesService.createOnyxiaSecret(region, namespaceId, serviceId, metadata);
+        }
     }
 
     @Override
