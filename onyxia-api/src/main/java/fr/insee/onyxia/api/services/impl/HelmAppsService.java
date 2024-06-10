@@ -220,9 +220,7 @@ public class HelmAppsService implements AppsService {
                         Base64.getEncoder()
                                 .encodeToString(requestDTO.getFriendlyName().getBytes()));
             }
-            byte[] byteArray = new byte[1];
-            byteArray[0] = (byte) (requestDTO.isShare() ? 1 : 0);
-            metadata.put("share", Base64.getEncoder().encodeToString(byteArray));
+            metadata.put("share", String.valueOf(requestDTO.isShare()));
             kubernetesService.createOnyxiaSecret(
                     region, namespaceId, requestDTO.getName(), metadata);
             return List.of(res.getManifest());
@@ -421,8 +419,11 @@ public class HelmAppsService implements AppsService {
                                     Base64.getDecoder().decode(secret.getData().get("catalog"))));
                 }
                 if (secret.getData().containsKey("share")) {
-                    byte[] byteArray = Base64.getDecoder().decode(secret.getData().get("share"));
-                    service.setShare(byteArray[0] != 0);
+                    service.setShare(
+                            Boolean.parseBoolean(
+                                    new String(
+                                            Base64.getDecoder()
+                                                    .decode(secret.getData().get("share")))));
                 }
             }
         } catch (Exception e) {
