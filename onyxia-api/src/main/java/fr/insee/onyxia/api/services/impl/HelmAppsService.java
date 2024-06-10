@@ -27,6 +27,9 @@ import fr.insee.onyxia.model.dto.ServicesListing;
 import fr.insee.onyxia.model.project.Project;
 import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.*;
+import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.fabric8.kubernetes.api.model.OwnerReference;
+import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Secret;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.Watch;
@@ -37,8 +40,11 @@ import io.github.inseefrlab.helmwrapper.model.HelmLs;
 import io.github.inseefrlab.helmwrapper.model.HelmReleaseInfo;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService.MultipleServiceFound;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -334,6 +340,170 @@ public class HelmAppsService implements AppsService {
                                 kubernetesService.determineNamespaceAndCreateIfNeeded(
                                         region, project, user));
         return getHelmApp(region, user, result);
+    }
+
+    @Override
+    public Service getUserServiceDetails(
+            Region region, Project project, User user, String serviceId)
+            throws MultipleServiceFound, ParseException {
+        if (serviceId.startsWith("/")) {
+            serviceId = serviceId.substring(1);
+        }
+        String namespace =
+                kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
+        HelmLs result =
+                getHelmInstallService()
+                        .getAppById(getHelmConfiguration(region, user), serviceId, namespace);
+        HelmReleaseInfo helmReleaseInfo =
+                getHelmInstallService()
+                        .getAll(
+                                getHelmConfiguration(region, user),
+                                result.getName(),
+                                result.getNamespace());
+        Service res = getHelmApp(region, user, result);
+        KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
+        List<HasMetadata> hasMetadata;
+        try (InputStream inputStream =
+                new ByteArrayInputStream(
+                        helmReleaseInfo.getManifest().getBytes(StandardCharsets.UTF_8))) {
+            hasMetadata = client.load(inputStream).items();
+        } catch (IOException e) {
+            throw new RuntimeException("Exception during loading manifest", e);
+        }
+        List<Object> manifests = new ArrayList<Object>(hasMetadata);
+        res.setTemplates(manifests);
+        List<Map<String, Object>> podInfoList = new ArrayList<>();
+
+        List<Pod> pods = client.pods().inNamespace(namespace).list().getItems();
+        for (Pod pod : pods) {
+            Map<String, Object> podInfo = new HashMap<>();
+            podInfo.put("podName", pod.getMetadata().getName());
+            podInfo.put("owners", getOwnerReferences(pod, client));
+            podInfo.put("containers", getContainers(pod));
+            podInfoList.add(podInfo);
+        }
+        res.setPodsAndOwners(
+                filterPodsByTopLevelOwnerReferences(podInfoList, hasMetadata, namespace, client));
+        return res;
+    }
+
+    private List<Map<String, Object>> getContainers(Pod pod) {
+        List<Map<String, Object>> containersInfo = new ArrayList<>();
+        List<io.fabric8.kubernetes.api.model.Container> containers = pod.getSpec().getContainers();
+        List<io.fabric8.kubernetes.api.model.Container> initContainers =
+                pod.getSpec().getInitContainers();
+
+        for (io.fabric8.kubernetes.api.model.Container container : containers) {
+            Map<String, Object> containerInfo = new HashMap<>();
+            containerInfo.put("name", container.getName());
+            containerInfo.put("image", container.getImage());
+            containerInfo.put("resources", container.getResources());
+            containerInfo.put("type", "container");
+
+            containersInfo.add(containerInfo);
+        }
+
+        for (io.fabric8.kubernetes.api.model.Container initContainer : initContainers) {
+            Map<String, Object> initContainerInfo = new HashMap<>();
+            initContainerInfo.put("name", initContainer.getName());
+            initContainerInfo.put("image", initContainer.getImage());
+            initContainerInfo.put("resources", initContainer.getResources());
+            initContainerInfo.put("type", "initContainer");
+
+            containersInfo.add(initContainerInfo);
+        }
+
+        return containersInfo;
+    }
+
+    private List<Map<String, Object>> getOwnerReferences(
+            HasMetadata resource, KubernetesClient client) {
+        List<Map<String, Object>> owners = new ArrayList<>();
+
+        List<OwnerReference> ownerReferences = resource.getMetadata().getOwnerReferences();
+        if (ownerReferences != null) {
+            for (OwnerReference ownerReference : ownerReferences) {
+                String kind = ownerReference.getKind();
+                String name = ownerReference.getName();
+
+                // Fetch the owner resource
+                HasMetadata ownerResource =
+                        fetchOwnerResource(
+                                resource.getMetadata().getNamespace(), kind, name, client);
+                if (ownerResource != null) {
+                    Map<String, Object> ownerInfo = new HashMap<>();
+                    ownerInfo.put("kind", kind);
+                    ownerInfo.put("name", name);
+                    ownerInfo.put("owners", getOwnerReferences(ownerResource, client));
+
+                    owners.add(ownerInfo);
+                }
+            }
+        }
+
+        return owners;
+    }
+
+    private HasMetadata fetchOwnerResource(
+            String namespace, String kind, String name, KubernetesClient client) {
+        switch (kind) {
+            case "ReplicaSet":
+                return client.apps().replicaSets().inNamespace(namespace).withName(name).get();
+            case "Deployment":
+                return client.apps().deployments().inNamespace(namespace).withName(name).get();
+            case "StatefulSet":
+                return client.apps().statefulSets().inNamespace(namespace).withName(name).get();
+            case "DaemonSet":
+                return client.apps().daemonSets().inNamespace(namespace).withName(name).get();
+            case "Pod":
+                return client.pods().inNamespace(namespace).withName(name).get();
+            default:
+                return null; // Handle other kinds if needed
+        }
+    }
+
+    private List<Map<String, Object>> filterPodsByTopLevelOwnerReferences(
+            List<Map<String, Object>> podInfoList,
+            List<HasMetadata> resourceList,
+            String namespace,
+            KubernetesClient client) {
+        Set<String> resourceNamesAndKinds =
+                resourceList.stream()
+                        .map(
+                                resource ->
+                                        resource.getKind() + "/" + resource.getMetadata().getName())
+                        .collect(Collectors.toSet());
+
+        return podInfoList.stream()
+                .filter(
+                        podInfo -> {
+                            List<Map<String, Object>> owners =
+                                    (List<Map<String, Object>>) podInfo.get("owners");
+                            return owners.stream()
+                                    .anyMatch(
+                                            owner ->
+                                                    resourceNamesAndKinds.contains(
+                                                            findTopLevelOwner(
+                                                                    (String) owner.get("kind"),
+                                                                    (String) owner.get("name"),
+                                                                    namespace,
+                                                                    client)));
+                        })
+                .collect(Collectors.toList());
+    }
+
+    private String findTopLevelOwner(
+            String kind, String name, String namespace, KubernetesClient client) {
+        HasMetadata resource = fetchOwnerResource(namespace, kind, name, client);
+        while (resource != null && !resource.getMetadata().getOwnerReferences().isEmpty()) {
+            OwnerReference ownerReference = resource.getMetadata().getOwnerReferences().get(0);
+            resource =
+                    fetchOwnerResource(
+                            namespace, ownerReference.getKind(), ownerReference.getName(), client);
+        }
+        return resource != null
+                ? resource.getKind() + "/" + resource.getMetadata().getName()
+                : null;
     }
 
     @Override

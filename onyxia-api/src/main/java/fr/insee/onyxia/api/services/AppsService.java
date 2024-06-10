@@ -46,6 +46,9 @@ public interface AppsService {
     Service getUserService(Region region, Project project, User user, String serviceId)
             throws Exception;
 
+    Service getUserServiceDetails(Region region, Project project, User user, String serviceId)
+            throws Exception;
+
     UninstallService destroyService(
             Region region, Project project, User user, String path, boolean bulk) throws Exception;
 
