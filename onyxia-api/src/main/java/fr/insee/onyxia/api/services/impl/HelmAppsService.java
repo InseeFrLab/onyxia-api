@@ -212,13 +212,10 @@ public class HelmAppsService implements AppsService {
                             catalogId);
             onyxiaEventPublisher.publishEvent(installServiceEvent);
             Map<String, String> metadata = new HashMap<>();
-            metadata.put("catalog", Base64.getEncoder().encodeToString(catalogId.getBytes()));
-            metadata.put("owner", Base64.getEncoder().encodeToString(user.getIdep().getBytes()));
+            metadata.put("catalog", catalogId);
+            metadata.put("owner", user.getIdep());
             if (requestDTO.getFriendlyName() != null) {
-                metadata.put(
-                        "friendlyName",
-                        Base64.getEncoder()
-                                .encodeToString(requestDTO.getFriendlyName().getBytes()));
+                metadata.put("friendlyName", requestDTO.getFriendlyName());
             }
             metadata.put("share", String.valueOf(requestDTO.isShare()));
             kubernetesService.createOnyxiaSecret(
@@ -402,28 +399,19 @@ public class HelmAppsService implements AppsService {
                             .inNamespace(release.getNamespace())
                             .withName(ONYXIA_SECRET_PREFIX + release.getName())
                             .get();
-            if (secret != null && secret.getData() != null) {
-                if (secret.getData().containsKey("friendlyName")) {
-                    service.setFriendlyName(
-                            new String(
-                                    Base64.getDecoder()
-                                            .decode(secret.getData().get("friendlyName"))));
+            if (secret != null && secret.getStringData() != null) {
+                Map<String, String> stringData = secret.getStringData();
+                if (stringData.containsKey("friendlyName")) {
+                    service.setFriendlyName(stringData.get("friendlyName"));
                 }
-                if (secret.getData().containsKey("owner")) {
-                    service.setOwner(
-                            new String(Base64.getDecoder().decode(secret.getData().get("owner"))));
+                if (stringData.containsKey("owner")) {
+                    service.setOwner(stringData.get("owner"));
                 }
-                if (secret.getData().containsKey("catalog")) {
-                    service.setCatalogId(
-                            new String(
-                                    Base64.getDecoder().decode(secret.getData().get("catalog"))));
+                if (stringData.containsKey("catalog")) {
+                    service.setCatalogId(stringData.get("catalog"));
                 }
-                if (secret.getData().containsKey("share")) {
-                    service.setShare(
-                            Boolean.parseBoolean(
-                                    new String(
-                                            Base64.getDecoder()
-                                                    .decode(secret.getData().get("share")))));
+                if (stringData.containsKey("share")) {
+                    service.setShare(Boolean.parseBoolean(stringData.get("share")));
                 }
             }
         } catch (Exception e) {
@@ -469,14 +457,7 @@ public class HelmAppsService implements AppsService {
     public void rename(
             Region region, Project project, User user, String serviceId, String friendlyName)
             throws IOException, InterruptedException, TimeoutException {
-        patchOnyxiaSecret(
-                region,
-                project,
-                user,
-                serviceId,
-                Map.of(
-                        "friendlyName",
-                        Base64.getEncoder().encodeToString(friendlyName.getBytes())));
+        patchOnyxiaSecret(region, project, user, serviceId, Map.of("friendlyName", friendlyName));
     }
 
     @Override
@@ -496,17 +477,17 @@ public class HelmAppsService implements AppsService {
                         .withName(ONYXIA_SECRET_PREFIX + serviceId)
                         .get();
         if (secret != null) {
-            Map<String, String> secretData = secret.getData();
+            Map<String, String> secretData = secret.getStringData();
             if (secretData == null) {
                 // Initialize the map if it's null
                 secretData = new HashMap<>();
             }
             secretData.putAll(data);
-            secret.setData(secretData);
+            secret.setStringData(secretData);
             client.secrets().inNamespace(namespaceId).resource(secret).serverSideApply();
         } else {
             Map<String, String> metadata = new HashMap<>();
-            metadata.put("owner", Base64.getEncoder().encodeToString(user.getIdep().getBytes()));
+            metadata.put("owner", user.getIdep());
             metadata.putAll(data);
             kubernetesService.createOnyxiaSecret(region, namespaceId, serviceId, metadata);
         }
