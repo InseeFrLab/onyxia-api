@@ -368,10 +368,39 @@ public class HelmAppsService implements AppsService {
             Map<String, Object> podInfo = new HashMap<>();
             podInfo.put("podName", pod.getMetadata().getName());
             podInfo.put("owners", getOwnerReferences(pod,client));
+            podInfo.put("containers", getContainers(pod));
             podInfoList.add(podInfo);
         }
         res.setPodsAndOwners(filterPodsByTopLevelOwnerReferences(podInfoList, hasMetadata, namespace, client));                                                             
         return res;
+    }
+
+    private List<Map<String, Object>> getContainers(Pod pod) {
+        List<Map<String, Object>> containersInfo = new ArrayList<>();
+        List<Container> containers = pod.getSpec().getContainers();
+        List<Container> initContainers = pod.getSpec().getInitContainers();
+
+        for (Container container : containers) {
+            Map<String, Object> containerInfo = new HashMap<>();
+            containerInfo.put("name", container.getName());
+            containerInfo.put("image", container.getImage());
+            containerInfo.put("resources", container.getResources());
+            containerInfo.put("type", "container");
+
+            containersInfo.add(containerInfo);
+        }
+
+        for (Container initContainer : initContainers) {
+            Map<String, Object> initContainerInfo = new HashMap<>();
+            initContainerInfo.put("name", initContainer.getName());
+            initContainerInfo.put("image", initContainer.getImage());
+            initContainerInfo.put("resources", initContainer.getResources());
+            initContainerInfo.put("type", "initContainer");
+
+            containersInfo.add(initContainerInfo);
+        }
+
+        return containersInfo;
     }
 
     private List<Map<String, Object>> getOwnerReferences(HasMetadata resource, KubernetesClient client) {
