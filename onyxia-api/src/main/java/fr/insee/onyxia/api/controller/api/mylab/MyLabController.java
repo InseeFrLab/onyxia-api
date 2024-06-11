@@ -26,12 +26,13 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 @Tag(name = "My lab", description = "My services")
 @RequestMapping("/my-lab")
@@ -211,43 +212,56 @@ public class MyLabController {
             int split = chart.lastIndexOf('-');
             String chartName = chart.substring(0, split);
             String version = chart.substring(split + 1);
-            List<CatalogWrapper> elligibleCatalogs =
-                    catalogService.getCatalogs(region, user).getCatalogs().stream()
-                            .filter(
-                                    catalog ->
-                                            catalog.getCatalog()
-                                                    .getPackageByNameAndVersion(chartName, version)
-                                                    .isPresent())
-                            .toList();
-            if (elligibleCatalogs.isEmpty()) {
-                throw new NotFoundException();
+            String catalogId = userService.getCatalogId();
+            // This code is for legacy compat for services that were created with Onyxia < v2.7.0
+            // before introduction of Onyxia's secret
+            if (catalogId == null) {
+                List<CatalogWrapper> elligibleCatalogs =
+                        catalogService.getCatalogs(region, user).getCatalogs().stream()
+                                .filter(
+                                        catalog ->
+                                                catalog.getCatalog()
+                                                        .getPackageByName(chartName)
+                                                        .isPresent())
+                                .toList();
+                if (elligibleCatalogs.isEmpty()) {
+                    throw new NotFoundException();
+                }
+                if (elligibleCatalogs.size() > 1) {
+                    throw new IllegalStateException("Chart is present in multiple catalogs, abort");
+                }
+                CatalogWrapper catalog = elligibleCatalogs.getFirst();
+                catalogId = catalog.getId();
             }
-            if (elligibleCatalogs.size() > 1) {
-                throw new IllegalStateException("Chart is present in multiple catalogs, abort");
+            Optional<CatalogWrapper> catalog = catalogService.getCatalogById(catalogId);
+            if (catalog.isEmpty()) {
+                throw new IllegalStateException(
+                        "Catalog " + catalogId + " is not available anymore");
             }
-            CatalogWrapper catalog = elligibleCatalogs.getFirst();
-            Pkg pkg = catalog.getCatalog().getPackageByNameAndVersion(chartName, version).get();
+
             if (suspend) {
                 helmAppsService.suspend(
                         region,
                         project,
-                        catalog.getId(),
-                        pkg,
+                        catalog.get().getId(),
+                        chartName,
+                        version,
                         user,
                         serviceId,
-                        catalog.getSkipTlsVerify(),
-                        catalog.getCaFile(),
+                        catalog.get().getSkipTlsVerify(),
+                        catalog.get().getCaFile(),
                         false);
             } else {
                 helmAppsService.resume(
                         region,
                         project,
-                        catalog.getId(),
-                        pkg,
+                        catalog.get().getId(),
+                        chartName,
+                        version,
                         user,
                         serviceId,
-                        catalog.getSkipTlsVerify(),
-                        catalog.getCaFile(),
+                        catalog.get().getSkipTlsVerify(),
+                        catalog.get().getCaFile(),
                         false);
             }
         }
