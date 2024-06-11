@@ -501,7 +501,8 @@ public class HelmAppsService implements AppsService {
             Region region,
             Project project,
             String catalogId,
-            Pkg pkg,
+            String chartName,
+            String version,
             User user,
             String serviceId,
             boolean skipTlsVerify,
@@ -512,7 +513,8 @@ public class HelmAppsService implements AppsService {
                 region,
                 project,
                 catalogId,
-                pkg,
+                chartName,
+                version,
                 user,
                 serviceId,
                 skipTlsVerify,
@@ -526,7 +528,8 @@ public class HelmAppsService implements AppsService {
             Region region,
             Project project,
             String catalogId,
-            Pkg pkg,
+            String chartName,
+            String version,
             User user,
             String serviceId,
             boolean skipTlsVerify,
@@ -537,7 +540,8 @@ public class HelmAppsService implements AppsService {
                 region,
                 project,
                 catalogId,
-                pkg,
+                chartName,
+                version,
                 user,
                 serviceId,
                 skipTlsVerify,
@@ -550,7 +554,8 @@ public class HelmAppsService implements AppsService {
             Region region,
             Project project,
             String catalogId,
-            Pkg pkg,
+            String chartName,
+            String version,
             User user,
             String serviceId,
             boolean skipTlsVerify,
@@ -564,10 +569,10 @@ public class HelmAppsService implements AppsService {
             getHelmInstallService()
                     .suspend(
                             getHelmConfiguration(region, user),
-                            catalogId + "/" + pkg.getName(),
+                            catalogId + "/" + chartName,
                             namespaceId,
                             serviceId,
-                            pkg.getVersion(),
+                            version,
                             dryRun,
                             skipTlsVerify,
                             caFile);
@@ -575,17 +580,17 @@ public class HelmAppsService implements AppsService {
             getHelmInstallService()
                     .resume(
                             getHelmConfiguration(region, user),
-                            catalogId + "/" + pkg.getName(),
+                            catalogId + "/" + chartName,
                             namespaceId,
                             serviceId,
-                            pkg.getVersion(),
+                            version,
                             dryRun,
                             skipTlsVerify,
                             caFile);
         }
         SuspendResumeServiceEvent event =
                 new SuspendResumeServiceEvent(
-                        user.getIdep(), namespaceId, serviceId, pkg.getName(), catalogId, suspend);
+                        user.getIdep(), namespaceId, serviceId, chartName, catalogId, suspend);
         onyxiaEventPublisher.publishEvent(event);
     }
 
