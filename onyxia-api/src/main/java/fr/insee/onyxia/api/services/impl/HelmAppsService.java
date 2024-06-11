@@ -19,6 +19,7 @@ import fr.insee.onyxia.api.services.control.xgenerated.XGeneratedContext;
 import fr.insee.onyxia.api.services.control.xgenerated.XGeneratedProcessor;
 import fr.insee.onyxia.api.services.control.xgenerated.XGeneratedProvider;
 import fr.insee.onyxia.api.services.impl.kubernetes.KubernetesService;
+import fr.insee.onyxia.api.services.utils.Base64Utils;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.Config.Property;
 import fr.insee.onyxia.model.catalog.Pkg;
@@ -212,12 +213,13 @@ public class HelmAppsService implements AppsService {
                             catalogId);
             onyxiaEventPublisher.publishEvent(installServiceEvent);
             Map<String, String> metadata = new HashMap<>();
-            metadata.put("catalog", catalogId);
-            metadata.put("owner", user.getIdep());
+            metadata.put("catalog", Base64Utils.base64Encode(catalogId));
+            metadata.put("owner", Base64Utils.base64Encode(user.getIdep()));
             if (requestDTO.getFriendlyName() != null) {
-                metadata.put("friendlyName", requestDTO.getFriendlyName());
+                metadata.put(
+                        "friendlyName", Base64Utils.base64Encode(requestDTO.getFriendlyName()));
             }
-            metadata.put("share", String.valueOf(requestDTO.isShare()));
+            metadata.put("share", Base64Utils.base64Encode(String.valueOf(requestDTO.isShare())));
             kubernetesService.createOnyxiaSecret(
                     region, namespaceId, requestDTO.getName(), metadata);
             return List.of(res.getManifest());
@@ -399,19 +401,20 @@ public class HelmAppsService implements AppsService {
                             .inNamespace(release.getNamespace())
                             .withName(ONYXIA_SECRET_PREFIX + release.getName())
                             .get();
-            if (secret != null && secret.getStringData() != null) {
-                Map<String, String> stringData = secret.getStringData();
-                if (stringData.containsKey("friendlyName")) {
-                    service.setFriendlyName(stringData.get("friendlyName"));
+            if (secret != null && secret.getData() != null) {
+                Map<String, String> data = secret.getData();
+                if (data.containsKey("friendlyName")) {
+                    service.setFriendlyName(Base64Utils.base64Decode(data.get("friendlyName")));
                 }
-                if (stringData.containsKey("owner")) {
-                    service.setOwner(stringData.get("owner"));
+                if (data.containsKey("owner")) {
+                    service.setOwner(Base64Utils.base64Decode(data.get("owner")));
                 }
-                if (stringData.containsKey("catalog")) {
-                    service.setCatalogId(stringData.get("catalog"));
+                if (data.containsKey("catalog")) {
+                    service.setCatalogId(Base64Utils.base64Decode(data.get("catalog")));
                 }
-                if (stringData.containsKey("share")) {
-                    service.setShare(Boolean.parseBoolean(stringData.get("share")));
+                if (data.containsKey("share")) {
+                    service.setShare(
+                            Boolean.parseBoolean(Base64Utils.base64Decode(data.get("share"))));
                 }
             }
         } catch (Exception e) {
@@ -477,13 +480,13 @@ public class HelmAppsService implements AppsService {
                         .withName(ONYXIA_SECRET_PREFIX + serviceId)
                         .get();
         if (secret != null) {
-            Map<String, String> secretData = secret.getStringData();
-            if (secretData == null) {
-                // Initialize the map if it's null
-                secretData = new HashMap<>();
-            }
-            secretData.putAll(data);
-            secret.setStringData(secretData);
+            Map<String, String> secretData =
+                    secret.getData() != null ? secret.getData() : new HashMap<>();
+            data.forEach(
+                    (k, v) -> {
+                        secretData.put(k, Base64Utils.base64Encode(v));
+                    });
+            secret.setData(secretData);
             client.secrets().inNamespace(namespaceId).resource(secret).serverSideApply();
         } else {
             Map<String, String> metadata = new HashMap<>();
