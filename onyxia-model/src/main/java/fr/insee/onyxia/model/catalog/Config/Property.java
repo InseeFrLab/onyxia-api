@@ -3,7 +3,11 @@ package fr.insee.onyxia.model.catalog.Config;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.List;
 import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -358,6 +362,22 @@ public class Property {
         boolean hidden = false;
         boolean readonly = false;
         String overwriteDefaultWith;
+
+        @JsonTypeInfo(
+            use = JsonTypeInfo.Id.CLASS,
+            include = JsonTypeInfo.As.PROPERTY,
+            property = "@class"
+        )
+        @JsonSubTypes({
+            @JsonSubTypes.Type(value = String.class, name = "java.lang.String"),
+            @JsonSubTypes.Type(value = Integer.class, name = "java.lang.Integer"),
+            @JsonSubTypes.Type(value = Boolean.class, name = "java.lang.Boolean"),
+            @JsonSubTypes.Type(value = Double.class, name = "java.lang.Double"),
+            @JsonSubTypes.Type(value = Map.class, name = "java.util.Map"),
+            @JsonSubTypes.Type(value = List.class, name = "java.util.List")
+        })
+        List<Object> overwriteListEnumWith;
+
         String useRegionSliderConfig;
         Object formFieldLabel;
         Object formFieldHelperText;
@@ -384,6 +404,14 @@ public class Property {
 
         public void setOverwriteDefaultWith(String overwriteDefaultWith) {
             this.overwriteDefaultWith = overwriteDefaultWith;
+        }
+
+        public List<Object> getOverwriteListEnumWith() {
+            return overwriteListEnumWith;
+        }
+
+        public void setOverwriteListEnumWith(List<Object> overwriteListEnumWith) {
+            this.overwriteListEnumWith = overwriteListEnumWith;
         }
 
         public String getUseRegionSliderConfig() {
