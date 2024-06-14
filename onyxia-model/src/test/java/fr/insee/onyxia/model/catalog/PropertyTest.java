@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -15,7 +14,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class PropertyTest {
+class PropertyTest {
 
     private ObjectMapper mapper;
     private Property property;
@@ -54,7 +53,7 @@ public class PropertyTest {
     }
 
     @Test
-    void testSerialization() throws JsonProcessingException {
+    void testSerialization() throws IOException {
         String json = mapper.writeValueAsString(property);
         System.out.println("Serialized JSON: \n" + json);
         assertTrue(json.contains("\"type\":\"string\""));
@@ -72,7 +71,7 @@ public class PropertyTest {
     }
 
     @Test
-    void testListEnumProperty() throws JsonProcessingException, IOException {
+    void testListEnumProperty() throws IOException {
         Property pullPolicyProperty = new Property();
         pullPolicyProperty.setType("string");
         pullPolicyProperty.setDefaut("IfNotPresent");
@@ -90,7 +89,7 @@ public class PropertyTest {
     }
 
     @Test
-    void testXOnyxiaProperty() throws JsonProcessingException, IOException {
+    void testXOnyxiaProperty() throws IOException {
         Property groupProperty = new Property();
         groupProperty.setType("string");
         groupProperty.setDefaut("");
