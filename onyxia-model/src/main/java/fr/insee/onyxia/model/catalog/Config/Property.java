@@ -361,21 +361,8 @@ public class Property {
 
         boolean hidden = false;
         boolean readonly = false;
-        String overwriteDefaultWith;
 
-        @JsonTypeInfo(
-            use = JsonTypeInfo.Id.CLASS,
-            include = JsonTypeInfo.As.PROPERTY,
-            property = "@class"
-        )
-        @JsonSubTypes({
-            @JsonSubTypes.Type(value = String.class, name = "java.lang.String"),
-            @JsonSubTypes.Type(value = Integer.class, name = "java.lang.Integer"),
-            @JsonSubTypes.Type(value = Boolean.class, name = "java.lang.Boolean"),
-            @JsonSubTypes.Type(value = Double.class, name = "java.lang.Double"),
-            @JsonSubTypes.Type(value = Map.class, name = "java.util.Map"),
-            @JsonSubTypes.Type(value = List.class, name = "java.util.List")
-        })
+        String overwriteDefaultWith;
         String overwriteListEnumWith;
 
         String useRegionSliderConfig;
