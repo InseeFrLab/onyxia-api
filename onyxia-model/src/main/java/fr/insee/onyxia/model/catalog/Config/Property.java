@@ -359,7 +359,7 @@ public class Property {
         boolean readonly = false;
 
         String overwriteDefaultWith;
-        String overwriteListEnumWith;
+        Object overwriteListEnumWith;
 
         String useRegionSliderConfig;
         Object formFieldLabel;
@@ -389,11 +389,11 @@ public class Property {
             this.overwriteDefaultWith = overwriteDefaultWith;
         }
 
-        public String getOverwriteListEnumWith() {
+        public Object getOverwriteListEnumWith() {
             return overwriteListEnumWith;
         }
 
-        public void setOverwriteListEnumWith(String overwriteListEnumWith) {
+        public void setOverwriteListEnumWith(Object overwriteListEnumWith) {
             this.overwriteListEnumWith = overwriteListEnumWith;
         }
 
