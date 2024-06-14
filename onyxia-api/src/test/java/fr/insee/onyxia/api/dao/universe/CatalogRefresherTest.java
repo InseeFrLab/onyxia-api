@@ -14,7 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.ApplicationArguments;
 
 @ExtendWith(MockitoExtension.class)
-public class CatalogRefresherTest {
+class CatalogRefresherTest {
 
     @Mock private Catalogs catalogs;
 
@@ -32,7 +32,7 @@ public class CatalogRefresherTest {
     }
 
     @Test
-    public void testRefreshHandlesInterruptedException() throws Exception {
+    void testRefreshHandlesInterruptedException() throws Exception {
         doThrow(new InterruptedException("Thread was interrupted"))
                 .when(helmRepoService)
                 .repoUpdate();
@@ -45,7 +45,7 @@ public class CatalogRefresherTest {
     }
 
     @Test
-    public void testRefreshHandlesTimeoutAndIOException() throws Exception {
+    void testRefreshHandlesTimeoutAndIOException() throws Exception {
         doThrow(new TimeoutException("Timeout")).when(helmRepoService).repoUpdate();
 
         catalogRefresher.run(applicationArguments);

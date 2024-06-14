@@ -12,7 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class CompatibilityChecksTest {
+class CompatibilityChecksTest {
 
     @Mock private HelmVersionService helmVersionService;
 
@@ -22,7 +22,7 @@ public class CompatibilityChecksTest {
     public void setUp() {}
 
     @Test
-    public void testCheckHelmHandlesInterruptedException() throws Exception {
+    void testCheckHelmHandlesInterruptedException() throws Exception {
         doThrow(new InterruptedException("Thread was interrupted"))
                 .when(helmVersionService)
                 .getVersion();
@@ -35,7 +35,7 @@ public class CompatibilityChecksTest {
     }
 
     @Test
-    public void testCheckHelmHandlesGenericException() throws Exception {
+    void testCheckHelmHandlesGenericException() throws Exception {
         doThrow(new RuntimeException("Some other exception")).when(helmVersionService).getVersion();
 
         try {
