@@ -376,7 +376,7 @@ public class Property {
             @JsonSubTypes.Type(value = Map.class, name = "java.util.Map"),
             @JsonSubTypes.Type(value = List.class, name = "java.util.List")
         })
-        List<Object> overwriteListEnumWith;
+        String overwriteListEnumWith;
 
         String useRegionSliderConfig;
         Object formFieldLabel;
@@ -406,11 +406,11 @@ public class Property {
             this.overwriteDefaultWith = overwriteDefaultWith;
         }
 
-        public List<Object> getOverwriteListEnumWith() {
+        public String getOverwriteListEnumWith() {
             return overwriteListEnumWith;
         }
 
-        public void setOverwriteListEnumWith(List<Object> overwriteListEnumWith) {
+        public void setOverwriteListEnumWith(String overwriteListEnumWith) {
             this.overwriteListEnumWith = overwriteListEnumWith;
         }
 

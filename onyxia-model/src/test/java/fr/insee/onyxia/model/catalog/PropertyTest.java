@@ -1,6 +1,7 @@
 package fr.insee.onyxia.model.catalog;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -8,11 +9,12 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import fr.insee.onyxia.model.catalog.Config.Property;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 public class PropertyTest {
 
@@ -45,7 +47,7 @@ public class PropertyTest {
 
         Property.XOnyxia xOnyxia = new Property.XOnyxia();
         xOnyxia.setOverwriteDefaultWith("user.email");
-        xOnyxia.setOverwriteListEnumWith(Arrays.asList("value1", 2, 3.14));
+        xOnyxia.setOverwriteListEnumWith("user.decodedIdToken.groups");
         xOnyxia.setUseRegionSliderConfig("config");
         xOnyxia.setFormFieldLabel("label");
         xOnyxia.setFormFieldHelperText("helper text");
@@ -71,31 +73,50 @@ public class PropertyTest {
     }
 
     @Test
-    public void testEdgeCases() throws JsonProcessingException, IOException {
-        Property edgeCaseProperty = new Property();
-        edgeCaseProperty.setXonyxia(new Property.XOnyxia());
-        edgeCaseProperty.getXonyxia().setOverwriteListEnumWith(List.of());
+    public void testListEnumProperty() throws JsonProcessingException, IOException {
+        Property pullPolicyProperty = new Property();
+        pullPolicyProperty.setType("string");
+        pullPolicyProperty.setDefaut("IfNotPresent");
+        pullPolicyProperty.setListEnumeration(Arrays.asList("IfNotPresent", "Always", "Never"));
 
-        String json = mapper.writeValueAsString(edgeCaseProperty);
-        Property deserializedEdgeCaseProperty = mapper.readValue(json, Property.class);
+        String json = mapper.writeValueAsString(pullPolicyProperty);
+        Property deserializedProperty = mapper.readValue(json, Property.class);
 
-        assertTrue(deserializedEdgeCaseProperty.getXonyxia().getOverwriteListEnumWith().isEmpty());
+        assertNotNull(deserializedProperty, "PullPolicy property should not be null");
+        assertEquals("IfNotPresent", deserializedProperty.getDefaut());
+
+        List<Object> listEnum = (List<Object>) deserializedProperty.getListEnumeration();
+        assertNotNull(listEnum, "listEnum should not be null");
+        assertEquals(Arrays.asList("IfNotPresent", "Always", "Never"), listEnum);
     }
 
     @Test
-    public void testOverwriteListEnumWithVariousTypes() throws JsonProcessingException, IOException {
+    public void testXOnyxiaProperty() throws JsonProcessingException, IOException {
+        Property groupProperty = new Property();
+        groupProperty.setType("string");
+        groupProperty.setDefaut("");
+        groupProperty.setListEnumeration(List.of(""));
+
         Property.XOnyxia xOnyxia = new Property.XOnyxia();
-        xOnyxia.setOverwriteListEnumWith(Arrays.asList("USER_ONYXIA", "codegouv", "onyxia", "sspcloud-admin"));
-        property.setXonyxia(xOnyxia);
+        xOnyxia.setOverwriteDefaultWith("user.decodedIdToken.groups[0]");
+        xOnyxia.setOverwriteListEnumWith("user.decodedIdToken.groups");
+        groupProperty.setXonyxia(xOnyxia);
 
-        String json = mapper.writeValueAsString(property);
-        Property deserializedProperty = mapper.readValue(json, Property.class);
+        // Serialize and deserialize to test
+        String json = mapper.writeValueAsString(groupProperty);
+        Property deserializedGroupProperty = mapper.readValue(json, Property.class);
 
-        List<Object> overwriteListEnumWith = deserializedProperty.getXonyxia().getOverwriteListEnumWith();
-        assertEquals(4, overwriteListEnumWith.size());
-        assertTrue(overwriteListEnumWith.contains("USER_ONYXIA"));
-        assertTrue(overwriteListEnumWith.contains("codegouv"));
-        assertTrue(overwriteListEnumWith.contains("onyxia"));
-        assertTrue(overwriteListEnumWith.contains("sspcloud-admin"));
+        assertNotNull(deserializedGroupProperty, "Group property should not be null");
+        assertEquals("", deserializedGroupProperty.getDefaut());
+
+        List<Object> listEnum = (List<Object>) deserializedGroupProperty.getListEnumeration();
+        assertNotNull(listEnum, "listEnum should not be null");
+        assertEquals(List.of(""), listEnum);
+
+        // Check x-onyxia values
+        Property.XOnyxia deserializedXOnyxia = deserializedGroupProperty.getXonyxia();
+        assertNotNull(deserializedXOnyxia, "XOnyxia property should not be null");
+        assertEquals("user.decodedIdToken.groups[0]", deserializedXOnyxia.getOverwriteDefaultWith());
+        assertEquals("user.decodedIdToken.groups", deserializedXOnyxia.getOverwriteListEnumWith());
     }
 }
