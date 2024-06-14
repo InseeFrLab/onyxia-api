@@ -9,12 +9,11 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import fr.insee.onyxia.model.catalog.Config.Property;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class PropertyTest {
 
@@ -116,7 +115,8 @@ public class PropertyTest {
         // Check x-onyxia values
         Property.XOnyxia deserializedXOnyxia = deserializedGroupProperty.getXonyxia();
         assertNotNull(deserializedXOnyxia, "XOnyxia property should not be null");
-        assertEquals("user.decodedIdToken.groups[0]", deserializedXOnyxia.getOverwriteDefaultWith());
+        assertEquals(
+                "user.decodedIdToken.groups[0]", deserializedXOnyxia.getOverwriteDefaultWith());
         assertEquals("user.decodedIdToken.groups", deserializedXOnyxia.getOverwriteListEnumWith());
     }
 }
