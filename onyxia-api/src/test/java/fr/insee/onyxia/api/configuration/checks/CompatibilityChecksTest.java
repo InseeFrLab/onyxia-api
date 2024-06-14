@@ -18,8 +18,14 @@ class CompatibilityChecksTest {
 
     @InjectMocks private CompatibilityChecks compatibilityChecks;
 
+    private boolean exitCalled;
+
     @BeforeEach
-    public void setUp() {}
+    void setUp() {
+        exitCalled = false;
+        compatibilityChecks =
+                new CompatibilityChecks(null, null, helmVersionService, () -> exitCalled = true);
+    }
 
     @Test
     void testCheckHelmHandlesInterruptedException() throws Exception {
@@ -38,13 +44,9 @@ class CompatibilityChecksTest {
     void testCheckHelmHandlesGenericException() throws Exception {
         doThrow(new RuntimeException("Some other exception")).when(helmVersionService).getVersion();
 
-        try {
-            compatibilityChecks.checkHelm();
-        } catch (Exception e) {
-            // This shouldn't be reached due to System.exit(0), but we want to ensure the LOGGER
-            // call is made
-            verify(helmVersionService).getVersion();
-            assert (false); // Fail the test if an exception is thrown
-        }
+        compatibilityChecks.checkHelm();
+
+        verify(helmVersionService).getVersion();
+        assert (exitCalled); // Check that the exit handler was called
     }
 }

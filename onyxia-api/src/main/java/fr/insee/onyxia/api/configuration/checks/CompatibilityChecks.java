@@ -18,17 +18,30 @@ public class CompatibilityChecks {
     private static final Logger LOGGER = LoggerFactory.getLogger(CompatibilityChecks.class);
     private final RegionsConfiguration regionsConfiguration;
     private final KubernetesClientProvider kubernetesClientProvider;
-
     private final HelmVersionService helmVersionService;
+    private final Runnable exitHandler;
 
     @Autowired
     public CompatibilityChecks(
             RegionsConfiguration regionsConfiguration,
             KubernetesClientProvider kubernetesClientProvider,
             HelmVersionService helmVersionService) {
+        this(
+                regionsConfiguration,
+                kubernetesClientProvider,
+                helmVersionService,
+                () -> System.exit(0));
+    }
+
+    public CompatibilityChecks(
+            RegionsConfiguration regionsConfiguration,
+            KubernetesClientProvider kubernetesClientProvider,
+            HelmVersionService helmVersionService,
+            Runnable exitHandler) {
         this.regionsConfiguration = regionsConfiguration;
         this.kubernetesClientProvider = kubernetesClientProvider;
         this.helmVersionService = helmVersionService;
+        this.exitHandler = exitHandler;
     }
 
     @EventListener(ContextRefreshedEvent.class)
@@ -36,13 +49,11 @@ public class CompatibilityChecks {
         try {
             LOGGER.info("Using helm {}", helmVersionService.getVersion());
         } catch (InterruptedException e) {
-            // Restore the interrupted status
             Thread.currentThread().interrupt();
             LOGGER.error("Thread was interrupted while determining helm version", e);
-            // Handle interruption-specific logic if needed
         } catch (Exception e) {
             LOGGER.error("Could not determine helm version", e);
-            System.exit(0);
+            exitHandler.run();
         }
     }
 
