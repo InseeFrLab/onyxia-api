@@ -35,6 +35,11 @@ public class CompatibilityChecks {
     public void checkHelm() {
         try {
             LOGGER.info("Using helm {}", helmVersionService.getVersion());
+        } catch (InterruptedException e) {
+            // Restore the interrupted status
+            Thread.currentThread().interrupt();
+            LOGGER.error("Thread was interrupted while determining helm version", e);
+            // Handle interruption-specific logic if needed
         } catch (Exception e) {
             LOGGER.error("Could not determine helm version", e);
             System.exit(0);
