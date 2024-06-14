@@ -21,7 +21,7 @@ public class PropertyTest {
     private Property property;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
@@ -54,7 +54,7 @@ public class PropertyTest {
     }
 
     @Test
-    public void testSerialization() throws JsonProcessingException {
+    void testSerialization() throws JsonProcessingException {
         String json = mapper.writeValueAsString(property);
         System.out.println("Serialized JSON: \n" + json);
         assertTrue(json.contains("\"type\":\"string\""));
@@ -63,7 +63,7 @@ public class PropertyTest {
     }
 
     @Test
-    public void testDeserialization() throws IOException {
+    void testDeserialization() throws IOException {
         String json = mapper.writeValueAsString(property);
         Property deserializedProperty = mapper.readValue(json, Property.class);
         assertEquals(property.getType(), deserializedProperty.getType());
@@ -72,7 +72,7 @@ public class PropertyTest {
     }
 
     @Test
-    public void testListEnumProperty() throws JsonProcessingException, IOException {
+    void testListEnumProperty() throws JsonProcessingException, IOException {
         Property pullPolicyProperty = new Property();
         pullPolicyProperty.setType("string");
         pullPolicyProperty.setDefaut("IfNotPresent");
@@ -90,7 +90,7 @@ public class PropertyTest {
     }
 
     @Test
-    public void testXOnyxiaProperty() throws JsonProcessingException, IOException {
+    void testXOnyxiaProperty() throws JsonProcessingException, IOException {
         Property groupProperty = new Property();
         groupProperty.setType("string");
         groupProperty.setDefaut("");
