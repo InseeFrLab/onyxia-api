@@ -55,7 +55,10 @@ public class CatalogRefresher implements ApplicationRunner {
 
         try {
             helmRepoService.repoUpdate();
-        } catch (InterruptedException | TimeoutException | IOException e) {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            LOGGER.warn("Thread was interrupted during repo update", e);
+        } catch (TimeoutException | IOException e) {
             LOGGER.warn("Exception occurred", e);
         }
     }
