@@ -15,6 +15,7 @@ import io.fabric8.kubernetes.api.model.rbac.RoleBindingBuilder;
 import io.fabric8.kubernetes.api.model.rbac.SubjectBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientException;
+import io.fabric8.kubernetes.client.dsl.Resource;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
@@ -92,19 +93,22 @@ public class KubernetesService {
             }
         }
 
-        kubClient
-                .namespaces()
-                .resource(
-                        new NamespaceBuilder()
-                                .withNewMetadata()
-                                .withName(namespaceId)
-                                .withLabels(region.getServices().getNamespaceLabels())
-                                .addToLabels("onyxia_owner", owner.getId())
-                                .withAnnotations(region.getServices().getNamespaceAnnotations())
-                                .addToAnnotations(userMetadata)
-                                .endMetadata()
-                                .build())
-                .serverSideApply();
+        Resource<Namespace> namespace =
+                kubClient
+                        .namespaces()
+                        .resource(
+                                new NamespaceBuilder()
+                                        .withNewMetadata()
+                                        .withName(namespaceId)
+                                        .withLabels(region.getServices().getNamespaceLabels())
+                                        .addToLabels("onyxia_owner", owner.getId())
+                                        .withAnnotations(
+                                                region.getServices().getNamespaceAnnotations())
+                                        .addToAnnotations(userMetadata)
+                                        .endMetadata()
+                                        .build());
+        boolean newNamespace = namespace.get() == null;
+        namespace.serverSideApply();
 
         final RoleBinding bindingToCreate =
                 kubClient
@@ -168,9 +172,11 @@ public class KubernetesService {
                     quota,
                     !region.getServices().getQuotas().isAllowUserModification());
         }
-        InitNamespaceEvent initNamespaceEvent =
-                new InitNamespaceEvent(region.getName(), namespaceId, owner.getId());
-        onyxiaEventPublisher.publishEvent(initNamespaceEvent);
+        if (newNamespace) {
+            InitNamespaceEvent initNamespaceEvent =
+                    new InitNamespaceEvent(region.getName(), namespaceId, owner.getId());
+            onyxiaEventPublisher.publishEvent(initNamespaceEvent);
+        }
 
         return namespaceId;
     }
