@@ -358,7 +358,7 @@ public class Property {
         boolean hidden = false;
         boolean readonly = false;
 
-        String overwriteDefaultWith;
+        Object overwriteDefaultWith;
         Object overwriteListEnumWith;
 
         String useRegionSliderConfig;
