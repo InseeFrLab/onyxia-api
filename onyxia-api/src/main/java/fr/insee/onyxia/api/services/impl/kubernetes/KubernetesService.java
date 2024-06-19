@@ -5,14 +5,12 @@ import fr.insee.onyxia.api.controller.exception.NamespaceAlreadyExistException;
 import fr.insee.onyxia.api.controller.exception.NamespaceNotFoundException;
 import fr.insee.onyxia.api.events.InitNamespaceEvent;
 import fr.insee.onyxia.api.events.OnyxiaEventPublisher;
+import fr.insee.onyxia.api.services.impl.HelmAppsService;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.project.Project;
 import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.quota.Quota;
-import io.fabric8.kubernetes.api.model.NamespaceBuilder;
-import io.fabric8.kubernetes.api.model.Quantity;
-import io.fabric8.kubernetes.api.model.ResourceQuota;
-import io.fabric8.kubernetes.api.model.ResourceQuotaBuilder;
+import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.rbac.RoleBinding;
 import io.fabric8.kubernetes.api.model.rbac.RoleBindingBuilder;
 import io.fabric8.kubernetes.api.model.rbac.SubjectBuilder;
@@ -217,6 +215,43 @@ public class KubernetesService {
                 }
             }
         }
+    }
+
+    public void createOnyxiaSecret(
+            Region region, String namespaceId, String releaseName, Map<String, String> secretData) {
+
+        final KubernetesClient kubClient = kubernetesClientProvider.getRootClient(region);
+        String ownerSecretName =
+                "sh.helm.release.v1." + releaseName + ".v1"; // Name of the Secret managed by Helm
+
+        // Fetch the existing secret managed by Helm
+        Secret ownerSecret =
+                kubClient.secrets().inNamespace(namespaceId).withName(ownerSecretName).get();
+
+        // Create owner reference
+        OwnerReference ownerReference =
+                new OwnerReferenceBuilder()
+                        .withApiVersion(ownerSecret.getApiVersion())
+                        .withKind(ownerSecret.getKind())
+                        .withName(ownerSecret.getMetadata().getName())
+                        .withUid(ownerSecret.getMetadata().getUid())
+                        .withController(true) // Optional: Specifies that this owner is a controller
+                        .build();
+
+        // Define the new secret
+        Secret newSecret =
+                new SecretBuilder()
+                        .withNewMetadata()
+                        .withName(HelmAppsService.ONYXIA_SECRET_PREFIX + releaseName)
+                        .addNewOwnerReferenceLike(ownerReference)
+                        .endOwnerReference()
+                        .endMetadata()
+                        .addToData(secretData)
+                        .withType("onyxia.sh/release.v1")
+                        .build();
+
+        // Create the secret in Kubernetes
+        newSecret = kubClient.secrets().inNamespace(namespaceId).resource(newSecret).create();
     }
 
     private String getNameFromOwner(Region region, Owner owner) {

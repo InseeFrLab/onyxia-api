@@ -97,7 +97,7 @@ jobs:
             type=sha
             type=raw,value=${{ env.TAG }}, enable=true
       - name: Build and push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: onyxia-api
           platforms: linux/amd64,linux/arm64
