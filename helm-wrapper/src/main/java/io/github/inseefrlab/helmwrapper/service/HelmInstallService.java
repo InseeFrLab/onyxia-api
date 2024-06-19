@@ -137,7 +137,7 @@ public class HelmInstallService {
                     InterruptedException,
                     TimeoutException,
                     IllegalArgumentException {
-        StringBuilder command = new StringBuilder("helm upgrade --install ");
+        StringBuilder command = new StringBuilder("helm upgrade --install --history-max 0 ");
         if (skipTlsVerify) {
             command.append("--insecure-skip-tls-verify ");
         } else if (caFile != null) {

@@ -357,7 +357,10 @@ public class Property {
 
         boolean hidden = false;
         boolean readonly = false;
-        Object overwriteDefaultWith;
+
+        String overwriteDefaultWith;
+        Object overwriteListEnumWith;
+
         String useRegionSliderConfig;
         Object formFieldLabel;
         Object formFieldHelperText;
@@ -384,6 +387,14 @@ public class Property {
 
         public void setOverwriteDefaultWith(Object overwriteDefaultWith) {
             this.overwriteDefaultWith = overwriteDefaultWith;
+        }
+
+        public Object getOverwriteListEnumWith() {
+            return overwriteListEnumWith;
+        }
+
+        public void setOverwriteListEnumWith(Object overwriteListEnumWith) {
+            this.overwriteListEnumWith = overwriteListEnumWith;
         }
 
         public String getUseRegionSliderConfig() {
