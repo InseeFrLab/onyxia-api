@@ -36,36 +36,56 @@ public class CatalogRefresher implements ApplicationRunner {
         this.refreshTime = refreshTime;
     }
 
-    private void refresh() {
+    private void refreshCatalogs() {
         catalogs.getCatalogs()
                 .forEach(
                         c -> {
                             try {
-                                LOGGER.info(
-                                        helmRepoService.addHelmRepo(
-                                                c.getLocation(),
-                                                c.getId(),
-                                                c.getSkipTlsVerify(),
-                                                c.getCaFile()));
+                                LOGGER.info("Adding Helm Repo: {}", c.getId());
+                                helmRepoService.addHelmRepo(
+                                        c.getLocation(),
+                                        c.getId(),
+                                        c.getSkipTlsVerify(),
+                                        c.getCaFile());
+                                LOGGER.info("Updating catalog: {}", c.getId());
                                 catalogLoader.updateCatalog(c);
                             } catch (Exception e) {
-                                LOGGER.warn("Exception occurred", e);
+                                LOGGER.warn(
+                                        "Exception occurred while updating catalog: {}",
+                                        c.getId(),
+                                        e);
                             }
                         });
+    }
 
+    private void updateRepo() throws InterruptedException {
         try {
+            LOGGER.info("Updating Helm Repo Service...");
             helmRepoService.repoUpdate();
         } catch (InterruptedException e) {
+            LOGGER.warn("InterruptedException occurred during repoUpdate", e);
             Thread.currentThread().interrupt();
-            LOGGER.warn("Thread was interrupted during repo update", e);
+            throw e;
         } catch (TimeoutException | IOException e) {
-            LOGGER.warn("Exception occurred", e);
+            LOGGER.warn("Exception occurred during repoUpdate", e);
         }
+    }
+
+    private void refresh() throws InterruptedException {
+        updateRepo();
+        refreshCatalogs();
     }
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        this.refresh();
+        LOGGER.info("Starting catalog refresher...");
+        try {
+            refresh();
+        } catch (InterruptedException e) {
+            LOGGER.warn("Run method interrupted", e);
+            Thread.currentThread().interrupt();
+        }
+
         if (refreshTime > 0L) {
             Timer timer = new Timer();
             TimerTask timerTask =
@@ -73,7 +93,12 @@ public class CatalogRefresher implements ApplicationRunner {
                         @Override
                         public void run() {
                             LOGGER.info("Refreshing catalogs");
-                            refresh();
+                            try {
+                                refresh();
+                            } catch (InterruptedException e) {
+                                LOGGER.warn("Timer task interrupted", e);
+                                Thread.currentThread().interrupt();
+                            }
                         }
                     };
             timer.scheduleAtFixedRate(timerTask, refreshTime, refreshTime);

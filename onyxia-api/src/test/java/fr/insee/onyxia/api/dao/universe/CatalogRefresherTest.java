@@ -2,11 +2,14 @@ package fr.insee.onyxia.api.dao.universe;
 
 import static org.mockito.Mockito.*;
 
+import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.configuration.Catalogs;
 import io.github.inseefrlab.helmwrapper.service.HelmRepoService;
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -27,12 +30,14 @@ class CatalogRefresherTest {
     private CatalogRefresher catalogRefresher;
 
     @BeforeEach
-    public void setUp() {
-        catalogRefresher = new CatalogRefresher(catalogs, catalogLoader, helmRepoService, 1000L);
+    void setUp() {
+        catalogRefresher = new CatalogRefresher(catalogs, catalogLoader, helmRepoService, 1000);
+        Thread.interrupted(); // Clear any existing interrupted status
     }
 
     @Test
-    void testRefreshHandlesInterruptedException() throws Exception {
+    @DisplayName("Test InterruptedException Handling")
+    void testInterruptedExceptionHandling() throws Exception {
         doThrow(new InterruptedException("Thread was interrupted"))
                 .when(helmRepoService)
                 .repoUpdate();
@@ -40,20 +45,50 @@ class CatalogRefresherTest {
         catalogRefresher.run(applicationArguments);
 
         verify(helmRepoService).repoUpdate();
-        // Ensure that the current thread's interrupted status is set
+        verify(catalogLoader, never()).updateCatalog(any(CatalogWrapper.class));
+
         assert (Thread.currentThread().isInterrupted());
+        Thread.interrupted(); // Reset interrupt status for other tests
     }
 
     @Test
-    void testRefreshHandlesTimeoutAndIOException() throws Exception {
+    @DisplayName("Test TimeoutException Handling")
+    void testTimeoutExceptionHandling() throws Exception {
         doThrow(new TimeoutException("Timeout")).when(helmRepoService).repoUpdate();
 
         catalogRefresher.run(applicationArguments);
-        verify(helmRepoService).repoUpdate();
 
-        doThrow(new IOException("IO Exception")).when(helmRepoService).repoUpdate();
+        verify(helmRepoService).repoUpdate();
+        verify(catalogLoader, never()).updateCatalog(any(CatalogWrapper.class));
+    }
+
+    @Test
+    @DisplayName("Test IOException Handling")
+    void testIOExceptionHandling() throws Exception {
+        doThrow(new IOException("IO error")).when(helmRepoService).repoUpdate();
 
         catalogRefresher.run(applicationArguments);
-        verify(helmRepoService, times(2)).repoUpdate();
+
+        verify(helmRepoService).repoUpdate();
+        verify(catalogLoader, never()).updateCatalog(any(CatalogWrapper.class));
+    }
+
+    @Test
+    @DisplayName("Test Successful Refresh")
+    void testSuccessfulRefresh() throws Exception {
+        CatalogWrapper catalogWrapper = mock(CatalogWrapper.class);
+        when(catalogWrapper.getLocation()).thenReturn("location");
+        when(catalogWrapper.getId()).thenReturn("id");
+        when(catalogWrapper.getSkipTlsVerify()).thenReturn(false);
+        when(catalogWrapper.getCaFile()).thenReturn(null);
+
+        when(catalogs.getCatalogs()).thenReturn(List.of(catalogWrapper));
+        when(helmRepoService.addHelmRepo("location", "id", false, null)).thenReturn("Repo added");
+
+        catalogRefresher.run(applicationArguments);
+
+        verify(helmRepoService).repoUpdate();
+        verify(helmRepoService, times(1)).addHelmRepo("location", "id", false, null);
+        verify(catalogLoader, times(1)).updateCatalog(catalogWrapper);
     }
 }
