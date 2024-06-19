@@ -2,8 +2,16 @@
   "catalogs": [
     {
       "id": "ide",
-      "name": "IDE",
-      "description": "Services for datascientists.",
+      "name": {
+        "en": "Development environments",
+        "fr": "Environnements de développement",
+        "de": "Entwicklungsumgebungen",
+        "fi": "Kehitysympäristöt",
+        "it": "Ambienti di sviluppo",
+        "nl": "Ontwikkelingsomgevingen",
+        "no": "Utviklingsmiljøer",
+        "zh-CN": "开发环境"
+      },
       "maintainer": "innovation@insee.fr",
       "location": "https://inseefrlab.github.io/helm-charts-interactive-services",
       "status": "PROD",
@@ -20,7 +28,16 @@
     },
     {
       "id": "databases",
-      "name": "Databases",
+      "name": {
+        "en": "Databases",
+        "fr": "Bases de données",
+        "de": "Datenbanken",
+        "fi": "Tietokannat",
+        "it": "Database",
+        "nl": "Databases",
+        "no": "Databaser",
+        "zh-CN": "数据库"
+      },
       "description": "Databases for datascientists.",
       "maintainer": "innovation@insee.fr",
       "location": "https://inseefrlab.github.io/helm-charts-databases",
@@ -38,8 +55,16 @@
     },
     {
       "id": "automation",
-      "name": "Automation",
-      "description": "Automation for datascientists.",
+      "name": {
+        "en": "Automation",
+        "fr": "Automatisation",
+        "de": "Automatisierung",
+        "fi": "Automaatio",
+        "it": "Automazione",
+        "nl": "Automatisering",
+        "no": "Automatisering",
+        "zh-CN": "自动化"
+      },
       "maintainer": "innovation@insee.fr",
       "location": "https://inseefrlab.github.io/helm-charts-automation",
       "status": "PROD",
