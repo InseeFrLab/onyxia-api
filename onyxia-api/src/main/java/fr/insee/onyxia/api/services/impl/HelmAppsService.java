@@ -19,6 +19,7 @@ import fr.insee.onyxia.api.services.control.xgenerated.XGeneratedContext;
 import fr.insee.onyxia.api.services.control.xgenerated.XGeneratedProcessor;
 import fr.insee.onyxia.api.services.control.xgenerated.XGeneratedProvider;
 import fr.insee.onyxia.api.services.impl.kubernetes.KubernetesService;
+import fr.insee.onyxia.api.services.utils.Base64Utils;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.Config.Property;
 import fr.insee.onyxia.model.catalog.Pkg;
@@ -27,6 +28,7 @@ import fr.insee.onyxia.model.dto.ServicesListing;
 import fr.insee.onyxia.model.project.Project;
 import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.*;
+import io.fabric8.kubernetes.api.model.Secret;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.Watch;
 import io.fabric8.kubernetes.client.Watcher;
@@ -75,6 +77,8 @@ public class HelmAppsService implements AppsService {
     private final UrlGenerator urlGenerator;
 
     final OnyxiaEventPublisher onyxiaEventPublisher;
+
+    public static final String ONYXIA_SECRET_PREFIX = "sh.onyxia.release.v1.";
 
     @Autowired
     public HelmAppsService(
@@ -208,6 +212,16 @@ public class HelmAppsService implements AppsService {
                             pkg.getName(),
                             catalogId);
             onyxiaEventPublisher.publishEvent(installServiceEvent);
+            Map<String, String> metadata = new HashMap<>();
+            metadata.put("catalog", Base64Utils.base64Encode(catalogId));
+            metadata.put("owner", Base64Utils.base64Encode(user.getIdep()));
+            if (requestDTO.getFriendlyName() != null) {
+                metadata.put(
+                        "friendlyName", Base64Utils.base64Encode(requestDTO.getFriendlyName()));
+            }
+            metadata.put("share", Base64Utils.base64Encode(String.valueOf(requestDTO.isShare())));
+            kubernetesService.createOnyxiaSecret(
+                    region, namespaceId, requestDTO.getName(), metadata);
             return List.of(res.getManifest());
         } catch (IllegalArgumentException e) {
             throw new AccessDeniedException(e.getMessage());
@@ -380,6 +394,32 @@ public class HelmAppsService implements AppsService {
         } catch (Exception e) {
             service.setStartedAt(0);
         }
+        try {
+            KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
+            Secret secret =
+                    client.secrets()
+                            .inNamespace(release.getNamespace())
+                            .withName(ONYXIA_SECRET_PREFIX + release.getName())
+                            .get();
+            if (secret != null && secret.getData() != null) {
+                Map<String, String> data = secret.getData();
+                if (data.containsKey("friendlyName")) {
+                    service.setFriendlyName(Base64Utils.base64Decode(data.get("friendlyName")));
+                }
+                if (data.containsKey("owner")) {
+                    service.setOwner(Base64Utils.base64Decode(data.get("owner")));
+                }
+                if (data.containsKey("catalog")) {
+                    service.setCatalogId(Base64Utils.base64Decode(data.get("catalog")));
+                }
+                if (data.containsKey("share")) {
+                    service.setShare(
+                            Boolean.parseBoolean(Base64Utils.base64Decode(data.get("share"))));
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.warn("Exception occurred", e);
+        }
         service.setId(release.getName());
         service.setName(release.getName());
         service.setSubtitle(release.getChart());
@@ -417,11 +457,52 @@ public class HelmAppsService implements AppsService {
     }
 
     @Override
+    public void rename(
+            Region region, Project project, User user, String serviceId, String friendlyName)
+            throws IOException, InterruptedException, TimeoutException {
+        patchOnyxiaSecret(region, project, user, serviceId, Map.of("friendlyName", friendlyName));
+    }
+
+    @Override
+    public void share(Region region, Project project, User user, String serviceId, boolean share)
+            throws IOException, InterruptedException, TimeoutException {
+        patchOnyxiaSecret(region, project, user, serviceId, Map.of("share", String.valueOf(share)));
+    }
+
+    private void patchOnyxiaSecret(
+            Region region, Project project, User user, String serviceId, Map<String, String> data) {
+        String namespaceId =
+                kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
+        KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
+        Secret secret =
+                client.secrets()
+                        .inNamespace(namespaceId)
+                        .withName(ONYXIA_SECRET_PREFIX + serviceId)
+                        .get();
+        if (secret != null) {
+            Map<String, String> secretData =
+                    secret.getData() != null ? secret.getData() : new HashMap<>();
+            data.forEach(
+                    (k, v) -> {
+                        secretData.put(k, Base64Utils.base64Encode(v));
+                    });
+            secret.setData(secretData);
+            client.secrets().inNamespace(namespaceId).resource(secret).serverSideApply();
+        } else {
+            Map<String, String> metadata = new HashMap<>();
+            metadata.put("owner", user.getIdep());
+            metadata.putAll(data);
+            kubernetesService.createOnyxiaSecret(region, namespaceId, serviceId, metadata);
+        }
+    }
+
+    @Override
     public void suspend(
             Region region,
             Project project,
             String catalogId,
-            Pkg pkg,
+            String chartName,
+            String version,
             User user,
             String serviceId,
             boolean skipTlsVerify,
@@ -432,7 +513,8 @@ public class HelmAppsService implements AppsService {
                 region,
                 project,
                 catalogId,
-                pkg,
+                chartName,
+                version,
                 user,
                 serviceId,
                 skipTlsVerify,
@@ -446,7 +528,8 @@ public class HelmAppsService implements AppsService {
             Region region,
             Project project,
             String catalogId,
-            Pkg pkg,
+            String chartName,
+            String version,
             User user,
             String serviceId,
             boolean skipTlsVerify,
@@ -457,7 +540,8 @@ public class HelmAppsService implements AppsService {
                 region,
                 project,
                 catalogId,
-                pkg,
+                chartName,
+                version,
                 user,
                 serviceId,
                 skipTlsVerify,
@@ -470,7 +554,8 @@ public class HelmAppsService implements AppsService {
             Region region,
             Project project,
             String catalogId,
-            Pkg pkg,
+            String chartName,
+            String version,
             User user,
             String serviceId,
             boolean skipTlsVerify,
@@ -484,10 +569,10 @@ public class HelmAppsService implements AppsService {
             getHelmInstallService()
                     .suspend(
                             getHelmConfiguration(region, user),
-                            catalogId + "/" + pkg.getName(),
+                            catalogId + "/" + chartName,
                             namespaceId,
                             serviceId,
-                            pkg.getVersion(),
+                            version,
                             dryRun,
                             skipTlsVerify,
                             caFile);
@@ -495,17 +580,17 @@ public class HelmAppsService implements AppsService {
             getHelmInstallService()
                     .resume(
                             getHelmConfiguration(region, user),
-                            catalogId + "/" + pkg.getName(),
+                            catalogId + "/" + chartName,
                             namespaceId,
                             serviceId,
-                            pkg.getVersion(),
+                            version,
                             dryRun,
                             skipTlsVerify,
                             caFile);
         }
         SuspendResumeServiceEvent event =
                 new SuspendResumeServiceEvent(
-                        user.getIdep(), namespaceId, serviceId, pkg.getName(), catalogId, suspend);
+                        user.getIdep(), namespaceId, serviceId, chartName, catalogId, suspend);
         onyxiaEventPublisher.publishEvent(event);
     }
 
