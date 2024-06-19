@@ -27,9 +27,6 @@ public class CatalogWrapper {
     @Schema(description = "Localized string for the description of the catalog")
     private Object description;
 
-    @Schema(description = "Localized string for the title of the catalog")
-    private Object title;
-
     @Schema(description = "Who maintains the catalog")
     private String maintainer;
 
