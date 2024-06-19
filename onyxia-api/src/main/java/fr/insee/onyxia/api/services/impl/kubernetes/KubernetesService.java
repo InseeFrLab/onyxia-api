@@ -256,7 +256,7 @@ public class KubernetesService {
                         .addNewOwnerReferenceLike(ownerReference)
                         .endOwnerReference()
                         .endMetadata()
-                        .addToStringData(secretData)
+                        .addToData(secretData)
                         .withType("onyxia.sh/release.v1")
                         .build();
 
