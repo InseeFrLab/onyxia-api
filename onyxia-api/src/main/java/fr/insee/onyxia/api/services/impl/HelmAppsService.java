@@ -490,7 +490,7 @@ public class HelmAppsService implements AppsService {
             if (secret.getMetadata().getManagedFields() != null) {
                 secret.getMetadata().getManagedFields().clear();
             }
-            client.secrets().inNamespace(namespaceId).resource(secret).serverSideApply();
+            client.secrets().inNamespace(namespaceId).resource(secret).serverSideApply(true);
         } else {
             Map<String, String> metadata = new HashMap<>();
             metadata.put("owner", user.getIdep());
