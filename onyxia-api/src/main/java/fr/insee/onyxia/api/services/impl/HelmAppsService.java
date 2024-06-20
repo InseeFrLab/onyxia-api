@@ -487,6 +487,9 @@ public class HelmAppsService implements AppsService {
                         secretData.put(k, Base64Utils.base64Encode(v));
                     });
             secret.setData(secretData);
+            if (secret.getMetadata().getManagedFields() != null) {
+                secret.getMetadata().getManagedFields().clear();
+            }
             client.secrets().inNamespace(namespaceId).resource(secret).serverSideApply();
         } else {
             Map<String, String> metadata = new HashMap<>();
