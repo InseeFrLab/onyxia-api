@@ -266,26 +266,9 @@ public class HelmAppsService implements AppsService {
                         .filter(
                                 service -> {
                                     boolean canUserSeeThisService = false;
-                                    if (project.getGroup() == null) {
+                                    if (project.getGroup() == null || service.isShare() || user.getIdep().equalsIgnoreCase(service.getOwner()) {
                                         // Personal group
                                         canUserSeeThisService = true;
-                                    } else {
-                                        if (service.getEnv().containsKey("onyxia.share")
-                                                && "true"
-                                                        .equals(
-                                                                service.getEnv()
-                                                                        .get("onyxia.share"))) {
-                                            // Service has been intentionally shared
-                                            canUserSeeThisService = true;
-                                        }
-                                        if (service.getEnv().containsKey("onyxia.owner")
-                                                && user.getIdep()
-                                                        .equalsIgnoreCase(
-                                                                service.getEnv()
-                                                                        .get("onyxia.owner"))) {
-                                            // User is owner
-                                            canUserSeeThisService = true;
-                                        }
                                     }
                                     return canUserSeeThisService;
                                 })
