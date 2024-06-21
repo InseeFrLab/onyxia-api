@@ -266,7 +266,7 @@ public class HelmAppsService implements AppsService {
                         .filter(
                                 service -> {
                                     boolean canUserSeeThisService = false;
-                                    if (project.getGroup() == null || service.isShare() || user.getIdep().equalsIgnoreCase(service.getOwner()) {
+                                    if (project.getGroup() == null || service.isShare() || user.getIdep().equalsIgnoreCase(service.getOwner())) {
                                         // Personal group
                                         canUserSeeThisService = true;
                                     }
