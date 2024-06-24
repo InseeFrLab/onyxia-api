@@ -13,7 +13,11 @@ public abstract class CatalogWrapper {
     private Map<String, List<Chart>> entries = Map.of();
 
     public Optional<Chart> getPackageByName(String name) {
-        return entries.get(name).stream().findFirst();
+        if (entries.containsKey(name)) {
+            return entries.get(name).stream().findFirst();
+        } else {
+            return Optional.empty();
+        }
     }
 
     public Optional<Chart> getPackageByNameAndVersion(String name, String version) {
