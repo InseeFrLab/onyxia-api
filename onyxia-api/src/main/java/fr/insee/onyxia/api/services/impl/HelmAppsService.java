@@ -266,7 +266,10 @@ public class HelmAppsService implements AppsService {
                         .filter(
                                 service -> {
                                     boolean canUserSeeThisService = false;
-                                    if (project.getGroup() == null || service.isShare() || user.getIdep().equalsIgnoreCase(service.getOwner())) {
+                                    if (project.getGroup() == null
+                                            || service.isShare()
+                                            || user.getIdep()
+                                                    .equalsIgnoreCase(service.getOwner())) {
                                         // Personal group
                                         canUserSeeThisService = true;
                                     }
@@ -473,7 +476,11 @@ public class HelmAppsService implements AppsService {
             if (secret.getMetadata().getManagedFields() != null) {
                 secret.getMetadata().getManagedFields().clear();
             }
-            client.secrets().inNamespace(namespaceId).resource(secret).forceConflicts().serverSideApply();
+            client.secrets()
+                    .inNamespace(namespaceId)
+                    .resource(secret)
+                    .forceConflicts()
+                    .serverSideApply();
         } else {
             Map<String, String> metadata = new HashMap<>();
             metadata.put("owner", user.getIdep());
