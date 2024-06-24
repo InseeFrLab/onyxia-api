@@ -36,7 +36,7 @@ public class CatalogRefresher implements ApplicationRunner {
         this.refreshTime = refreshTime;
     }
 
-    private void refreshCatalogs() {
+    private void refreshCatalogs() throws InterruptedException {
         catalogs.getCatalogs()
                 .forEach(
                         c -> {
@@ -49,6 +49,9 @@ public class CatalogRefresher implements ApplicationRunner {
                                         c.getCaFile());
                                 LOGGER.info("Updating catalog: {}", c.getId());
                                 catalogLoader.updateCatalog(c);
+                            } catch (InterruptedException e) {
+                                Thread.currentThread().interrupt();
+                                throw new RuntimeException(e); // or handle it as needed
                             } catch (Exception e) {
                                 LOGGER.warn(
                                         "Exception occurred while updating catalog: {}",
