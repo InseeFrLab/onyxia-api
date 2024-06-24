@@ -22,7 +22,7 @@ public class Command {
                     "^[ ]*[a-z0-9]([-a-z0-9 ]*[a-z0-9 ])?(\\.[a-z0-9 ]([-a-z0-9 ]*[a-z0-9 ])?)*[ ]*$");
     private static final Logger LOGGER = LoggerFactory.getLogger(Command.class);
 
-    static ProcessExecutor getProcessExecutor() { // Changed to package-private
+    private static ProcessExecutor getProcessExecutor() {
         ProcessExecutor processExecutor = new ProcessExecutor();
         processExecutor.redirectError(System.err);
         processExecutor.readOutput(true);
@@ -40,52 +40,45 @@ public class Command {
     public static ProcessResult executeAndGetResponseAsJson(
             HelmConfiguration helmConfiguration, String command)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        validateCommand(command);
         return getProcessExecutor()
                 .environment(getEnv(helmConfiguration))
-                .commandSplit(buildSecureCommand(command, helmConfiguration) + " --output json")
+                .commandSplit(addConfigToCommand(command, helmConfiguration) + " --output json")
                 .execute();
     }
 
     public static ProcessResult executeAndGetResponseAsJson(String command)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        validateCommand(command);
         return executeAndGetResponseAsJson(null, command);
     }
 
     public static ProcessResult executeAndGetResponseAsRaw(
             HelmConfiguration helmConfiguration, String command)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        validateCommand(command);
         return getProcessExecutor()
                 .environment(getEnv(helmConfiguration))
-                .commandSplit(buildSecureCommand(command, helmConfiguration))
+                .commandSplit(addConfigToCommand(command, helmConfiguration))
                 .execute();
     }
 
     public static ProcessResult executeAndGetResponseAsRaw(String command)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        validateCommand(command);
         return executeAndGetResponseAsRaw(null, command);
     }
 
     public static ProcessResult execute(HelmConfiguration helmConfiguration, String command)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        validateCommand(command);
         return getProcessExecutor()
                 .environment(getEnv(helmConfiguration))
-                .commandSplit(buildSecureCommand(command, helmConfiguration))
+                .commandSplit(addConfigToCommand(command, helmConfiguration))
                 .execute();
     }
 
     public static ProcessResult execute(String command)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        validateCommand(command);
         return execute(null, command);
     }
 
-    static Map<String, String> getEnv(
-            HelmConfiguration helmConfiguration) { // Changed to package-private
+    private static Map<String, String> getEnv(HelmConfiguration helmConfiguration) {
         Map<String, String> env = new HashMap<>();
         if (System.getProperty("http.proxyHost") != null) {
             env.put(
@@ -112,50 +105,45 @@ public class Command {
         return env;
     }
 
-    static String buildSecureCommand(
-            String command, HelmConfiguration helmConfiguration) { // Changed to package-private
-        StringBuilder newCommand = new StringBuilder(command).append(" ");
-        if (helmConfiguration != null) {
-            if (helmConfiguration.getAsKubeUser() != null) {
-                newCommand
-                        .append(" --kube-as-user ")
-                        .append(escapeArgument(helmConfiguration.getAsKubeUser()))
-                        .append(" ");
-            }
-            String kubeConfig = null;
-            if (StringUtils.isNotEmpty(helmConfiguration.getApiserverUrl())) {
-                newCommand
-                        .append(" --kube-apiserver=")
-                        .append(escapeArgument(helmConfiguration.getApiserverUrl()))
-                        .append(" ");
-                kubeConfig = "/dev/null";
-            }
-            if (StringUtils.isNotEmpty(helmConfiguration.getKubeToken())) {
-                newCommand
-                        .append(" --kube-token=")
-                        .append(escapeArgument(helmConfiguration.getKubeToken()))
-                        .append(" ");
-                kubeConfig = "/dev/null";
-            }
-            if (StringUtils.isNotEmpty(helmConfiguration.getKubeConfig())) {
-                kubeConfig = helmConfiguration.getKubeConfig();
-            }
-            if (kubeConfig != null) {
-                newCommand.append(" --kubeconfig=").append(escapeArgument(kubeConfig)).append(" ");
-            }
+    private static String addConfigToCommand(String command, HelmConfiguration helmConfiguration) {
+        if (helmConfiguration == null) {
+            return command;
         }
-        return newCommand.toString();
-    }
-
-    static void validateCommand(String command)
-            throws IllegalArgumentException { // Changed to package-private
-        if (!safeToConcatenate.matcher(command).matches()) {
-            throw new IllegalArgumentException("Illegal characters in command");
+        String newCommand = command;
+        newCommand = newCommand.concat(" ");
+        if (helmConfiguration.getAsKubeUser() != null) {
+            newCommand =
+                    newCommand.concat(" --kube-as-user " + helmConfiguration.getAsKubeUser() + " ");
         }
-    }
+        String kubeConfig = null;
+        if (StringUtils.isNotEmpty(helmConfiguration.getApiserverUrl())) {
+            newCommand =
+                    newCommand
+                            .concat(" --kube-apiserver=" + helmConfiguration.getApiserverUrl())
+                            .concat(" ");
+            // Kubeconfig should be set to /dev/null to prevent mixing user provided configuration
+            // with pre-existing local kubeconfig (most likely re-using a cluster certificate from
+            // another cluster)
+            kubeConfig = "/dev/null";
+        }
 
-    static String escapeArgument(String argument) { // Changed to package-private
-        return argument.replaceAll("([\"\\\\])", "\\\\$1");
+        if (StringUtils.isNotEmpty(helmConfiguration.getKubeToken())) {
+            newCommand =
+                    newCommand
+                            .concat(" --kube-token=" + helmConfiguration.getKubeToken())
+                            .concat(" ");
+            kubeConfig = "/dev/null";
+        }
+
+        if (StringUtils.isNotEmpty(helmConfiguration.getKubeConfig())) {
+            kubeConfig = helmConfiguration.getKubeConfig();
+        }
+
+        if (kubeConfig != null) {
+            newCommand = newCommand.concat(" --kubeconfig=" + kubeConfig).concat(" ");
+        }
+
+        return newCommand;
     }
 
     public static void safeConcat(StringBuilder currentCommand, String toConcat)
