@@ -38,9 +38,11 @@ public class Command {
     }
 
     public static ProcessResult executeAndGetResponseAsJson(
-            HelmConfiguration helmConfiguration, String command)
+            HelmConfiguration helmConfiguration, String command, boolean bypassCommandValidation)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        validateCommand(command);
+        if (!bypassCommandValidation) {
+            validateCommand(command);
+        }
         return getProcessExecutor()
                 .environment(getEnv(helmConfiguration))
                 .commandSplit(buildSecureCommand(command, helmConfiguration) + " --output json")
@@ -49,8 +51,7 @@ public class Command {
 
     public static ProcessResult executeAndGetResponseAsJson(String command)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        validateCommand(command);
-        return executeAndGetResponseAsJson(null, command);
+        return executeAndGetResponseAsJson(null, command, false);
     }
 
     public static ProcessResult executeAndGetResponseAsRaw(
@@ -78,7 +79,15 @@ public class Command {
 
     public static ProcessResult execute(HelmConfiguration helmConfiguration, String command)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        validateCommand(command);
+        return execute(helmConfiguration, command, false);
+    }
+
+    public static ProcessResult execute(
+            HelmConfiguration helmConfiguration, String command, boolean bypassCommandValidation)
+            throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
+        if (!bypassCommandValidation) {
+            validateCommand(command);
+        }
         return getProcessExecutor()
                 .environment(getEnv(helmConfiguration))
                 .commandSplit(buildSecureCommand(command, helmConfiguration))
@@ -87,7 +96,6 @@ public class Command {
 
     public static ProcessResult execute(String command)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        validateCommand(command);
         return execute(null, command);
     }
 

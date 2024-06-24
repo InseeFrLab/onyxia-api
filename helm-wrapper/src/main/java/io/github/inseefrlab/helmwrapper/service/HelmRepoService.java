@@ -39,7 +39,7 @@ public class HelmRepoService {
                             "--ca-file " + System.getenv("CACERTS_DIR") + "/" + caFile + " ");
         }
         command = command.concat(nomRepo + " " + url);
-        return Command.execute(command).getOutput().getString();
+        return Command.execute(null, command, true).getOutput().getString();
     }
 
     public void repoUpdate() throws InterruptedException, TimeoutException, IOException {
