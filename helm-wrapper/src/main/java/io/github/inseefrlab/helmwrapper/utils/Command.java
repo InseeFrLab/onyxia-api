@@ -56,7 +56,15 @@ public class Command {
     public static ProcessResult executeAndGetResponseAsRaw(
             HelmConfiguration helmConfiguration, String command)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        validateCommand(command);
+        return executeAndGetResponseAsRaw(helmConfiguration, command, false);
+    }
+
+    public static ProcessResult executeAndGetResponseAsRaw(
+            HelmConfiguration helmConfiguration, String command, boolean bypassCommandValidation)
+            throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
+        if (!bypassCommandValidation) {
+            validateCommand(command);
+        }
         return getProcessExecutor()
                 .environment(getEnv(helmConfiguration))
                 .commandSplit(buildSecureCommand(command, helmConfiguration))
@@ -65,7 +73,6 @@ public class Command {
 
     public static ProcessResult executeAndGetResponseAsRaw(String command)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        validateCommand(command);
         return executeAndGetResponseAsRaw(null, command);
     }
 
