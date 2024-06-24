@@ -1,15 +1,14 @@
 package fr.insee.onyxia.model.service;
 
-import java.util.Map;
-
 public class HealthCheckResult {
     private boolean healthy;
     private String name;
     private String kind;
-    private Map<String, Object> details;
+    private HealthDetails details;
 
-    public HealthCheckResult(
-            boolean healthy, String name, String kind, Map<String, Object> details) {
+    public HealthCheckResult() {}
+
+    public HealthCheckResult(boolean healthy, String name, String kind, HealthDetails details) {
         this.healthy = healthy;
         this.name = name;
         this.kind = kind;
@@ -40,11 +39,32 @@ public class HealthCheckResult {
         this.kind = kind;
     }
 
-    public Map<String, Object> getDetails() {
+    public HealthDetails getDetails() {
         return details;
     }
 
-    public void setDetails(Map<String, Object> details) {
+    public void setDetails(HealthDetails details) {
         this.details = details;
+    }
+
+    public static class HealthDetails {
+        private int nbWanted;
+        private int nbUp;
+
+        public int getNbUp() {
+            return nbUp;
+        }
+
+        public int getNbWanted() {
+            return nbWanted;
+        }
+
+        public void setNbUp(int nbUp) {
+            this.nbUp = nbUp;
+        }
+
+        public void setNbWanted(int nbWanted) {
+            this.nbWanted = nbWanted;
+        }
     }
 }
