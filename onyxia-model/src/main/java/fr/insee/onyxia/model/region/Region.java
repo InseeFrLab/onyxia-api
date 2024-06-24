@@ -208,6 +208,9 @@ public class Region {
 
         private Map<String, Object> customValues = new HashMap<>();
 
+        private NamespaceAnnotationsDynamic namespaceAnnotationsDynamic =
+                new NamespaceAnnotationsDynamic();
+
         public DefaultConfiguration getDefaultConfiguration() {
             return defaultConfiguration;
         }
@@ -246,6 +249,15 @@ public class Region {
 
         public void setAllowNamespaceCreation(boolean allowNamespaceCreation) {
             this.allowNamespaceCreation = allowNamespaceCreation;
+        }
+
+        public NamespaceAnnotationsDynamic getNamespaceAnnotationsDynamic() {
+            return namespaceAnnotationsDynamic;
+        }
+
+        public void setNamespaceAnnotationsDynamic(
+                NamespaceAnnotationsDynamic namespaceAnnotationsDynamic) {
+            this.namespaceAnnotationsDynamic = namespaceAnnotationsDynamic;
         }
 
         public Map<String, String> getNamespaceLabels() {
@@ -385,6 +397,28 @@ public class Region {
 
             @JsonProperty("tokenPassthrough")
             TOKEN_PASSTHROUGH
+        }
+
+        public static class NamespaceAnnotationsDynamic {
+            private boolean enabled = true;
+
+            private List<String> userAttributes = new ArrayList<>();
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
+            }
+
+            public List<String> getUserAttributes() {
+                return userAttributes;
+            }
+
+            public void setUserAttributes(List<String> userAttributes) {
+                this.userAttributes = userAttributes;
+            }
         }
 
         public static class DefaultConfiguration {

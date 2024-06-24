@@ -1,12 +1,12 @@
-FROM eclipse-temurin:21.0.2_13-jre as extract
+FROM eclipse-temurin:21.0.3_9-jre as extract
 ARG JAR_FILE=target/*.jar
 COPY ${JAR_FILE} application.jar
 RUN java -Djarmode=layertools -jar application.jar  extract
 
-FROM eclipse-temurin:21.0.2_13-jre
+FROM eclipse-temurin:21.0.3_9-jre
 WORKDIR /app
 # Install helm
-RUN curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | DESIRED_VERSION=v3.14.2 bash
+RUN curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | DESIRED_VERSION=v3.15.2 bash
 RUN groupadd --gid 101 --system onyxia && \
     useradd --system --uid 101 --create-home --home-dir /var/cache/onyxia --shell /sbin/nologin --gid onyxia --comment onyxia onyxia
 # Allow adding CA certificates

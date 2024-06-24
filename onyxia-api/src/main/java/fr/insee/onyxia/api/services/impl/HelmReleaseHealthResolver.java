@@ -1,27 +1,23 @@
 package fr.insee.onyxia.api.services.impl;
 
+import fr.insee.onyxia.model.service.*;
 import io.fabric8.kubernetes.api.model.HasMetadata;
-import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.api.model.Secret;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
-
-import fr.insee.onyxia.model.service.*;
+import java.util.stream.Collectors;
 
 public final class HelmReleaseHealthResolver {
 
-    static List<HealthCheckResult> checkHelmReleaseHealth(String namespace, String manifest, KubernetesClient kubernetesClient) {
+    static List<HealthCheckResult> checkHelmReleaseHealth(
+            String namespace, String manifest, KubernetesClient kubernetesClient) {
         // Identify the Helm release secret
         List<HasMetadata> resources;
         try (InputStream inputStream =
@@ -41,116 +37,180 @@ public final class HelmReleaseHealthResolver {
         return results;
     }
 
-    private static List<HealthCheckResult> checkDeploymentsHealth(String namespace, List<HasMetadata> resources, KubernetesClient kubernetesClient) {
+    private static List<HealthCheckResult> checkDeploymentsHealth(
+            String namespace, List<HasMetadata> resources, KubernetesClient kubernetesClient) {
         List<HealthCheckResult> results = new ArrayList<>();
-        List<HasMetadata> deployments = resources.stream()
-                .filter(resource -> "Deployment".equals(resource.getKind()))
-                .collect(Collectors.toList());
+        List<HasMetadata> deployments =
+                resources.stream()
+                        .filter(resource -> "Deployment".equals(resource.getKind()))
+                        .collect(Collectors.toList());
 
         for (HasMetadata deployment : deployments) {
-            int availableReplicas = getSafeInt(
-                    () -> kubernetesClient.apps().deployments()
-                            .inNamespace(namespace).withName(deployment.getMetadata().getName())
-                            .get().getStatus().getAvailableReplicas()
-            );
+            int availableReplicas =
+                    getSafeInt(
+                            () ->
+                                    kubernetesClient
+                                            .apps()
+                                            .deployments()
+                                            .inNamespace(namespace)
+                                            .withName(deployment.getMetadata().getName())
+                                            .get()
+                                            .getStatus()
+                                            .getAvailableReplicas());
 
-            int desiredReplicas = getSafeInt(
-                    () -> kubernetesClient.apps().deployments()
-                            .inNamespace(namespace).withName(deployment.getMetadata().getName())
-                            .get().getSpec().getReplicas()
-            );
+            int desiredReplicas =
+                    getSafeInt(
+                            () ->
+                                    kubernetesClient
+                                            .apps()
+                                            .deployments()
+                                            .inNamespace(namespace)
+                                            .withName(deployment.getMetadata().getName())
+                                            .get()
+                                            .getSpec()
+                                            .getReplicas());
             boolean healthy = availableReplicas >= desiredReplicas;
             Map<String, Object> details = new HashMap<>();
             details.put("availableReplicas", availableReplicas);
             details.put("desiredReplicas", desiredReplicas);
 
-            results.add(new HealthCheckResult(healthy, deployment.getMetadata().getName(), "Deployment", details));
+            results.add(
+                    new HealthCheckResult(
+                            healthy, deployment.getMetadata().getName(), "Deployment", details));
         }
         return results;
     }
 
-    private static List<HealthCheckResult> checkStatefulSetsHealth(String namespace, List<HasMetadata> resources, KubernetesClient kubernetesClient) {
+    private static List<HealthCheckResult> checkStatefulSetsHealth(
+            String namespace, List<HasMetadata> resources, KubernetesClient kubernetesClient) {
         List<HealthCheckResult> results = new ArrayList<>();
-        List<HasMetadata> statefulSets = resources.stream()
-                .filter(resource -> "StatefulSet".equals(resource.getKind()))
-                .collect(Collectors.toList());
+        List<HasMetadata> statefulSets =
+                resources.stream()
+                        .filter(resource -> "StatefulSet".equals(resource.getKind()))
+                        .collect(Collectors.toList());
 
         for (HasMetadata statefulSet : statefulSets) {
-            int readyReplicas = getSafeInt(
-                    () -> kubernetesClient.apps().statefulSets()
-                            .inNamespace(namespace).withName(statefulSet.getMetadata().getName())
-                            .get().getStatus().getReadyReplicas()
-            );
+            int readyReplicas =
+                    getSafeInt(
+                            () ->
+                                    kubernetesClient
+                                            .apps()
+                                            .statefulSets()
+                                            .inNamespace(namespace)
+                                            .withName(statefulSet.getMetadata().getName())
+                                            .get()
+                                            .getStatus()
+                                            .getReadyReplicas());
 
-            int desiredReplicas = getSafeInt(
-                    () -> kubernetesClient.apps().statefulSets()
-                            .inNamespace(namespace).withName(statefulSet.getMetadata().getName())
-                            .get().getSpec().getReplicas()
-            );
+            int desiredReplicas =
+                    getSafeInt(
+                            () ->
+                                    kubernetesClient
+                                            .apps()
+                                            .statefulSets()
+                                            .inNamespace(namespace)
+                                            .withName(statefulSet.getMetadata().getName())
+                                            .get()
+                                            .getSpec()
+                                            .getReplicas());
 
             boolean healthy = readyReplicas >= desiredReplicas;
             Map<String, Object> details = new HashMap<>();
             details.put("readyReplicas", readyReplicas);
             details.put("desiredReplicas", desiredReplicas);
 
-            results.add(new HealthCheckResult(healthy, statefulSet.getMetadata().getName(), "StatefulSet", details));
+            results.add(
+                    new HealthCheckResult(
+                            healthy, statefulSet.getMetadata().getName(), "StatefulSet", details));
         }
         return results;
     }
 
-    private static List<HealthCheckResult> checkDaemonSetsHealth(String namespace, List<HasMetadata> resources, KubernetesClient kubernetesClient) {
+    private static List<HealthCheckResult> checkDaemonSetsHealth(
+            String namespace, List<HasMetadata> resources, KubernetesClient kubernetesClient) {
         List<HealthCheckResult> results = new ArrayList<>();
-        List<HasMetadata> daemonSets = resources.stream()
-                .filter(resource -> "DaemonSet".equals(resource.getKind()))
-                .collect(Collectors.toList());
+        List<HasMetadata> daemonSets =
+                resources.stream()
+                        .filter(resource -> "DaemonSet".equals(resource.getKind()))
+                        .collect(Collectors.toList());
 
         for (HasMetadata daemonSet : daemonSets) {
-            int desiredNumberScheduled = getSafeInt(
-                    () -> kubernetesClient.apps().daemonSets()
-                            .inNamespace(namespace).withName(daemonSet.getMetadata().getName())
-                            .get().getStatus().getDesiredNumberScheduled()
-            );
+            int desiredNumberScheduled =
+                    getSafeInt(
+                            () ->
+                                    kubernetesClient
+                                            .apps()
+                                            .daemonSets()
+                                            .inNamespace(namespace)
+                                            .withName(daemonSet.getMetadata().getName())
+                                            .get()
+                                            .getStatus()
+                                            .getDesiredNumberScheduled());
 
-            int numberAvailable = getSafeInt(
-                    () -> kubernetesClient.apps().daemonSets()
-                            .inNamespace(namespace).withName(daemonSet.getMetadata().getName())
-                            .get().getStatus().getNumberAvailable()
-            );
+            int numberAvailable =
+                    getSafeInt(
+                            () ->
+                                    kubernetesClient
+                                            .apps()
+                                            .daemonSets()
+                                            .inNamespace(namespace)
+                                            .withName(daemonSet.getMetadata().getName())
+                                            .get()
+                                            .getStatus()
+                                            .getNumberAvailable());
 
             boolean healthy = numberAvailable >= desiredNumberScheduled;
             Map<String, Object> details = new HashMap<>();
             details.put("desiredNumberScheduled", desiredNumberScheduled);
             details.put("numberAvailable", numberAvailable);
 
-            results.add(new HealthCheckResult(healthy, daemonSet.getMetadata().getName(), "DaemonSet", details));
+            results.add(
+                    new HealthCheckResult(
+                            healthy, daemonSet.getMetadata().getName(), "DaemonSet", details));
         }
         return results;
     }
 
-    private static List<HealthCheckResult> checkReplicaSetsHealth(String namespace, List<HasMetadata> resources, KubernetesClient kubernetesClient) {
+    private static List<HealthCheckResult> checkReplicaSetsHealth(
+            String namespace, List<HasMetadata> resources, KubernetesClient kubernetesClient) {
         List<HealthCheckResult> results = new ArrayList<>();
-        List<HasMetadata> replicaSets = resources.stream()
-                .filter(resource -> "ReplicaSet".equals(resource.getKind()))
-                .collect(Collectors.toList());
+        List<HasMetadata> replicaSets =
+                resources.stream()
+                        .filter(resource -> "ReplicaSet".equals(resource.getKind()))
+                        .collect(Collectors.toList());
 
         for (HasMetadata replicaSet : replicaSets) {
-            int readyReplicas = getSafeInt(
-                    () -> kubernetesClient.apps().replicaSets()
-                            .inNamespace(namespace).withName(replicaSet.getMetadata().getName())
-                            .get().getStatus().getReadyReplicas()
-            );
+            int readyReplicas =
+                    getSafeInt(
+                            () ->
+                                    kubernetesClient
+                                            .apps()
+                                            .replicaSets()
+                                            .inNamespace(namespace)
+                                            .withName(replicaSet.getMetadata().getName())
+                                            .get()
+                                            .getStatus()
+                                            .getReadyReplicas());
 
-            int desiredReplicas = getSafeInt(
-                    () -> kubernetesClient.apps().replicaSets()
-                            .inNamespace(namespace).withName(replicaSet.getMetadata().getName())
-                            .get().getSpec().getReplicas()
-            );
+            int desiredReplicas =
+                    getSafeInt(
+                            () ->
+                                    kubernetesClient
+                                            .apps()
+                                            .replicaSets()
+                                            .inNamespace(namespace)
+                                            .withName(replicaSet.getMetadata().getName())
+                                            .get()
+                                            .getSpec()
+                                            .getReplicas());
             boolean healthy = readyReplicas >= desiredReplicas;
             Map<String, Object> details = new HashMap<>();
             details.put("readyReplicas", readyReplicas);
             details.put("desiredReplicas", desiredReplicas);
 
-            results.add(new HealthCheckResult(healthy, replicaSet.getMetadata().getName(), "ReplicaSet", details));
+            results.add(
+                    new HealthCheckResult(
+                            healthy, replicaSet.getMetadata().getName(), "ReplicaSet", details));
         }
         return results;
     }

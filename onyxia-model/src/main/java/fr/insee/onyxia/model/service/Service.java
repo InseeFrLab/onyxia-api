@@ -77,6 +77,18 @@ public class Service {
     @Schema(description = "Is this service suspended ?")
     private boolean suspended = false;
 
+    @Schema(description = "CatalogId")
+    private String catalogId;
+
+    @Schema(description = "userID who starts the service")
+    private String owner;
+
+    @Schema(description = "friendly name of the service")
+    private String friendlyName;
+
+    @Schema(description = "Is this service shared ?")
+    private boolean share = false;
+
     @Schema(description = "")
     private Map<String, String> labels;
 
@@ -273,6 +285,38 @@ public class Service {
 
     public void setControllers(List<HealthCheckResult> controllers) {
         this.controllers = controllers;
+    }
+
+    public String getCatalogId() {
+        return catalogId;
+    }
+
+    public void setCatalogId(String catalogId) {
+        this.catalogId = catalogId;
+    }
+
+    public boolean isShare() {
+        return share;
+    }
+
+    public void setShare(boolean share) {
+        this.share = share;
+    }
+
+    public String getFriendlyName() {
+        return friendlyName;
+    }
+
+    public void setFriendlyName(String friendlyName) {
+        this.friendlyName = friendlyName;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 
     @Schema(description = "")

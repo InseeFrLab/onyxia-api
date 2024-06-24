@@ -145,6 +145,40 @@ public class MyLabController {
         return null;
     }
 
+    @PostMapping("/app/rename")
+    public void renameApp(
+            @Parameter(hidden = true) Region region,
+            @Parameter(hidden = true) Project project,
+            @RequestBody RenameRequestDTO request)
+            throws Exception {
+        if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
+            User user = userProvider.getUser(region);
+            helmAppsService.rename(
+                    region,
+                    project,
+                    userProvider.getUser(region),
+                    request.getServiceID(),
+                    request.getFriendlyName());
+        }
+    }
+
+    @PostMapping("/app/share")
+    public void shareApp(
+            @Parameter(hidden = true) Region region,
+            @Parameter(hidden = true) Project project,
+            @RequestBody ShareRequestDTO request)
+            throws Exception {
+        if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
+            User user = userProvider.getUser(region);
+            helmAppsService.share(
+                    region,
+                    project,
+                    userProvider.getUser(region),
+                    request.getServiceID(),
+                    request.isShare());
+        }
+    }
+
     @PostMapping("/app/suspend")
     public void suspendApp(
             @Parameter(hidden = true) Region region,
@@ -177,43 +211,56 @@ public class MyLabController {
             int split = chart.lastIndexOf('-');
             String chartName = chart.substring(0, split);
             String version = chart.substring(split + 1);
-            List<CatalogWrapper> elligibleCatalogs =
-                    catalogService.getCatalogs(region, user).getCatalogs().stream()
-                            .filter(
-                                    catalog ->
-                                            catalog.getCatalog()
-                                                    .getPackageByNameAndVersion(chartName, version)
-                                                    .isPresent())
-                            .toList();
-            if (elligibleCatalogs.isEmpty()) {
-                throw new NotFoundException();
+            String catalogId = userService.getCatalogId();
+            // This code is for legacy compat for services that were created with Onyxia < v2.7.0
+            // before introduction of Onyxia's secret
+            if (catalogId == null) {
+                List<CatalogWrapper> elligibleCatalogs =
+                        catalogService.getCatalogs(region, user).getCatalogs().stream()
+                                .filter(
+                                        catalog ->
+                                                catalog.getCatalog()
+                                                        .getPackageByName(chartName)
+                                                        .isPresent())
+                                .toList();
+                if (elligibleCatalogs.isEmpty()) {
+                    throw new NotFoundException();
+                }
+                if (elligibleCatalogs.size() > 1) {
+                    throw new IllegalStateException("Chart is present in multiple catalogs, abort");
+                }
+                CatalogWrapper catalog = elligibleCatalogs.getFirst();
+                catalogId = catalog.getId();
             }
-            if (elligibleCatalogs.size() > 1) {
-                throw new IllegalStateException("Chart is present in multiple catalogs, abort");
+            Optional<CatalogWrapper> catalog = catalogService.getCatalogById(catalogId);
+            if (catalog.isEmpty()) {
+                throw new IllegalStateException(
+                        "Catalog " + catalogId + " is not available anymore");
             }
-            CatalogWrapper catalog = elligibleCatalogs.getFirst();
-            Pkg pkg = catalog.getCatalog().getPackageByNameAndVersion(chartName, version).get();
+
             if (suspend) {
                 helmAppsService.suspend(
                         region,
                         project,
-                        catalog.getId(),
-                        pkg,
+                        catalog.get().getId(),
+                        chartName,
+                        version,
                         user,
                         serviceId,
-                        catalog.getSkipTlsVerify(),
-                        catalog.getCaFile(),
+                        catalog.get().getSkipTlsVerify(),
+                        catalog.get().getCaFile(),
                         false);
             } else {
                 helmAppsService.resume(
                         region,
                         project,
-                        catalog.getId(),
-                        pkg,
+                        catalog.get().getId(),
+                        chartName,
+                        version,
                         user,
                         serviceId,
-                        catalog.getSkipTlsVerify(),
-                        catalog.getCaFile(),
+                        catalog.get().getSkipTlsVerify(),
+                        catalog.get().getCaFile(),
                         false);
             }
         }
@@ -441,6 +488,48 @@ public class MyLabController {
 
         public void setServiceID(String serviceID) {
             this.serviceID = serviceID;
+        }
+    }
+
+    public static class RenameRequestDTO {
+        private String serviceID;
+        private String friendlyName;
+
+        public String getServiceID() {
+            return serviceID;
+        }
+
+        public void setServiceID(String serviceID) {
+            this.serviceID = serviceID;
+        }
+
+        public String getFriendlyName() {
+            return friendlyName;
+        }
+
+        public void setFriendlyName(String friendlyName) {
+            this.friendlyName = friendlyName;
+        }
+    }
+
+    public static class ShareRequestDTO {
+        private String serviceID;
+        private boolean share;
+
+        public String getServiceID() {
+            return serviceID;
+        }
+
+        public void setServiceID(String serviceID) {
+            this.serviceID = serviceID;
+        }
+
+        public boolean isShare() {
+            return share;
+        }
+
+        public void setShare(boolean share) {
+            this.share = share;
         }
     }
 }

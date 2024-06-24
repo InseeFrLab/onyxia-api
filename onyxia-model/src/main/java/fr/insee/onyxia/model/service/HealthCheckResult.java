@@ -1,6 +1,5 @@
 package fr.insee.onyxia.model.service;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Map;
 
 public class HealthCheckResult {
@@ -9,7 +8,8 @@ public class HealthCheckResult {
     private String kind;
     private Map<String, Object> details;
 
-    public HealthCheckResult(boolean healthy, String name, String kind, Map<String, Object> details) {
+    public HealthCheckResult(
+            boolean healthy, String name, String kind, Map<String, Object> details) {
         this.healthy = healthy;
         this.name = name;
         this.kind = kind;
