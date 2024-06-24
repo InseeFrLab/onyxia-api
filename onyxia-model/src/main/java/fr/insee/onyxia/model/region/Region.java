@@ -671,12 +671,12 @@ public class Region {
             private boolean enabled = false;
             private String scc;
 
-            public void setEnabled(boolean enabled) {
-                this.enabled = enabled;
+            public boolean isEnabled() {
+                return enabled;
             }
 
-            public boolean isUserEnabled() {
-                return userEnabled;
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
             }
 
             public String getScc() {
