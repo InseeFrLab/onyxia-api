@@ -266,26 +266,12 @@ public class HelmAppsService implements AppsService {
                         .filter(
                                 service -> {
                                     boolean canUserSeeThisService = false;
-                                    if (project.getGroup() == null) {
+                                    if (project.getGroup() == null
+                                            || service.isShare()
+                                            || user.getIdep()
+                                                    .equalsIgnoreCase(service.getOwner())) {
                                         // Personal group
                                         canUserSeeThisService = true;
-                                    } else {
-                                        if (service.getEnv().containsKey("onyxia.share")
-                                                && "true"
-                                                        .equals(
-                                                                service.getEnv()
-                                                                        .get("onyxia.share"))) {
-                                            // Service has been intentionally shared
-                                            canUserSeeThisService = true;
-                                        }
-                                        if (service.getEnv().containsKey("onyxia.owner")
-                                                && user.getIdep()
-                                                        .equalsIgnoreCase(
-                                                                service.getEnv()
-                                                                        .get("onyxia.owner"))) {
-                                            // User is owner
-                                            canUserSeeThisService = true;
-                                        }
                                     }
                                     return canUserSeeThisService;
                                 })
@@ -487,7 +473,14 @@ public class HelmAppsService implements AppsService {
                         secretData.put(k, Base64Utils.base64Encode(v));
                     });
             secret.setData(secretData);
-            client.secrets().inNamespace(namespaceId).resource(secret).serverSideApply();
+            if (secret.getMetadata().getManagedFields() != null) {
+                secret.getMetadata().getManagedFields().clear();
+            }
+            client.secrets()
+                    .inNamespace(namespaceId)
+                    .resource(secret)
+                    .forceConflicts()
+                    .serverSideApply();
         } else {
             Map<String, String> metadata = new HashMap<>();
             metadata.put("owner", user.getIdep());
