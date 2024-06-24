@@ -205,6 +205,7 @@ public class Region {
         private DefaultConfiguration defaultConfiguration = new DefaultConfiguration();
         private K8sPublicEndpoint k8sPublicEndpoint = new K8sPublicEndpoint();
         private CustomInitScript customInitScript = new CustomInitScript();
+        private OpenshiftSCC openshiftSCC = new OpenshiftSCC();
 
         private Map<String, Object> customValues = new HashMap<>();
 
@@ -663,6 +664,29 @@ public class Region {
                     this.gpu = gpu;
                 }
             }
+        }
+
+        public static class OpenshiftSCC {
+
+            private boolean enabled = false;
+            private String scc;
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
+            }
+
+            public boolean isUserEnabled() {
+                return userEnabled;
+            }
+
+            public String getScc() {
+                return scc;
+            }
+
+            public void setScc(String scc) {
+                this.scc = scc;
+            }
+
         }
 
         public static class Quotas {
