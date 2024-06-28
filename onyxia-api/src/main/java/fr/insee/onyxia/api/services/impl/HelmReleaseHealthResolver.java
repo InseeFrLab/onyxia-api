@@ -53,8 +53,8 @@ public final class HelmReleaseHealthResolver {
                                         .inNamespace(namespace)
                                         .withName(name)
                                         .get();
-                        details.setNbWanted(deployment.getSpec().getReplicas());
-                        details.setNbUp(deployment.getStatus().getReadyReplicas());
+                        details.setDesired(deployment.getSpec().getReplicas());
+                        details.setReady(deployment.getStatus().getReadyReplicas());
                     case "StatefulSet":
                         StatefulSet statefulset =
                                 kubernetesClient
@@ -63,8 +63,8 @@ public final class HelmReleaseHealthResolver {
                                         .inNamespace(namespace)
                                         .withName(name)
                                         .get();
-                        details.setNbWanted(statefulset.getSpec().getReplicas());
-                        details.setNbUp(statefulset.getStatus().getReadyReplicas());
+                        details.setDesired(statefulset.getSpec().getReplicas());
+                        details.setReady(statefulset.getStatus().getReadyReplicas());
                     case "DaemonSet":
                         DaemonSet daemonSet =
                                 kubernetesClient
@@ -73,8 +73,8 @@ public final class HelmReleaseHealthResolver {
                                         .inNamespace(namespace)
                                         .withName(name)
                                         .get();
-                        details.setNbWanted(daemonSet.getStatus().getDesiredNumberScheduled());
-                        details.setNbUp(daemonSet.getStatus().getNumberReady());
+                        details.setDesired(daemonSet.getStatus().getDesiredNumberScheduled());
+                        details.setReady(daemonSet.getStatus().getNumberReady());
                     default:
                         continue;
                 }
@@ -85,7 +85,7 @@ public final class HelmReleaseHealthResolver {
                         resource.getMetadata().getName());
             }
             result.setDetails(details);
-            result.setHealthy(details.getNbUp() >= details.getNbWanted());
+            result.setHealthy(details.getReady() >= details.getDesired());
             results.add(result);
         }
         return results;

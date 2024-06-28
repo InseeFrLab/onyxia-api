@@ -48,23 +48,23 @@ public class HealthCheckResult {
     }
 
     public static class HealthDetails {
-        private int nbWanted;
-        private int nbUp;
+        private int desired;
+        private int ready;
 
-        public int getNbUp() {
-            return nbUp;
+        public int getReady() {
+            return ready;
         }
 
-        public int getNbWanted() {
-            return nbWanted;
+        public int getDesired() {
+            return desired;
         }
 
-        public void setNbUp(int nbUp) {
-            this.nbUp = nbUp;
+        public void setReady(int ready) {
+            this.ready = ready;
         }
 
-        public void setNbWanted(int nbWanted) {
-            this.nbWanted = nbWanted;
+        public void setDesired(int desired) {
+            this.desired = desired;
         }
     }
 }
