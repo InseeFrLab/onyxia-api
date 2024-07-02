@@ -3,7 +3,7 @@ package fr.insee.onyxia.model.catalog.Config;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /** Properties */
@@ -11,7 +11,7 @@ import java.util.Map;
 public class Category {
 
     @Schema(description = "")
-    Map<String, Property> properties = new HashMap<>();
+    Map<String, Property> properties = new LinkedHashMap<>();
 
     @Schema(description = "")
     String description;
