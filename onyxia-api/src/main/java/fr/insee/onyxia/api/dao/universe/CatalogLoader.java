@@ -192,7 +192,7 @@ public class CatalogLoader {
                     while ((len = tarIn.read(buffer)) != -1) {
                         baos.write(buffer, 0, len);
                     }                    
-                    chart.setSchema(objectMapper.readTree(baos.toString("UTF-8"));
+                    chart.setSchema(objectMapper.readTree(baos.toString("UTF-8")));
                 }
             }
         }
