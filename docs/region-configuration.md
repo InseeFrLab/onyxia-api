@@ -269,9 +269,9 @@ type Region = {
        * Example: 
        * For a user "bob" in the "exploration" group, using the configuration:
        * 
-       * Single bucket mode:
+       * Shared bucket mode, all the users share a single bucket:
        *   "workingDirectory": {
-       *       "bucketMode": "single",
+       *       "bucketMode": "shared",
        *       "bucketName": "onyxia",
        *       "prefix": "user-",
        *       "prefixGroup": "project-"
