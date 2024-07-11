@@ -26,6 +26,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Map;
+import java.util.HashMap;
+
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
