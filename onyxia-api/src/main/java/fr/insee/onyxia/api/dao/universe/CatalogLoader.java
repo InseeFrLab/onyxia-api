@@ -24,6 +24,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Map;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
@@ -248,8 +249,9 @@ public class CatalogLoader {
                 }
             }
         } else if (schemaNode.isArray()) {
-            for (int i = 0; i < schemaNode.size(); i++) {
-                ((ObjectNode) schemaNode).set(i, resolveInternalReferences(schemaNode.get(i), rootNode));
+            ArrayNode arrayNode = (ArrayNode) schemaNode;
+            for (int i = 0; i < arrayNode.size(); i++) {
+                arrayNode.set(i, resolveInternalReferences(arrayNode.get(i), rootNode));
             }
         }
         return schemaNode;
