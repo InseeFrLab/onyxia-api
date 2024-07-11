@@ -198,7 +198,7 @@ public class CatalogLoader {
                     while ((len = tarIn.read(buffer)) != -1) {
                         baos.write(buffer, 0, len);
                     }                    
-                    chart.setConfig(resolveInternalReferences(mapper.readTree(baos.toString("UTF-8")),mapper));
+                    chart.setConfig(resolveInternalReferences(mapper.readTree(baos.toString("UTF-8"))));
                 }
             }
         }
@@ -220,5 +220,38 @@ public class CatalogLoader {
         // Convert the resolved schema back to JsonNode
         JSONObject resolvedSchemaJson = new JSONObject(schema.toString());
         return objectMapper.readTree(resolvedSchemaJson.toString());
+    }
+
+    public JsonNode resolveInternalReferences(JsonNode schemaNode) {
+        return resolveInternalReferences(schemaNode, schemaNode);
+    }
+
+    private JsonNode resolveInternalReferences(JsonNode schemaNode, JsonNode rootNode) {
+        if (schemaNode.isObject()) {
+            ObjectNode objectNode = (ObjectNode) schemaNode;
+            Iterator<Map.Entry<String, JsonNode>> fields = objectNode.fields();
+            while (fields.hasNext()) {
+                Map.Entry<String, JsonNode> field = fields.next();
+                if (field.getKey().equals("$ref") && field.getValue().isTextual()) {
+                    String ref = field.getValue().asText();
+                    if (ref.startsWith("#/definitions/")) {
+                        String refName = ref.substring("#/definitions/".length());
+                        JsonNode refNode = rootNode.at("/definitions/" + refName);
+                        if (!refNode.isMissingNode()) {
+                            JsonNode resolvedNode = resolveInternalReferences(refNode.deepCopy(), rootNode);
+                            objectNode.setAll((ObjectNode) resolvedNode);
+                            objectNode.remove("$ref");
+                        }
+                    }
+                } else {
+                    objectNode.set(field.getKey(), resolveInternalReferences(field.getValue(), rootNode));
+                }
+            }
+        } else if (schemaNode.isArray()) {
+            for (int i = 0; i < schemaNode.size(); i++) {
+                ((ObjectNode) schemaNode).set(i, resolveInternalReferences(schemaNode.get(i), rootNode));
+            }
+        }
+        return schemaNode;
     }
 }
