@@ -211,7 +211,8 @@ public class HelmAppsService implements AppsService {
                             namespaceId,
                             requestDTO.getName(),
                             pkg.getName(),
-                            catalogId);
+                            catalogId,
+                            requestDTO.getFriendlyName());
             onyxiaEventPublisher.publishEvent(installServiceEvent);
             Map<String, String> metadata = new HashMap<>();
             metadata.put("catalog", Base64Utils.base64Encode(catalogId));
