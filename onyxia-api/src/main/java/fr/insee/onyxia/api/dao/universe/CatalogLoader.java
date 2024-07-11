@@ -245,7 +245,7 @@ public class CatalogLoader {
                         JsonNode refNode = rootNode.at("/definitions/" + refName);
                         if (!refNode.isMissingNode()) {
                             JsonNode resolvedNode = resolveInternalReferences(refNode.deepCopy(), rootNode);
-                            updates.putAll((ObjectNode) resolvedNode);
+                            updates.putAll(convertToMap((ObjectNode) resolvedNode));
                             updates.put("$ref", null);
                         }
                     }
@@ -268,5 +268,15 @@ public class CatalogLoader {
             }
         }
         return schemaNode;
+    }
+
+    private Map<String, JsonNode> convertToMap(ObjectNode objectNode) {
+        Map<String, JsonNode> map = new HashMap<>();
+        Iterator<Map.Entry<String, JsonNode>> fields = objectNode.fields();
+        while (fields.hasNext()) {
+            Map.Entry<String, JsonNode> field = fields.next();
+            map.put(field.getKey(), field.getValue());
+        }
+        return map;
     }
 }
