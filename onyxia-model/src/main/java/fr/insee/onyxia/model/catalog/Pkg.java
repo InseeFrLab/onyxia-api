@@ -15,7 +15,7 @@ public class Pkg {
     private String version;
 
     @Schema(description = "")
-    private JsonNode schema;
+    private JsonNode config;
 
     public String getName() {
         return this.name;
@@ -51,12 +51,12 @@ public class Pkg {
         this.version = version;
     }
 
-    public JsonNode getSchema() {
-        return this.schema;
+    public JsonNode getConfig() {
+        return this.config;
     }
 
-    public void setSchema(JsonNode schema) {
-        this.schema = schema;
+    public void setConfig(JsonNode config) {
+        this.config = config;
     }
     public Pkg version(String version) {
         this.version = version;
