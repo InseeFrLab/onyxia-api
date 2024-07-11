@@ -13,8 +13,6 @@ import fr.insee.onyxia.api.events.OnyxiaEventPublisher;
 import fr.insee.onyxia.api.events.SuspendResumeServiceEvent;
 import fr.insee.onyxia.api.events.UninstallServiceEvent;
 import fr.insee.onyxia.api.services.AppsService;
-import fr.insee.onyxia.api.services.control.AdmissionControllerHelm;
-import fr.insee.onyxia.api.services.control.utils.PublishContext;
 import fr.insee.onyxia.api.services.impl.kubernetes.KubernetesService;
 import fr.insee.onyxia.api.services.utils.Base64Utils;
 import fr.insee.onyxia.model.User;
@@ -61,16 +59,11 @@ public class HelmAppsService implements AppsService {
 
     private final KubernetesService kubernetesService;
 
-    private final List<AdmissionControllerHelm> admissionControllers;
 
     private final FastDateFormat helmDateFormat = FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss");
     private final KubernetesClientProvider kubernetesClientProvider;
 
     private final HelmClientProvider helmClientProvider;
-
-    private final XGeneratedProcessor xGeneratedProcessor;
-
-    private final UrlGenerator urlGenerator;
 
     final OnyxiaEventPublisher onyxiaEventPublisher;
 
@@ -80,19 +73,13 @@ public class HelmAppsService implements AppsService {
     public HelmAppsService(
             @Qualifier("helm") ObjectMapper mapperHelm,
             KubernetesService kubernetesService,
-            List<AdmissionControllerHelm> admissionControllers,
             KubernetesClientProvider kubernetesClientProvider,
             HelmClientProvider helmClientProvider,
-            XGeneratedProcessor xGeneratedProcessor,
-            UrlGenerator urlGenerator,
             OnyxiaEventPublisher onyxiaEventPublisher) {
         this.mapperHelm = mapperHelm;
         this.kubernetesService = kubernetesService;
-        this.admissionControllers = admissionControllers;
         this.kubernetesClientProvider = kubernetesClientProvider;
         this.helmClientProvider = helmClientProvider;
-        this.xGeneratedProcessor = xGeneratedProcessor;
-        this.urlGenerator = urlGenerator;
         this.onyxiaEventPublisher = onyxiaEventPublisher;
     }
 
