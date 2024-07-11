@@ -231,6 +231,8 @@ public class CatalogLoader {
     private JsonNode resolveInternalReferences(JsonNode schemaNode, JsonNode rootNode) {
         if (schemaNode.isObject()) {
             ObjectNode objectNode = (ObjectNode) schemaNode;
+            Map<String, JsonNode> updates = new HashMap<>();
+
             Iterator<Map.Entry<String, JsonNode>> fields = objectNode.fields();
             while (fields.hasNext()) {
                 Map.Entry<String, JsonNode> field = fields.next();
@@ -241,12 +243,20 @@ public class CatalogLoader {
                         JsonNode refNode = rootNode.at("/definitions/" + refName);
                         if (!refNode.isMissingNode()) {
                             JsonNode resolvedNode = resolveInternalReferences(refNode.deepCopy(), rootNode);
-                            objectNode.setAll((ObjectNode) resolvedNode);
-                            objectNode.remove("$ref");
+                            updates.putAll((ObjectNode) resolvedNode);
+                            updates.put("$ref", null);
                         }
                     }
                 } else {
-                    objectNode.set(field.getKey(), resolveInternalReferences(field.getValue(), rootNode));
+                    updates.put(field.getKey(), resolveInternalReferences(field.getValue(), rootNode));
+                }
+            }
+
+            for (Map.Entry<String, JsonNode> update : updates.entrySet()) {
+                if (update.getValue() == null) {
+                    objectNode.remove(update.getKey());
+                } else {
+                    objectNode.set(update.getKey(), update.getValue());
                 }
             }
         } else if (schemaNode.isArray()) {
