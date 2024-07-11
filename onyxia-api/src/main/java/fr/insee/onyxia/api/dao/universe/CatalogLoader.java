@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.ByteArrayOutputStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -186,8 +187,13 @@ public class CatalogLoader {
                     ObjectMapper mapper = new ObjectMapper();
                     mapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, false);
                     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                    Config config = mapper.readValue(tarIn, Config.class);
-                    chart.setConfig(config);
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    byte[] buffer = new byte[1024];
+                    int len;
+                    while ((len = tarIn.read(buffer)) != -1) {
+                        baos.write(buffer, 0, len);
+                    }                    
+                    chart.setSchema(objectMapper.readTree(baos.toString("UTF-8")););
                 }
             }
         }
