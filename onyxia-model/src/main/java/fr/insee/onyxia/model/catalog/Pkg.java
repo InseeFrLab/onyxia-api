@@ -1,7 +1,6 @@
 package fr.insee.onyxia.model.catalog;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import fr.insee.onyxia.model.catalog.Config.Config;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "")
