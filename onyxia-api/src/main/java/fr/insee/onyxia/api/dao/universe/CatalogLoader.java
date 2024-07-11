@@ -192,9 +192,27 @@ public class CatalogLoader {
                     while ((len = tarIn.read(buffer)) != -1) {
                         baos.write(buffer, 0, len);
                     }                    
-                    chart.setConfig(mapper.readTree(baos.toString("UTF-8")));
+                    chart.setConfig(resolveInternalReferences(mapper.readTree(baos.toString("UTF-8"))));
                 }
             }
         }
+    }
+
+    public JsonNode resolveInternalReferences(JsonNode schemaNode) throws IOException {
+        // Convert the main schema JSON node to JSONObject
+        JSONObject schemaJson = new JSONObject(new JSONTokener(schemaNode.toString()));
+
+        // Create a SchemaLoader
+        SchemaLoader loader = SchemaLoader.builder()
+                .schemaJson(schemaJson)
+                .resolutionScope("file:///") // Setting a base URI for relative references
+                .build();
+
+        // Load and expand the schema
+        Schema schema = loader.load().build();
+
+        // Convert the resolved schema back to JsonNode
+        JSONObject resolvedSchemaJson = new JSONObject(schema.toString());
+        return objectMapper.readTree(resolvedSchemaJson.toString());
     }
 }
