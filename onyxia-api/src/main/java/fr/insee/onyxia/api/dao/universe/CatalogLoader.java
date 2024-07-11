@@ -198,13 +198,13 @@ public class CatalogLoader {
                     while ((len = tarIn.read(buffer)) != -1) {
                         baos.write(buffer, 0, len);
                     }                    
-                    chart.setConfig(resolveInternalReferences(mapper.readTree(baos.toString("UTF-8"))));
+                    chart.setConfig(resolveInternalReferences(mapper.readTree(baos.toString("UTF-8")),mapper));
                 }
             }
         }
     }
 
-    public JsonNode resolveInternalReferences(JsonNode schemaNode) throws IOException {
+    public JsonNode resolveInternalReferences(JsonNode schemaNode, ObjectMapper objectMapper) throws IOException {
         // Convert the main schema JSON node to JSONObject
         JSONObject schemaJson = new JSONObject(new JSONTokener(schemaNode.toString()));
 
