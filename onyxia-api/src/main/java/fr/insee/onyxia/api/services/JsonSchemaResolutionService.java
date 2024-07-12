@@ -2,13 +2,12 @@ package fr.insee.onyxia.api.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.Iterator;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class JsonSchemaResolutionService {
@@ -42,7 +41,7 @@ public class JsonSchemaResolutionService {
                     }
                     if (refNode != null && !refNode.isMissingNode()) {
                         JsonNode resolvedNode = resolveReferences(refNode.deepCopy(), rootNode);
-                        fields.remove();  // Remove the $ref field
+                        fields.remove(); // Remove the $ref field
                         objectNode.setAll((ObjectNode) resolvedNode);
                     }
                 } else {
