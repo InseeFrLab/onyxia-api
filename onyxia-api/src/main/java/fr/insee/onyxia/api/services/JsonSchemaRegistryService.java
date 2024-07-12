@@ -1,3 +1,5 @@
+package fr.insee.onyxia.api.services;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
