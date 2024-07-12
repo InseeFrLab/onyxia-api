@@ -12,4 +12,9 @@ public class RestExceptionHandler {
     @ResponseStatus(value = HttpStatus.FORBIDDEN)
     @ExceptionHandler(AccessDeniedException.class)
     public void handleAccessDeniedException(Exception ignored) {}
+
+    @ExceptionHandler(SchemaNotFoundException.class)
+    public ResponseEntity<String> handleSchemaNotFoundException(SchemaNotFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
 }
