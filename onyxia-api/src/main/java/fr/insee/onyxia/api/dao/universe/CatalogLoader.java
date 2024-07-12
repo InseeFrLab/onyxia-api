@@ -4,33 +4,32 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import org.everit.json.schema.Schema;
-import org.everit.json.schema.loader.SchemaLoader;
-import org.json.JSONObject;
-import org.json.JSONTokener;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.zafarkhaja.semver.Version;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.helm.Chart;
 import fr.insee.onyxia.model.helm.Repository;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 import java.util.Map;
-import java.util.HashMap;
-
+import java.util.Optional;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.everit.json.schema.Schema;
+import org.everit.json.schema.loader.SchemaLoader;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -201,22 +200,25 @@ public class CatalogLoader {
                     int len;
                     while ((len = tarIn.read(buffer)) != -1) {
                         baos.write(buffer, 0, len);
-                    }                    
-                    chart.setConfig(resolveInternalReferences(mapper.readTree(baos.toString("UTF-8"))));
+                    }
+                    chart.setConfig(
+                            resolveInternalReferences(mapper.readTree(baos.toString("UTF-8"))));
                 }
             }
         }
     }
 
-    public JsonNode resolveInternalReferences(JsonNode schemaNode, ObjectMapper objectMapper) throws IOException {
+    public JsonNode resolveInternalReferences(JsonNode schemaNode, ObjectMapper objectMapper)
+            throws IOException {
         // Convert the main schema JSON node to JSONObject
         JSONObject schemaJson = new JSONObject(new JSONTokener(schemaNode.toString()));
 
         // Create a SchemaLoader
-        SchemaLoader loader = SchemaLoader.builder()
-                .schemaJson(schemaJson)
-                .resolutionScope("file:///") // Setting a base URI for relative references
-                .build();
+        SchemaLoader loader =
+                SchemaLoader.builder()
+                        .schemaJson(schemaJson)
+                        .resolutionScope("file:///") // Setting a base URI for relative references
+                        .build();
 
         // Load and expand the schema
         Schema schema = loader.load().build();
@@ -244,13 +246,15 @@ public class CatalogLoader {
                         String refName = ref.substring("#/definitions/".length());
                         JsonNode refNode = rootNode.at("/definitions/" + refName);
                         if (!refNode.isMissingNode()) {
-                            JsonNode resolvedNode = resolveInternalReferences(refNode.deepCopy(), rootNode);
+                            JsonNode resolvedNode =
+                                    resolveInternalReferences(refNode.deepCopy(), rootNode);
                             updates.putAll(convertToMap((ObjectNode) resolvedNode));
                             updates.put("$ref", null);
                         }
                     }
                 } else {
-                    updates.put(field.getKey(), resolveInternalReferences(field.getValue(), rootNode));
+                    updates.put(
+                            field.getKey(), resolveInternalReferences(field.getValue(), rootNode));
                 }
             }
 

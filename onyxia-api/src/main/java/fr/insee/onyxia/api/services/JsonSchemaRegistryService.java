@@ -2,18 +2,20 @@ package fr.insee.onyxia.api.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.nio.file.*;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.PostConstruct;
+import org.springframework.stereotype.Service;
 
 @Service
 public class JsonSchemaRegistryService {
 
-    private static final String SCHEMA_DIRECTORY = "src/main/resources/schemas";
+    private static final String SCHEMA_DIRECTORY = "/schemas";
     private final ObjectMapper objectMapper;
     private final Map<String, JsonNode> schemaRegistry;
 
@@ -23,8 +25,8 @@ public class JsonSchemaRegistryService {
     }
 
     @PostConstruct
-    private void loadSchemas() throws IOException {
-        Files.walk(Paths.get(SCHEMA_DIRECTORY))
+    private void loadSchemas() throws IOException, URISyntaxException {
+        Files.walk(Paths.get(JsonSchemaRegistryService.class.getResource(SCHEMA_DIRECTORY).toURI()))
                 .filter(Files::isRegularFile)
                 .forEach(this::loadSchema);
     }
@@ -32,8 +34,7 @@ public class JsonSchemaRegistryService {
     private void loadSchema(Path path) {
         try {
             JsonNode schema = objectMapper.readTree(path.toFile());
-            String relativePath = Paths.get(SCHEMA_DIRECTORY).relativize(path).toString().replace("\\", "/");
-            schemaRegistry.put(relativePath, schema);
+            schemaRegistry.put(path.getFileName().toString(), schema);
         } catch (IOException e) {
             throw new RuntimeException("Failed to load schema: " + path.getFileName(), e);
         }

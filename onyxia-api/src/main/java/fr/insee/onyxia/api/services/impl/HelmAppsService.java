@@ -59,7 +59,6 @@ public class HelmAppsService implements AppsService {
 
     private final KubernetesService kubernetesService;
 
-
     private final FastDateFormat helmDateFormat = FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss");
     private final KubernetesClientProvider kubernetesClientProvider;
 

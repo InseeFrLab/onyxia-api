@@ -1,19 +1,21 @@
+package fr.insee.onyxia.api.controller.pub;
+
 import com.fasterxml.jackson.databind.JsonNode;
+import fr.insee.onyxia.api.controller.exception.SchemaNotFoundException;
+import fr.insee.onyxia.api.services.JsonSchemaRegistryService;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import fr.insee.onyxia.api.services.JsonSchemaRegistryService;
-import fr.insee.onyxia.api.controller.exception.SchemaNotFoundException; 
-import java.util.Map;
 
 @RestController
-@RequestMapping("/api/schemas")
+@RequestMapping("/public/schemas")
 public class JsonSchemaController {
 
-    private JsonSchemaRegistryService jsonSchemaRegistryService;
-    
+    private final JsonSchemaRegistryService jsonSchemaRegistryService;
+
     @Autowired
     public JsonSchemaController(JsonSchemaRegistryService jsonSchemaRegistryService) {
         this.jsonSchemaRegistryService = jsonSchemaRegistryService;

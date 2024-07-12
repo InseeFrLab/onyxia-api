@@ -1,0 +1,72 @@
+{
+  "$id": "https://example.com/schemas/s3.json",
+  "title": "S3 Configuration",
+  "description": "Configuration of temporary identity for AWS S3",
+  "type": "object",
+  "properties": {
+    "enabled": {
+      "type": "boolean",
+      "description": "Add S3 temporary identity inside your environment",
+      "default": true
+    },
+    "accessKeyId": {
+      "description": "AWS Access Key",
+      "type": "string",
+      "x-onyxia": {
+        "overwriteDefaultWith": "{{s3.AWS_ACCESS_KEY_ID}}"
+      },
+      "hidden": {
+        "value": false,
+        "path": "enabled"
+      }
+    },
+    "endpoint": {
+      "description": "AWS S3 Endpoint",
+      "type": "string",
+      "x-onyxia": {
+        "overwriteDefaultWith": "{{s3.AWS_S3_ENDPOINT}}"
+      },
+      "hidden": {
+        "value": false,
+        "path": "enabled"
+      }
+    },
+    "defaultRegion": {
+      "description": "AWS S3 default region",
+      "type": "string",
+      "x-onyxia": {
+        "overwriteDefaultWith": "{{s3.AWS_DEFAULT_REGION}}"
+      },
+      "hidden": {
+        "value": false,
+        "path": "enabled"
+      }
+    },
+    "secretAccessKey": {
+      "description": "AWS S3 secret access key",
+      "type": "string",
+      "render": "password",
+      "x-onyxia": {
+        "overwriteDefaultWith": "{{s3.AWS_SECRET_ACCESS_KEY}}"
+      },
+      "hidden": {
+        "value": false,
+        "path": "enabled"
+      }
+    },
+    "sessionToken": {
+      "description": "AWS S3 session Token",
+      "type": "string",
+      "render": "password",
+      "x-onyxia": {
+        "overwriteDefaultWith": "{{s3.AWS_SESSION_TOKEN}}"
+      },
+      "hidden": {
+        "value": false,
+        "path": "enabled"
+      }
+    }
+  },
+  "required": ["enabled"]
+}
+
