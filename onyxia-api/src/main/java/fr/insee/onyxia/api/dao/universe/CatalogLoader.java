@@ -13,6 +13,7 @@ import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.helm.Chart;
 import fr.insee.onyxia.model.helm.Repository;
+import fr.insee.onyxia.api.services.JsonSchemaResolutionService;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,13 +45,14 @@ public class CatalogLoader {
     private static final Logger LOGGER = LoggerFactory.getLogger(CatalogLoader.class);
 
     private final ResourceLoader resourceLoader;
-
+    private final JsonSchemaResolutionService jsonSchemaResolutionService;
     private final ObjectMapper mapperHelm;
 
     public CatalogLoader(
-            ResourceLoader resourceLoader, @Qualifier("helm") ObjectMapper mapperHelm) {
+            ResourceLoader resourceLoader, @Qualifier("helm") ObjectMapper mapperHelm, JsonSchemaResolutionService jsonSchemaResolutionService) {
         this.resourceLoader = resourceLoader;
         this.mapperHelm = mapperHelm;
+        this.jsonSchemaResolutionService = jsonSchemaResolutionService;
     }
 
     public void updateCatalog(CatalogWrapper cw) {
@@ -202,7 +204,7 @@ public class CatalogLoader {
                         baos.write(buffer, 0, len);
                     }
                     chart.setConfig(
-                            resolveInternalReferences(mapper.readTree(baos.toString("UTF-8"))));
+                            jsonSchemaResolutionService.resolveReferences(mapper.readTree(baos.toString("UTF-8"))));
                 }
             }
         }
