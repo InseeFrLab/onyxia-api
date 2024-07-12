@@ -12,8 +12,12 @@ import java.util.Map;
 @RequestMapping("/api/schemas")
 public class JsonSchemaController {
 
-    @Autowired
     private JsonSchemaRegistryService jsonSchemaRegistryService;
+    
+    @Autowired
+    public JsonSchemaController(JsonSchemaRegistryService jsonSchemaRegistryService) {
+        this.jsonSchemaRegistryService = jsonSchemaRegistryService;
+    }
 
     @GetMapping
     public Map<String, JsonNode> listSchemas() {
