@@ -9,8 +9,6 @@ import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.configuration.CustomObjectMapper;
 import fr.insee.onyxia.api.util.TestUtils;
 import fr.insee.onyxia.model.helm.Chart;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.DisplayName;
@@ -146,5 +144,4 @@ public class CatalogLoaderTest {
                                 + "Exception occurred during loading resource: class path resource "
                                 + "[catalog-loader-test/keepeme1.gz]"));
     }
-
 }

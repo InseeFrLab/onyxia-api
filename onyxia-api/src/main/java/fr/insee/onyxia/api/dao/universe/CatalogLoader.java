@@ -10,11 +10,11 @@ import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.helm.Chart;
 import fr.insee.onyxia.model.helm.Repository;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.ByteArrayOutputStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -191,7 +191,7 @@ public class CatalogLoader {
                     int len;
                     while ((len = tarIn.read(buffer)) != -1) {
                         baos.write(buffer, 0, len);
-                    }                    
+                    }
                     chart.setConfig(mapper.readTree(baos.toString("UTF-8")));
                 }
             }
