@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,8 @@ public class JsonSchemaResolutionService {
     private JsonNode resolveReferences(JsonNode schemaNode, JsonNode rootNode) {
         if (schemaNode.isObject()) {
             ObjectNode objectNode = (ObjectNode) schemaNode;
+            Map<String, JsonNode> updates = new HashMap<>();
+
             Iterator<Map.Entry<String, JsonNode>> fields = objectNode.fields();
             while (fields.hasNext()) {
                 Map.Entry<String, JsonNode> field = fields.next();
@@ -41,11 +44,19 @@ public class JsonSchemaResolutionService {
                     }
                     if (refNode != null && !refNode.isMissingNode()) {
                         JsonNode resolvedNode = resolveReferences(refNode.deepCopy(), rootNode);
-                        fields.remove(); // Remove the $ref field
-                        objectNode.setAll((ObjectNode) resolvedNode);
+                        updates.putAll(convertToMap((ObjectNode) resolvedNode));
+                        updates.put("$ref", null);
                     }
                 } else {
-                    objectNode.set(field.getKey(), resolveReferences(field.getValue(), rootNode));
+                    updates.put(field.getKey(), resolveReferences(field.getValue(), rootNode));
+                }
+            }
+
+            for (Map.Entry<String, JsonNode> update : updates.entrySet()) {
+                if (update.getValue() == null) {
+                    objectNode.remove(update.getKey());
+                } else {
+                    objectNode.set(update.getKey(), update.getValue());
                 }
             }
         } else if (schemaNode.isArray()) {
@@ -55,5 +66,15 @@ public class JsonSchemaResolutionService {
             }
         }
         return schemaNode;
+    }
+
+    private Map<String, JsonNode> convertToMap(ObjectNode objectNode) {
+        Map<String, JsonNode> map = new HashMap<>();
+        Iterator<Map.Entry<String, JsonNode>> fields = objectNode.fields();
+        while (fields.hasNext()) {
+            Map.Entry<String, JsonNode> field = fields.next();
+            map.put(field.getKey(), field.getValue());
+        }
+        return map;
     }
 }
