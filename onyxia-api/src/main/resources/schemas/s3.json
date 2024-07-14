@@ -17,7 +17,8 @@
       },
       "hidden": {
         "value": false,
-        "path": "enabled"
+        "path": "enabled",
+        "isPathRelative": true
       }
     },
     "endpoint": {
@@ -28,7 +29,8 @@
       },
       "hidden": {
         "value": false,
-        "path": "enabled"
+        "path": "enabled",
+        "isPathRelative": true
       }
     },
     "defaultRegion": {
@@ -39,7 +41,8 @@
       },
       "hidden": {
         "value": false,
-        "path": "enabled"
+        "path": "enabled",
+        "isPathRelative": true
       }
     },
     "secretAccessKey": {
@@ -51,7 +54,8 @@
       },
       "hidden": {
         "value": false,
-        "path": "enabled"
+        "path": "enabled",
+        "isPathRelative": true
       }
     },
     "sessionToken": {
@@ -63,7 +67,8 @@
       },
       "hidden": {
         "value": false,
-        "path": "enabled"
+        "path": "enabled",
+        "isPathRelative": true
       }
     }
   },
