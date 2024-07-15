@@ -6,14 +6,15 @@ import io.fabric8.kubernetes.api.model.apps.DaemonSet;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.StatefulSet;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public final class HelmReleaseHealthResolver {
 
@@ -55,6 +56,7 @@ public final class HelmReleaseHealthResolver {
                                         .get();
                         details.setDesired(deployment.getSpec().getReplicas());
                         details.setReady(deployment.getStatus().getReadyReplicas());
+                        break;
                     case "StatefulSet":
                         StatefulSet statefulset =
                                 kubernetesClient
@@ -65,6 +67,7 @@ public final class HelmReleaseHealthResolver {
                                         .get();
                         details.setDesired(statefulset.getSpec().getReplicas());
                         details.setReady(statefulset.getStatus().getReadyReplicas());
+                        break;
                     case "DaemonSet":
                         DaemonSet daemonSet =
                                 kubernetesClient
@@ -75,6 +78,7 @@ public final class HelmReleaseHealthResolver {
                                         .get();
                         details.setDesired(daemonSet.getStatus().getDesiredNumberScheduled());
                         details.setReady(daemonSet.getStatus().getNumberReady());
+                        break;
                     default:
                         continue;
                 }
