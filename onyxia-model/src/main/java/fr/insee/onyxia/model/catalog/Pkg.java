@@ -1,6 +1,6 @@
 package fr.insee.onyxia.model.catalog;
 
-import fr.insee.onyxia.model.catalog.Config.Config;
+import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "")
@@ -15,15 +15,7 @@ public class Pkg {
     private String version;
 
     @Schema(description = "")
-    private Config config;
-
-    public void setConfig(Config config) {
-        this.config = config;
-    }
-
-    public Config getConfig() {
-        return config;
-    }
+    private JsonNode config;
 
     public String getName() {
         return this.name;
@@ -57,6 +49,14 @@ public class Pkg {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public JsonNode getConfig() {
+        return this.config;
+    }
+
+    public void setConfig(JsonNode config) {
+        this.config = config;
     }
 
     public Pkg version(String version) {

@@ -13,16 +13,9 @@ import fr.insee.onyxia.api.events.OnyxiaEventPublisher;
 import fr.insee.onyxia.api.events.SuspendResumeServiceEvent;
 import fr.insee.onyxia.api.events.UninstallServiceEvent;
 import fr.insee.onyxia.api.services.AppsService;
-import fr.insee.onyxia.api.services.control.AdmissionControllerHelm;
-import fr.insee.onyxia.api.services.control.commons.UrlGenerator;
-import fr.insee.onyxia.api.services.control.utils.PublishContext;
-import fr.insee.onyxia.api.services.control.xgenerated.XGeneratedContext;
-import fr.insee.onyxia.api.services.control.xgenerated.XGeneratedProcessor;
-import fr.insee.onyxia.api.services.control.xgenerated.XGeneratedProvider;
 import fr.insee.onyxia.api.services.impl.kubernetes.KubernetesService;
 import fr.insee.onyxia.api.services.utils.Base64Utils;
 import fr.insee.onyxia.model.User;
-import fr.insee.onyxia.model.catalog.Config.Property;
 import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
 import fr.insee.onyxia.model.dto.ServicesListing;
@@ -66,16 +59,10 @@ public class HelmAppsService implements AppsService {
 
     private final KubernetesService kubernetesService;
 
-    private final List<AdmissionControllerHelm> admissionControllers;
-
     private final FastDateFormat helmDateFormat = FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss");
     private final KubernetesClientProvider kubernetesClientProvider;
 
     private final HelmClientProvider helmClientProvider;
-
-    private final XGeneratedProcessor xGeneratedProcessor;
-
-    private final UrlGenerator urlGenerator;
 
     final OnyxiaEventPublisher onyxiaEventPublisher;
 
@@ -85,19 +72,13 @@ public class HelmAppsService implements AppsService {
     public HelmAppsService(
             @Qualifier("helm") ObjectMapper mapperHelm,
             KubernetesService kubernetesService,
-            List<AdmissionControllerHelm> admissionControllers,
             KubernetesClientProvider kubernetesClientProvider,
             HelmClientProvider helmClientProvider,
-            XGeneratedProcessor xGeneratedProcessor,
-            UrlGenerator urlGenerator,
             OnyxiaEventPublisher onyxiaEventPublisher) {
         this.mapperHelm = mapperHelm;
         this.kubernetesService = kubernetesService;
-        this.admissionControllers = admissionControllers;
         this.kubernetesClientProvider = kubernetesClientProvider;
         this.helmClientProvider = helmClientProvider;
-        this.xGeneratedProcessor = xGeneratedProcessor;
-        this.urlGenerator = urlGenerator;
         this.onyxiaEventPublisher = onyxiaEventPublisher;
     }
 
@@ -122,71 +103,6 @@ public class HelmAppsService implements AppsService {
             final String caFile)
             throws IOException, TimeoutException, InterruptedException {
 
-        PublishContext context = new PublishContext();
-
-        XGeneratedContext xGeneratedContext = xGeneratedProcessor.readContext(pkg);
-        XGeneratedProvider xGeneratedProvider =
-                new XGeneratedProvider() {
-                    @Override
-                    public String getGroupId() {
-                        return null;
-                    }
-
-                    @Override
-                    public String getAppId(
-                            String scopeName,
-                            XGeneratedContext.Scope scope,
-                            Property.XGenerated xGenerated) {
-                        return pkg.getName();
-                    }
-
-                    @Override
-                    public String getExternalDns(
-                            String scopeName,
-                            XGeneratedContext.Scope scope,
-                            Property.XGenerated xGenerated) {
-                        return urlGenerator.generateUrl(
-                                user.getIdep(),
-                                pkg.getName(),
-                                context.getGlobalContext().getRandomizedId(),
-                                scopeName
-                                        + (StringUtils.isNotBlank(xGenerated.getName())
-                                                ? "-" + xGenerated.getName()
-                                                : ""),
-                                region.getServices().getExpose().getDomain());
-                    }
-
-                    @Override
-                    public String getInternalDns(
-                            String scopeName,
-                            XGeneratedContext.Scope scope,
-                            Property.XGenerated xGenerated) {
-                        return "";
-                    }
-
-                    @Override
-                    public String getInitScript(
-                            String scopeName,
-                            XGeneratedContext.Scope scope,
-                            Property.XGenerated xGenerated) {
-                        return region.getServices().getInitScript();
-                    }
-                };
-        Map<String, String> xGeneratedValues =
-                xGeneratedProcessor.process(xGeneratedContext, xGeneratedProvider);
-        xGeneratedProcessor.injectIntoContext(fusion, xGeneratedValues);
-
-        long nbInvalidations =
-                admissionControllers.stream()
-                        .map(
-                                controller ->
-                                        controller.validateContract(
-                                                region, pkg, fusion, user, context))
-                        .filter(b -> !b)
-                        .count();
-        if (nbInvalidations > 0) {
-            throw new AccessDeniedException("Validation failed");
-        }
         File values = File.createTempFile("values", ".yaml");
         mapperHelm.writeValue(values, fusion);
         String namespaceId =
