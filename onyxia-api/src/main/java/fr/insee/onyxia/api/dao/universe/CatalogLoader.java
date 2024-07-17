@@ -194,6 +194,18 @@ public class CatalogLoader {
                     }
                     chart.setConfig(mapper.readTree(baos.toString("UTF-8")));
                 }
+                if (entry.getName().endsWith(chart.getName() + "/values.yaml")
+                        && !entry.getName()
+                                .endsWith("charts/" + chart.getName() + "/values.yaml")) {
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    byte[] buffer = new byte[1024];
+                    int len;
+                    while ((len = tarIn.read(buffer)) != -1) {
+                        baos.write(buffer, 0, len);
+                    }
+                    byte[] fileContent = baos.toByteArray();
+                    chart.setDefaultValues(new String(fileContent));
+                }
             }
         }
     }
