@@ -970,22 +970,18 @@ public class Region {
         private boolean enabled;
         private String scc;
 
-        // Getter for enabled
         public boolean isEnabled() {
             return enabled;
         }
 
-        // Setter for enabled
         public void setEnabled(boolean enabled) {
             this.enabled = enabled;
         }
 
-        // Getter for scc
         public String getScc() {
             return scc;
         }
 
-        // Setter for scc
         public void setScc(String scc) {
             this.scc = scc;
         }

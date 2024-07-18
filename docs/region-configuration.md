@@ -78,7 +78,7 @@ Users can work on Onyxia as a User or as a Group to which they belong. Each user
 | `quotas`                      | | Properties setting quotas on how many resources a user can get on the services provider.                                                                                                                                                                                                                           | See [Quotas properties](#quotas-properties)                                                       |
 | `defaultConfiguration`        | | Default configuration on services that a user can override. For client purposes only.                                                                                                                                                                                                                              | See [Default Configuration](#default-configuration-properties)                                    |
 | `customInitScript`            | | This can be used to customize user environments using a regional script executed by some users' pods.                                                                                                                                                                                                              | See [CustomInitScript properties](#custominitscript-properties)
-| `openshiftSCC`            | | This can be used to inject scc in openshift clusters  | See [OpenshiftSCC properties](#openshiftSCC-properties)                               |
+| `openshiftSCC`            | | This can be used to inject SCC (Security Context Constraints) in openshift clusters  | See [OpenshiftSCC properties](#openshiftSCC-properties)                               |
 | `customValues`                | | This can be used to specify custom values that will be available for helm chart injection in the web app. Nested values are supported.                                                                                                                                                                             | ` "customValues": {"myCustomKey": "myValue", "myNestedCustomKey": {"nestedKey": "nestedValue"} }` |
 
 ### CustomInitScript properties
@@ -92,12 +92,12 @@ These properties define how to reach the **service provider API**.
 
 ### OpenshiftSCC properties
 
-These properties define if SCC must be inject in services for openshift clusters
+These properties define if SCC should be injected in services for openshift clusters
 
 | Key | Description | Example |
 | --------------------- | ------------------------------------------------------------------ | ---- |
-| `enabled` | default to false | `true` |
-| `scc` | name of the scc  | `anyuid` |
+| `enabled` | defaults to `false` | `true` |
+| `scc` | name of the SCC  | `anyuid` |
 
 ### Server properties
 
