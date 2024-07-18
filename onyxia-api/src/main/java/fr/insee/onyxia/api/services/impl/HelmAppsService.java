@@ -41,6 +41,11 @@ import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
+import org.everit.json.schema.ValidationException;
+import org.everit.json.schema.Schema;
+import org.everit.json.schema.loader.SchemaLoader;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,7 +106,15 @@ public class HelmAppsService implements AppsService {
             Map<String, Object> fusion,
             final boolean skipTlsVerify,
             final String caFile)
-            throws IOException, TimeoutException, InterruptedException {
+            throws IOException, TimeoutException, InterruptedException, ValidationException {
+
+        JSONObject jsonSchema = new JSONObject(new JSONTokener(pkg.getConfig().toString()));
+        // Load the schema
+        Schema schema = SchemaLoader.load(jsonSchema);
+        // Convert the options map to a JSONObject
+        JSONObject jsonObject = new JSONObject(fusion);
+        // Validate the options object against the schema
+        schema.validate(jsonObject);
 
         File values = File.createTempFile("values", ".yaml");
         mapperHelm.writeValue(values, fusion);
