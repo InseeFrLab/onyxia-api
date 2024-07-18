@@ -55,6 +55,7 @@ public final class HelmReleaseHealthResolver {
                                         .get();
                         details.setDesired(deployment.getSpec().getReplicas());
                         details.setReady(deployment.getStatus().getReadyReplicas());
+                        break;
                     case "StatefulSet":
                         StatefulSet statefulset =
                                 kubernetesClient
@@ -65,6 +66,7 @@ public final class HelmReleaseHealthResolver {
                                         .get();
                         details.setDesired(statefulset.getSpec().getReplicas());
                         details.setReady(statefulset.getStatus().getReadyReplicas());
+                        break;
                     case "DaemonSet":
                         DaemonSet daemonSet =
                                 kubernetesClient
@@ -75,6 +77,7 @@ public final class HelmReleaseHealthResolver {
                                         .get();
                         details.setDesired(daemonSet.getStatus().getDesiredNumberScheduled());
                         details.setReady(daemonSet.getStatus().getNumberReady());
+                        break;
                     default:
                         continue;
                 }
