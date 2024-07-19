@@ -89,6 +89,10 @@ public class Chart extends Pkg {
 
     @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
+    @Schema(description = "")
+    @JsonProperty("defaultValues")
+    private String defaultValues;
+
     @JsonProperty("apiVersion")
     public String getApiVersion() {
         return apiVersion;
@@ -237,6 +241,16 @@ public class Chart extends Pkg {
     @JsonProperty("version")
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    @JsonProperty("defaultValues")
+    public String getDefaultValues() {
+        return defaultValues;
+    }
+
+    @JsonProperty("defaultValues")
+    public void setDefaultValues(String defaultValues) {
+        this.defaultValues = defaultValues;
     }
 
     @JsonAnyGetter

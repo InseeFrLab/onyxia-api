@@ -205,7 +205,7 @@ public class Region {
         private DefaultConfiguration defaultConfiguration = new DefaultConfiguration();
         private K8sPublicEndpoint k8sPublicEndpoint = new K8sPublicEndpoint();
         private CustomInitScript customInitScript = new CustomInitScript();
-
+        private OpenshiftSCC openshiftSCC = new OpenshiftSCC();
         private Map<String, Object> customValues = new HashMap<>();
 
         private NamespaceAnnotationsDynamic namespaceAnnotationsDynamic =
@@ -233,6 +233,14 @@ public class Region {
 
         public void setCustomInitScript(CustomInitScript customInitScript) {
             this.customInitScript = customInitScript;
+        }
+
+        public OpenshiftSCC getOpenshiftSCC() {
+            return openshiftSCC;
+        }
+
+        public void setOpenshiftSCC(OpenshiftSCC openshiftSCC) {
+            this.openshiftSCC = openshiftSCC;
         }
 
         public boolean isSingleNamespace() {
@@ -955,6 +963,27 @@ public class Region {
 
         public void setChecksum(String checksum) {
             this.checksum = checksum;
+        }
+    }
+
+    public static class OpenshiftSCC {
+        private boolean enabled;
+        private String scc;
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public String getScc() {
+            return scc;
+        }
+
+        public void setScc(String scc) {
+            this.scc = scc;
         }
     }
 
