@@ -308,7 +308,7 @@ public class KubernetesService {
     public ResourceQuota getOnyxiaQuota(Region region, Project project, User user) {
         final KubernetesClient kubClient = kubernetesClientProvider.getRootClient(region);
         final String namespace = determineNamespaceAndCreateIfNeeded(region, project, user);
-        return kubClient.resourceQuotas().inNamespace(namespace).withName("onyxia-quota").get();
+        return kubClient.resourceQuotas().inNamespace(namespace).withName(ONYXIA_QUOTA).get();
     }
 
     private String getSubjectKind(Owner owner) {
