@@ -42,19 +42,6 @@ public class InstallServiceEvent extends OnyxiaEvent {
             String namespace,
             String releaseName,
             String packageName,
-            String catalogId) {
-        this.namespace = namespace;
-        this.releaseName = releaseName;
-        this.catalogId = catalogId;
-        this.username = username;
-        this.packageName = packageName;
-    }
-
-    public InstallServiceEvent(
-            String username,
-            String namespace,
-            String releaseName,
-            String packageName,
             String catalogId,
             String friendlyName) {
         this.namespace = namespace;
