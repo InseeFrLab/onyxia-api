@@ -32,6 +32,7 @@ public class KubernetesService {
 
     final OnyxiaEventPublisher onyxiaEventPublisher;
     private static final Logger LOGGER = LoggerFactory.getLogger(KubernetesService.class);
+    public static final String ONYXIA_QUOTA = "onyxia-quota";
 
     @Autowired
     public KubernetesService(
@@ -199,7 +200,7 @@ public class KubernetesService {
         resourceQuotaBuilder
                 .withNewMetadata()
                 .withLabels(Map.of("createdby", "onyxia"))
-                .withName("onyxia-quota")
+                .withName(ONYXIA_QUOTA)
                 .withNamespace(namespaceId)
                 .endMetadata();
 
@@ -219,6 +220,14 @@ public class KubernetesService {
         resourceQuotaBuilderSpecNested.endSpec();
 
         final ResourceQuota quota = resourceQuotaBuilder.build();
+        ResourceQuota resourceQuota =
+                kubClient.resourceQuotas().inNamespace(namespaceId).withName(ONYXIA_QUOTA).get();
+        if (resourceQuota != null
+                && resourceQuota.getMetadata().getAnnotations().containsKey("onyxia_ignore")) {
+            // The annotation onyxia_ignore can be set to prevent Onyxia from managing this
+            // resourcequota
+            return;
+        }
         if (overrideExisting) {
             kubClient.resourceQuotas().inNamespace(namespaceId).createOrReplace(quota);
         } else {
