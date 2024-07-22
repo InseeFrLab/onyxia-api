@@ -1,5 +1,4 @@
 {
-  "$id": "https://example.com/schemas/s3.json",
   "title": "S3 Configuration",
   "description": "Configuration of temporary identity for AWS S3",
   "type": "object",
