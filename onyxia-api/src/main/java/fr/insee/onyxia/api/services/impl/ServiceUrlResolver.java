@@ -12,8 +12,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class ServiceUrlResolver {
+
+    private ServiceUrlResolver() {}
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServiceUrlResolver.class);
+
     static List<String> getServiceUrls(Region region, String manifest, KubernetesClient client) {
         Region.Expose expose = region.getServices().getExpose();
         boolean isIstioEnabled = expose.getIstio() != null && expose.getIstio().isEnabled();
@@ -49,9 +56,8 @@ public final class ServiceUrlResolver {
                                                                                             .getPath()))
                                     .toList());
                 } catch (Exception e) {
-                    System.out.println(
-                            "Warning : could not read urls from ingress "
-                                    + ingress.getFullResourceName());
+                    LOGGER.warn(
+                            "Could not read urls from ingress {}", ingress.getFullResourceName());
                 }
             }
         }
@@ -66,9 +72,9 @@ public final class ServiceUrlResolver {
                 try {
                     urls.add(resource.get("spec", "host"));
                 } catch (Exception e) {
-                    System.out.println(
-                            "Warning : could not read urls from OpenShift Route "
-                                    + resource.getFullResourceName());
+                    LOGGER.warn(
+                            "Could not read urls from OpenShift Route {}",
+                            resource.getFullResourceName());
                 }
             }
         }
@@ -85,9 +91,9 @@ public final class ServiceUrlResolver {
                     // One should consider to add support for 'spec/http[*]/match[*]/uri/prefix'
                     urls.addAll(resource.get("spec", "hosts"));
                 } catch (Exception e) {
-                    System.out.println(
-                            "Warning : could not read urls from Istio Virtual Service "
-                                    + resource.getFullResourceName());
+                    LOGGER.warn(
+                            "Could not read urls from Istio Virtual Service {}",
+                            resource.getFullResourceName());
                 }
             }
         }
