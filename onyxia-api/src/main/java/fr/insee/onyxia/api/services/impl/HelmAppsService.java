@@ -38,7 +38,6 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.slf4j.Logger;
@@ -339,8 +338,7 @@ public class HelmAppsService implements AppsService {
             Map<String, String> result = new HashMap<>();
             node.fields()
                     .forEachRemaining(
-                            currentNode ->
-                                    mapAppender(result, currentNode, new ArrayList<String>()));
+                            currentNode -> mapAppender(result, currentNode, new ArrayList<>()));
             service.setEnv(result);
             service.setSuspendable(service.getEnv().containsKey(SUSPEND_KEY));
             if (service.getEnv().containsKey(SUSPEND_KEY)) {
@@ -384,10 +382,7 @@ public class HelmAppsService implements AppsService {
         if (secret != null) {
             Map<String, String> secretData =
                     secret.getData() != null ? secret.getData() : new HashMap<>();
-            data.forEach(
-                    (k, v) -> {
-                        secretData.put(k, Base64Utils.base64Encode(v));
-                    });
+            data.forEach((k, v) -> secretData.put(k, Base64Utils.base64Encode(v)));
             secret.setData(secretData);
             if (secret.getMetadata().getManagedFields() != null) {
                 secret.getMetadata().getManagedFields().clear();
@@ -588,7 +583,7 @@ public class HelmAppsService implements AppsService {
                                     currentTask.setStatus(status);
                                     return currentTask;
                                 })
-                        .collect(Collectors.toList()));
+                        .toList());
 
         return service;
     }
