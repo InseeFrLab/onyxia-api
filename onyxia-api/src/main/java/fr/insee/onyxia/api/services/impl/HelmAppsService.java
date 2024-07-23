@@ -67,6 +67,10 @@ public class HelmAppsService implements AppsService {
     final OnyxiaEventPublisher onyxiaEventPublisher;
 
     public static final String ONYXIA_SECRET_PREFIX = "sh.onyxia.release.v1.";
+    private static final String CATALOG = "catalog";
+    private static final String OWNER = "owner";
+    private static final String FRIENDLY_NAME = "friendlyName";
+    private static final String SHARE = "share";
 
     @Autowired
     public HelmAppsService(
@@ -131,13 +135,12 @@ public class HelmAppsService implements AppsService {
                             requestDTO.getFriendlyName());
             onyxiaEventPublisher.publishEvent(installServiceEvent);
             Map<String, String> metadata = new HashMap<>();
-            metadata.put("catalog", Base64Utils.base64Encode(catalogId));
-            metadata.put("owner", Base64Utils.base64Encode(user.getIdep()));
+            metadata.put(CATALOG, Base64Utils.base64Encode(catalogId));
+            metadata.put(OWNER, Base64Utils.base64Encode(user.getIdep()));
             if (requestDTO.getFriendlyName() != null) {
-                metadata.put(
-                        "friendlyName", Base64Utils.base64Encode(requestDTO.getFriendlyName()));
+                metadata.put(FRIENDLY_NAME, Base64Utils.base64Encode(requestDTO.getFriendlyName()));
             }
-            metadata.put("share", Base64Utils.base64Encode(String.valueOf(requestDTO.isShare())));
+            metadata.put(SHARE, Base64Utils.base64Encode(String.valueOf(requestDTO.isShare())));
             kubernetesService.createOnyxiaSecret(
                     region, namespaceId, requestDTO.getName(), metadata);
             return List.of(res.getManifest());
@@ -307,18 +310,18 @@ public class HelmAppsService implements AppsService {
                             .get();
             if (secret != null && secret.getData() != null) {
                 Map<String, String> data = secret.getData();
-                if (data.containsKey("friendlyName")) {
-                    service.setFriendlyName(Base64Utils.base64Decode(data.get("friendlyName")));
+                if (data.containsKey(FRIENDLY_NAME)) {
+                    service.setFriendlyName(Base64Utils.base64Decode(data.get(FRIENDLY_NAME)));
                 }
-                if (data.containsKey("owner")) {
-                    service.setOwner(Base64Utils.base64Decode(data.get("owner")));
+                if (data.containsKey(OWNER)) {
+                    service.setOwner(Base64Utils.base64Decode(data.get(OWNER)));
                 }
-                if (data.containsKey("catalog")) {
-                    service.setCatalogId(Base64Utils.base64Decode(data.get("catalog")));
+                if (data.containsKey(CATALOG)) {
+                    service.setCatalogId(Base64Utils.base64Decode(data.get(CATALOG)));
                 }
-                if (data.containsKey("share")) {
+                if (data.containsKey(SHARE)) {
                     service.setShare(
-                            Boolean.parseBoolean(Base64Utils.base64Decode(data.get("share"))));
+                            Boolean.parseBoolean(Base64Utils.base64Decode(data.get(SHARE))));
                 }
             }
         } catch (Exception e) {
@@ -364,13 +367,13 @@ public class HelmAppsService implements AppsService {
     public void rename(
             Region region, Project project, User user, String serviceId, String friendlyName)
             throws IOException, InterruptedException, TimeoutException {
-        patchOnyxiaSecret(region, project, user, serviceId, Map.of("friendlyName", friendlyName));
+        patchOnyxiaSecret(region, project, user, serviceId, Map.of(FRIENDLY_NAME, friendlyName));
     }
 
     @Override
     public void share(Region region, Project project, User user, String serviceId, boolean share)
             throws IOException, InterruptedException, TimeoutException {
-        patchOnyxiaSecret(region, project, user, serviceId, Map.of("share", String.valueOf(share)));
+        patchOnyxiaSecret(region, project, user, serviceId, Map.of(SHARE, String.valueOf(share)));
     }
 
     private void patchOnyxiaSecret(
@@ -401,7 +404,7 @@ public class HelmAppsService implements AppsService {
                     .serverSideApply();
         } else {
             Map<String, String> metadata = new HashMap<>();
-            metadata.put("owner", user.getIdep());
+            metadata.put(OWNER, user.getIdep());
             metadata.putAll(data);
             kubernetesService.createOnyxiaSecret(region, namespaceId, serviceId, metadata);
         }
