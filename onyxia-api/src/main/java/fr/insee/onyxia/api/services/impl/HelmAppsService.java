@@ -185,18 +185,13 @@ public class HelmAppsService implements AppsService {
                 installedCharts.parallelStream()
                         .map(release -> getHelmApp(region, user, release))
                         .filter(
-                                service -> {
-                                    boolean canUserSeeThisService = false;
-                                    if (project.getGroup() == null
-                                            || service.isShare()
-                                            || user.getIdep()
-                                                    .equalsIgnoreCase(service.getOwner())) {
-                                        // Personal group
-                                        canUserSeeThisService = true;
-                                    }
-                                    return canUserSeeThisService;
-                                })
-                        .collect(Collectors.toList());
+                                service ->
+                                        // Check if user can see this service
+                                        project.getGroup() == null
+                                                || service.isShare()
+                                                || user.getIdep()
+                                                        .equalsIgnoreCase(service.getOwner()))
+                        .toList();
         ServicesListing listing = new ServicesListing();
         listing.setApps(services);
         return CompletableFuture.completedFuture(listing);
