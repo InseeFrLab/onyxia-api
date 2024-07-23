@@ -90,21 +90,24 @@ public class Quota {
         return quotas;
     }
 
-    public void loadFromMap(Map<String, String> data) {
-        setMemoryRequests(data.get(REQUESTS_MEMORY));
-        setCpuRequests(data.get(REQUESTS_CPU));
-        setMemoryLimits(data.get(LIMITS_MEMORY));
-        setCpuLimits(data.get(LIMITS_CPU));
-        setEphemeralStorageRequests(data.get(REQUESTS_EPHEMERAL_STORAGE));
-        setEphemeralStorageLimits(data.get(LIMITS_EPHEMERAL_STORAGE));
-        setStorageRequests(data.get(REQUESTS_STORAGE));
+    public static Quota from(Map<String, String> data) {
+        Quota quota = new Quota();
+        quota.setMemoryRequests(data.get(REQUESTS_MEMORY));
+        quota.setCpuRequests(data.get(REQUESTS_CPU));
+        quota.setMemoryLimits(data.get(LIMITS_MEMORY));
+        quota.setCpuLimits(data.get(LIMITS_CPU));
+        quota.setEphemeralStorageRequests(data.get(REQUESTS_EPHEMERAL_STORAGE));
+        quota.setEphemeralStorageLimits(data.get(LIMITS_EPHEMERAL_STORAGE));
+        quota.setStorageRequests(data.get(REQUESTS_STORAGE));
         if (data.containsKey(REQUESTS_NVIDIA_COM_GPU)) {
-            setNvidiaGpuRequests(Integer.parseInt(data.get(REQUESTS_NVIDIA_COM_GPU)));
+            quota.setNvidiaGpuRequests(Integer.parseInt(data.get(REQUESTS_NVIDIA_COM_GPU)));
         }
         if (data.containsKey(LIMITS_NVIDIA_COM_GPU)) {
-            setNvidiaGpuLimits(Integer.parseInt(data.get(LIMITS_NVIDIA_COM_GPU)));
+            quota.setNvidiaGpuLimits(Integer.parseInt(data.get(LIMITS_NVIDIA_COM_GPU)));
         }
-        setPodsCount(data.get(COUNT_PODS) == null ? null : Integer.valueOf(data.get(COUNT_PODS)));
+        quota.setPodsCount(
+                data.get(COUNT_PODS) == null ? null : Integer.valueOf(data.get(COUNT_PODS)));
+        return quota;
     }
 
     public String getMemoryRequests() {
