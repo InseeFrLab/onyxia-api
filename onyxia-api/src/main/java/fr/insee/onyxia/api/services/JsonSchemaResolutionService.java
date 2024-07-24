@@ -29,14 +29,13 @@ public class JsonSchemaResolutionService {
     private JsonNode resolveReferences(JsonNode schemaNode, JsonNode rootNode) {
         if (schemaNode.isObject()) {
             ObjectNode objectNode = (ObjectNode) schemaNode;
+            Iterator<Map.Entry<String, JsonNode>> fields = objectNode.fields();
             Map<String, JsonNode> updates = new HashMap<>();
 
-            Iterator<Map.Entry<String, JsonNode>> fields = objectNode.fields();
             while (fields.hasNext()) {
                 Map.Entry<String, JsonNode> field = fields.next();
                 JsonNode fieldValue = field.getValue();
 
-                // Handle $ref attribute
                 if (field.getKey().equals("$ref") && fieldValue.isTextual()) {
                     String ref = fieldValue.asText();
                     JsonNode refNode = null;
@@ -45,24 +44,25 @@ public class JsonSchemaResolutionService {
                     } else {
                         refNode = registryService.getSchema(ref);
                     }
+
                     if (refNode != null && !refNode.isMissingNode()) {
                         JsonNode resolvedNode = resolveReferences(refNode.deepCopy(), rootNode);
                         updates.putAll(convertToMap((ObjectNode) resolvedNode));
                         updates.put("$ref", null);
                     }
-                }
-                // Handle x-onyxia.overwriteSchemaWith attribute
-                else if (field.getKey().equals("x-onyxia")
-                        && fieldValue.has("overwriteSchemaWith")) {
-                    String overrideSchemaName = fieldValue.get("overwriteSchemaWith").asText();
+                } else if (fieldValue.isObject()
+                        && fieldValue.has("x-onyxia")
+                        && fieldValue.get("x-onyxia").has("overwriteSchemaWith")) {
+                    String overrideSchemaName =
+                            fieldValue.get("x-onyxia").get("overwriteSchemaWith").asText();
                     JsonNode overrideSchemaNode = registryService.getSchema(overrideSchemaName);
+
                     if (overrideSchemaNode != null && !overrideSchemaNode.isMissingNode()) {
-                        JsonNode mergedNode = mergeSchemas(schemaNode, overrideSchemaNode);
-                        updates.putAll(convertToMap((ObjectNode) mergedNode));
+                        JsonNode resolvedNode =
+                                resolveReferences(overrideSchemaNode.deepCopy(), rootNode);
+                        updates.put(field.getKey(), resolvedNode);
                     }
-                }
-                // Recursively resolve for nested objects
-                else if (fieldValue.isObject() || fieldValue.isArray()) {
+                } else if (fieldValue.isObject() || fieldValue.isArray()) {
                     updates.put(field.getKey(), resolveReferences(fieldValue, rootNode));
                 }
             }
@@ -81,11 +81,6 @@ public class JsonSchemaResolutionService {
             }
         }
         return schemaNode;
-    }
-
-    private ObjectNode mergeSchemas(JsonNode originalSchema, JsonNode overrideSchema) {
-        ObjectNode mergedSchema = (ObjectNode) overrideSchema.deepCopy();
-        return mergedSchema;
     }
 
     private Map<String, JsonNode> convertToMap(ObjectNode objectNode) {
