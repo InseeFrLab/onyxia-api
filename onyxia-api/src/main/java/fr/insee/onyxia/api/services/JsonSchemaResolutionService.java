@@ -84,12 +84,7 @@ public class JsonSchemaResolutionService {
     }
 
     private ObjectNode mergeSchemas(JsonNode originalSchema, JsonNode overrideSchema) {
-        ObjectNode mergedSchema = (ObjectNode) originalSchema.deepCopy();
-        Iterator<Map.Entry<String, JsonNode>> fields = overrideSchema.fields();
-        while (fields.hasNext()) {
-            Map.Entry<String, JsonNode> field = fields.next();
-            mergedSchema.set(field.getKey(), field.getValue());
-        }
+        ObjectNode mergedSchema = (ObjectNode) overrideSchema.deepCopy();
         return mergedSchema;
     }
 
