@@ -6,6 +6,7 @@ public class InstallServiceEvent extends OnyxiaEvent {
     private String namespace;
     private String releaseName;
     private String packageName;
+    private String friendlyName;
 
     public String getReleaseName() {
         return releaseName;
@@ -23,6 +24,14 @@ public class InstallServiceEvent extends OnyxiaEvent {
         this.packageName = packageName;
     }
 
+    public String getFriendlyName() {
+        return friendlyName;
+    }
+
+    public void setFriendlyName(String friendlyName) {
+        this.friendlyName = friendlyName;
+    }
+
     private String username;
     private String catalogId;
 
@@ -33,12 +42,14 @@ public class InstallServiceEvent extends OnyxiaEvent {
             String namespace,
             String releaseName,
             String packageName,
-            String catalogId) {
+            String catalogId,
+            String friendlyName) {
         this.namespace = namespace;
         this.releaseName = releaseName;
         this.catalogId = catalogId;
         this.username = username;
         this.packageName = packageName;
+        this.friendlyName = friendlyName;
     }
 
     public String getUsername() {
