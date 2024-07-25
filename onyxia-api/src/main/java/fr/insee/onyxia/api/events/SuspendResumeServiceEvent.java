@@ -13,7 +13,7 @@ public class SuspendResumeServiceEvent extends InstallServiceEvent {
             String packageName,
             String catalogId,
             boolean suspend) {
-        super(username, namespace, releaseName, packageName, catalogId);
+        super(username, namespace, releaseName, packageName, catalogId, null);
         this.isSuspend = suspend;
     }
 
