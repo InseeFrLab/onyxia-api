@@ -1,5 +1,7 @@
 package fr.insee.onyxia.api.dao.universe;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -12,6 +14,8 @@ import fr.insee.onyxia.api.services.JsonSchemaResolutionService;
 import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.helm.Chart;
 import fr.insee.onyxia.model.helm.Repository;
+import java.io.*;
+import java.util.*;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
@@ -26,11 +30,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
-import java.io.*;
-import java.util.*;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Service
 public class CatalogLoader {
@@ -196,9 +195,11 @@ public class CatalogLoader {
                     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                     try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
                         tarIn.transferTo(baos);
-                        chart.setConfig(jsonSchemaResolutionService.resolveReferences(mapper.readTree(baos.toString(UTF_8))));
+                        chart.setConfig(
+                                jsonSchemaResolutionService.resolveReferences(
+                                        mapper.readTree(baos.toString(UTF_8))));
                     }
-                 } else if (entryName.endsWith(chartName + "/values.yaml")
+                } else if (entryName.endsWith(chartName + "/values.yaml")
                         && !entryName.endsWith("charts/" + chartName + "/values.yaml")) {
                     try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
                         tarIn.transferTo(baos);
