@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class CustomMetrics implements MeterBinder {
 
-    private static Counter counter;
+    private Counter counter;
 
     public void plusUn() {
         counter.increment();
