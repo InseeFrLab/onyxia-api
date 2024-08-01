@@ -4,6 +4,7 @@ import fr.insee.onyxia.api.controller.exception.NamespaceAlreadyExistException;
 import fr.insee.onyxia.api.controller.exception.OnboardingDisabledException;
 import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.api.services.impl.kubernetes.KubernetesService;
+import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.region.Region;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -58,14 +59,15 @@ public class OnboardingController {
 
         checkPermissions(region, request);
         final KubernetesService.Owner owner = new KubernetesService.Owner();
+        final User user = userProvider.getUser(region);
         if (request.getGroup() != null) {
             owner.setId(request.getGroup());
             owner.setType(KubernetesService.Owner.OwnerType.GROUP);
         } else {
-            owner.setId(userProvider.getUser(region).getIdep());
+            owner.setId(user.getIdep());
             owner.setType(KubernetesService.Owner.OwnerType.USER);
         }
-        kubernetesService.createDefaultNamespace(region, owner);
+        kubernetesService.createOrUpdateNamespace(region, owner, user);
     }
 
     private void checkPermissions(Region region, OnboardingRequest request)

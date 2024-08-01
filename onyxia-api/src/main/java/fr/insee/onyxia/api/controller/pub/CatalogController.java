@@ -4,9 +4,6 @@ import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.configuration.Catalogs;
 import fr.insee.onyxia.api.configuration.NotFoundException;
 import fr.insee.onyxia.api.services.CatalogService;
-import fr.insee.onyxia.model.catalog.Config.Property;
-import fr.insee.onyxia.model.catalog.Config.Property.XForm;
-import fr.insee.onyxia.model.catalog.Config.Property.XOnyxia;
 import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.helm.Chart;
 import fr.insee.onyxia.model.region.Region;
@@ -14,9 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -82,7 +77,6 @@ public class CatalogController {
                 catalogService
                         .getPackage(catalogId, packageName)
                         .orElseThrow(NotFoundException::new);
-        addCustomOnyxiaProperties(pkg);
         return pkg;
     }
 
@@ -116,7 +110,6 @@ public class CatalogController {
                 catalogService
                         .getChartByVersion(catalogId, chartName, version)
                         .orElseThrow(NotFoundException::new);
-        addCustomOnyxiaProperties(chart);
         return chart;
     }
 
@@ -140,57 +133,6 @@ public class CatalogController {
     public List<Chart> getCharts(@PathVariable String catalogId, @PathVariable String chartName) {
         List<Chart> charts =
                 catalogService.getCharts(catalogId, chartName).orElseThrow(NotFoundException::new);
-        charts.forEach(this::addCustomOnyxiaProperties);
         return charts;
-    }
-
-    private void addCustomOnyxiaProperties(Pkg pkg) {
-        Map<String, Property> properties = pkg.getConfig().getProperties().getProperties();
-        Property property = new Property();
-        property.setDescription("Onyxia specific configuration");
-        property.setType("object");
-        property.setProperties(new HashMap<>());
-        Map<String, Property> onyxiaProperties = new HashMap<>();
-        Property customName = new Property();
-        String stringType = "string";
-        customName.setType(stringType);
-        customName.setDescription("Service custom name");
-        customName.setDefaut(pkg.getName());
-        customName.setTitle("Custom name");
-        onyxiaProperties.put("friendlyName", customName);
-        Property userDefinedValues = new Property();
-        userDefinedValues.setType(stringType);
-        userDefinedValues.setDescription("Values defined by the end user");
-        userDefinedValues.setDefaut("");
-        userDefinedValues.setTitle("User defined values");
-        XOnyxia xonyxiaUserDefinedValues = new XOnyxia();
-        xonyxiaUserDefinedValues.setHidden(true);
-        userDefinedValues.setXonyxia(xonyxiaUserDefinedValues);
-        onyxiaProperties.put("userDefinedValues", userDefinedValues);
-        Property owner = new Property();
-        owner.setType(stringType);
-        owner.setDescription("Owner of the chart");
-        owner.setDefaut("owner");
-        owner.setTitle("Owner");
-        XForm xform = new XForm();
-        xform.setValue("{{user.idep}}");
-        xform.setHidden(true);
-        owner.setXform(xform);
-        XOnyxia xonyxia = new XOnyxia();
-        xonyxia.setOverwriteDefaultWith("{{user.idep}}");
-        xonyxia.setHidden(true);
-        owner.setXonyxia(xonyxia);
-        onyxiaProperties.put("owner", owner);
-
-        Property share = new Property();
-        share.setType("boolean");
-        share.setDescription("Enable share for this service");
-        share.setDefaut(false);
-        share.setTitle("Share");
-        onyxiaProperties.put("share", share);
-
-        property.setProperties(onyxiaProperties);
-
-        properties.put("onyxia", property);
     }
 }

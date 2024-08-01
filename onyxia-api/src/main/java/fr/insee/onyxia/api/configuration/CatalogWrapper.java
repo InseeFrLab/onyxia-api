@@ -21,11 +21,11 @@ public class CatalogWrapper {
     @Schema(description = "Catalog id")
     private String id;
 
-    @Schema(description = "Catalog name")
-    private String name;
+    @Schema(description = "Localized string for the name of the catalog")
+    private Object name;
 
-    @Schema(description = "Description of the catalog")
-    private String description;
+    @Schema(description = "Localized string for the description of the catalog")
+    private Object description;
 
     @Schema(description = "Who maintains the catalog")
     private String maintainer;
@@ -127,11 +127,11 @@ public class CatalogWrapper {
         this.id = id;
     }
 
-    public String getName() {
+    public Object getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(Object name) {
         this.name = name;
     }
 
@@ -143,11 +143,11 @@ public class CatalogWrapper {
         this.location = location;
     }
 
-    public String getDescription() {
+    public Object getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(Object description) {
         this.description = description;
     }
 

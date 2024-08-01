@@ -205,8 +205,11 @@ public class Region {
         private DefaultConfiguration defaultConfiguration = new DefaultConfiguration();
         private K8sPublicEndpoint k8sPublicEndpoint = new K8sPublicEndpoint();
         private CustomInitScript customInitScript = new CustomInitScript();
-
+        private OpenshiftSCC openshiftSCC = new OpenshiftSCC();
         private Map<String, Object> customValues = new HashMap<>();
+
+        private NamespaceAnnotationsDynamic namespaceAnnotationsDynamic =
+                new NamespaceAnnotationsDynamic();
 
         public DefaultConfiguration getDefaultConfiguration() {
             return defaultConfiguration;
@@ -232,6 +235,14 @@ public class Region {
             this.customInitScript = customInitScript;
         }
 
+        public OpenshiftSCC getOpenshiftSCC() {
+            return openshiftSCC;
+        }
+
+        public void setOpenshiftSCC(OpenshiftSCC openshiftSCC) {
+            this.openshiftSCC = openshiftSCC;
+        }
+
         public boolean isSingleNamespace() {
             return singleNamespace;
         }
@@ -246,6 +257,15 @@ public class Region {
 
         public void setAllowNamespaceCreation(boolean allowNamespaceCreation) {
             this.allowNamespaceCreation = allowNamespaceCreation;
+        }
+
+        public NamespaceAnnotationsDynamic getNamespaceAnnotationsDynamic() {
+            return namespaceAnnotationsDynamic;
+        }
+
+        public void setNamespaceAnnotationsDynamic(
+                NamespaceAnnotationsDynamic namespaceAnnotationsDynamic) {
+            this.namespaceAnnotationsDynamic = namespaceAnnotationsDynamic;
         }
 
         public Map<String, String> getNamespaceLabels() {
@@ -385,6 +405,28 @@ public class Region {
 
             @JsonProperty("tokenPassthrough")
             TOKEN_PASSTHROUGH
+        }
+
+        public static class NamespaceAnnotationsDynamic {
+            private boolean enabled = true;
+
+            private List<String> userAttributes = new ArrayList<>();
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
+            }
+
+            public List<String> getUserAttributes() {
+                return userAttributes;
+            }
+
+            public void setUserAttributes(List<String> userAttributes) {
+                this.userAttributes = userAttributes;
+            }
         }
 
         public static class DefaultConfiguration {
@@ -921,6 +963,27 @@ public class Region {
 
         public void setChecksum(String checksum) {
             this.checksum = checksum;
+        }
+    }
+
+    public static class OpenshiftSCC {
+        private boolean enabled;
+        private String scc;
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public String getScc() {
+            return scc;
+        }
+
+        public void setScc(String scc) {
+            this.scc = scc;
         }
     }
 

@@ -55,29 +55,31 @@ The Onyxia service platform is a Kubernetes cluster but Onyxia is meant to be ex
 
 Users can work on Onyxia as a User or as a Group to which they belong. Each user and group can have its own **namespace** which is an isolated space of Kubernetes.
 
-| Key | Default | Description | Example |
-| --------------------- | ------- | ------------------------------------------------------------------ | ---- |
-| `type` | | Type of the platform on which services are launched. Only Kubernetes is supported, Marathon has been removed. | "KUBERNETES" |
-| `allowNamespaceCreation` | true | If true, the /onboarding endpoint is enabled and the user will have a namespace created on its first request on a service resource. | true |
-| `namespaceLabels` |  | Labels to add at namespace creation | {"zone":"prod"} |
-| `namespaceAnnotations` |  | Annotations to add at namespace creation | {"zone":"prod"} |
-| `singleNamespace` | true | When true, all users share the same namespace on the service provider. This configuration can be used if a project works on its own Onyxia region. | |
-| `userNamespace` | true | When true, all users have a namespace for their work. This configuration can be used if you don't allow a user to have their own space to work and only use project space | |
-| `namespacePrefix` | "user-" | User has a personal namespace like namespacePrefix + userId (should only be used when not singleNamespace but not the case) | |
-| `groupNamespacePrefix` | "projet-" | User in a group groupId can access the namespace groupeNamespacePrefix + groupId. This prefix is also used for the Vault group directory. | |
-| `usernamePrefix` | | If set, the Kubernetes user corresponding to the Onyxia user is named usernamePrefix + userId on impersonation mode, otherwise it is identified only as userId | "user-" |
-| `groupPrefix` | | not used | |
-| `authenticationMode` | serviceAccount | serviceAccount, impersonate or tokenPassthrough : on serviceAccount mode Onyxia API uses its own serviceAccount (by default admin or cluster-admin), with impersonate mode Onyxia requests the API with user's permissions (helm option `--kube-as-user`). With tokenPassthrough, the authentication token is passed to the API server. | |
-| `expose` | | When users request to expose their service, only subdomain of this object domain are allowed | See [Expose properties](#expose-properties) |
-| `monitoring` | | Define the URL pattern of the monitoring service that is to be launched with each service. Only for client purposes. | {URLPattern: "https://$NAMESPACE-$INSTANCE.mymonitoring.sspcloud.fr"} |
-| `initScript` | | Define where to fetch a script that will be launched on some service on startup. | "https://inseefrlab.github.io/onyxia/onyxia-init.sh" |
-| `allowedURIPattern` | "^https://" | Init scripts set by the user have to respect this pattern. | |
-| `server` | | Define the configuration of the services provider API server, this value is not served on the API as it contains credentials for the API. | See [Server properties](#server-properties) |
-| `k8sPublicEndpoint` | | Define external access to Kubernetes API if available. It helps Onyxia users to directly connect to Kubernetes outside the datalab | See [K8sPublicEndpoint properties](#k8sPublicEndpoint-properties) |
-| `quotas` | | Properties setting quotas on how many resources a user can get on the services provider. | See [Quotas properties](#quotas-properties) |
-| `defaultConfiguration` | | Default configuration on services that a user can override. For client purposes only. | See [Default Configuration](#default-configuration-properties) |
-| `customInitScript` | | This can be used to customize user environments using a regional script executed by some users' pods. | See [CustomInitScript properties](#custom-init-script-properties) |
-| `customValues` | | This can be used to specify custom values that will be available for helm chart injection in the web app. Nested values are supported. | ` "customValues": {"myCustomKey": "myValue", "myNestedCustomKey": {"nestedKey": "nestedValue"} }` |
+| Key                           | Default | Description                                                                                                                                                                                                                                                                                                        | Example                                                                                           |
+|-------------------------------| ------- |--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|
+| `type`                        | | Type of the platform on which services are launched. Only Kubernetes is supported, Marathon has been removed.                                                                                                                                                                                                      | "KUBERNETES"                                                                                      |
+| `allowNamespaceCreation`      | true | If true, the /onboarding endpoint is enabled and the user will have a namespace created on its first request on a service resource.                                                                                                                                                                                | true                                                                                              |
+| `namespaceLabels`             |  | Static labels to add to the namespace (at creation and subsequent user logins)                                                                                                                                                                                                                                     | {"zone":"prod"}                                                                                   |
+| `namespaceAnnotations`        |  | Static annotations to add to the namespace (at creation and subsequent user logins)                                                                                                                                                                                                                                | {"zone":"prod"}                                                                                   |
+| `namespaceAnnotationsDynamic` |  | Dynamic annotations (currently only based on user JWT token) to add to the namespace (at creation and subsequent user logins). Annotations names will be prefixed with `onyxia_`. `onyxia_last_login_timestamp` is also added.                                                                                     | {"enabled": true, "userAttributes": ["sub", "email"] }                                            |
+| `singleNamespace`             | true | When true, all users share the same namespace on the service provider. This configuration can be used if a project works on its own Onyxia region.                                                                                                                                                                 |                                                                                                   |
+| `userNamespace`               | true | When true, all users have a namespace for their work. This configuration can be used if you don't allow a user to have their own space to work and only use project space                                                                                                                                          |                                                                                                   |
+| `namespacePrefix`             | "user-" | User has a personal namespace like namespacePrefix + userId (should only be used when not singleNamespace but not the case)                                                                                                                                                                                        |                                                                                                   |
+| `groupNamespacePrefix`        | "projet-" | User in a group groupId can access the namespace groupeNamespacePrefix + groupId. This prefix is also used for the Vault group directory.                                                                                                                                                                          |                                                                                                   |
+| `usernamePrefix`              | | If set, the Kubernetes user corresponding to the Onyxia user is named usernamePrefix + userId on impersonation mode, otherwise it is identified only as userId                                                                                                                                                     | "user-"                                                                                           |
+| `groupPrefix`                 | | not used                                                                                                                                                                                                                                                                                                           |                                                                                                   |
+| `authenticationMode`          | serviceAccount | serviceAccount, impersonate or tokenPassthrough : on serviceAccount mode Onyxia API uses its own serviceAccount (by default admin or cluster-admin), with impersonate mode Onyxia requests the API with user's permissions (helm option `--kube-as-user`). With tokenPassthrough, the authentication token is passed to the API server. |                                                                                                   |
+| `expose`                      | | When users request to expose their service, only subdomain of this object domain are allowed                                                                                                                                                                                                                       | See [Expose properties](#expose-properties)                                                       |
+| `monitoring`                  | | Define the URL pattern of the monitoring service that is to be launched with each service. Only for client purposes.                                                                                                                                                                                               | {URLPattern: "https://$NAMESPACE-$INSTANCE.mymonitoring.sspcloud.fr"}                             |
+| `initScript`                  | | Define where to fetch a script that will be launched on some service on startup.                                                                                                                                                                                                                                   | "https://inseefrlab.github.io/onyxia/onyxia-init.sh"                                              |
+| `allowedURIPattern`           | "^https://" | Init scripts set by the user have to respect this pattern.                                                                                                                                                                                                                                                         |                                                                                                   |
+| `server`                      | | Define the configuration of the services provider API server, this value is not served on the API as it contains credentials for the API.                                                                                                                                                                          | See [Server properties](#server-properties)                                                       |
+| `k8sPublicEndpoint`           | | Define external access to Kubernetes API if available. It helps Onyxia users to directly connect to Kubernetes outside the datalab                                                                                                                                                                                 | See [K8sPublicEndpoint properties](#k8sPublicEndpoint-properties)                                 |
+| `quotas`                      | | Properties setting quotas on how many resources a user can get on the services provider.                                                                                                                                                                                                                           | See [Quotas properties](#quotas-properties)                                                       |
+| `defaultConfiguration`        | | Default configuration on services that a user can override. For client purposes only.                                                                                                                                                                                                                              | See [Default Configuration](#default-configuration-properties)                                    |
+| `customInitScript`            | | This can be used to customize user environments using a regional script executed by some users' pods.                                                                                                                                                                                                              | See [CustomInitScript properties](#custominitscript-properties)
+| `openshiftSCC`            | | This can be used to inject SCC (Security Context Constraints) in openshift clusters  | See [OpenshiftSCC properties](#openshiftSCC-properties)                               |
+| `customValues`                | | This can be used to specify custom values that will be available for helm chart injection in the web app. Nested values are supported.                                                                                                                                                                             | ` "customValues": {"myCustomKey": "myValue", "myNestedCustomKey": {"nestedKey": "nestedValue"} }` |
 
 ### CustomInitScript properties
 
@@ -87,6 +89,15 @@ These properties define how to reach the **service provider API**.
 | --------------------- | ------------------------------------------------------------------ | ---- |
 | `URL` | URL of the init script | "api.kub.sspcloud.fr" |
 | `checksum` | checksum of the init script |  |
+
+### OpenshiftSCC properties
+
+These properties define if SCC should be injected in services for openshift clusters
+
+| Key | Description | Example |
+| --------------------- | ------------------------------------------------------------------ | ---- |
+| `enabled` | defaults to `false` | `true` |
+| `scc` | name of the SCC  | `anyuid` |
 
 ### Server properties
 
@@ -268,9 +279,9 @@ type Region = {
        * Example: 
        * For a user "bob" in the "exploration" group, using the configuration:
        * 
-       * Single bucket mode:
+       * Shared bucket mode, all the users share a single bucket:
        *   "workingDirectory": {
-       *       "bucketMode": "single",
+       *       "bucketMode": "shared",
        *       "bucketName": "onyxia",
        *       "prefix": "user-",
        *       "prefixGroup": "project-"
