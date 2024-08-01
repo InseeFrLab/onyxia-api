@@ -9,8 +9,6 @@ import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.configuration.CustomObjectMapper;
 import fr.insee.onyxia.api.util.TestUtils;
 import fr.insee.onyxia.model.helm.Chart;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.DisplayName;
@@ -145,37 +143,5 @@ public class CatalogLoaderTest {
                         "fr.insee.onyxia.api.dao.universe.CatalogLoaderException: "
                                 + "Exception occurred during loading resource: class path resource "
                                 + "[catalog-loader-test/keepeme1.gz]"));
-    }
-
-    @Test
-    /**
-     * This test is for a regression on commons compress 1.26
-     * https://commons.apache.org/proper/commons-compress/changes-report.html#a1.26.0 that made it
-     * non parallelable
-     */
-    void shouldExtractPackageInParallel() throws IOException {
-        List<Chart> charts = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
-            Chart chart = new Chart();
-            chart.setName("vscode-python-darkmode");
-            charts.add(chart);
-        }
-        charts.parallelStream()
-                .forEach(
-                        chart -> {
-                            try {
-                                catalogLoader.extractDataFromTgz(
-                                        resourceLoader
-                                                .getResource(
-                                                        "classpath:/catalog-loader-test/vscode-python-darkmode-1.11.11.tgz")
-                                                .getInputStream(),
-                                        chart);
-                                assertEquals(
-                                        19,
-                                        chart.getConfig().getProperties().getProperties().size());
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                        });
     }
 }

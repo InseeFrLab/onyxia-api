@@ -1,7 +1,6 @@
 package fr.insee.onyxia.api.services.impl.kubernetes;
 
 import fr.insee.onyxia.api.configuration.kubernetes.KubernetesClientProvider;
-import fr.insee.onyxia.api.controller.exception.NamespaceAlreadyExistException;
 import fr.insee.onyxia.api.controller.exception.NamespaceNotFoundException;
 import fr.insee.onyxia.api.events.InitNamespaceEvent;
 import fr.insee.onyxia.api.events.OnyxiaEventPublisher;
@@ -16,6 +15,8 @@ import io.fabric8.kubernetes.api.model.rbac.RoleBindingBuilder;
 import io.fabric8.kubernetes.api.model.rbac.SubjectBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientException;
+import io.fabric8.kubernetes.client.dsl.Resource;
+import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -31,6 +32,7 @@ public class KubernetesService {
 
     final OnyxiaEventPublisher onyxiaEventPublisher;
     private static final Logger LOGGER = LoggerFactory.getLogger(KubernetesService.class);
+    public static final String ONYXIA_QUOTA = "onyxia-quota";
 
     @Autowired
     public KubernetesService(
@@ -40,12 +42,9 @@ public class KubernetesService {
         this.onyxiaEventPublisher = onyxiaEventPublisher;
     }
 
-    public String createDefaultNamespace(Region region, Owner owner) {
+    public String createOrUpdateNamespace(Region region, Owner owner, User user) {
         final String namespaceId = getDefaultNamespace(region, owner);
-        if (isNamespaceAlreadyExisting(region, namespaceId)) {
-            throw new NamespaceAlreadyExistException();
-        }
-        return createNamespace(region, namespaceId, owner);
+        return createNamespace(region, namespaceId, owner, user);
     }
 
     @NotNull
@@ -68,7 +67,7 @@ public class KubernetesService {
                     owner.setId(user.getIdep());
                     owner.setType(KubernetesService.Owner.OwnerType.USER);
                 }
-                createNamespace(region, project.getNamespace(), owner);
+                createNamespace(region, project.getNamespace(), owner, user);
             }
         }
         return project.getNamespace();
@@ -78,23 +77,39 @@ public class KubernetesService {
         return kubernetesClientProvider.getRootClient(region).getNamespace();
     }
 
-    private String createNamespace(Region region, String namespaceId, Owner owner) {
+    private String createNamespace(Region region, String namespaceId, Owner owner, User user) {
         final String name = getNameFromOwner(region, owner);
 
         final KubernetesClient kubClient = kubernetesClientProvider.getRootClient(region);
 
-        kubClient
-                .namespaces()
-                .resource(
-                        new NamespaceBuilder()
-                                .withNewMetadata()
-                                .withName(namespaceId)
-                                .withLabels(region.getServices().getNamespaceLabels())
-                                .addToLabels("onyxia_owner", owner.getId())
-                                .withAnnotations(region.getServices().getNamespaceAnnotations())
-                                .endMetadata()
-                                .build())
-                .create();
+        Map<String, String> userMetadata = new HashMap<>();
+        Region.Services.NamespaceAnnotationsDynamic namespaceAnnotationsDynamic =
+                region.getServices().getNamespaceAnnotationsDynamic();
+        if (namespaceAnnotationsDynamic.isEnabled() && user != null) {
+            userMetadata.put(
+                    "onyxia_last_login_timestamp", String.valueOf(System.currentTimeMillis()));
+            for (String claim : namespaceAnnotationsDynamic.getUserAttributes()) {
+                String claimValue = String.valueOf(user.getAttributes().getOrDefault(claim, ""));
+                userMetadata.put("onyxia_" + claim, claimValue);
+            }
+        }
+
+        Resource<Namespace> namespace =
+                kubClient
+                        .namespaces()
+                        .resource(
+                                new NamespaceBuilder()
+                                        .withNewMetadata()
+                                        .withName(namespaceId)
+                                        .withLabels(region.getServices().getNamespaceLabels())
+                                        .addToLabels("onyxia_owner", owner.getId())
+                                        .withAnnotations(
+                                                region.getServices().getNamespaceAnnotations())
+                                        .addToAnnotations(userMetadata)
+                                        .endMetadata()
+                                        .build());
+        boolean newNamespace = namespace.get() == null;
+        namespace.serverSideApply();
 
         final RoleBinding bindingToCreate =
                 kubClient
@@ -158,9 +173,11 @@ public class KubernetesService {
                     quota,
                     !region.getServices().getQuotas().isAllowUserModification());
         }
-        InitNamespaceEvent initNamespaceEvent =
-                new InitNamespaceEvent(region.getName(), namespaceId, owner.getId());
-        onyxiaEventPublisher.publishEvent(initNamespaceEvent);
+        if (newNamespace) {
+            InitNamespaceEvent initNamespaceEvent =
+                    new InitNamespaceEvent(region.getName(), namespaceId, owner.getId());
+            onyxiaEventPublisher.publishEvent(initNamespaceEvent);
+        }
 
         return namespaceId;
     }
@@ -183,7 +200,7 @@ public class KubernetesService {
         resourceQuotaBuilder
                 .withNewMetadata()
                 .withLabels(Map.of("createdby", "onyxia"))
-                .withName("onyxia-quota")
+                .withName(ONYXIA_QUOTA)
                 .withNamespace(namespaceId)
                 .endMetadata();
 
@@ -203,6 +220,14 @@ public class KubernetesService {
         resourceQuotaBuilderSpecNested.endSpec();
 
         final ResourceQuota quota = resourceQuotaBuilder.build();
+        ResourceQuota resourceQuota =
+                kubClient.resourceQuotas().inNamespace(namespaceId).withName(ONYXIA_QUOTA).get();
+        if (resourceQuota != null
+                && resourceQuota.getMetadata().getAnnotations().containsKey("onyxia_ignore")) {
+            // The annotation onyxia_ignore can be set to prevent Onyxia from managing this
+            // resourcequota
+            return;
+        }
         if (overrideExisting) {
             kubClient.resourceQuotas().inNamespace(namespaceId).createOrReplace(quota);
         } else {
@@ -283,7 +308,7 @@ public class KubernetesService {
     public ResourceQuota getOnyxiaQuota(Region region, Project project, User user) {
         final KubernetesClient kubClient = kubernetesClientProvider.getRootClient(region);
         final String namespace = determineNamespaceAndCreateIfNeeded(region, project, user);
-        return kubClient.resourceQuotas().inNamespace(namespace).withName("onyxia-quota").get();
+        return kubClient.resourceQuotas().inNamespace(namespace).withName(ONYXIA_QUOTA).get();
     }
 
     private String getSubjectKind(Owner owner) {

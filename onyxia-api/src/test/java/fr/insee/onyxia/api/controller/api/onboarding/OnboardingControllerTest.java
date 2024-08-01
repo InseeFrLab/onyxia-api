@@ -92,7 +92,7 @@ class OnboardingControllerTest extends BaseTest {
         region.setServices(servicesConfiguration);
         when(regionsConfiguration.getDefaultRegion()).thenReturn(region);
         when(userProvider.getUser(any())).thenReturn(User.newInstance().setIdep("default").build());
-        when(kubernetesService.createDefaultNamespace(any(), any()))
+        when(kubernetesService.createOrUpdateNamespace(any(), any(), any()))
                 .thenThrow(new NamespaceAlreadyExistException());
 
         mockMvc.perform(post("/onboarding").content("{}").contentType(APPLICATION_JSON))
