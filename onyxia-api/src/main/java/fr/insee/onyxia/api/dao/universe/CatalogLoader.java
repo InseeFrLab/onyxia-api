@@ -1,7 +1,5 @@
 package fr.insee.onyxia.api.dao.universe;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -14,16 +12,6 @@ import fr.insee.onyxia.api.services.JsonSchemaResolutionService;
 import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.helm.Chart;
 import fr.insee.onyxia.model.helm.Repository;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
@@ -38,6 +26,11 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
+import java.io.*;
+import java.util.*;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Service
 public class CatalogLoader {
@@ -186,40 +179,31 @@ public class CatalogLoader {
     }
 
     public void extractDataFromTgz(InputStream in, Chart chart) throws IOException {
-        GzipCompressorInputStream gzipIn = new GzipCompressorInputStream(in);
-        // HelmConfig config = null;
-        try (TarArchiveInputStream tarIn = new TarArchiveInputStream(gzipIn)) {
+        String chartName = chart.getName();
+
+        try (GzipCompressorInputStream gzipIn = new GzipCompressorInputStream(in);
+                TarArchiveInputStream tarIn = new TarArchiveInputStream(gzipIn)) {
+
             TarArchiveEntry entry;
 
             while ((entry = tarIn.getNextEntry()) != null) {
-                if (entry.getName().endsWith(chart.getName() + "/values.schema.json")
-                        && !entry.getName()
-                                .endsWith("charts/" + chart.getName() + "/values.schema.json")) {
+                String entryName = entry.getName();
+                if (entryName.endsWith(chartName + "/values.schema.json")
+                        && !entryName.endsWith("charts/" + chartName + "/values.schema.json")) {
                     // TODO : mutualize objectmapper
                     ObjectMapper mapper = new ObjectMapper();
                     mapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, false);
                     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    byte[] buffer = new byte[1024];
-                    int len;
-                    while ((len = tarIn.read(buffer)) != -1) {
-                        baos.write(buffer, 0, len);
+                    try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                        tarIn.transferTo(baos);
+                        chart.setConfig(jsonSchemaResolutionService.resolveReferences(mapper.readTree(baos.toString(UTF_8))));
                     }
-                    chart.setConfig(
-                            jsonSchemaResolutionService.resolveReferences(
-                                    mapper.readTree(baos.toString("UTF-8"))));
-                }
-                if (entry.getName().endsWith(chart.getName() + "/values.yaml")
-                        && !entry.getName()
-                                .endsWith("charts/" + chart.getName() + "/values.yaml")) {
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    byte[] buffer = new byte[1024];
-                    int len;
-                    while ((len = tarIn.read(buffer)) != -1) {
-                        baos.write(buffer, 0, len);
+                 } else if (entryName.endsWith(chartName + "/values.yaml")
+                        && !entryName.endsWith("charts/" + chartName + "/values.yaml")) {
+                    try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                        tarIn.transferTo(baos);
+                        chart.setDefaultValues(baos.toString());
                     }
-                    byte[] fileContent = baos.toByteArray();
-                    chart.setDefaultValues(new String(fileContent));
                 }
             }
         }
