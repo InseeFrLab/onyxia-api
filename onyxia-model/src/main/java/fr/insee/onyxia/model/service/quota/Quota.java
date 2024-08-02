@@ -10,7 +10,18 @@ import java.util.Map;
                 "Resource quotas are a tool for administrators to address the fair sharing of cluster resources between namespaces https://kubernetes.io/docs/concepts/policy/resource-quotas/")
 public class Quota {
 
-    @JsonProperty("requests.memory")
+    private static final String REQUESTS_MEMORY = "requests.memory";
+    private static final String REQUESTS_CPU = "requests.cpu";
+    private static final String LIMITS_MEMORY = "limits.memory";
+    private static final String LIMITS_CPU = "limits.cpu";
+    private static final String REQUESTS_STORAGE = "requests.storage";
+    private static final String COUNT_PODS = "count/pods";
+    private static final String REQUESTS_EPHEMERAL_STORAGE = "requests.ephemeral-storage";
+    private static final String LIMITS_EPHEMERAL_STORAGE = "limits.ephemeral-storage";
+    private static final String REQUESTS_NVIDIA_COM_GPU = "requests.nvidia.com/gpu";
+    private static final String LIMITS_NVIDIA_COM_GPU = "limits.nvidia.com/gpu";
+
+    @JsonProperty(REQUESTS_MEMORY)
     @Schema(
             description =
                     "Across all pods in a non-terminal state, the sum of memory requests cannot exceed this value.")
@@ -19,82 +30,84 @@ public class Quota {
     @Schema(
             description =
                     "Across all pods in a non-terminal state, the sum of CPU requests cannot exceed this value.")
-    @JsonProperty("requests.cpu")
+    @JsonProperty(REQUESTS_CPU)
     private String cpuRequests;
 
     @Schema(
             description =
                     "Across all pods in a non-terminal state, the sum of memory limits cannot exceed this value.")
-    @JsonProperty("limits.memory")
+    @JsonProperty(LIMITS_MEMORY)
     private String memoryLimits;
 
     @Schema(
             description =
                     "Across all pods in a non-terminal state, the sum of CPU limits cannot exceed this value.")
-    @JsonProperty("limits.cpu")
+    @JsonProperty(LIMITS_CPU)
     private String cpuLimits;
 
     @Schema(
             description =
                     "Across all persistent volume claims, the sum of storage requests cannot exceed this value.")
-    @JsonProperty("requests.storage")
+    @JsonProperty(REQUESTS_STORAGE)
     private String storageRequests;
 
     @Schema(description = "The number of pod in the namespace cannot exceed this value.")
-    @JsonProperty("count/pods")
+    @JsonProperty(COUNT_PODS)
     private Integer podsCount;
 
     @Schema(description = "The request ephemeralStorage allowed")
-    @JsonProperty("requests.ephemeral-storage")
+    @JsonProperty(REQUESTS_EPHEMERAL_STORAGE)
     private String ephemeralStorageRequests;
 
     @Schema(description = "The limit ephemeralStorage allowed")
-    @JsonProperty("limits.ephemeral-storage")
+    @JsonProperty(LIMITS_EPHEMERAL_STORAGE)
     private String ephemeralStorageLimits;
 
     @Schema(description = "The request nvidia gpu")
-    @JsonProperty("requests.nvidia.com/gpu")
+    @JsonProperty(REQUESTS_NVIDIA_COM_GPU)
     private Integer nvidiaGpuRequests;
 
     @Schema(description = "The limit nvidia gpu")
-    @JsonProperty("limits.nvidia.com/gpu")
+    @JsonProperty(LIMITS_NVIDIA_COM_GPU)
     private Integer nvidiaGpuLimits;
 
     public Map<String, String> asMap() {
         final Map<String, String> quotas = new HashMap<>();
-        quotas.put("requests.memory", getMemoryRequests());
-        quotas.put("requests.cpu", getCpuRequests());
-        quotas.put("limits.memory", getMemoryLimits());
-        quotas.put("limits.cpu", getCpuLimits());
-        quotas.put("requests.storage", getStorageRequests());
-        quotas.put("count/pods", getPodsCount() == null ? null : String.valueOf(getPodsCount()));
-        quotas.put("requests.ephemeral-storage", getEphemeralStorageRequests());
-        quotas.put("limits.ephemeral-storage", getEphemeralStorageLimits());
+        quotas.put(REQUESTS_MEMORY, getMemoryRequests());
+        quotas.put(REQUESTS_CPU, getCpuRequests());
+        quotas.put(LIMITS_MEMORY, getMemoryLimits());
+        quotas.put(LIMITS_CPU, getCpuLimits());
+        quotas.put(REQUESTS_STORAGE, getStorageRequests());
+        quotas.put(COUNT_PODS, getPodsCount() == null ? null : String.valueOf(getPodsCount()));
+        quotas.put(REQUESTS_EPHEMERAL_STORAGE, getEphemeralStorageRequests());
+        quotas.put(LIMITS_EPHEMERAL_STORAGE, getEphemeralStorageLimits());
         quotas.put(
-                "requests.nvidia.com/gpu",
+                REQUESTS_NVIDIA_COM_GPU,
                 getNvidiaGpuRequests() == null ? null : String.valueOf(getNvidiaGpuRequests()));
         quotas.put(
-                "limits.nvidia.com/gpu",
+                LIMITS_NVIDIA_COM_GPU,
                 getNvidiaGpuLimits() == null ? null : String.valueOf(getNvidiaGpuLimits()));
         return quotas;
     }
 
-    public void loadFromMap(Map<String, String> data) {
-        setMemoryRequests(data.get("requests.memory"));
-        setCpuRequests(data.get("requests.cpu"));
-        setMemoryLimits(data.get("limits.memory"));
-        setCpuLimits(data.get("limits.cpu"));
-        setEphemeralStorageRequests(data.get("requests.ephemeral-storage"));
-        setEphemeralStorageLimits(data.get("limits.ephemeral-storage"));
-        setStorageRequests(data.get("requests.storage"));
-        if (data.containsKey("requests.nvidia.com/gpu")) {
-            setNvidiaGpuRequests(Integer.parseInt(data.get("requests.nvidia.com/gpu")));
+    public static Quota from(Map<String, String> data) {
+        Quota quota = new Quota();
+        quota.setMemoryRequests(data.get(REQUESTS_MEMORY));
+        quota.setCpuRequests(data.get(REQUESTS_CPU));
+        quota.setMemoryLimits(data.get(LIMITS_MEMORY));
+        quota.setCpuLimits(data.get(LIMITS_CPU));
+        quota.setEphemeralStorageRequests(data.get(REQUESTS_EPHEMERAL_STORAGE));
+        quota.setEphemeralStorageLimits(data.get(LIMITS_EPHEMERAL_STORAGE));
+        quota.setStorageRequests(data.get(REQUESTS_STORAGE));
+        if (data.containsKey(REQUESTS_NVIDIA_COM_GPU)) {
+            quota.setNvidiaGpuRequests(Integer.parseInt(data.get(REQUESTS_NVIDIA_COM_GPU)));
         }
-        if (data.containsKey("limits.nvidia.com/gpu")) {
-            setNvidiaGpuLimits(Integer.parseInt(data.get("limits.nvidia.com/gpu")));
+        if (data.containsKey(LIMITS_NVIDIA_COM_GPU)) {
+            quota.setNvidiaGpuLimits(Integer.parseInt(data.get(LIMITS_NVIDIA_COM_GPU)));
         }
-        setPodsCount(
-                data.get("count/pods") == null ? null : Integer.valueOf(data.get("count/pods")));
+        quota.setPodsCount(
+                data.get(COUNT_PODS) == null ? null : Integer.valueOf(data.get(COUNT_PODS)));
+        return quota;
     }
 
     public String getMemoryRequests() {

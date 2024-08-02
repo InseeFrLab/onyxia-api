@@ -76,10 +76,8 @@ public class QuotaController {
         }
 
         final QuotaUsage quotaUsage = new QuotaUsage();
-        final Quota spec = new Quota();
-        final Quota usage = new Quota();
-        mapKubQuotaToQuota(resourceQuota.getStatus().getHard(), spec);
-        mapKubQuotaToQuota(resourceQuota.getStatus().getUsed(), usage);
+        final Quota spec = kubQuotaToQuota(resourceQuota.getStatus().getHard());
+        final Quota usage = kubQuotaToQuota(resourceQuota.getStatus().getUsed());
         quotaUsage.setSpec(spec);
         quotaUsage.setUsage(usage);
 
@@ -199,10 +197,10 @@ public class QuotaController {
         return owner;
     }
 
-    private void mapKubQuotaToQuota(Map<String, Quantity> resourceQuota, Quota quota) {
+    private Quota kubQuotaToQuota(Map<String, Quantity> resourceQuota) {
         final Map<String, String> rawData = new HashMap<>();
-        resourceQuota.entrySet().forEach(e -> rawData.put(e.getKey(), e.getValue().toString()));
-        quota.loadFromMap(rawData);
+        resourceQuota.forEach((key, value) -> rawData.put(key, value.toString()));
+        return Quota.from(rawData);
     }
 
     public KubernetesService getKubernetesService() {
