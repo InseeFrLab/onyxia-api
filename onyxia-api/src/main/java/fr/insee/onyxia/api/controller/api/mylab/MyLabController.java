@@ -232,7 +232,7 @@ public class MyLabController {
                 CatalogWrapper catalog = elligibleCatalogs.getFirst();
                 catalogId = catalog.getId();
             }
-            Optional<CatalogWrapper> catalog = catalogService.getCatalogById(catalogId);
+            Optional<CatalogWrapper> catalog = catalogService.getCatalogById(catalogId,user);
             if (catalog.isEmpty()) {
                 throw new IllegalStateException(
                         "Catalog " + catalogId + " is not available anymore");
