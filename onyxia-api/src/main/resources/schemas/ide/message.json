@@ -1,0 +1,7 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "message",
+    "type": "string",
+    "description": "add a message in the notes",
+    "default": ""
+}

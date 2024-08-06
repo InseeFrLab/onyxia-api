@@ -1,0 +1,14 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Node Selector",
+    "type": "object",
+    "description": "Node selector constraints for the pod",
+    "additionalProperties": {
+      "type": "string",
+      "description": "Key-value pairs to select nodes"
+    },
+    "x-onyxia": {
+        "hidden": false,
+        "overwriteDefaultWith": "region.nodeSelector"
+    }
+}

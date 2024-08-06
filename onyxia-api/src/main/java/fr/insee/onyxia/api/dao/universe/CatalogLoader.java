@@ -4,19 +4,25 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.zafarkhaja.semver.Version;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
+import fr.insee.onyxia.api.services.JsonSchemaResolutionService;
 import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.helm.Chart;
 import fr.insee.onyxia.model.helm.Repository;
 import java.io.*;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.everit.json.schema.Schema;
+import org.everit.json.schema.loader.SchemaLoader;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -31,13 +37,16 @@ public class CatalogLoader {
     private static final Logger LOGGER = LoggerFactory.getLogger(CatalogLoader.class);
 
     private final ResourceLoader resourceLoader;
-
+    private final JsonSchemaResolutionService jsonSchemaResolutionService;
     private final ObjectMapper mapperHelm;
 
     public CatalogLoader(
-            ResourceLoader resourceLoader, @Qualifier("helm") ObjectMapper mapperHelm) {
+            ResourceLoader resourceLoader,
+            @Qualifier("helm") ObjectMapper mapperHelm,
+            JsonSchemaResolutionService jsonSchemaResolutionService) {
         this.resourceLoader = resourceLoader;
         this.mapperHelm = mapperHelm;
+        this.jsonSchemaResolutionService = jsonSchemaResolutionService;
     }
 
     public void updateCatalog(CatalogWrapper cw) {
@@ -184,10 +193,11 @@ public class CatalogLoader {
                     ObjectMapper mapper = new ObjectMapper();
                     mapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, false);
                     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
                     try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
                         tarIn.transferTo(baos);
-                        chart.setConfig(mapper.readTree(baos.toString(UTF_8)));
+                        chart.setConfig(
+                                jsonSchemaResolutionService.resolveReferences(
+                                        mapper.readTree(baos.toString(UTF_8))));
                     }
                 } else if (entryName.endsWith(chartName + "/values.yaml")
                         && !entryName.endsWith("charts/" + chartName + "/values.yaml")) {
@@ -198,5 +208,81 @@ public class CatalogLoader {
                 }
             }
         }
+    }
+
+    public JsonNode resolveInternalReferences(JsonNode schemaNode, ObjectMapper objectMapper)
+            throws IOException {
+        // Convert the main schema JSON node to JSONObject
+        JSONObject schemaJson = new JSONObject(new JSONTokener(schemaNode.toString()));
+
+        // Create a SchemaLoader
+        SchemaLoader loader =
+                SchemaLoader.builder()
+                        .schemaJson(schemaJson)
+                        .resolutionScope("file:///") // Setting a base URI for relative references
+                        .build();
+
+        // Load and expand the schema
+        Schema schema = loader.load().build();
+
+        // Convert the resolved schema back to JsonNode
+        JSONObject resolvedSchemaJson = new JSONObject(schema.toString());
+        return objectMapper.readTree(resolvedSchemaJson.toString());
+    }
+
+    public JsonNode resolveInternalReferences(JsonNode schemaNode) {
+        return resolveInternalReferences(schemaNode, schemaNode);
+    }
+
+    private JsonNode resolveInternalReferences(JsonNode schemaNode, JsonNode rootNode) {
+        if (schemaNode.isObject()) {
+            ObjectNode objectNode = (ObjectNode) schemaNode;
+            Map<String, JsonNode> updates = new HashMap<>();
+
+            Iterator<Map.Entry<String, JsonNode>> fields = objectNode.fields();
+            while (fields.hasNext()) {
+                Map.Entry<String, JsonNode> field = fields.next();
+                if (field.getKey().equals("$ref") && field.getValue().isTextual()) {
+                    String ref = field.getValue().asText();
+                    if (ref.startsWith("#/definitions/")) {
+                        String refName = ref.substring("#/definitions/".length());
+                        JsonNode refNode = rootNode.at("/definitions/" + refName);
+                        if (!refNode.isMissingNode()) {
+                            JsonNode resolvedNode =
+                                    resolveInternalReferences(refNode.deepCopy(), rootNode);
+                            updates.putAll(convertToMap((ObjectNode) resolvedNode));
+                            updates.put("$ref", null);
+                        }
+                    }
+                } else {
+                    updates.put(
+                            field.getKey(), resolveInternalReferences(field.getValue(), rootNode));
+                }
+            }
+
+            for (Map.Entry<String, JsonNode> update : updates.entrySet()) {
+                if (update.getValue() == null) {
+                    objectNode.remove(update.getKey());
+                } else {
+                    objectNode.set(update.getKey(), update.getValue());
+                }
+            }
+        } else if (schemaNode.isArray()) {
+            ArrayNode arrayNode = (ArrayNode) schemaNode;
+            for (int i = 0; i < arrayNode.size(); i++) {
+                arrayNode.set(i, resolveInternalReferences(arrayNode.get(i), rootNode));
+            }
+        }
+        return schemaNode;
+    }
+
+    private Map<String, JsonNode> convertToMap(ObjectNode objectNode) {
+        Map<String, JsonNode> map = new HashMap<>();
+        Iterator<Map.Entry<String, JsonNode>> fields = objectNode.fields();
+        while (fields.hasNext()) {
+            Map.Entry<String, JsonNode> field = fields.next();
+            map.put(field.getKey(), field.getValue());
+        }
+        return map;
     }
 }
