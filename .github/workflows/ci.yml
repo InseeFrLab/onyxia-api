@@ -15,7 +15,7 @@ on:
       - 'docs/**'
 
 env:
-  REGISTRY: europe-north1-docker.pkg.dev/${{ secrets.GAR_PROJECT_ID }}/dapla-lab-docker/onyxia
+  REGISTRY: europe-west4-docker.pkg.dev/${{ secrets.GAR_PROJECT_ID }}/dapla-lab-docker/onyxia
   IMAGE: onyxia-api
   TAG: ${{ github.ref_name }}-${{ github.sha }}
 
