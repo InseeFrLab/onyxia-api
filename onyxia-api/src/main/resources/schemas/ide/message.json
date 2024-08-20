@@ -15,7 +15,7 @@
         "en":{
             "type": "string",
             "description": "message to add in notes",
-            "default": "",
+            "default": ""
             }
         }
 }
