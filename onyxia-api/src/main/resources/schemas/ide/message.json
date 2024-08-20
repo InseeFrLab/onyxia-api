@@ -9,12 +9,12 @@
     "properties": {
         "fr":{
             "type": string,
-            "description":"message à ajouter dans les notes,
+            "description":"message à ajouter dans les notes",
             "default": "NB: ce service pourrait être supprimé après 7 jours d'utilisation en raison de nos règles de gestion"
          },
         "en":{
             "type": string,
-            "description: "message to add in notes",
+            "description": "message to add in notes",
             "default": "Warning: this service may be deleted after 7 days due to our management policies",
             }
         }
