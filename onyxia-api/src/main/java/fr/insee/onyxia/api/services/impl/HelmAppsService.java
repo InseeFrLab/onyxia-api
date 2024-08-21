@@ -198,13 +198,19 @@ public class HelmAppsService implements AppsService {
 
     @Override
     public String getLogs(
-            Region region, Project project, User user, String serviceId, String taskId) {
+            Region region,
+            Project project,
+            User user,
+            String serviceId,
+            String taskId,
+            String containerId) {
         KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
         return client.pods()
                 .inNamespace(
                         kubernetesService.determineNamespaceAndCreateIfNeeded(
                                 region, project, user))
                 .withName(taskId)
+                .inContainer(containerId)
                 .getLog();
     }
 

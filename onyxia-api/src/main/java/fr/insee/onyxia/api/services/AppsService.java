@@ -49,7 +49,13 @@ public interface AppsService {
     UninstallService destroyService(
             Region region, Project project, User user, String path, boolean bulk) throws Exception;
 
-    String getLogs(Region region, Project project, User user, String serviceId, String taskId);
+    String getLogs(
+            Region region,
+            Project project,
+            User user,
+            String serviceId,
+            String taskId,
+            String containerId);
 
     Watch getEvents(Region region, Project project, User user, Watcher<Event> watcher)
             throws HelmInstallService.MultipleServiceFound, ParseException;

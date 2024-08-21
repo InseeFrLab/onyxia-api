@@ -298,10 +298,16 @@ public class MyLabController {
             @Parameter(hidden = true) Region region,
             @Parameter(hidden = true) Project project,
             @RequestParam("serviceId") String serviceId,
-            @RequestParam("taskId") String taskId) {
+            @RequestParam("taskId") String taskId,
+            @RequestParam("containerId") Optional<String> containerId) {
         if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
             return helmAppsService.getLogs(
-                    region, project, userProvider.getUser(region), serviceId, taskId);
+                    region,
+                    project,
+                    userProvider.getUser(region),
+                    serviceId,
+                    taskId,
+                    containerId.orElse(null));
         }
         return null;
     }
