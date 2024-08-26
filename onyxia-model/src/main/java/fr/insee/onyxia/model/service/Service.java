@@ -29,9 +29,6 @@ public class Service {
                     "State of the release (can be: unknown, deployed, uninstalled, superseded, failed, uninstalling, pending-install, pending-upgrade or pending-rollback)")
     private String status;
 
-    @Schema(description = "Fixed to kubernetes. This should be removed in v1.0")
-    private ServiceType type;
-
     @Schema(description = "Urls are coming from ingress object")
     private List<String> urls;
 
@@ -157,14 +154,6 @@ public class Service {
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public ServiceType getType() {
-        return type;
-    }
-
-    public void setType(ServiceType type) {
-        this.type = type;
     }
 
     public List<String> getUrls() {
@@ -324,11 +313,6 @@ public class Service {
         DEPLOYING,
         RUNNING,
         STOPPED;
-    }
-
-    @Schema(description = "")
-    public static enum ServiceType {
-        KUBERNETES
     }
 
     @Schema(description = "")

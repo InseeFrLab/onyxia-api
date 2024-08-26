@@ -324,7 +324,6 @@ public class HelmAppsService implements AppsService {
         service.setId(release.getName());
         service.setName(release.getName());
         service.setSubtitle(release.getChart());
-        service.setType(Service.ServiceType.KUBERNETES);
         service.setName(release.getName());
         service.setNamespace(release.getNamespace());
         service.setRevision(release.getRevision());

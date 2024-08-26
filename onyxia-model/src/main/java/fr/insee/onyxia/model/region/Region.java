@@ -3,7 +3,6 @@ package fr.insee.onyxia.model.region;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import fr.insee.onyxia.model.service.Service;
 import fr.insee.onyxia.model.service.quota.Quota;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
@@ -185,7 +184,6 @@ public class Region {
             allowSetters = true)
     public static class Services {
 
-        private Service.ServiceType type;
         private boolean singleNamespace = true;
         private boolean allowNamespaceCreation = true;
         private Map<String, String> namespaceLabels = new HashMap<>();
@@ -290,14 +288,6 @@ public class Region {
 
         public void setUserNamespace(boolean userNamespace) {
             this.userNamespace = userNamespace;
-        }
-
-        public Service.ServiceType getType() {
-            return type;
-        }
-
-        public void setType(Service.ServiceType type) {
-            this.type = type;
         }
 
         public String getNamespacePrefix() {
