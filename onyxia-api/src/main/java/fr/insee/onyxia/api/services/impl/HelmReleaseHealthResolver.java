@@ -85,7 +85,8 @@ public final class HelmReleaseHealthResolver {
                 LOGGER.warn(
                         "Could not retrieve health status from resource kind {} name {} ",
                         resource.getKind(),
-                        resource.getMetadata().getName());
+                        resource.getMetadata().getName(),
+                        e);
             }
             result.setDetails(details);
             result.setHealthy(details.getReady() >= details.getDesired());
