@@ -1,6 +1,5 @@
-// This file is a json5-file, which onyxia-api should be able to parse
-{
-  "catalogs": [
+// This file is a json5-file, which onyxia-api should be able to parse to a CatalogWrapper list
+[
     {
       "id": "ide",
       "name": "IDE",
@@ -32,5 +31,4 @@
         }
       ]
     },
-  ],
-}
+]
