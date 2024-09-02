@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.insee.onyxia.model.service.quota.Quota;
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -207,6 +206,7 @@ public class Region {
          * @See V3Checks
          */
         private Object defaultConfiguration = null;
+
         private K8sPublicEndpoint k8sPublicEndpoint = new K8sPublicEndpoint();
 
         private NamespaceAnnotationsDynamic namespaceAnnotationsDynamic =

@@ -19,22 +19,25 @@ public class V3Checks {
 
     @Autowired
     public V3Checks(RegionsConfiguration regionsConfiguration) {
-        this(regionsConfiguration,  () -> System.exit(0));
+        this(regionsConfiguration, () -> System.exit(0));
     }
 
-    public V3Checks(
-            RegionsConfiguration regionsConfiguration, Runnable exitHandler) {
+    public V3Checks(RegionsConfiguration regionsConfiguration, Runnable exitHandler) {
         this.regionsConfiguration = regionsConfiguration;
         this.exitHandler = exitHandler;
     }
 
     @EventListener(ContextRefreshedEvent.class)
     public void checkDefaultConfigurationIsNoLongerSupported() {
-        regionsConfiguration.getResolvedRegions().forEach(region -> {
-           if (region.getServices().getDefaultConfiguration() != null) {
-               LOGGER.error("FATAL : Setting defaultConfiguration in region is no longer supported and has been replaced by JSONSchema support. See migration guide at https://docs.onyxia.sh/admin-doc/migration-guides/v8-greater-than-v9");
-               exitHandler.run();
-           }
-        });
+        regionsConfiguration
+                .getResolvedRegions()
+                .forEach(
+                        region -> {
+                            if (region.getServices().getDefaultConfiguration() != null) {
+                                LOGGER.error(
+                                        "FATAL : Setting defaultConfiguration in region is no longer supported and has been replaced by JSONSchema support. See migration guide at https://docs.onyxia.sh/admin-doc/migration-guides/v8-greater-than-v9");
+                                exitHandler.run();
+                            }
+                        });
     }
 }
