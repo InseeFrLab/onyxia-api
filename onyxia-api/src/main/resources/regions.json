@@ -49,10 +49,6 @@
             "count/pods": "52"
           }
         },
-        "defaultConfiguration": {
-          "IPProtection": false,
-          "networkPolicy": false
-        },
         "expose": {
           "domain": "fakedomain.kub.example.com",
           "ingress": true,
