@@ -1,0 +1,72 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Vault",
+    "description": "Configuration of vault client",
+    "type": "object",
+    "properties": {
+        "enabled": {
+            "type": "boolean",
+            "description": "Add vault temporary identity inside your environment",
+            "default": true
+        },
+        "token": {
+            "description": "token vault",
+            "type": "string",
+            "render": "password",
+            "x-onyxia": {
+                "overwriteDefaultWith": "{{vault.VAULT_TOKEN}}"
+            },
+            "hidden": {
+              "value": false,
+              "path": "enabled",
+              "isPathRelative": true
+            }
+        },
+        "url": {
+            "description": "url of vault server",
+            "type": "string",
+            "x-onyxia": {
+                "overwriteDefaultWith": "{{vault.VAULT_ADDR}}"
+            },
+            "hidden": {
+              "value": false,
+              "path": "enabled",
+              "isPathRelative": true
+            }
+        },
+        "mount": {
+            "description": "mount of the v2 secret engine",
+            "type": "string",
+            "x-onyxia": {
+                "overwriteDefaultWith": "{{vault.VAULT_MOUNT}}"
+            },
+            "hidden": {
+              "value": false,
+              "path": "enabled",
+              "isPathRelative": true
+            }
+        },
+        "directory": {
+            "description": "top level directory",
+            "type": "string",
+            "x-onyxia": {
+                "overwriteDefaultWith": "{{vault.VAULT_TOP_DIR}}"
+            },
+            "hidden": {
+              "value": false,
+              "path": "enabled",
+              "isPathRelative": true
+            }
+        },
+        "secret": {
+            "description": "the path of the secret to convert into a list of environment variables",
+            "type": "string",
+            "default": "",
+            "hidden": {
+              "value": false,
+              "path": "enabled",
+              "isPathRelative": true
+            }
+        }
+    }
+}
