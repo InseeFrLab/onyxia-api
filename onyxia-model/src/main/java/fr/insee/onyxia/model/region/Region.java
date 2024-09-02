@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.insee.onyxia.model.service.quota.Quota;
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -199,6 +200,13 @@ public class Region {
         private Monitoring monitoring;
         private String allowedURIPattern = "^https://";
         private Quotas quotas = new Quotas();
+
+        /***
+         * @Deprecated since v3
+         * Should no longer be used. If used, a check will fail at startup and crash the app.
+         * @See V3Checks
+         */
+        private Object defaultConfiguration = null;
         private K8sPublicEndpoint k8sPublicEndpoint = new K8sPublicEndpoint();
 
         private NamespaceAnnotationsDynamic namespaceAnnotationsDynamic =
@@ -210,6 +218,14 @@ public class Region {
 
         public void setSingleNamespace(boolean singleNamespace) {
             this.singleNamespace = singleNamespace;
+        }
+
+        public void setDefaultConfiguration(Object defaultConfiguration) {
+            this.defaultConfiguration = defaultConfiguration;
+        }
+
+        public Object getDefaultConfiguration() {
+            return defaultConfiguration;
         }
 
         public boolean isAllowNamespaceCreation() {
