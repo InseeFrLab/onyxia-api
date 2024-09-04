@@ -3,7 +3,6 @@ package fr.insee.onyxia.model.region;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import fr.insee.onyxia.model.service.Service;
 import fr.insee.onyxia.model.service.quota.Quota;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
@@ -185,7 +184,6 @@ public class Region {
             allowSetters = true)
     public static class Services {
 
-        private Service.ServiceType type;
         private boolean singleNamespace = true;
         private boolean allowNamespaceCreation = true;
         private Map<String, String> namespaceLabels = new HashMap<>();
@@ -199,49 +197,20 @@ public class Region {
         private Expose expose;
         private Server server;
         private Monitoring monitoring;
-        private String initScript;
         private String allowedURIPattern = "^https://";
         private Quotas quotas = new Quotas();
-        private DefaultConfiguration defaultConfiguration = new DefaultConfiguration();
+
+        /***
+         * @Deprecated since v3
+         * Should no longer be used. If used, a check will fail at startup and crash the app.
+         * @See V3Checks
+         */
+        private Object defaultConfiguration = null;
+
         private K8sPublicEndpoint k8sPublicEndpoint = new K8sPublicEndpoint();
-        private CustomInitScript customInitScript = new CustomInitScript();
-        private OpenshiftSCC openshiftSCC = new OpenshiftSCC();
-        private Map<String, Object> customValues = new HashMap<>();
 
         private NamespaceAnnotationsDynamic namespaceAnnotationsDynamic =
                 new NamespaceAnnotationsDynamic();
-
-        public DefaultConfiguration getDefaultConfiguration() {
-            return defaultConfiguration;
-        }
-
-        public void setDefaultConfiguration(DefaultConfiguration defaultConfiguration) {
-            this.defaultConfiguration = defaultConfiguration;
-        }
-
-        public Map<String, Object> getCustomValues() {
-            return customValues;
-        }
-
-        public void setCustomValues(Map<String, Object> customValues) {
-            this.customValues = customValues;
-        }
-
-        public CustomInitScript getCustomInitScript() {
-            return customInitScript;
-        }
-
-        public void setCustomInitScript(CustomInitScript customInitScript) {
-            this.customInitScript = customInitScript;
-        }
-
-        public OpenshiftSCC getOpenshiftSCC() {
-            return openshiftSCC;
-        }
-
-        public void setOpenshiftSCC(OpenshiftSCC openshiftSCC) {
-            this.openshiftSCC = openshiftSCC;
-        }
 
         public boolean isSingleNamespace() {
             return singleNamespace;
@@ -249,6 +218,14 @@ public class Region {
 
         public void setSingleNamespace(boolean singleNamespace) {
             this.singleNamespace = singleNamespace;
+        }
+
+        public void setDefaultConfiguration(Object defaultConfiguration) {
+            this.defaultConfiguration = defaultConfiguration;
+        }
+
+        public Object getDefaultConfiguration() {
+            return defaultConfiguration;
         }
 
         public boolean isAllowNamespaceCreation() {
@@ -292,14 +269,6 @@ public class Region {
             this.userNamespace = userNamespace;
         }
 
-        public Service.ServiceType getType() {
-            return type;
-        }
-
-        public void setType(Service.ServiceType type) {
-            this.type = type;
-        }
-
         public String getNamespacePrefix() {
             return namespacePrefix;
         }
@@ -338,14 +307,6 @@ public class Region {
 
         public void setMonitoring(Monitoring monitoring) {
             this.monitoring = monitoring;
-        }
-
-        public String getInitScript() {
-            return initScript;
-        }
-
-        public void setInitScript(String initScript) {
-            this.initScript = initScript;
         }
 
         public String getAllowedURIPattern() {
@@ -426,250 +387,6 @@ public class Region {
 
             public void setUserAttributes(List<String> userAttributes) {
                 this.userAttributes = userAttributes;
-            }
-        }
-
-        public static class DefaultConfiguration {
-            private boolean IPProtection = false;
-            private boolean networkPolicy = false;
-            private List<Object> from = new ArrayList<>();
-            private List<Object> tolerations = new ArrayList<>();
-            private Object nodeSelector;
-            private Object startupProbe;
-            private Kafka kafka = new Kafka();
-            private Sliders sliders = new Sliders();
-            private Resources resources = new Resources();
-
-            public boolean isIPProtection() {
-                return IPProtection;
-            }
-
-            public void setIPProtection(boolean IPProtection) {
-                this.IPProtection = IPProtection;
-            }
-
-            public boolean isNetworkPolicy() {
-                return networkPolicy;
-            }
-
-            public void setNetworkPolicy(boolean networkPolicy) {
-                this.networkPolicy = networkPolicy;
-            }
-
-            public List<Object> getFrom() {
-                return from;
-            }
-
-            public void setFrom(List<Object> from) {
-                this.from = from;
-            }
-
-            public List<Object> getTolerations() {
-                return tolerations;
-            }
-
-            public void setTolerations(List<Object> tolerations) {
-                this.tolerations = tolerations;
-            }
-
-            public Object getNodeSelector() {
-                return nodeSelector;
-            }
-
-            public void setNodeSelector(Object nodeSelector) {
-                this.nodeSelector = nodeSelector;
-            }
-
-            public Object getStartupProbe() {
-                return startupProbe;
-            }
-
-            public void setStartupProbe(Object startupProbe) {
-                this.startupProbe = startupProbe;
-            }
-
-            public Kafka getKafka() {
-                return kafka;
-            }
-
-            public void setKafka(Kafka kafka) {
-                this.kafka = kafka;
-            }
-
-            public Sliders getSliders() {
-                return sliders;
-            }
-
-            public void setSliders(Sliders sliders) {
-                this.sliders = sliders;
-            }
-
-            public Resources getResources() {
-                return resources;
-            }
-
-            public void setResources(Resources resources) {
-                this.resources = resources;
-            }
-
-            public static class Kafka {
-                @JsonProperty("URL")
-                private String url;
-
-                private String topicName;
-
-                public String getUrl() {
-                    return url;
-                }
-
-                public void setUrl(String url) {
-                    this.url = url;
-                }
-
-                public String getTopicName() {
-                    return topicName;
-                }
-
-                public void setTopicName(String topicName) {
-                    this.topicName = topicName;
-                }
-            }
-
-            public static class Sliders {
-
-                Slider cpu;
-                Slider memory;
-                Slider gpu;
-                Slider disk;
-
-                public Slider getCpu() {
-                    return cpu;
-                }
-
-                public void setCpu(Slider cpu) {
-                    this.cpu = cpu;
-                }
-
-                public Slider getMemory() {
-                    return memory;
-                }
-
-                public void setMemory(Slider memory) {
-                    this.memory = memory;
-                }
-
-                public Slider getGpu() {
-                    return gpu;
-                }
-
-                public void setGpu(Slider gpu) {
-                    this.gpu = gpu;
-                }
-
-                public Slider getDisk() {
-                    return disk;
-                }
-
-                public void setDisk(Slider disk) {
-                    this.disk = disk;
-                }
-
-                public static class Slider {
-
-                    Integer sliderMin;
-                    Integer sliderMax;
-                    Integer sliderStep;
-                    String sliderUnit;
-
-                    public Integer getSliderMin() {
-                        return sliderMin;
-                    }
-
-                    public void setSliderMin(Integer sliderMin) {
-                        this.sliderMin = sliderMin;
-                    }
-
-                    public Integer getSliderMax() {
-                        return sliderMax;
-                    }
-
-                    public void setSliderMax(Integer sliderMax) {
-                        this.sliderMax = sliderMax;
-                    }
-
-                    public Integer getSliderStep() {
-                        return sliderStep;
-                    }
-
-                    public void setSliderStep(Integer sliderStep) {
-                        this.sliderStep = sliderStep;
-                    }
-
-                    public String getSliderUnit() {
-                        return sliderUnit;
-                    }
-
-                    public void setSliderUnit(String sliderUnit) {
-                        this.sliderUnit = sliderUnit;
-                    }
-                }
-            }
-
-            public static class Resources {
-                private String cpuRequest;
-                private String cpuLimit;
-                private String memoryRequest;
-                private String memoryLimit;
-                private String disk;
-                private String gpu;
-
-                public String getCpuRequest() {
-                    return cpuRequest;
-                }
-
-                public void setCpuRequest(String cpuRequest) {
-                    this.cpuRequest = cpuRequest;
-                }
-
-                public String getCpuLimit() {
-                    return cpuLimit;
-                }
-
-                public void setCpuLimit(String cpuLimit) {
-                    this.cpuLimit = cpuLimit;
-                }
-
-                public String getMemoryRequest() {
-                    return memoryRequest;
-                }
-
-                public void setMemoryRequest(String memoryRequest) {
-                    this.memoryRequest = memoryRequest;
-                }
-
-                public String getMemoryLimit() {
-                    return memoryLimit;
-                }
-
-                public void setMemoryLimit(String memoryLimit) {
-                    this.memoryLimit = memoryLimit;
-                }
-
-                public String getDisk() {
-                    return disk;
-                }
-
-                public void setDisk(String disk) {
-                    this.disk = disk;
-                }
-
-                public String getGpu() {
-                    return gpu;
-                }
-
-                public void setGpu(String gpu) {
-                    this.gpu = gpu;
-                }
             }
         }
 
@@ -764,18 +481,8 @@ public class Region {
     @Schema(description = "")
     public static class Data {
 
-        private Atlas atlas;
-
         @JsonProperty("S3")
         private S3 s3;
-
-        public Atlas getAtlas() {
-            return atlas;
-        }
-
-        public void setAtlas(Atlas atlas) {
-            this.atlas = atlas;
-        }
 
         public S3 getS3() {
             return s3;
@@ -783,30 +490,6 @@ public class Region {
 
         public void setS3(S3 s3) {
             this.s3 = s3;
-        }
-    }
-
-    public static class Atlas {
-
-        @JsonProperty("URL")
-        private String url;
-
-        private OIDCConfiguration oidcConfiguration = null;
-
-        public String getUrl() {
-            return url;
-        }
-
-        public void setUrl(String url) {
-            this.url = url;
-        }
-
-        public OIDCConfiguration getOidcConfiguration() {
-            return oidcConfiguration;
-        }
-
-        public void setOidcConfiguration(OIDCConfiguration oidcConfiguration) {
-            this.oidcConfiguration = oidcConfiguration;
         }
     }
 
@@ -939,51 +622,6 @@ public class Region {
 
         public void setOidcConfiguration(OIDCConfiguration oidcConfiguration) {
             this.oidcConfiguration = oidcConfiguration;
-        }
-    }
-
-    public static class CustomInitScript {
-
-        @JsonProperty("URL")
-        private String url;
-
-        private String checksum;
-
-        public String getUrl() {
-            return url;
-        }
-
-        public void setUrl(String url) {
-            this.url = url;
-        }
-
-        public String getChecksum() {
-            return checksum;
-        }
-
-        public void setChecksum(String checksum) {
-            this.checksum = checksum;
-        }
-    }
-
-    public static class OpenshiftSCC {
-        private boolean enabled;
-        private String scc;
-
-        public boolean isEnabled() {
-            return enabled;
-        }
-
-        public void setEnabled(boolean enabled) {
-            this.enabled = enabled;
-        }
-
-        public String getScc() {
-            return scc;
-        }
-
-        public void setScc(String scc) {
-            this.scc = scc;
         }
     }
 

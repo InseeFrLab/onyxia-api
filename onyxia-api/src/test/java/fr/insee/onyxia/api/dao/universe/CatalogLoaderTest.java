@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.configuration.CustomObjectMapper;
+import fr.insee.onyxia.api.services.JsonSchemaRegistryService;
+import fr.insee.onyxia.api.services.JsonSchemaResolutionService;
 import fr.insee.onyxia.api.util.TestUtils;
 import fr.insee.onyxia.model.helm.Chart;
 import java.util.List;
@@ -21,7 +23,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.CollectionUtils;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {CatalogLoader.class, CustomObjectMapper.class})
+@SpringBootTest(
+        classes = {
+            CatalogLoader.class,
+            CustomObjectMapper.class,
+            JsonSchemaResolutionService.class,
+            JsonSchemaRegistryService.class
+        })
 public class CatalogLoaderTest {
 
     @Autowired CatalogLoader catalogLoader;

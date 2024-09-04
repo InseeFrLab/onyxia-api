@@ -89,9 +89,7 @@ public class MyLabController {
         User user = userProvider.getUser(region);
         ServicesListing dto = new ServicesListing();
         List<CompletableFuture<ServicesListing>> futures = new ArrayList<>();
-        if (region.getServices().getType().equals(Service.ServiceType.KUBERNETES)) {
-            futures.add(helmAppsService.getUserServices(region, project, user, groupId));
-        }
+        futures.add(helmAppsService.getUserServices(region, project, user, groupId));
         for (var future : futures) {
             ServicesListing listing = future.get();
             dto.getApps().addAll(listing.getApps());
@@ -138,11 +136,8 @@ public class MyLabController {
             @Parameter(hidden = true) Project project,
             @RequestParam("serviceId") String serviceId)
             throws Exception {
-        if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
-            return helmAppsService.getUserService(
-                    region, project, userProvider.getUser(region), serviceId);
-        }
-        return null;
+        return helmAppsService.getUserService(
+                region, project, userProvider.getUser(region), serviceId);
     }
 
     @PostMapping("/app/rename")
@@ -151,15 +146,12 @@ public class MyLabController {
             @Parameter(hidden = true) Project project,
             @RequestBody RenameRequestDTO request)
             throws Exception {
-        if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
-            User user = userProvider.getUser(region);
-            helmAppsService.rename(
-                    region,
-                    project,
-                    userProvider.getUser(region),
-                    request.getServiceID(),
-                    request.getFriendlyName());
-        }
+        helmAppsService.rename(
+                region,
+                project,
+                userProvider.getUser(region),
+                request.getServiceID(),
+                request.getFriendlyName());
     }
 
     @PostMapping("/app/share")
@@ -168,15 +160,12 @@ public class MyLabController {
             @Parameter(hidden = true) Project project,
             @RequestBody ShareRequestDTO request)
             throws Exception {
-        if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
-            User user = userProvider.getUser(region);
-            helmAppsService.share(
-                    region,
-                    project,
-                    userProvider.getUser(region),
-                    request.getServiceID(),
-                    request.isShare());
-        }
+        helmAppsService.share(
+                region,
+                project,
+                userProvider.getUser(region),
+                request.getServiceID(),
+                request.isShare());
     }
 
     @PostMapping("/app/suspend")
@@ -199,72 +188,69 @@ public class MyLabController {
 
     private void suspendOrResume(Region region, Project project, String serviceId, boolean suspend)
             throws Exception {
-        if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
-            User user = userProvider.getUser(region);
-            Service userService =
-                    helmAppsService.getUserService(
-                            region, project, userProvider.getUser(region), serviceId);
-            if (!userService.isSuspendable()) {
-                throw new ServiceNotSuspendableException();
+        User user = userProvider.getUser(region);
+        Service userService =
+                helmAppsService.getUserService(
+                        region, project, userProvider.getUser(region), serviceId);
+        if (!userService.isSuspendable()) {
+            throw new ServiceNotSuspendableException();
+        }
+        String chart = userService.getChart();
+        int split = chart.lastIndexOf('-');
+        String chartName = chart.substring(0, split);
+        String version = chart.substring(split + 1);
+        String catalogId = userService.getCatalogId();
+        // This code is for legacy compat for services that were created with Onyxia < v2.7.0
+        // before introduction of Onyxia's secret
+        if (catalogId == null) {
+            List<CatalogWrapper> elligibleCatalogs =
+                    catalogService.getCatalogs(region, user).getCatalogs().stream()
+                            .filter(
+                                    catalog ->
+                                            catalog.getCatalog()
+                                                    .getPackageByName(chartName)
+                                                    .isPresent())
+                            .toList();
+            if (elligibleCatalogs.isEmpty()) {
+                throw new NotFoundException();
             }
-            String chart = userService.getChart();
-            int split = chart.lastIndexOf('-');
-            String chartName = chart.substring(0, split);
-            String version = chart.substring(split + 1);
-            String catalogId = userService.getCatalogId();
-            // This code is for legacy compat for services that were created with Onyxia < v2.7.0
-            // before introduction of Onyxia's secret
-            if (catalogId == null) {
-                List<CatalogWrapper> elligibleCatalogs =
-                        catalogService.getCatalogs(region, user).getCatalogs().stream()
-                                .filter(
-                                        catalog ->
-                                                catalog.getCatalog()
-                                                        .getPackageByName(chartName)
-                                                        .isPresent())
-                                .toList();
-                if (elligibleCatalogs.isEmpty()) {
-                    throw new NotFoundException();
-                }
-                if (elligibleCatalogs.size() > 1) {
-                    throw new IllegalStateException("Chart is present in multiple catalogs, abort");
-                }
-                CatalogWrapper catalog = elligibleCatalogs.getFirst();
-                catalogId = catalog.getId();
+            if (elligibleCatalogs.size() > 1) {
+                throw new IllegalStateException("Chart is present in multiple catalogs, abort");
             }
-            Optional<CatalogWrapper> catalog = catalogService.getCatalogById(catalogId, user);
-            if (catalog.isEmpty()) {
-                throw new IllegalStateException(
-                        "Catalog " + catalogId + " is not available anymore");
-            }
+            CatalogWrapper catalog = elligibleCatalogs.getFirst();
+            catalogId = catalog.getId();
+        }
+        Optional<CatalogWrapper> catalog = catalogService.getCatalogById(catalogId, user);
+        if (catalog.isEmpty()) {
+            throw new IllegalStateException("Catalog " + catalogId + " is not available anymore");
+        }
 
-            if (suspend) {
-                helmAppsService.suspend(
-                        region,
-                        project,
-                        catalog.get().getId(),
-                        chartName,
-                        version,
-                        user,
-                        serviceId,
-                        catalog.get().getSkipTlsVerify(),
-                        catalog.get().getTimeout(),
-                        catalog.get().getCaFile(),
-                        false);
-            } else {
-                helmAppsService.resume(
-                        region,
-                        project,
-                        catalog.get().getId(),
-                        chartName,
-                        version,
-                        user,
-                        serviceId,
-                        catalog.get().getSkipTlsVerify(),
-                        catalog.get().getTimeout(),
-                        catalog.get().getCaFile(),
-                        false);
-            }
+        if (suspend) {
+            helmAppsService.suspend(
+                    region,
+                    project,
+                    catalog.get().getId(),
+                    chartName,
+                    version,
+                    user,
+                    serviceId,
+                    catalog.get().getSkipTlsVerify(),
+                    catalog.get().getTimeout(),
+                    catalog.get().getCaFile(),
+                    false);
+        } else {
+            helmAppsService.resume(
+                    region,
+                    project,
+                    catalog.get().getId(),
+                    chartName,
+                    version,
+                    user,
+                    serviceId,
+                    catalog.get().getSkipTlsVerify(),
+                    catalog.get().getTimeout(),
+                    catalog.get().getCaFile(),
+                    false);
         }
     }
 
@@ -301,11 +287,8 @@ public class MyLabController {
             @Parameter(hidden = true) Project project,
             @RequestParam("serviceId") String serviceId,
             @RequestParam("taskId") String taskId) {
-        if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
-            return helmAppsService.getLogs(
-                    region, project, userProvider.getUser(region), serviceId, taskId);
-        }
-        return null;
+        return helmAppsService.getLogs(
+                region, project, userProvider.getUser(region), serviceId, taskId);
     }
 
     @Operation(
@@ -329,36 +312,32 @@ public class MyLabController {
             @Parameter(hidden = true) Region region, @Parameter(hidden = true) Project project)
             throws Exception {
 
-        if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
-            final SseEmitter emitter = new SseEmitter();
-            final CustomWatcher watcher = new CustomWatcher(emitter, objectMapper);
-            final Watch watch =
-                    helmAppsService.getEvents(
-                            region, project, userProvider.getUser(region), watcher);
-            emitter.onCompletion(
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            watch.close();
-                        }
-                    });
-            emitter.onError(
-                    new Consumer<Throwable>() {
-                        @Override
-                        public void accept(Throwable throwable) {
-                            watch.close();
-                        }
-                    });
-            emitter.onTimeout(
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            watch.close();
-                        }
-                    });
-            return emitter;
-        }
-        return null;
+        final SseEmitter emitter = new SseEmitter();
+        final CustomWatcher watcher = new CustomWatcher(emitter, objectMapper);
+        final Watch watch =
+                helmAppsService.getEvents(region, project, userProvider.getUser(region), watcher);
+        emitter.onCompletion(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        watch.close();
+                    }
+                });
+        emitter.onError(
+                new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) {
+                        watch.close();
+                    }
+                });
+        emitter.onTimeout(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        watch.close();
+                    }
+                });
+        return emitter;
     }
 
     public static class CustomWatcher implements Watcher<Event> {
@@ -425,11 +404,8 @@ public class MyLabController {
             @RequestParam(value = "path", required = false) String path,
             @RequestParam(value = "bulk", required = false) Optional<Boolean> bulk)
             throws Exception {
-        if (Service.ServiceType.KUBERNETES.equals(region.getServices().getType())) {
-            return helmAppsService.destroyService(
-                    region, project, userProvider.getUser(region), path, bulk.orElse(false));
-        }
-        return null;
+        return helmAppsService.destroyService(
+                region, project, userProvider.getUser(region), path, bulk.orElse(false));
     }
 
     @Operation(
