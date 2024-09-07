@@ -9,16 +9,16 @@
             "title": "Enable network policy",
             "description": "Only pod from the same namespace will be allowed",
             "default": false,
-            "hidden": {
-                "value": true
+            "x-onyxia": {
+                "hidden": true
             }
         },
         "from": {
             "type": "array",
             "description": "Array of source allowed to have network access to your service",
             "default": [],
-            "hidden": {
-                "value": true
+            "x-onyxia": {
+                "hidden": true
             }
         }
     }
