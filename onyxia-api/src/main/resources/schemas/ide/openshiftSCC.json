@@ -3,11 +3,14 @@
     "title": "Openshift SCC",
     "description": "configuration for openshift compatibility",
     "type": "object",
+    "x-onyxia": {
+        "hidden": true
+    },
     "properties": {
         "enabled": {
             "description": "enable rolebinding with openshift scc",
             "type": "boolean",
-            "default": false
+            "default": false,
         },
         "scc": {
             "type": "string",
