@@ -10,7 +10,7 @@
         "enabled": {
             "description": "enable rolebinding with openshift scc",
             "type": "boolean",
-            "default": false,
+            "default": false
         },
         "scc": {
             "type": "string",
