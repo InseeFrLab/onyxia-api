@@ -8,7 +8,7 @@
       "description": "Key-value pairs to select nodes"
     },
     "x-onyxia": {
-        "hidden": false,
+        "hidden": true,
         "overwriteDefaultWith": "region.nodeSelector"
     }
 }
