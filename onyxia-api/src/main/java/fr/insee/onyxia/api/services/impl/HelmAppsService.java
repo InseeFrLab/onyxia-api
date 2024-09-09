@@ -108,6 +108,7 @@ public class HelmAppsService implements AppsService {
             User user,
             Map<String, Object> fusion,
             final boolean skipTlsVerify,
+            String timeout,
             final String caFile)
             throws IOException, TimeoutException, InterruptedException, ValidationException {
 
@@ -136,6 +137,7 @@ public class HelmAppsService implements AppsService {
                                     values,
                                     null,
                                     skipTlsVerify,
+                                    timeout,
                                     caFile);
             InstallServiceEvent installServiceEvent =
                     new InstallServiceEvent(
@@ -422,6 +424,7 @@ public class HelmAppsService implements AppsService {
             User user,
             String serviceId,
             boolean skipTlsVerify,
+            String timeout,
             String caFile,
             boolean dryRun)
             throws IOException, InterruptedException, TimeoutException {
@@ -434,6 +437,7 @@ public class HelmAppsService implements AppsService {
                 user,
                 serviceId,
                 skipTlsVerify,
+                timeout,
                 caFile,
                 dryRun,
                 true);
@@ -449,6 +453,7 @@ public class HelmAppsService implements AppsService {
             User user,
             String serviceId,
             boolean skipTlsVerify,
+            String timeout,
             String caFile,
             boolean dryRun)
             throws IOException, InterruptedException, TimeoutException {
@@ -461,6 +466,7 @@ public class HelmAppsService implements AppsService {
                 user,
                 serviceId,
                 skipTlsVerify,
+                timeout,
                 caFile,
                 dryRun,
                 false);
@@ -475,6 +481,7 @@ public class HelmAppsService implements AppsService {
             User user,
             String serviceId,
             boolean skipTlsVerify,
+            String timeout,
             String caFile,
             boolean dryRun,
             boolean suspend)
@@ -491,6 +498,7 @@ public class HelmAppsService implements AppsService {
                             version,
                             dryRun,
                             skipTlsVerify,
+                            timeout,
                             caFile);
         } else {
             getHelmInstallService()
@@ -502,6 +510,7 @@ public class HelmAppsService implements AppsService {
                             version,
                             dryRun,
                             skipTlsVerify,
+                            timeout,
                             caFile);
         }
         SuspendResumeServiceEvent event =

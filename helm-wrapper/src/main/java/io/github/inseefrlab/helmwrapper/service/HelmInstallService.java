@@ -42,6 +42,7 @@ public class HelmInstallService {
             String version,
             boolean dryRun,
             final boolean skipTlsVerify,
+            String timeout,
             String caFile)
             throws InvalidExitValueException,
                     IOException,
@@ -58,6 +59,7 @@ public class HelmInstallService {
                 null,
                 Map.of("global.suspend", "false"),
                 skipTlsVerify,
+                timeout,
                 caFile,
                 true);
     }
@@ -70,6 +72,7 @@ public class HelmInstallService {
             String version,
             boolean dryRun,
             final boolean skipTlsVerify,
+            String timeout,
             String caFile)
             throws InvalidExitValueException,
                     IOException,
@@ -86,6 +89,7 @@ public class HelmInstallService {
                 null,
                 Map.of("global.suspend", "true"),
                 skipTlsVerify,
+                timeout,
                 caFile,
                 true);
     }
@@ -100,6 +104,7 @@ public class HelmInstallService {
             File values,
             Map<String, String> env,
             final boolean skipTlsVerify,
+            String timeout,
             String caFile)
             throws InvalidExitValueException,
                     IOException,
@@ -116,6 +121,7 @@ public class HelmInstallService {
                 values,
                 env,
                 skipTlsVerify,
+                timeout,
                 caFile,
                 false);
     }
@@ -130,6 +136,7 @@ public class HelmInstallService {
             File values,
             Map<String, String> env,
             final boolean skipTlsVerify,
+            String timeout,
             String caFile,
             boolean reuseValues)
             throws InvalidExitValueException,
@@ -138,6 +145,11 @@ public class HelmInstallService {
                     TimeoutException,
                     IllegalArgumentException {
         StringBuilder command = new StringBuilder("helm upgrade --install --history-max 0 ");
+
+        if (timeout != null) {
+            command.append("--timeout " + timeout + " ");
+        }
+
         if (skipTlsVerify) {
             command.append("--insecure-skip-tls-verify ");
         } else if (caFile != null) {

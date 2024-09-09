@@ -40,6 +40,7 @@ public interface AppsService {
             User user,
             Map<String, Object> fusion,
             final boolean skipTlsVerify,
+            String timeout,
             final String caFile)
             throws Exception;
 
@@ -69,6 +70,7 @@ public interface AppsService {
             User user,
             String serviceId,
             boolean skipTlsVerify,
+            String timeout,
             String caFile,
             boolean dryRun)
             throws IOException, InterruptedException, TimeoutException;
@@ -82,6 +84,7 @@ public interface AppsService {
             User user,
             String serviceId,
             boolean skipTlsVerify,
+            String timeout,
             String caFile,
             boolean dryRun)
             throws IOException, InterruptedException, TimeoutException;

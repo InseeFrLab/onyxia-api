@@ -235,6 +235,7 @@ public class MyLabController {
                     user,
                     serviceId,
                     catalog.get().getSkipTlsVerify(),
+                    catalog.get().getTimeout(),
                     catalog.get().getCaFile(),
                     false);
         } else {
@@ -247,6 +248,7 @@ public class MyLabController {
                     user,
                     serviceId,
                     catalog.get().getSkipTlsVerify(),
+                    catalog.get().getTimeout(),
                     catalog.get().getCaFile(),
                     false);
         }
@@ -449,10 +451,20 @@ public class MyLabController {
 
         boolean skipTlsVerify = catalog.getSkipTlsVerify();
         String caFile = catalog.getCaFile();
+        String timeout = catalog.getTimeout();
         Map<String, Object> fusion = new HashMap<>();
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
         return helmAppsService.installApp(
-                region, project, requestDTO, catalogId, pkg, user, fusion, skipTlsVerify, caFile);
+                region,
+                project,
+                requestDTO,
+                catalogId,
+                pkg,
+                user,
+                fusion,
+                skipTlsVerify,
+                timeout,
+                caFile);
     }
 
     public static class SuspendOrResumeRequestDTO {
