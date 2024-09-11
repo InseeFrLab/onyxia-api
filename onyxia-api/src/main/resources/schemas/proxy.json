@@ -1,0 +1,30 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Proxy",
+    "type": "object",
+    "x-onyxia": {
+          "hidden": true
+      },
+    "properties": {
+        "enabled": {
+                    "type": "boolean",
+                    "description": "Inject proxy settings",
+                    "default": "false"
+                  },
+        "httpProxy": {
+          "type": "string",
+          "description": "Proxy URL for HTTP requests",
+          "default": ""
+        },
+        "httpsProxy": {
+          "type": "string",
+          "description": "Proxy URL for HTTPS requests",
+          "default": ""
+        },
+        "noProxy": {
+          "type": "string",
+          "description": "Comma separated list of hosts for which proxy is bypassed",
+          "default": ""
+        }
+    }
+}
