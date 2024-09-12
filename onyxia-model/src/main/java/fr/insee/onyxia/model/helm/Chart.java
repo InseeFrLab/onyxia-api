@@ -87,6 +87,10 @@ public class Chart extends Pkg {
     @JsonProperty("version")
     private String version;
 
+    @Schema(description = "")
+    @JsonProperty("annotations")
+    private Map<String, String> annotations;
+
     @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @Schema(description = "")
@@ -241,6 +245,16 @@ public class Chart extends Pkg {
     @JsonProperty("version")
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    @JsonProperty("annotations")
+    public Map<String, String> getAnnotations() {
+        return annotations;
+    }
+
+    @JsonProperty("annotations")
+    public void setAnnotations(Map<String, String> annotations) {
+        this.annotations = annotations;
     }
 
     @JsonProperty("defaultValues")
