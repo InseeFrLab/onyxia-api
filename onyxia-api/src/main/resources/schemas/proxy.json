@@ -6,7 +6,7 @@
         "enabled": {
                     "type": "boolean",
                     "description": "Inject proxy settings",
-                    "default": "false",
+                    "default": false,
                     "x-onyxia": {
                        "hidden": true
                     }
