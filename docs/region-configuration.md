@@ -21,7 +21,6 @@ See [regions.json](/onyxia-api/src/main/resources/regions.json) for a complete e
     - [S3](#s3)
   - [Vault properties](#vault-properties)
   - [Git properties](#git-properties)
-  - [ProxyConfiguration properties](#proxyconfiguration-properties)
   - [ProxyInjection properties](#proxyinjection-properties)
   - [PackageRepositoryInjection properties](#packagerepositoryinjection-properties)
   - [CertificateAuthorityInjection properties](#certificateauthorityinjection-properties)
@@ -319,16 +318,6 @@ It can be used to add additional features to Onyxia. It helps users to keep thei
 | `type` | | Type of Git implementation. | "gitlab", "github" |
 | `URL` | | URL of the git service for the region. | "https://git.change.me" |
 | `oidcConfiguration` | | Allow override of openidconnect authentication for this specific service. If not defined then global Onyxia authentication will be used. | {clientID: "onyxia", issuerURI: "https://auth.lab.sspcloud.fr/auth"} |
-
-## ProxyConfiguration properties
-
-It can be used to inject proxy configuration in the services, if the helm chart in the catalog allows it you can bind this value to the Helm chart value to override for example HTTP_PROXY, HTTPS_PROXY and NO_PROXY en variable in the pod launched.
-
-| Key | Default | Description | Example |
-| --------------------- | ------- | ------------------------------------------------------------------ | ---- |
-| `httpProxyUrl` | | URL of the enterprise proxy for the region for HTTP. | "http://proxy.enterprise.com:8080" |
-| `httpsProxyUrl` | | URL of the enterprise proxy for the region for HTTPS. | "http://proxy.enterprise.com:8080" |
-| `noProxy` | | enterprise local domain that should not take proxy comma separated | "corporate.com" |
 
 ## ProxyInjection properties
 
