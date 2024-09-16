@@ -1,5 +1,10 @@
 package fr.insee.onyxia.api.controller.api.mylab;
 
+import org.everit.json.schema.Schema;
+import org.everit.json.schema.ValidationException;
+import org.everit.json.schema.loader.SchemaLoader;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
