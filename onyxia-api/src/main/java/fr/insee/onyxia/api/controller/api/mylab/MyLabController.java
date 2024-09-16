@@ -500,8 +500,12 @@ public class MyLabController {
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
 
         JSONObject jsonSchema = new JSONObject(new JSONTokener(jsonSchemaResolutionService.resolveReferences(pkg.getConfig(),(String) user.getAttributes().get("role")).toString()));
-        // Load the schema
-        org.everit.json.schema.Schema schema = SchemaLoader.load(jsonSchema);
+
+        SchemaLoader loader = SchemaLoader.builder()
+                        .schemaJson(jsonSchema)
+                        .draftV6Support() // or draftV7Support()
+                        .build();
+        org.everit.json.schema.Schema schema  = loader.load().build();
         // Convert the options map to a JSONObject
         JSONObject jsonObject = new JSONObject(fusion);
         // Validate the options object against the schema
