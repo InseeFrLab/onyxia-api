@@ -8,8 +8,10 @@ import fr.insee.onyxia.api.controller.exception.ServiceNotSuspendableException;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.CatalogService;
 import fr.insee.onyxia.api.services.UserProvider;
+import fr.insee.onyxia.api.services.JsonSchemaResolutionService;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.Pkg;
+import fr.insee.onyxia.model.helm.Chart;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
 import fr.insee.onyxia.model.dto.ServicesListing;
 import fr.insee.onyxia.model.project.Project;
@@ -144,7 +146,7 @@ public class MyLabController {
                 .getChartByVersion(catalogId, chartName, version)
                 .orElseThrow(NotFoundException::new);
         
-        return jsonSchemaResolutionService.resolveReferences(chart.getConfig(),user.getAttributes("role"));
+        return jsonSchemaResolutionService.resolveReferences(chart.getConfig(),user.getAttributes().get("role"));
     }
 
     @Operation(
