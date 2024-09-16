@@ -22,7 +22,7 @@ public class JsonSchemaController {
     }
 
     @GetMapping
-    public Map<String, JsonNode> listSchemas(@RequestParam("role") String role)) {
+    public Map<String, JsonNode> listSchemas(@RequestParam("role") String role) {
         return jsonSchemaRegistryService.listSchemas(role);
     }
 
