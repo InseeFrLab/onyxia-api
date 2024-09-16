@@ -195,9 +195,7 @@ public class CatalogLoader {
                     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                     try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
                         tarIn.transferTo(baos);
-                        chart.setConfig(
-                                jsonSchemaResolutionService.resolveReferences(
-                                        mapper.readTree(baos.toString(UTF_8))));
+                        chart.setConfig(mapper.readTree(baos.toString(UTF_8)));
                     }
                 } else if (entryName.endsWith(chartName + "/values.yaml")
                         && !entryName.endsWith("charts/" + chartName + "/values.yaml")) {

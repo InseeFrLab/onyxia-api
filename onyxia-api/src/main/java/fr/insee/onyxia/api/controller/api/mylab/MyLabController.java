@@ -44,6 +44,8 @@ public class MyLabController {
 
     private final CatalogService catalogService;
 
+    private final JsonSchemaResolutionService jsonSchemaResolutionService;
+
     private ObjectMapper objectMapper;
 
     @Autowired
@@ -51,10 +53,12 @@ public class MyLabController {
             AppsService helmAppsService,
             UserProvider userProvider,
             CatalogService catalogService,
+            JsonSchemaResolutionService jsonSchemaResolutionService,
             ObjectMapper objectMapper) {
         this.helmAppsService = helmAppsService;
         this.userProvider = userProvider;
         this.catalogService = catalogService;
+        this.jsonSchemaResolutionService = jsonSchemaResolutionService;
         this.objectMapper = objectMapper;
     }
 
@@ -106,6 +110,41 @@ public class MyLabController {
     public Catalogs getMyCatalogs(@Parameter(hidden = true) Region region) {
         User user = userProvider.getUser(region);
         return catalogService.getCatalogs(region, user);
+    }
+
+    @Operation(
+            summary = "Get a helm chart from a specific catalog by version.",
+            description =
+                    "Get a helm chart from a specific catalog by version, with detailed information on the package including: descriptions, sources, and configuration options.",
+            parameters = {
+                @Parameter(
+                        required = true,
+                        name = "catalogId",
+                        description = "Unique ID of the enabled catalog for this Onyxia API.",
+                        in = ParameterIn.PATH),
+                @Parameter(
+                        required = true,
+                        name = "chartName",
+                        description = "Unique name of the chart from the selected catalog.",
+                        in = ParameterIn.PATH),
+                @Parameter(
+                        required = true,
+                        name = "version",
+                        description = "Version of the chart",
+                        in = ParameterIn.PATH)
+            })
+    @GetMapping("schemas/{catalogId}/charts/{chartName}/versions/{version}")
+    public Catalogs getSchemas(@Parameter(hidden = true) Region region,
+            @PathVariable String catalogId,
+            @PathVariable String chartName,
+            @PathVariable String version) {
+        User user = userProvider.getUser(region);
+        Chart chart = 
+        catalogService
+                .getChartByVersion(catalogId, chartName, version)
+                .orElseThrow(NotFoundException::new);
+        
+        return jsonSchemaResolutionService.resolveReferences(chart.getConfig(),user.getAttributes("role"));
     }
 
     @Operation(
