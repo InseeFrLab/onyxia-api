@@ -112,13 +112,6 @@ public class HelmAppsService implements AppsService {
             final String caFile)
             throws IOException, TimeoutException, InterruptedException, ValidationException {
 
-        JSONObject jsonSchema = new JSONObject(new JSONTokener(pkg.getConfig().toString()));
-        // Load the schema
-        Schema schema = SchemaLoader.load(jsonSchema);
-        // Convert the options map to a JSONObject
-        JSONObject jsonObject = new JSONObject(fusion);
-        // Validate the options object against the schema
-        schema.validate(jsonObject);
 
         File values = File.createTempFile("values", ".yaml");
         mapperHelm.writeValue(values, fusion);

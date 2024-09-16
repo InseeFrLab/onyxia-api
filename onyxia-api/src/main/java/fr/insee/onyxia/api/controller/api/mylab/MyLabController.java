@@ -491,11 +491,22 @@ public class MyLabController {
                         .getPackageByName(requestDTO.getPackageName())
                         .orElseThrow(NotFoundException::new);
 
+
+        Map<String, Object> fusion = new HashMap<>();
+        fusion.putAll((Map<String, Object>) requestDTO.getOptions());
+
+        JSONObject jsonSchema = new JSONObject(new JSONTokener(jsonSchemaResolutionService.resolveReferences(pkg.getConfig(),(String) user.getAttributes().get("role")).toString()));
+        // Load the schema
+        Schema schema = SchemaLoader.load(jsonSchema);
+        // Convert the options map to a JSONObject
+        JSONObject jsonObject = new JSONObject(fusion);
+        // Validate the options object against the schema
+        schema.validate(jsonObject);
+                
         boolean skipTlsVerify = catalog.getSkipTlsVerify();
         String caFile = catalog.getCaFile();
         String timeout = catalog.getTimeout();
-        Map<String, Object> fusion = new HashMap<>();
-        fusion.putAll((Map<String, Object>) requestDTO.getOptions());
+
         return helmAppsService.installApp(
                 region,
                 project,
