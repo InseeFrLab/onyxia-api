@@ -1,6 +1,7 @@
 package fr.insee.onyxia.api.controller.api.mylab;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.configuration.Catalogs;
 import fr.insee.onyxia.api.configuration.NotFoundException;
@@ -136,7 +137,7 @@ public class MyLabController {
                         in = ParameterIn.PATH)
             })
     @GetMapping("schemas/{catalogId}/charts/{chartName}/versions/{version}")
-    public Catalogs getSchemas(@Parameter(hidden = true) Region region,
+    public JsonNode getSchemas(@Parameter(hidden = true) Region region,
             @PathVariable String catalogId,
             @PathVariable String chartName,
             @PathVariable String version) {
@@ -146,7 +147,7 @@ public class MyLabController {
                 .getChartByVersion(catalogId, chartName, version)
                 .orElseThrow(NotFoundException::new);
         
-        return jsonSchemaResolutionService.resolveReferences(chart.getConfig(),user.getAttributes().get("role"));
+        return jsonSchemaResolutionService.resolveReferences(chart.getConfig(),(String) user.getAttributes().get("role"));
     }
 
     @Operation(
