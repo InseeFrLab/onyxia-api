@@ -22,6 +22,10 @@ public class JsonSchemaResolutionService {
         this.registryService = registryService;
     }
 
+    public JsonNode resolveReferences(JsonNode schemaNode) {
+        return resolveReferences(schemaNode, schemaNode, "");
+    }
+
     public JsonNode resolveReferences(JsonNode schemaNode, String role) {
         return resolveReferences(schemaNode, schemaNode, role);
     }
@@ -46,7 +50,7 @@ public class JsonSchemaResolutionService {
                     }
 
                     if (refNode != null && !refNode.isMissingNode()) {
-                        JsonNode resolvedNode = resolveReferences(refNode.deepCopy(), rootNode);
+                        JsonNode resolvedNode = resolveReferences(refNode.deepCopy(), rootNode, role);
                         updates.putAll(convertToMap((ObjectNode) resolvedNode));
                         updates.put("$ref", null);
                     }
@@ -59,11 +63,11 @@ public class JsonSchemaResolutionService {
 
                     if (overrideSchemaNode != null && !overrideSchemaNode.isMissingNode()) {
                         JsonNode resolvedNode =
-                                resolveReferences(overrideSchemaNode.deepCopy(), rootNode);
+                                resolveReferences(overrideSchemaNode.deepCopy(), rootNode, role);
                         updates.put(field.getKey(), resolvedNode);
                     }
                 } else if (fieldValue.isObject() || fieldValue.isArray()) {
-                    updates.put(field.getKey(), resolveReferences(fieldValue, rootNode));
+                    updates.put(field.getKey(), resolveReferences(fieldValue, rootNode, role));
                 }
             }
 
@@ -77,7 +81,7 @@ public class JsonSchemaResolutionService {
         } else if (schemaNode.isArray()) {
             ArrayNode arrayNode = (ArrayNode) schemaNode;
             for (int i = 0; i < arrayNode.size(); i++) {
-                arrayNode.set(i, resolveReferences(arrayNode.get(i), rootNode));
+                arrayNode.set(i, resolveReferences(arrayNode.get(i), rootNode, role));
             }
         }
         return schemaNode;
