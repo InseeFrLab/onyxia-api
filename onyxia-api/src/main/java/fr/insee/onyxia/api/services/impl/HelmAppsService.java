@@ -105,7 +105,7 @@ public class HelmAppsService implements AppsService {
             final boolean skipTlsVerify,
             String timeout,
             final String caFile)
-            throws IOException, TimeoutException, InterruptedException, ValidationException {
+            throws IOException, TimeoutException, InterruptedException {
 
 
         File values = File.createTempFile("values", ".yaml");
