@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "startupProbe",
+  "type": "object",
+  "description": "Startup probe",
+  "default": {
+    "failureThreshold": 60,
+    "initialDelaySeconds": 10,
+    "periodSeconds": 10,
+    "successThreshold": 1,
+    "timeoutSeconds": 2
+  },
+  "x-onyxia": {
+    "hidden": true
+  }
+}
