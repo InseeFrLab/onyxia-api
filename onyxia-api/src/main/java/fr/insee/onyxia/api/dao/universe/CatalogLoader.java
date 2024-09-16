@@ -36,16 +36,13 @@ public class CatalogLoader {
     private static final Logger LOGGER = LoggerFactory.getLogger(CatalogLoader.class);
 
     private final ResourceLoader resourceLoader;
-    private final JsonSchemaResolutionService jsonSchemaResolutionService;
     private final ObjectMapper mapperHelm;
 
     public CatalogLoader(
             ResourceLoader resourceLoader,
-            @Qualifier("helm") ObjectMapper mapperHelm,
-            JsonSchemaResolutionService jsonSchemaResolutionService) {
+            @Qualifier("helm") ObjectMapper mapperHelm) {
         this.resourceLoader = resourceLoader;
         this.mapperHelm = mapperHelm;
-        this.jsonSchemaResolutionService = jsonSchemaResolutionService;
     }
 
     public void updateCatalog(CatalogWrapper cw) {
