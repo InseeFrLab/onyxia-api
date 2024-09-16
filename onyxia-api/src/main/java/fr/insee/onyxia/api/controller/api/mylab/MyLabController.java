@@ -1,6 +1,5 @@
 package fr.insee.onyxia.api.controller.api.mylab;
 
-import org.everit.json.schema.Schema;
 import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
@@ -502,7 +501,7 @@ public class MyLabController {
 
         JSONObject jsonSchema = new JSONObject(new JSONTokener(jsonSchemaResolutionService.resolveReferences(pkg.getConfig(),(String) user.getAttributes().get("role")).toString()));
         // Load the schema
-        Schema schema = SchemaLoader.load(jsonSchema);
+        org.everit.json.schema.Schema schema = SchemaLoader.load(jsonSchema);
         // Convert the options map to a JSONObject
         JSONObject jsonObject = new JSONObject(fusion);
         // Validate the options object against the schema
