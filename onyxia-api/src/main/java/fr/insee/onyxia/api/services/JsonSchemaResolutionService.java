@@ -22,11 +22,11 @@ public class JsonSchemaResolutionService {
         this.registryService = registryService;
     }
 
-    public JsonNode resolveReferences(JsonNode schemaNode) {
-        return resolveReferences(schemaNode, schemaNode);
+    public JsonNode resolveReferences(JsonNode schemaNode, String role) {
+        return resolveReferences(schemaNode, schemaNode, role);
     }
 
-    private JsonNode resolveReferences(JsonNode schemaNode, JsonNode rootNode) {
+    private JsonNode resolveReferences(JsonNode schemaNode, JsonNode rootNode, String role) {
         if (schemaNode.isObject()) {
             ObjectNode objectNode = (ObjectNode) schemaNode;
             Iterator<Map.Entry<String, JsonNode>> fields = objectNode.fields();
@@ -42,7 +42,7 @@ public class JsonSchemaResolutionService {
                     if (ref.startsWith("#/definitions/")) {
                         refNode = rootNode.at(ref.substring(1));
                     } else {
-                        refNode = registryService.getSchema(ref);
+                        refNode = registryService.getSchema(role,ref);
                     }
 
                     if (refNode != null && !refNode.isMissingNode()) {
@@ -55,7 +55,7 @@ public class JsonSchemaResolutionService {
                         && fieldValue.get("x-onyxia").has("overwriteSchemaWith")) {
                     String overrideSchemaName =
                             fieldValue.get("x-onyxia").get("overwriteSchemaWith").asText();
-                    JsonNode overrideSchemaNode = registryService.getSchema(overrideSchemaName);
+                    JsonNode overrideSchemaNode = registryService.getSchema(role,overrideSchemaName);
 
                     if (overrideSchemaNode != null && !overrideSchemaNode.isMissingNode()) {
                         JsonNode resolvedNode =
