@@ -22,12 +22,12 @@ public class JsonSchemaController {
     }
 
     @GetMapping
-    public Map<String, JsonNode> listSchemas(@RequestParam("role") String role) {
+    public Map<String, JsonNode> listSchemas(@RequestParam(value = "role", required = false) String role) {
         return jsonSchemaRegistryService.listSchemas(role);
     }
 
     @GetMapping("/{schemaName}")
-    public JsonNode getSchema(@PathVariable String schemaName, @RequestParam("role") String role) {
+    public JsonNode getSchema(@PathVariable String schemaName, @RequestParam(value = "role", required = false) String role) {
         JsonNode schema = jsonSchemaRegistryService.getSchema(role, schemaName);
         if (schema == null) {
             throw new SchemaNotFoundException(schemaName);
