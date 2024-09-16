@@ -115,7 +115,7 @@ public class JsonSchemaRegistryService {
         return new HashMap<>(schemaRegistry);
     }
 
-    public Map<String, JsonNode> listRoleSchemas(String role) {
+    public Map<String, JsonNode> listSchemas(String role) {
         // Create a new map starting with the default schemas
         Map<String, JsonNode> combinedSchemas = new HashMap<>(schemaRegistry);
 
