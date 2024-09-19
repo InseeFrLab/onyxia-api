@@ -499,7 +499,7 @@ public class MyLabController {
         Map<String, Object> fusion = new HashMap<>();
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
 
-        JSONObject jsonSchema = new JSONObject(new JSONTokener(jsonSchemaResolutionService.resolveReferences(pkg.getConfig(),(String) user.getAttributes().get("role")).toString()));
+        JSONObject jsonSchema = new JSONObject(new JSONTokener(jsonSchemaResolutionService.resolveReferences(pkg.getConfig(), user.getRoles()).toString()));
 
         SchemaLoader loader = SchemaLoader.builder()
                         .schemaJson(jsonSchema)
