@@ -166,7 +166,7 @@ public class OIDCConfiguration {
             if (userInfo.getClaimAsStringList(rolesClaim) != null) {
                 List<String> roles = userInfo.getClaimAsStringList(rolesClaim);
                 Collections.sort(roles);
-                user.setRoles(userInfo.getClaimAsStringList(roles));
+                user.setRoles(roles);
             }
             user.getAttributes().putAll(userInfo.getClaims());
             user.getAttributes().put("sub", userInfo.getSubject());
