@@ -7,6 +7,8 @@ import fr.insee.onyxia.api.services.utils.HttpRequestUtils;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.region.Region;
 import org.apache.commons.lang3.StringUtils;
+import java.util.Collections;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -162,7 +164,9 @@ public class OIDCConfiguration {
                 user.setGroups(userInfo.getClaimAsStringList(groupsClaim));
             }
             if (userInfo.getClaimAsStringList(rolesClaim) != null) {
-                user.setRoles(userInfo.getClaimAsStringList(rolesClaim));
+                List<String> roles = userInfo.getClaimAsStringList(rolesClaim);
+                Collections.sort(roles);
+                user.setRoles(userInfo.getClaimAsStringList(roles));
             }
             user.getAttributes().putAll(userInfo.getClaims());
             user.getAttributes().put("sub", userInfo.getSubject());
