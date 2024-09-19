@@ -10,6 +10,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -141,5 +143,18 @@ public class JsonSchemaRegistryService {
         }
         // If not found in the role registry, return the default schema
         return getSchema(schemaName);
+    }
+
+    public JsonNode getSchema(List<String> roles, String schemaName) {
+        // Iterate through each role and check if the schema exists in the role-based registry
+        for (String role : roles) {
+            Map<String, JsonNode> roleSchemas = roleSchemaRegistry.get(role);
+            if (roleSchemas != null && roleSchemas.containsKey(schemaName)) {
+                return roleSchemas.get(schemaName); // Return the role-specific schema if found
+            }
+        }
+
+        // If not found in any role registry, return the default schema
+        return getSchema(schemaName); // Fallback to the default schema
     }
 }

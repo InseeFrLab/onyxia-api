@@ -151,7 +151,7 @@ public class MyLabController {
                 .getChartByVersion(catalogId, chartName, version)
                 .orElseThrow(NotFoundException::new);
         
-        return jsonSchemaResolutionService.resolveReferences(chart.getConfig(),(String) user.getAttributes().get("role"));
+        return jsonSchemaResolutionService.resolveReferences(chart.getConfig(), user.getRoles());
     }
 
     @Operation(

@@ -46,6 +46,9 @@ public class OIDCConfiguration {
     @Value("${oidc.groups-claim}")
     private String groupsClaim;
 
+    @Value("${oidc.roles-claim}")
+    private String rolesClaim;
+
     @Value("${oidc.issuer-uri}")
     private String issuerUri;
 
@@ -157,6 +160,9 @@ public class OIDCConfiguration {
             user.setNomComplet(userInfo.getClaimAsString("name"));
             if (userInfo.getClaimAsStringList(groupsClaim) != null) {
                 user.setGroups(userInfo.getClaimAsStringList(groupsClaim));
+            }
+            if (userInfo.getClaimAsStringList(rolesClaim) != null) {
+                user.setRoles(userInfo.getClaimAsStringList(rolesClaim));
             }
             user.getAttributes().putAll(userInfo.getClaims());
             user.getAttributes().put("sub", userInfo.getSubject());

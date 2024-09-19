@@ -27,13 +27,16 @@ public class User implements Serializable {
 
     @Schema(description = "")
     String ip;
-
+   
     @JsonIgnore
     @Schema(description = "")
     Map<String, Object> attributes = new HashMap<>();
 
     @Schema(description = "")
     List<String> groups = new ArrayList<>();
+
+    @Schema(description = "")
+    List<String> roles = new ArrayList<>();
 
     public Map<String, Object> getAttributes() {
         return attributes;
@@ -121,6 +124,16 @@ public class User implements Serializable {
     public void setGroups(List<String> groups) {
         this.groups = groups;
     }
+
+
+    public List<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
+    }
+
 
     public static Builder newInstance() {
         return new Builder();
