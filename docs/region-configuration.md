@@ -94,27 +94,18 @@ It can be used to add additional features to Onyxia. It helps Onyxia users to di
 
 When this feature is enabled, namespaces are created with **quotas**.
 
-| Key | Default | Description |
-| --------------------- | ------- | ------------------------------------------------------------------ |
-| `enabled` | false | Whether or not users are subject to a resource limitation. Quotas can only be applied to users and not to groups. (will be deprecated see userEnabled and groupEnabled) |
-| `allowUserModification` | true | Whether or not the user can manually disable or change its own limitation or group limitation. |
-| `default` | | This quota is applied on the namespace at creation, before user modification or reset. New configuration will not be applied to existing namespaces. (will be deprecated see userEnabled and groupEnabled) |
-| `userEnabled` | false | Whether or not users are subject to a resource limitation. Enable this on user namespace only with user quota content based on kubernetes model . |
-| `user` | false | This quota is applied on the user namespace at creation, before user modification or reset. New configuration will not be applied to already existing namespaces. |
-| `groupEnabled` | false |Whether or not users are subject to a resource limitation. Enable this on group/project namespace only ith group quota content. |
-| `group` | false | This quota is applied on the group namespace at creation, before user modification or reset. New configuration will not be applied to already existing namespaces. |
+| Key | Default | Description | Example |
+| --------------------- | ------- | ------------------------------------------------------------------ | ---- |
+| `enabled` | false | Whether or not users are subject to a resource limitation. Quotas can only be applied to users and not to groups. (will be deprecated see userEnabled and groupEnabled) | false |
+| `allowUserModification` | true | Whether or not the user can manually disable or change its own limitation or group limitation. | true |
+| `default` | | This quota is applied on the namespace at creation, before user modification or reset. New configuration will not be applied to existing namespaces. (will be deprecated see userEnabled and groupEnabled) | |
+| `userEnabled` | false | Whether or not users are subject to a resource limitation. Enable this on user namespace only with user quota content based on kubernetes model . | false |
+| `user` | | This quota is applied on the user namespace at creation, before user modification or reset. New configuration will not be applied to already existing namespaces. | { "count/pods": "5" } |
+| `groupEnabled` | false |Whether or not users are subject to a resource limitation. Enable this on group/project namespace only ith group quota content. | false |
+| `group` | | This quota is applied on the group namespace at creation, before user modification or reset. New configuration will not be applied to already existing namespaces. | { "requests.memory": "5Gi", "requests.cpu": "100" } |
 
-A quota follows the Kubernetes model which is composed of:
-"requests.memory"
-"requests.cpu"
-"limits.memory"
-"limits.cpu"
-"requests.storage"
-"count/pods"
-"requests.ephemeral-storage"
-"limits.ephemeral-storage"
-"requests.nvidia.com/gpu"
-"limits.nvidia.com/gpu"
+A quota follows the Kubernetes model which is composed of: `"requests.memory"`, `"requests.cpu"`, `"limits.memory"`, `"limits.cpu"`, `"requests.storage"`, `"count/pods"`, `"requests.ephemeral-storage"`, `"limits.ephemeral-storage"`, `"requests.nvidia.com/gpu"`, `"limits.nvidia.com/gpu"`.
+
 
 ### Expose properties
 
