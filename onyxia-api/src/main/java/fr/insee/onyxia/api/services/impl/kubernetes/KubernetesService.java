@@ -137,10 +137,7 @@ public class KubernetesService {
                                         .endRoleRef()
                                         .build());
 
-        // could be deleted if enabled and default quota is deprecated
-        final boolean oldEnabled =
-                owner.getType() == Owner.OwnerType.USER
-                        && region.getServices().getQuotas().isEnabled();
+
         final boolean userEnabled =
                 owner.getType() == Owner.OwnerType.USER
                         && region.getServices().getQuotas().isUserEnabled();
@@ -148,16 +145,15 @@ public class KubernetesService {
                 owner.getType() == Owner.OwnerType.GROUP
                         && region.getServices().getQuotas().isGroupEnabled();
 
-        if (oldEnabled) {
-            final Quota quota = region.getServices().getQuotas().getDefaultQuota();
-            LOGGER.warn("applying old enabled style quota, this parameter will be deprecated");
-            applyQuotas(
-                    namespaceId,
-                    kubClient,
-                    quota,
-                    !region.getServices().getQuotas().isAllowUserModification());
-        } else if (userEnabled) {
-            final Quota quota = region.getServices().getQuotas().getUserQuota();
+        if (userEnabled) {
+            Quota quota = region.getServices().getQuotas().getUserQuota();
+            for (String role : user.getRoles()) {
+                if ( region.getServices().getQuotas().getRolesQuota().containsKey(role)) {
+                    quota = region.getServices().getQuotas().getRolesQuota().get(role);
+                    break; //take first role match
+                }
+            }
+            
             LOGGER.info("applying user enabled style quota");
             applyQuotas(
                     namespaceId,
