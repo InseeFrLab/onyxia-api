@@ -453,13 +453,6 @@ public class Region {
                 this.allowUserModification = allowUserModification;
             }
 
-            public Quota getDefaultQuota() {
-                return defaultQuota;
-            }
-
-            public void setDefaultQuota(Quota defaultQuota) {
-                this.defaultQuota = defaultQuota;
-            }
         }
     }
 
