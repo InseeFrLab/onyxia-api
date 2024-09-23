@@ -136,24 +136,24 @@ public class QuotaController {
             @Parameter(hidden = true) Region region, @Parameter(hidden = true) Project project) {
         checkQuotaModificationIsAllowed(region);
         final Owner owner = getOwner(region, project);
+        User user = userProvider.getUser(region);
         if (owner.getType() == Owner.OwnerType.USER) {
             checkUserQuotaIsEnabled(region);
-            if (region.getServices().getQuotas().isEnabled()) {
-                LOGGER.warn(
-                        "resetting to old enabled style quota, this parameter will be deprecated");
-                kubernetesService.applyQuota(
-                        region,
-                        project,
-                        userProvider.getUser(region),
-                        region.getServices().getQuotas().getDefaultQuota());
-            } else {
-                LOGGER.info("resetting to user enabled style quota");
-                kubernetesService.applyQuota(
-                        region,
-                        project,
-                        userProvider.getUser(region),
-                        region.getServices().getQuotas().getUserQuota());
+
+            Quota quota = region.getServices().getQuotas().getUserQuota();
+            for (String role : user.getRoles()) {
+                if ( region.getServices().getQuotas().getRolesQuota().containsKey(role)) {
+                    quota = region.getServices().getQuotas().getRolesQuota().get(role);
+                    break; //take first role match
+                }
             }
+            LOGGER.info("resetting to user enabled style quota");
+            kubernetesService.applyQuota(
+                    region,
+                    project,
+                    user,
+                    quota);
+
         } else if (owner.getType() == Owner.OwnerType.GROUP) {
             LOGGER.info("resetting to group enabled style quota");
             checkGroupQuotaIsEnabled(region);
@@ -166,8 +166,7 @@ public class QuotaController {
     }
 
     private void checkUserQuotaIsEnabled(Region region) {
-        if (!region.getServices().getQuotas().isEnabled()
-                && !region.getServices().getQuotas().isUserEnabled()) {
+        if ( !region.getServices().getQuotas().isUserEnabled()) {
             throw new AccessDeniedException("User Quotas are not active on this installation");
         }
     }
