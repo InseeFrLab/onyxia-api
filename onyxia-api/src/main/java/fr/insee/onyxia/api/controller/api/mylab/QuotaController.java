@@ -1,6 +1,7 @@
 package fr.insee.onyxia.api.controller.api.mylab;
 
 import fr.insee.onyxia.api.services.UserProvider;
+import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.api.services.impl.kubernetes.KubernetesService;
 import fr.insee.onyxia.api.services.impl.kubernetes.KubernetesService.Owner;
 import fr.insee.onyxia.model.project.Project;
