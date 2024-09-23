@@ -137,7 +137,6 @@ public class KubernetesService {
                                         .endRoleRef()
                                         .build());
 
-
         final boolean userEnabled =
                 owner.getType() == Owner.OwnerType.USER
                         && region.getServices().getQuotas().isUserEnabled();
@@ -148,26 +147,18 @@ public class KubernetesService {
         if (userEnabled) {
             Quota quota = region.getServices().getQuotas().getUserQuota();
             for (String role : user.getRoles()) {
-                if ( region.getServices().getQuotas().getRolesQuota().containsKey(role)) {
+                if (region.getServices().getQuotas().getRolesQuota().containsKey(role)) {
                     quota = region.getServices().getQuotas().getRolesQuota().get(role);
-                    break; //take first role match
+                    break; // take first role match
                 }
             }
-            
+
             LOGGER.info("applying user enabled style quota");
-            applyQuotas(
-                    namespaceId,
-                    kubClient,
-                    quota,
-                    !region.getServices().getQuotas().isAllowUserModification());
+            applyQuotas(namespaceId, kubClient, quota, true);
         } else if (groupEnabled) {
             final Quota quota = region.getServices().getQuotas().getGroupQuota();
             LOGGER.info("applying group enabled style quota");
-            applyQuotas(
-                    namespaceId,
-                    kubClient,
-                    quota,
-                    !region.getServices().getQuotas().isAllowUserModification());
+            applyQuotas(namespaceId, kubClient, quota, true);
         }
         if (newNamespace) {
             InitNamespaceEvent initNamespaceEvent =

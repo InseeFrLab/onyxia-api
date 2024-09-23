@@ -394,7 +394,6 @@ public class Region {
 
             private boolean userEnabled = false;
             private boolean groupEnabled = false;
-            private boolean allowUserModification = true;
 
             @JsonProperty("user")
             private Quota userQuota;
@@ -403,7 +402,7 @@ public class Region {
             private Quota groupQuota;
 
             @JsonProperty("roles")
-            private Map<String,Quota> rolesQuota = new HashMap<>();
+            private Map<String, Quota> rolesQuota = new HashMap<>();
 
             public boolean isUserEnabled() {
                 return userEnabled;
@@ -444,15 +443,6 @@ public class Region {
             public Map<String, Quota> getRolesQuota() {
                 return rolesQuota;
             }
-
-            public boolean isAllowUserModification() {
-                return allowUserModification;
-            }
-
-            public void setAllowUserModification(boolean allowUserModification) {
-                this.allowUserModification = allowUserModification;
-            }
-
         }
     }
 

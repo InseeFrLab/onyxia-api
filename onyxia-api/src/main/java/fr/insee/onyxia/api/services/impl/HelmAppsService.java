@@ -107,7 +107,6 @@ public class HelmAppsService implements AppsService {
             final String caFile)
             throws IOException, TimeoutException, InterruptedException {
 
-
         File values = File.createTempFile("values", ".yaml");
         mapperHelm.writeValue(values, fusion);
         String namespaceId =

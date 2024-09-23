@@ -1,24 +1,20 @@
 package fr.insee.onyxia.api.controller.api.mylab;
 
-import org.everit.json.schema.ValidationException;
-import org.everit.json.schema.loader.SchemaLoader;
-import org.json.JSONObject;
-import org.json.JSONTokener;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.configuration.Catalogs;
 import fr.insee.onyxia.api.configuration.NotFoundException;
 import fr.insee.onyxia.api.controller.exception.ServiceNotSuspendableException;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.CatalogService;
-import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.api.services.JsonSchemaResolutionService;
+import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.Pkg;
-import fr.insee.onyxia.model.helm.Chart;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
 import fr.insee.onyxia.model.dto.ServicesListing;
+import fr.insee.onyxia.model.helm.Chart;
 import fr.insee.onyxia.model.project.Project;
 import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.Service;
@@ -36,6 +32,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import org.everit.json.schema.loader.SchemaLoader;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -141,16 +140,17 @@ public class MyLabController {
                         in = ParameterIn.PATH)
             })
     @GetMapping("schemas/{catalogId}/charts/{chartName}/versions/{version}")
-    public JsonNode getSchemas(@Parameter(hidden = true) Region region,
+    public JsonNode getSchemas(
+            @Parameter(hidden = true) Region region,
             @PathVariable String catalogId,
             @PathVariable String chartName,
             @PathVariable String version) {
         User user = userProvider.getUser(region);
-        Chart chart = 
-        catalogService
-                .getChartByVersion(catalogId, chartName, version)
-                .orElseThrow(NotFoundException::new);
-        
+        Chart chart =
+                catalogService
+                        .getChartByVersion(catalogId, chartName, version)
+                        .orElseThrow(NotFoundException::new);
+
         return jsonSchemaResolutionService.resolveReferences(chart.getConfig(), user.getRoles());
     }
 
@@ -495,22 +495,27 @@ public class MyLabController {
                         .getPackageByName(requestDTO.getPackageName())
                         .orElseThrow(NotFoundException::new);
 
-
         Map<String, Object> fusion = new HashMap<>();
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
 
-        JSONObject jsonSchema = new JSONObject(new JSONTokener(jsonSchemaResolutionService.resolveReferences(pkg.getConfig(), user.getRoles()).toString()));
+        JSONObject jsonSchema =
+                new JSONObject(
+                        new JSONTokener(
+                                jsonSchemaResolutionService
+                                        .resolveReferences(pkg.getConfig(), user.getRoles())
+                                        .toString()));
 
-        SchemaLoader loader = SchemaLoader.builder()
+        SchemaLoader loader =
+                SchemaLoader.builder()
                         .schemaJson(jsonSchema)
                         .draftV6Support() // or draftV7Support()
                         .build();
-        org.everit.json.schema.Schema schema  = loader.load().build();
+        org.everit.json.schema.Schema schema = loader.load().build();
         // Convert the options map to a JSONObject
         JSONObject jsonObject = new JSONObject(fusion);
         // Validate the options object against the schema
         schema.validate(jsonObject);
-                
+
         boolean skipTlsVerify = catalog.getSkipTlsVerify();
         String caFile = catalog.getCaFile();
         String timeout = catalog.getTimeout();

@@ -1,8 +1,7 @@
 package fr.insee.onyxia.model.catalog;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
+import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "")
@@ -17,7 +16,7 @@ public class Pkg {
     private String version;
 
     @Schema(description = "")
-    @JsonIgnore 
+    @JsonIgnore
     private JsonNode config;
 
     public String getName() {

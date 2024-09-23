@@ -27,7 +27,7 @@ public class User implements Serializable {
 
     @Schema(description = "")
     String ip;
-   
+
     @JsonIgnore
     @Schema(description = "")
     Map<String, Object> attributes = new HashMap<>();
@@ -125,7 +125,6 @@ public class User implements Serializable {
         this.groups = groups;
     }
 
-
     public List<String> getRoles() {
         return roles;
     }
@@ -133,7 +132,6 @@ public class User implements Serializable {
     public void setRoles(List<String> roles) {
         this.roles = roles;
     }
-
 
     public static Builder newInstance() {
         return new Builder();

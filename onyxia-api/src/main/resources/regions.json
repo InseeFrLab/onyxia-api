@@ -20,7 +20,6 @@
           "userAttributes": ["email","locale","groups"]
         },
         "quotas": {
-          "allowUserModification": true,
           "enabled": false,
           "default": {
             "requests.memory": "10Gi",

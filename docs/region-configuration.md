@@ -92,17 +92,16 @@ It can be used to add additional features to Onyxia. It helps Onyxia users to di
 
 ### Quotas properties
 
-When this feature is enabled, namespaces are created with **quotas**.
+When this feature is enabled, Onyxia creates and maintain a [ResourceQuota](https://kubernetes.io/docs/concepts/policy/resource-quotas/) in the user / group namespace.  
+This feature can be enabled for either or both `user` and `group` namespaces and, for user namespaces, quotas can depend on the user roles. 
 
-| Key | Default | Description |
-| --------------------- | ------- | ------------------------------------------------------------------ |
-| `enabled` | false | Whether or not users are subject to a resource limitation. Quotas can only be applied to users and not to groups. (will be deprecated see userEnabled and groupEnabled) |
-| `allowUserModification` | true | Whether or not the user can manually disable or change its own limitation or group limitation. |
-| `default` | | This quota is applied on the namespace at creation, before user modification or reset. New configuration will not be applied to existing namespaces. (will be deprecated see userEnabled and groupEnabled) |
-| `userEnabled` | false | Whether or not users are subject to a resource limitation. Enable this on user namespace only with user quota content based on kubernetes model . |
-| `user` | false | This quota is applied on the user namespace at creation, before user modification or reset. New configuration will not be applied to already existing namespaces. |
-| `groupEnabled` | false |Whether or not users are subject to a resource limitation. Enable this on group/project namespace only ith group quota content. |
-| `group` | false | This quota is applied on the group namespace at creation, before user modification or reset. New configuration will not be applied to already existing namespaces. |
+| Key            | Default | Description                                                                                                                                                                                        | Example |
+|----------------| ------- |----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| ------ |
+| `userEnabled`  | false | Whether or not `ResourceQuotas` should be created for user namespaces.                                                                                                                             | true |
+| `user`         |  | Quota to apply to user namespaces.                                                                                                                                                                 | `{ "count/pods": "5" }` |
+| `roles`        |  | Map of quotas corresponding to user roles. In case the user has multiple of those roles, only the first one will be applied. If user has no role from this list then `user` quota will be applied. | `{"admin": { "count/pods": "999" }}` |
+| `groupEnabled` | false | Whether or not `ResourceQuotas` should be created for group namespaces.                                                                                                                            | true |
+| `group`        |  | Quota to apply to group namespaces.                                                                                                                                                                | `{ "count/pods": "5" }` |
 
 A quota follows the Kubernetes model which is composed of:
 "requests.memory"

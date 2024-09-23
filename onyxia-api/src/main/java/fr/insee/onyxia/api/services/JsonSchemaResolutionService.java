@@ -4,11 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,11 +49,12 @@ public class JsonSchemaResolutionService {
                     if (ref.startsWith("#/definitions/")) {
                         refNode = rootNode.at(ref.substring(1));
                     } else {
-                        refNode = registryService.getSchema(roles,ref);
+                        refNode = registryService.getSchema(roles, ref);
                     }
 
                     if (refNode != null && !refNode.isMissingNode()) {
-                        JsonNode resolvedNode = resolveReferences(refNode.deepCopy(), rootNode, roles);
+                        JsonNode resolvedNode =
+                                resolveReferences(refNode.deepCopy(), rootNode, roles);
                         updates.putAll(convertToMap((ObjectNode) resolvedNode));
                         updates.put("$ref", null);
                     }
@@ -62,7 +63,8 @@ public class JsonSchemaResolutionService {
                         && fieldValue.get("x-onyxia").has("overwriteSchemaWith")) {
                     String overrideSchemaName =
                             fieldValue.get("x-onyxia").get("overwriteSchemaWith").asText();
-                    JsonNode overrideSchemaNode = registryService.getSchema(roles,overrideSchemaName);
+                    JsonNode overrideSchemaNode =
+                            registryService.getSchema(roles, overrideSchemaName);
 
                     if (overrideSchemaNode != null && !overrideSchemaNode.isMissingNode()) {
                         JsonNode resolvedNode =

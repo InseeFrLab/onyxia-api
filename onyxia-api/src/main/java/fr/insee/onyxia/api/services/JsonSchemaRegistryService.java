@@ -9,9 +9,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -98,18 +97,26 @@ public class JsonSchemaRegistryService {
 
             // Extract the role from the directory structure (first subdirectory under base path)
             Path relativePath = basePath.relativize(schemaFile);
-            String role = relativePath.getName(0).toString(); // The first part of the relative path is the role
+            String role =
+                    relativePath
+                            .getName(0)
+                            .toString(); // The first part of the relative path is the role
 
             // Generate the schema key based on the path after the role directory
-            String schemaKey = relativePath.subpath(1, relativePath.getNameCount()).toString().replace(File.separatorChar, '/');
+            String schemaKey =
+                    relativePath
+                            .subpath(1, relativePath.getNameCount())
+                            .toString()
+                            .replace(File.separatorChar, '/');
 
             // Add the schema to the role-specific registry
             roleSchemaRegistry
-                .computeIfAbsent(role, k -> new HashMap<>())  // Ensure a map exists for the role
-                .put(schemaKey, schema);  // Add the schema under the role
+                    .computeIfAbsent(role, k -> new HashMap<>()) // Ensure a map exists for the role
+                    .put(schemaKey, schema); // Add the schema under the role
 
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load schema for role from file: " + schemaFile.getFileName(), e);
+            throw new RuntimeException(
+                    "Failed to load schema for role from file: " + schemaFile.getFileName(), e);
         }
     }
 
