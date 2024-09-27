@@ -2,9 +2,6 @@ package fr.insee.onyxia.api.events;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -18,6 +15,10 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @EnableAsync
 @Component
@@ -50,15 +51,11 @@ public class WebhookEventListener {
     @Async
     @EventListener
     public void onOnyxiaEvent(OnyxiaEvent onyxiaEvent) throws JsonProcessingException {
-        if (!includes.isEmpty()) {
-            if (!includes.contains(onyxiaEvent.getType())) {
-                return;
-            }
+        if (!includes.isEmpty() && !includes.contains(onyxiaEvent.getType())) {
+            return;
         }
-        if (!excludes.isEmpty()) {
-            if (excludes.contains(onyxiaEvent.getType())) {
-                return;
-            }
+        if (!excludes.isEmpty() && excludes.contains(onyxiaEvent.getType())) {
+            return;
         }
         RequestBody body = RequestBody.create(objectMapper.writeValueAsString(onyxiaEvent), JSON);
         Request request = new Request.Builder().url(url).post(body).build();
