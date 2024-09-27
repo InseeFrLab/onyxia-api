@@ -2,9 +2,6 @@ package fr.insee.onyxia.api.events;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -18,6 +15,10 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @EnableAsync
 @Component
@@ -65,7 +66,7 @@ public class WebhookEventListener {
         try {
             httpClient.newCall(request).execute();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failure while sending event to webhook, will not be retried", e);
         }
     }
 
