@@ -54,6 +54,8 @@ public final class HelmReleaseHealthResolver {
                                         .withName(name)
                                         .get();
                         details.setDesired(deployment.getSpec().getReplicas());
+                        // If replicas is 0 then readyReplicas is not defined (and can't be
+                        // different from 0 anyway)
                         if (deployment.getStatus().getReplicas() > 0) {
                             details.setReady(deployment.getStatus().getReadyReplicas());
                         }
@@ -67,6 +69,8 @@ public final class HelmReleaseHealthResolver {
                                         .withName(name)
                                         .get();
                         details.setDesired(statefulset.getSpec().getReplicas());
+                        // If replicas is 0 then readyReplicas is not defined (and can't be
+                        // different from 0 anyway)
                         if (statefulset.getStatus().getReplicas() > 0) {
                             details.setReady(statefulset.getStatus().getReadyReplicas());
                         }
@@ -80,6 +84,8 @@ public final class HelmReleaseHealthResolver {
                                         .withName(name)
                                         .get();
                         details.setDesired(daemonSet.getStatus().getDesiredNumberScheduled());
+                        // If replicas is 0 then readyReplicas is not defined (and can't be
+                        // different from 0 anyway)
                         if (daemonSet.getStatus().getNumberAvailable() > 0) {
                             details.setReady(daemonSet.getStatus().getNumberReady());
                         }
