@@ -98,9 +98,6 @@ Configurable properties :
 | `event.webhook.includes` |  | List of events types to send the webhook for (empty = all events). e.g `service.uninstall,service.install`                           |
 | `event.webhook.excludes` |  | List of events types to ignore for the webhook. e.g `service.uninstall,service.install`                           |
 
-
-
-
 ### Other configurations
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
