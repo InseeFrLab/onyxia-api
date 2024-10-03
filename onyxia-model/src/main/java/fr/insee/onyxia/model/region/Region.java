@@ -391,15 +391,9 @@ public class Region {
         }
 
         public static class Quotas {
-            // could be deprecated as userQuota/groupQuota is enough
-            private boolean enabled = false;
+
             private boolean userEnabled = false;
             private boolean groupEnabled = false;
-            private boolean allowUserModification = true;
-
-            // could be deprecated
-            @JsonProperty("default")
-            private Quota defaultQuota;
 
             @JsonProperty("user")
             private Quota userQuota;
@@ -407,13 +401,8 @@ public class Region {
             @JsonProperty("group")
             private Quota groupQuota;
 
-            public boolean isEnabled() {
-                return enabled;
-            }
-
-            public void setEnabled(boolean enabled) {
-                this.enabled = enabled;
-            }
+            @JsonProperty("roles")
+            private Map<String, Quota> rolesQuota = new HashMap<>();
 
             public boolean isUserEnabled() {
                 return userEnabled;
@@ -447,20 +436,12 @@ public class Region {
                 this.groupQuota = groupQuota;
             }
 
-            public boolean isAllowUserModification() {
-                return allowUserModification;
+            public void setRolesQuota(Map<String, Quota> rolesQuota) {
+                this.rolesQuota = rolesQuota;
             }
 
-            public void setAllowUserModification(boolean allowUserModification) {
-                this.allowUserModification = allowUserModification;
-            }
-
-            public Quota getDefaultQuota() {
-                return defaultQuota;
-            }
-
-            public void setDefaultQuota(Quota defaultQuota) {
-                this.defaultQuota = defaultQuota;
+            public Map<String, Quota> getRolesQuota() {
+                return rolesQuota;
             }
         }
     }

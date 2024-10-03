@@ -21,7 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "My lab", description = "My services")
 @RequestMapping("/my-lab/quota")
@@ -84,90 +86,8 @@ public class QuotaController {
         return quotaUsage;
     }
 
-    @Operation(
-            summary = "Change the quota for a namespace.",
-            description =
-                    "Change the quota for a namespace if the quota changing option is enabled.",
-            parameters = {
-                @Parameter(
-                        name = "ONYXIA-PROJECT",
-                        description =
-                                "Project associated with the namespace, defaults to user project.",
-                        in = ParameterIn.HEADER,
-                        schema =
-                                @Schema(
-                                        name = "ONYXIA-PROJECT",
-                                        type = "string",
-                                        description = "generated project id"))
-            })
-    @PostMapping
-    public void applyQuota(
-            @Parameter(hidden = true) Region region,
-            @Parameter(hidden = true) Project project,
-            @RequestBody Quota quota) {
-        checkQuotaModificationIsAllowed(region);
-        final Owner owner = getOwner(region, project);
-        if (owner.getType() == Owner.OwnerType.USER) {
-            checkUserQuotaIsEnabled(region);
-        } else if (owner.getType() == Owner.OwnerType.GROUP) {
-            checkGroupQuotaIsEnabled(region);
-        }
-        kubernetesService.applyQuota(region, project, userProvider.getUser(region), quota);
-    }
-
-    @Operation(
-            summary = "Reset the quota for a namespace to the default value.",
-            description =
-                    "Reset the quota for a namespace to the default value if the quota changing option is enabled.",
-            parameters = {
-                @Parameter(
-                        name = "ONYXIA-PROJECT",
-                        description =
-                                "Project associated with the namespace, defaults to user project.",
-                        in = ParameterIn.HEADER,
-                        schema =
-                                @Schema(
-                                        name = "ONYXIA-PROJECT",
-                                        type = "string",
-                                        description = "generated project id"))
-            })
-    @PostMapping("/reset")
-    public void resetQuota(
-            @Parameter(hidden = true) Region region, @Parameter(hidden = true) Project project) {
-        checkQuotaModificationIsAllowed(region);
-        final Owner owner = getOwner(region, project);
-        if (owner.getType() == Owner.OwnerType.USER) {
-            checkUserQuotaIsEnabled(region);
-            if (region.getServices().getQuotas().isEnabled()) {
-                LOGGER.warn(
-                        "resetting to old enabled style quota, this parameter will be deprecated");
-                kubernetesService.applyQuota(
-                        region,
-                        project,
-                        userProvider.getUser(region),
-                        region.getServices().getQuotas().getDefaultQuota());
-            } else {
-                LOGGER.info("resetting to user enabled style quota");
-                kubernetesService.applyQuota(
-                        region,
-                        project,
-                        userProvider.getUser(region),
-                        region.getServices().getQuotas().getUserQuota());
-            }
-        } else if (owner.getType() == Owner.OwnerType.GROUP) {
-            LOGGER.info("resetting to group enabled style quota");
-            checkGroupQuotaIsEnabled(region);
-            kubernetesService.applyQuota(
-                    region,
-                    project,
-                    userProvider.getUser(region),
-                    region.getServices().getQuotas().getGroupQuota());
-        }
-    }
-
     private void checkUserQuotaIsEnabled(Region region) {
-        if (!region.getServices().getQuotas().isEnabled()
-                && !region.getServices().getQuotas().isUserEnabled()) {
+        if (!region.getServices().getQuotas().isUserEnabled()) {
             throw new AccessDeniedException("User Quotas are not active on this installation");
         }
     }
@@ -175,13 +95,6 @@ public class QuotaController {
     private void checkGroupQuotaIsEnabled(Region region) {
         if (!region.getServices().getQuotas().isGroupEnabled()) {
             throw new AccessDeniedException("Group Quotas are not active on this installation");
-        }
-    }
-
-    private void checkQuotaModificationIsAllowed(Region region) {
-        if (!region.getServices().getQuotas().isAllowUserModification()) {
-            throw new AccessDeniedException(
-                    "User modification is not allowed on this installation");
         }
     }
 

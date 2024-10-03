@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -22,13 +23,16 @@ public class JsonSchemaController {
     }
 
     @GetMapping
-    public Map<String, JsonNode> listSchemas() {
-        return jsonSchemaRegistryService.listSchemas();
+    public Map<String, JsonNode> listSchemas(
+            @RequestParam(value = "role", required = false) String role) {
+        return jsonSchemaRegistryService.listSchemas(role);
     }
 
     @GetMapping("/{schemaName}")
-    public JsonNode getSchema(@PathVariable String schemaName) {
-        JsonNode schema = jsonSchemaRegistryService.getSchema(schemaName);
+    public JsonNode getSchema(
+            @PathVariable String schemaName,
+            @RequestParam(value = "role", required = false) String role) {
+        JsonNode schema = jsonSchemaRegistryService.getSchema(role, schemaName);
         if (schema == null) {
             throw new SchemaNotFoundException(schemaName);
         }
