@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21.0.4_7-jre as extract
+FROM eclipse-temurin:21.0.4_7-jre AS extract
 ARG JAR_FILE=target/*.jar
 COPY ${JAR_FILE} application.jar
 RUN java -Djarmode=layertools -jar application.jar  extract
