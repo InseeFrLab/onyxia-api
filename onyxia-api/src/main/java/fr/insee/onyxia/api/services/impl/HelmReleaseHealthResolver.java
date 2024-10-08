@@ -53,8 +53,14 @@ public final class HelmReleaseHealthResolver {
                                         .inNamespace(namespace)
                                         .withName(name)
                                         .get();
+                        if (deployment == null) continue;
                         details.setDesired(deployment.getSpec().getReplicas());
-                        details.setReady(deployment.getStatus().getReadyReplicas());
+                        // If replicas is 0 then readyReplicas is not defined (and can't be
+                        // different from 0 anyway)
+                        if (deployment.getStatus().getReplicas() > 0
+                                && deployment.getStatus().getReadyReplicas() != null) {
+                            details.setReady(deployment.getStatus().getReadyReplicas());
+                        }
                         break;
                     case "StatefulSet":
                         StatefulSet statefulset =
@@ -64,8 +70,14 @@ public final class HelmReleaseHealthResolver {
                                         .inNamespace(namespace)
                                         .withName(name)
                                         .get();
+                        if (statefulset == null) continue;
                         details.setDesired(statefulset.getSpec().getReplicas());
-                        details.setReady(statefulset.getStatus().getReadyReplicas());
+                        // If replicas is 0 then readyReplicas is not defined (and can't be
+                        // different from 0 anyway)
+                        if (statefulset.getStatus().getReplicas() > 0
+                                && statefulset.getStatus().getReadyReplicas() != null) {
+                            details.setReady(statefulset.getStatus().getReadyReplicas());
+                        }
                         break;
                     case "DaemonSet":
                         DaemonSet daemonSet =
@@ -75,8 +87,14 @@ public final class HelmReleaseHealthResolver {
                                         .inNamespace(namespace)
                                         .withName(name)
                                         .get();
+                        if (daemonSet == null) continue;
                         details.setDesired(daemonSet.getStatus().getDesiredNumberScheduled());
-                        details.setReady(daemonSet.getStatus().getNumberReady());
+                        // If replicas is 0 then readyReplicas is not defined (and can't be
+                        // different from 0 anyway)
+                        if (daemonSet.getStatus().getNumberAvailable() > 0
+                                && daemonSet.getStatus().getNumberReady() != null) {
+                            details.setReady(daemonSet.getStatus().getNumberReady());
+                        }
                         break;
                     default:
                         continue;

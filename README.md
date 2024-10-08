@@ -90,9 +90,13 @@ Configurable properties :
 | `http.proxyPassword` | | Password if the proxy requires authentication |
 
 ### Events
-| Key | Default | Description                            |
-| --------------------- |---------|----------------------------------------|
-| `event.logging.enabled` | `true`  | whether events should be logged or not |
+| Key                      | Default | Description                                                        |
+|--------------------------|--|--------------------------------------------------------------------|
+| `event.logging.enabled`  | `true` | whether events should be logged or not                             |
+| `event.webhook.enabled`  | `false` | whether events should be sent to an external webhook via HTTP POST |
+| `event.webhook.url`      |  | URL of the webhook to send the events to                           |
+| `event.webhook.includes` |  | List of events types to send the webhook for (empty = all events). e.g `service.uninstall,service.install`                           |
+| `event.webhook.excludes` |  | List of events types to ignore for the webhook. e.g `service.uninstall,service.install`                           |
 
 ### Other configurations
 | Key | Default | Description |

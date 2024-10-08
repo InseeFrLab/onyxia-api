@@ -362,12 +362,20 @@ public class MyLabController {
 
         @Override
         public void onClose() {
-            emitter.complete();
+            try {
+                emitter.complete();
+            } catch (Exception ignored) {
+
+            }
         }
 
         @Override
         public void onClose(WatcherException e) {
-            emitter.complete();
+            try {
+                emitter.complete();
+            } catch (Exception ignored) {
+
+            }
         }
     }
 
