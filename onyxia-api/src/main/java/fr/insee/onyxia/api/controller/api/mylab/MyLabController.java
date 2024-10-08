@@ -29,15 +29,16 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 @Tag(name = "My lab", description = "My services")
 @RequestMapping("/my-lab")
@@ -116,6 +117,30 @@ public class MyLabController {
     public Catalogs getMyCatalogs(@Parameter(hidden = true) Region region) {
         User user = userProvider.getUser(region);
         return catalogService.getCatalogs(region, user);
+    }
+
+    @Operation(
+            summary = "Get all versions of a chart from a specific catalog.",
+            description =
+                    "Get all versions of a chart from a specific catalog, with detailed information on the package including: descriptions, sources, and configuration options.",
+            parameters = {
+                @Parameter(
+                        required = true,
+                        name = "catalogId",
+                        description = "Unique ID of the enabled catalog for this Onyxia API.",
+                        in = ParameterIn.PATH),
+                @Parameter(
+                        required = true,
+                        name = "chartName",
+                        description = "Unique name of the chart from the selected catalog.",
+                        in = ParameterIn.PATH)
+            })
+    @GetMapping("/catalogs/{catalogId}/charts/{chartName}")
+    public List<Chart> getChartVersions(
+            @PathVariable String catalogId, @PathVariable String chartName) {
+        List<Chart> charts =
+                catalogService.getCharts(catalogId, chartName).orElseThrow(NotFoundException::new);
+        return charts;
     }
 
     @Operation(
