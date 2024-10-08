@@ -1,8 +1,11 @@
 package fr.insee.onyxia.api.controller.exception;
 
-public class SchemaNotFoundException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+import org.springframework.web.ErrorResponseException;
+
+public class SchemaNotFoundException extends ErrorResponseException {
 
     public SchemaNotFoundException(String schemaName) {
-        super("Schema not found: " + schemaName);
+        super(HttpStatus.NOT_FOUND);
     }
 }
