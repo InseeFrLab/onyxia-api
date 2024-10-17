@@ -1,5 +1,6 @@
 package fr.insee.onyxia.api.controller.api.mylab;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.configuration.Catalogs;
@@ -7,11 +8,13 @@ import fr.insee.onyxia.api.configuration.NotFoundException;
 import fr.insee.onyxia.api.controller.exception.ServiceNotSuspendableException;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.CatalogService;
+import fr.insee.onyxia.api.services.JsonSchemaResolutionService;
 import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
 import fr.insee.onyxia.model.dto.ServicesListing;
+import fr.insee.onyxia.model.helm.Chart;
 import fr.insee.onyxia.model.project.Project;
 import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.Service;
@@ -29,6 +32,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import org.everit.json.schema.loader.SchemaLoader;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -44,6 +50,8 @@ public class MyLabController {
 
     private final CatalogService catalogService;
 
+    private final JsonSchemaResolutionService jsonSchemaResolutionService;
+
     private ObjectMapper objectMapper;
 
     @Autowired
@@ -51,10 +59,12 @@ public class MyLabController {
             AppsService helmAppsService,
             UserProvider userProvider,
             CatalogService catalogService,
+            JsonSchemaResolutionService jsonSchemaResolutionService,
             ObjectMapper objectMapper) {
         this.helmAppsService = helmAppsService;
         this.userProvider = userProvider;
         this.catalogService = catalogService;
+        this.jsonSchemaResolutionService = jsonSchemaResolutionService;
         this.objectMapper = objectMapper;
     }
 
@@ -106,6 +116,66 @@ public class MyLabController {
     public Catalogs getMyCatalogs(@Parameter(hidden = true) Region region) {
         User user = userProvider.getUser(region);
         return catalogService.getCatalogs(region, user);
+    }
+
+    @Operation(
+            summary = "Get all versions of a chart from a specific catalog.",
+            description =
+                    "Get all versions of a chart from a specific catalog, with detailed information on the package including: descriptions, sources, and configuration options.",
+            parameters = {
+                @Parameter(
+                        required = true,
+                        name = "catalogId",
+                        description = "Unique ID of the enabled catalog for this Onyxia API.",
+                        in = ParameterIn.PATH),
+                @Parameter(
+                        required = true,
+                        name = "chartName",
+                        description = "Unique name of the chart from the selected catalog.",
+                        in = ParameterIn.PATH)
+            })
+    @GetMapping("/catalogs/{catalogId}/charts/{chartName}")
+    public List<Chart> getChartVersions(
+            @PathVariable String catalogId, @PathVariable String chartName) {
+        List<Chart> charts =
+                catalogService.getCharts(catalogId, chartName).orElseThrow(NotFoundException::new);
+        return charts;
+    }
+
+    @Operation(
+            summary = "Get a helm chart from a specific catalog by version.",
+            description =
+                    "Get a helm chart from a specific catalog by version, with detailed information on the package including: descriptions, sources, and configuration options.",
+            parameters = {
+                @Parameter(
+                        required = true,
+                        name = "catalogId",
+                        description = "Unique ID of the enabled catalog for this Onyxia API.",
+                        in = ParameterIn.PATH),
+                @Parameter(
+                        required = true,
+                        name = "chartName",
+                        description = "Unique name of the chart from the selected catalog.",
+                        in = ParameterIn.PATH),
+                @Parameter(
+                        required = true,
+                        name = "version",
+                        description = "Version of the chart",
+                        in = ParameterIn.PATH)
+            })
+    @GetMapping("schemas/{catalogId}/charts/{chartName}/versions/{version}")
+    public JsonNode getSchemas(
+            @Parameter(hidden = true) Region region,
+            @PathVariable String catalogId,
+            @PathVariable String chartName,
+            @PathVariable String version) {
+        User user = userProvider.getUser(region);
+        Chart chart =
+                catalogService
+                        .getChartByVersion(catalogId, chartName, version)
+                        .orElseThrow(NotFoundException::new);
+
+        return jsonSchemaResolutionService.resolveReferences(chart.getConfig(), user.getRoles());
     }
 
     @Operation(
@@ -457,11 +527,31 @@ public class MyLabController {
                         .getPackageByName(requestDTO.getPackageName())
                         .orElseThrow(NotFoundException::new);
 
+        Map<String, Object> fusion = new HashMap<>();
+        fusion.putAll((Map<String, Object>) requestDTO.getOptions());
+
+        JSONObject jsonSchema =
+                new JSONObject(
+                        new JSONTokener(
+                                jsonSchemaResolutionService
+                                        .resolveReferences(pkg.getConfig(), user.getRoles())
+                                        .toString()));
+
+        SchemaLoader loader =
+                SchemaLoader.builder()
+                        .schemaJson(jsonSchema)
+                        .draftV6Support() // or draftV7Support()
+                        .build();
+        org.everit.json.schema.Schema schema = loader.load().build();
+        // Convert the options map to a JSONObject
+        JSONObject jsonObject = new JSONObject(fusion);
+        // Validate the options object against the schema
+        schema.validate(jsonObject);
+
         boolean skipTlsVerify = catalog.getSkipTlsVerify();
         String caFile = catalog.getCaFile();
         String timeout = catalog.getTimeout();
-        Map<String, Object> fusion = new HashMap<>();
-        fusion.putAll((Map<String, Object>) requestDTO.getOptions());
+
         return helmAppsService.installApp(
                 region,
                 project,

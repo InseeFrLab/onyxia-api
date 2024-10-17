@@ -6,6 +6,8 @@ import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.api.services.utils.HttpRequestUtils;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.region.Region;
+import java.util.Collections;
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,6 +47,9 @@ public class OIDCConfiguration {
 
     @Value("${oidc.groups-claim}")
     private String groupsClaim;
+
+    @Value("${oidc.roles-claim}")
+    private String rolesClaim;
 
     @Value("${oidc.issuer-uri}")
     private String issuerUri;
@@ -157,6 +162,11 @@ public class OIDCConfiguration {
             user.setNomComplet(userInfo.getClaimAsString("name"));
             if (userInfo.getClaimAsStringList(groupsClaim) != null) {
                 user.setGroups(userInfo.getClaimAsStringList(groupsClaim));
+            }
+            if (userInfo.getClaimAsStringList(rolesClaim) != null) {
+                List<String> roles = userInfo.getClaimAsStringList(rolesClaim);
+                Collections.sort(roles);
+                user.setRoles(roles);
             }
             user.getAttributes().putAll(userInfo.getClaims());
             user.getAttributes().put("sub", userInfo.getSubject());

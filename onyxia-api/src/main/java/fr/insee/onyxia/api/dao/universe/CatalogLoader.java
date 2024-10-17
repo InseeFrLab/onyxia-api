@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.zafarkhaja.semver.Version;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
-import fr.insee.onyxia.api.services.JsonSchemaResolutionService;
 import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.helm.Chart;
 import fr.insee.onyxia.model.helm.Repository;
@@ -37,16 +36,12 @@ public class CatalogLoader {
     private static final Logger LOGGER = LoggerFactory.getLogger(CatalogLoader.class);
 
     private final ResourceLoader resourceLoader;
-    private final JsonSchemaResolutionService jsonSchemaResolutionService;
     private final ObjectMapper mapperHelm;
 
     public CatalogLoader(
-            ResourceLoader resourceLoader,
-            @Qualifier("helm") ObjectMapper mapperHelm,
-            JsonSchemaResolutionService jsonSchemaResolutionService) {
+            ResourceLoader resourceLoader, @Qualifier("helm") ObjectMapper mapperHelm) {
         this.resourceLoader = resourceLoader;
         this.mapperHelm = mapperHelm;
-        this.jsonSchemaResolutionService = jsonSchemaResolutionService;
     }
 
     public void updateCatalog(CatalogWrapper cw) {
@@ -195,9 +190,7 @@ public class CatalogLoader {
                     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                     try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
                         tarIn.transferTo(baos);
-                        chart.setConfig(
-                                jsonSchemaResolutionService.resolveReferences(
-                                        mapper.readTree(baos.toString(UTF_8))));
+                        chart.setConfig(mapper.readTree(baos.toString(UTF_8)));
                     }
                 } else if (entryName.endsWith(chartName + "/values.yaml")
                         && !entryName.endsWith("charts/" + chartName + "/values.yaml")) {

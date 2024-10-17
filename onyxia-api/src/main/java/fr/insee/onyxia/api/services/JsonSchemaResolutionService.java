@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,10 +25,15 @@ public class JsonSchemaResolutionService {
     }
 
     public JsonNode resolveReferences(JsonNode schemaNode) {
-        return resolveReferences(schemaNode, schemaNode);
+        List<String> roles = new ArrayList<>();
+        return resolveReferences(schemaNode, schemaNode, roles);
     }
 
-    private JsonNode resolveReferences(JsonNode schemaNode, JsonNode rootNode) {
+    public JsonNode resolveReferences(JsonNode schemaNode, List<String> roles) {
+        return resolveReferences(schemaNode, schemaNode, roles);
+    }
+
+    private JsonNode resolveReferences(JsonNode schemaNode, JsonNode rootNode, List<String> roles) {
         if (schemaNode.isObject()) {
             ObjectNode objectNode = (ObjectNode) schemaNode;
             Iterator<Map.Entry<String, JsonNode>> fields = objectNode.fields();
@@ -42,11 +49,12 @@ public class JsonSchemaResolutionService {
                     if (ref.startsWith("#/definitions/")) {
                         refNode = rootNode.at(ref.substring(1));
                     } else {
-                        refNode = registryService.getSchema(ref);
+                        refNode = registryService.getSchema(roles, ref);
                     }
 
                     if (refNode != null && !refNode.isMissingNode()) {
-                        JsonNode resolvedNode = resolveReferences(refNode.deepCopy(), rootNode);
+                        JsonNode resolvedNode =
+                                resolveReferences(refNode.deepCopy(), rootNode, roles);
                         updates.putAll(convertToMap((ObjectNode) resolvedNode));
                         updates.put("$ref", null);
                     }
@@ -55,15 +63,16 @@ public class JsonSchemaResolutionService {
                         && fieldValue.get("x-onyxia").has("overwriteSchemaWith")) {
                     String overrideSchemaName =
                             fieldValue.get("x-onyxia").get("overwriteSchemaWith").asText();
-                    JsonNode overrideSchemaNode = registryService.getSchema(overrideSchemaName);
+                    JsonNode overrideSchemaNode =
+                            registryService.getSchema(roles, overrideSchemaName);
 
                     if (overrideSchemaNode != null && !overrideSchemaNode.isMissingNode()) {
                         JsonNode resolvedNode =
-                                resolveReferences(overrideSchemaNode.deepCopy(), rootNode);
+                                resolveReferences(overrideSchemaNode.deepCopy(), rootNode, roles);
                         updates.put(field.getKey(), resolvedNode);
                     }
                 } else if (fieldValue.isObject() || fieldValue.isArray()) {
-                    updates.put(field.getKey(), resolveReferences(fieldValue, rootNode));
+                    updates.put(field.getKey(), resolveReferences(fieldValue, rootNode, roles));
                 }
             }
 
@@ -77,7 +86,7 @@ public class JsonSchemaResolutionService {
         } else if (schemaNode.isArray()) {
             ArrayNode arrayNode = (ArrayNode) schemaNode;
             for (int i = 0; i < arrayNode.size(); i++) {
-                arrayNode.set(i, resolveReferences(arrayNode.get(i), rootNode));
+                arrayNode.set(i, resolveReferences(arrayNode.get(i), rootNode, roles));
             }
         }
         return schemaNode;
