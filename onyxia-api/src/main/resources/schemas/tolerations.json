@@ -10,7 +10,8 @@
       "properties": {
         "key": {
           "type": "string",
-          "description": "The taint key that the toleration applies to."
+          "description": "The taint key that the toleration applies to.",
+          "default": ""
         },
         "operator": {
           "type": "string",
@@ -19,7 +20,8 @@
         },
         "value": {
           "type": "string",
-          "description": "The taint value that the toleration matches to."
+          "description": "The taint value that the toleration matches to.",
+          "default": "true"
         },
         "effect": {
           "type": "string",
@@ -28,7 +30,8 @@
         },
         "tolerationSeconds": {
           "type": "integer",
-          "description": "The period of time the toleration (which must be of effect NoExecute, otherwise this field is ignored) tolerates the taint. Represented in seconds."
+          "description": "The period of time the toleration (which must be of effect NoExecute, otherwise this field is ignored) tolerates the taint. Represented in seconds.",
+          "default": 0
         }
       },
       "required": ["key", "operator", "effect"],
