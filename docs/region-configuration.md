@@ -11,23 +11,16 @@ See [regions.json](/onyxia-api/src/main/resources/regions.json) for a complete e
 - [Region configuration](#region-configuration)
   - [Main region properties](#main-region-properties)
   - [Services properties](#services-properties)
-    - [CustomInitScript properties](#custominitscript-properties)
     - [Server properties](#server-properties)
     - [K8sPublicEndpoint properties](#k8spublicendpoint-properties)
     - [Quotas properties](#quotas-properties)
     - [Expose properties](#expose-properties)
       - [istio](#istio)
       - [CertManager](#certManager)
-    - [Default configuration properties](#default-configuration-properties)
-      - [Kafka](#kafka)
-      - [Sliders](#sliders)
-      - [Resources](#resources)
   - [Data properties](#data-properties)
     - [S3](#s3)
-    - [Atlas](#atlas)
   - [Vault properties](#vault-properties)
   - [Git properties](#git-properties)
-  - [ProxyConfiguration properties](#proxyconfiguration-properties)
   - [ProxyInjection properties](#proxyinjection-properties)
   - [PackageRepositoryInjection properties](#packagerepositoryinjection-properties)
   - [CertificateAuthorityInjection properties](#certificateauthorityinjection-properties)
@@ -70,34 +63,14 @@ Users can work on Onyxia as a User or as a Group to which they belong. Each user
 | `groupPrefix`                 | | not used                                                                                                                                                                                                                                                                                                           |                                                                                                   |
 | `authenticationMode`          | serviceAccount | serviceAccount, impersonate or tokenPassthrough : on serviceAccount mode Onyxia API uses its own serviceAccount (by default admin or cluster-admin), with impersonate mode Onyxia requests the API with user's permissions (helm option `--kube-as-user`). With tokenPassthrough, the authentication token is passed to the API server. |                                                                                                   |
 | `expose`                      | | When users request to expose their service, only subdomain of this object domain are allowed                                                                                                                                                                                                                       | See [Expose properties](#expose-properties)                                                       |
-| `monitoring`                  | | Define the URL pattern of the monitoring service that is to be launched with each service. Only for client purposes.                                                                                                                                                                                               | {URLPattern: "https://$NAMESPACE-$INSTANCE.mymonitoring.sspcloud.fr"}                             |
-| `initScript`                  | | Define where to fetch a script that will be launched on some service on startup.                                                                                                                                                                                                                                   | "https://inseefrlab.github.io/onyxia/onyxia-init.sh"                                              |
+| `monitoring`                  | | Define the URL pattern of the monitoring service that is to be launched with each service. Only for client purposes.                                                                                                                                                                                               | {URLPattern: "https://$NAMESPACE-$INSTANCE.mymonitoring.sspcloud.fr"}                             |                                            |
 | `allowedURIPattern`           | "^https://" | Init scripts set by the user have to respect this pattern.                                                                                                                                                                                                                                                         |                                                                                                   |
 | `server`                      | | Define the configuration of the services provider API server, this value is not served on the API as it contains credentials for the API.                                                                                                                                                                          | See [Server properties](#server-properties)                                                       |
 | `k8sPublicEndpoint`           | | Define external access to Kubernetes API if available. It helps Onyxia users to directly connect to Kubernetes outside the datalab                                                                                                                                                                                 | See [K8sPublicEndpoint properties](#k8sPublicEndpoint-properties)                                 |
 | `quotas`                      | | Properties setting quotas on how many resources a user can get on the services provider.                                                                                                                                                                                                                           | See [Quotas properties](#quotas-properties)                                                       |
-| `defaultConfiguration`        | | Default configuration on services that a user can override. For client purposes only.                                                                                                                                                                                                                              | See [Default Configuration](#default-configuration-properties)                                    |
-| `customInitScript`            | | This can be used to customize user environments using a regional script executed by some users' pods.                                                                                                                                                                                                              | See [CustomInitScript properties](#custominitscript-properties)
-| `openshiftSCC`            | | This can be used to inject SCC (Security Context Constraints) in openshift clusters  | See [OpenshiftSCC properties](#openshiftSCC-properties)                               |
-| `customValues`                | | This can be used to specify custom values that will be available for helm chart injection in the web app. Nested values are supported.                                                                                                                                                                             | ` "customValues": {"myCustomKey": "myValue", "myNestedCustomKey": {"nestedKey": "nestedValue"} }` |
 
-### CustomInitScript properties
 
-These properties define how to reach the **service provider API**.
 
-| Key | Description | Example |
-| --------------------- | ------------------------------------------------------------------ | ---- |
-| `URL` | URL of the init script | "api.kub.sspcloud.fr" |
-| `checksum` | checksum of the init script |  |
-
-### OpenshiftSCC properties
-
-These properties define if SCC should be injected in services for openshift clusters
-
-| Key | Description | Example |
-| --------------------- | ------------------------------------------------------------------ | ---- |
-| `enabled` | defaults to `false` | `true` |
-| `scc` | name of the SCC  | `anyuid` |
 
 ### Server properties
 
@@ -166,62 +139,6 @@ A quota follows the Kubernetes model which is composed of:
 | `enabled`  | false  | Whether or not Istio is enabled                                                                              |
 | `gateways` | []     | List of istio gateways to be used. Should contain at least one element. E.g. `["istio-system/my-gateway"]`   |
 
-
-
-### Default configuration properties
-
-| Key | Default | Description |
-| --------------------- | ------- | ------------------------------------------------------------------ |
-| `IPProtection` | false | Whether or not the default behavior of the reverse proxy serving the service is to block a request from an IP other than the one from which it has been created. For client purposes only. |
-| `networkPolicy` | false | Whether or not services can be reached by pods outside of the current namespace. For client purposes only. |
-| `from` | NA | List of allowed sources (Kubernetes network policies format for from) to reach user HTTP services. Used to allow ingress access to users' services |
-| `nodeSelector` | NA | This node selector can be injected in a service to restrain on which node it can be launched  |
-| `tolerations` | NA | This node selector can be injected in a service to force it to run on nodes with this taint |
-| `startupProbe` | NA | This startup probe can be injected into a service. It can help you in an environment with a slow network to specify a long duration before killing a container |
-| `kafka` | | See [Kafka](#kafka) |
-| `sliders` | | See [Sliders](#sliders) |
-| `Resources` | | See [Resources](#resources) |
-
-#### Kafka
-
-Kafka can be used to get some events in the user chart like Hive metastore.
-
-| Key | Default | Description |
-| --------------------- | ------- | ------------------------------------------------------------------ |
-| `URL` | N.A | brokerURL |
-| `topicName` | N.A | topic name for those events |
-
-#### Sliders
-
-Sliders specify some slider parameters that may overwrite some defaults.
-
-| Key | Default | Description |
-| --------------------- | ------- | ------------------------------------------------------------------ |
-| `cpu` | N.A | cpu slider parameters |
-| `memory` | N.A | memory slider parameters |
-| `gpu` | N.A | gpu slider parameters |
-| `disk` | N.A | disk slider parameters |
-
-
-| Key | Default | Description |
-| --------------------- | ------- | ------------------------------------------------------------------ |
-| `sliderMin` | N.A | sliderMin |
-| `sliderMax` | N.A | sliderMax |
-| `sliderStep` | N.A | sliderStep |
-| `sliderUnit` | N.A | sliderUnit |
-
-#### Resources
-
-Resources specify some values that may overwrite some defaults.
-
-| Key | Default | Description |
-| --------------------- | ------- | ------------------------------------------------------------------ |
-| `cpuRequest` | N.A | overwrite default CPU request if asked by helm-charts |
-| `cpuLimit` | N.A | overwrite default CPU limit if asked by helm-charts |
-| `memoryRequest` | N.A | overwrite default memory request if asked by helm-charts |
-| `memoryLimit` | N.A | overwrite default memory limit if asked by helm-charts |
-| `disk` | N.A | overwrite default disk size if asked by helm-charts |
-| `gpu` | N.A | overwrite default GPU if asked by helm-charts |
 
 
 ## Data properties
@@ -367,17 +284,7 @@ type Region = {
   };
 };
 ```
-
-### Atlas
-
-Atlas is a data management tool.
-
-It can be used to add additional features to the file explorer to transform it into a data explorer
-
-| Key | Default | Description | Example |
-| --------------------- | ------- | ------------------------------------------------------------------ | ---- |
-| `URL` | | URL of the atlas service for the region. | "https://atlas.change.me" |
-| `oidcConfiguration` | | Allow override of openidconnect authentication for this specific service. If not defined then global Onyxia authentication will be used. | {clientID: "onyxia", issuerURI: "https://auth.lab.sspcloud.fr/auth"} |
+|
 
 ## Vault properties
 
@@ -411,16 +318,6 @@ It can be used to add additional features to Onyxia. It helps users to keep thei
 | `type` | | Type of Git implementation. | "gitlab", "github" |
 | `URL` | | URL of the git service for the region. | "https://git.change.me" |
 | `oidcConfiguration` | | Allow override of openidconnect authentication for this specific service. If not defined then global Onyxia authentication will be used. | {clientID: "onyxia", issuerURI: "https://auth.lab.sspcloud.fr/auth"} |
-
-## ProxyConfiguration properties
-
-It can be used to inject proxy configuration in the services, if the helm chart in the catalog allows it you can bind this value to the Helm chart value to override for example HTTP_PROXY, HTTPS_PROXY and NO_PROXY en variable in the pod launched.
-
-| Key | Default | Description | Example |
-| --------------------- | ------- | ------------------------------------------------------------------ | ---- |
-| `httpProxyUrl` | | URL of the enterprise proxy for the region for HTTP. | "http://proxy.enterprise.com:8080" |
-| `httpsProxyUrl` | | URL of the enterprise proxy for the region for HTTPS. | "http://proxy.enterprise.com:8080" |
-| `noProxy` | | enterprise local domain that should not take proxy comma separated | "corporate.com" |
 
 ## ProxyInjection properties
 

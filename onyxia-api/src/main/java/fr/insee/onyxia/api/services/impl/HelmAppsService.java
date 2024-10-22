@@ -40,6 +40,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
+import org.everit.json.schema.Schema;
+import org.everit.json.schema.ValidationException;
+import org.everit.json.schema.loader.SchemaLoader;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,8 +108,17 @@ public class HelmAppsService implements AppsService {
             User user,
             Map<String, Object> fusion,
             final boolean skipTlsVerify,
+            String timeout,
             final String caFile)
-            throws IOException, TimeoutException, InterruptedException {
+            throws IOException, TimeoutException, InterruptedException, ValidationException {
+
+        JSONObject jsonSchema = new JSONObject(new JSONTokener(pkg.getConfig().toString()));
+        // Load the schema
+        Schema schema = SchemaLoader.load(jsonSchema);
+        // Convert the options map to a JSONObject
+        JSONObject jsonObject = new JSONObject(fusion);
+        // Validate the options object against the schema
+        schema.validate(jsonObject);
 
         File values = File.createTempFile("values", ".yaml");
         mapperHelm.writeValue(values, fusion);
@@ -123,6 +137,7 @@ public class HelmAppsService implements AppsService {
                                     values,
                                     null,
                                     skipTlsVerify,
+                                    timeout,
                                     caFile);
             InstallServiceEvent installServiceEvent =
                     new InstallServiceEvent(
@@ -324,7 +339,6 @@ public class HelmAppsService implements AppsService {
         service.setId(release.getName());
         service.setName(release.getName());
         service.setSubtitle(release.getChart());
-        service.setType(Service.ServiceType.KUBERNETES);
         service.setName(release.getName());
         service.setNamespace(release.getNamespace());
         service.setRevision(release.getRevision());
@@ -410,6 +424,7 @@ public class HelmAppsService implements AppsService {
             User user,
             String serviceId,
             boolean skipTlsVerify,
+            String timeout,
             String caFile,
             boolean dryRun)
             throws IOException, InterruptedException, TimeoutException {
@@ -422,6 +437,7 @@ public class HelmAppsService implements AppsService {
                 user,
                 serviceId,
                 skipTlsVerify,
+                timeout,
                 caFile,
                 dryRun,
                 true);
@@ -437,6 +453,7 @@ public class HelmAppsService implements AppsService {
             User user,
             String serviceId,
             boolean skipTlsVerify,
+            String timeout,
             String caFile,
             boolean dryRun)
             throws IOException, InterruptedException, TimeoutException {
@@ -449,6 +466,7 @@ public class HelmAppsService implements AppsService {
                 user,
                 serviceId,
                 skipTlsVerify,
+                timeout,
                 caFile,
                 dryRun,
                 false);
@@ -463,6 +481,7 @@ public class HelmAppsService implements AppsService {
             User user,
             String serviceId,
             boolean skipTlsVerify,
+            String timeout,
             String caFile,
             boolean dryRun,
             boolean suspend)
@@ -479,6 +498,7 @@ public class HelmAppsService implements AppsService {
                             version,
                             dryRun,
                             skipTlsVerify,
+                            timeout,
                             caFile);
         } else {
             getHelmInstallService()
@@ -490,6 +510,7 @@ public class HelmAppsService implements AppsService {
                             version,
                             dryRun,
                             skipTlsVerify,
+                            timeout,
                             caFile);
         }
         SuspendResumeServiceEvent event =
