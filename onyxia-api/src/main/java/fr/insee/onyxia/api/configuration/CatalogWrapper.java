@@ -54,6 +54,9 @@ public class CatalogWrapper {
     @Schema(description = "Skip tls certificate checks for the repository")
     private boolean skipTlsVerify;
 
+    @Schema(description = "value to wait for helm command to complete")
+    private String timeout;
+
     @Schema(description = "Verify certificates of HTTPS-enabled servers using this CA bundle")
     private String caFile;
 
@@ -197,6 +200,14 @@ public class CatalogWrapper {
 
     public void setSkipTlsVerify(boolean skipTlsVerify) {
         this.skipTlsVerify = skipTlsVerify;
+    }
+
+    public String getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(String timeout) {
+        this.timeout = timeout;
     }
 
     public String getCaFile() {

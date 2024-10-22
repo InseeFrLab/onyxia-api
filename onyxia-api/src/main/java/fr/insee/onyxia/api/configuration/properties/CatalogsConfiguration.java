@@ -29,7 +29,7 @@ public class CatalogsConfiguration {
 
     private List<CatalogWrapper> resolvedCatalogs;
 
-    private ObjectMapper mapper;
+    private final ObjectMapper mapper;
 
     @Autowired
     public CatalogsConfiguration(ObjectMapper mapper) {

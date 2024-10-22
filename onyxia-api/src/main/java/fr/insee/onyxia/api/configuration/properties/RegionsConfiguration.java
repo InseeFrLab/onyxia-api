@@ -3,7 +3,6 @@ package fr.insee.onyxia.api.configuration.properties;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.model.region.Region;
-import fr.insee.onyxia.model.service.Service;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.Arrays;
@@ -44,30 +43,28 @@ public class RegionsConfiguration {
         resolvedRegions = Arrays.asList(mapper.readValue(regions, Region[].class));
         resolvedRegions.forEach(
                 region -> {
-                    if (region.getServices().getType().equals(Service.ServiceType.KUBERNETES)) {
-                        if (region.getServices()
-                                .getAuthenticationMode()
-                                .equals(Region.Services.AuthenticationMode.SERVICEACCOUNT)) {
-                            LOGGER.warn(
-                                    "Using serviceAccount authentication for region {}. Onyxia will deploy services using it's own global permissions, this may be a security issue.",
-                                    region.getId());
-                        }
+                    if (region.getServices()
+                            .getAuthenticationMode()
+                            .equals(Region.Services.AuthenticationMode.SERVICEACCOUNT)) {
+                        LOGGER.warn(
+                                "Using serviceAccount authentication for region {}. Onyxia will deploy services using it's own global permissions, this may be a security issue.",
+                                region.getId());
+                    }
 
-                        if (region.getServices()
-                                .getAuthenticationMode()
-                                .equals(Region.Services.AuthenticationMode.IMPERSONATE)) {
-                            LOGGER.info(
-                                    "Using impersonation authentication for region {}.",
-                                    region.getId());
-                        }
+                    if (region.getServices()
+                            .getAuthenticationMode()
+                            .equals(Region.Services.AuthenticationMode.IMPERSONATE)) {
+                        LOGGER.info(
+                                "Using impersonation authentication for region {}.",
+                                region.getId());
+                    }
 
-                        if (region.getServices()
-                                .getAuthenticationMode()
-                                .equals(Region.Services.AuthenticationMode.TOKEN_PASSTHROUGH)) {
-                            LOGGER.info(
-                                    "Using token passthrough authentication for region {}. User token will be used by Onyxia to interact with the API Server.",
-                                    region.getId());
-                        }
+                    if (region.getServices()
+                            .getAuthenticationMode()
+                            .equals(Region.Services.AuthenticationMode.TOKEN_PASSTHROUGH)) {
+                        LOGGER.info(
+                                "Using token passthrough authentication for region {}. User token will be used by Onyxia to interact with the API Server.",
+                                region.getId());
                     }
                 });
     }

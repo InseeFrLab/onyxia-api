@@ -1,0 +1,21 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "message",
+    "type": "object",
+    "description": "add a message in the notes",
+    "x-onyxia":{
+        "hidden": true
+        },
+    "properties": {
+        "fr":{
+            "type": "string",
+            "description":"message à ajouter dans les notes",
+            "default": ""
+         },
+        "en":{
+            "type": "string",
+            "description": "message to add in notes",
+            "default": ""
+            }
+        }
+}

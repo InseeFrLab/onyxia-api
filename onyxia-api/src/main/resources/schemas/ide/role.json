@@ -1,0 +1,26 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Role",
+    "type": "object",
+    "properties": {
+        "enabled": {
+            "type": "boolean",
+            "description": "allow your service to access your namespace ressources",
+            "default": true
+        },
+        "role": {
+            "type": "string",
+            "description": "bind your service account to this kubernetes default role",
+            "default": "view",
+            "hidden": {
+                "value": false,
+                "path": "kubernetes/enabled"
+            },
+            "enum": [
+                "view",
+                "edit",
+                "admin"
+            ]
+        }
+    }
+}
