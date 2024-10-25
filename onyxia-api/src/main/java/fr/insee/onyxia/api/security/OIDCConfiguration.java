@@ -6,7 +6,13 @@ import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.api.services.utils.HttpRequestUtils;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.region.Region;
+import java.security.KeyFactory;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -49,6 +55,9 @@ public class OIDCConfiguration {
     @Value("${oidc.issuer-uri}")
     private String issuerUri;
 
+    @Value("${oidc.public-key}")
+    private String publicKey;
+
     @Value("${oidc.jwk-uri}")
     private String jwkUri;
 
@@ -62,6 +71,8 @@ public class OIDCConfiguration {
     private String extraQueryParams;
 
     private final HttpRequestUtils httpRequestUtils;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OIDCConfiguration.class);
 
     @Autowired
     public OIDCConfiguration(HttpRequestUtils httpRequestUtils) {
@@ -217,6 +228,14 @@ public class OIDCConfiguration {
         return extraQueryParams;
     }
 
+    public String getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
+    }
+
     public void setExtraQueryParams(String extraQueryParams) {
         this.extraQueryParams = extraQueryParams;
     }
@@ -228,6 +247,23 @@ public class OIDCConfiguration {
         if (StringUtils.isNotEmpty(jwkUri)) {
             NimbusJwtDecoder decoder = NimbusJwtDecoder.withJwkSetUri(jwkUri).build();
             return decoder;
+        }
+
+        if (StringUtils.isNotEmpty(publicKey)) {
+            LOGGER.info("OIDC : using public key {} to validate tokens", publicKey);
+            try {
+                byte[] decodedKey = Base64.getDecoder().decode(publicKey);
+                X509EncodedKeySpec keySpec = new X509EncodedKeySpec(decodedKey);
+                KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+                RSAPublicKey parsedPublicKey = (RSAPublicKey) keyFactory.generatePublic(keySpec);
+                NimbusJwtDecoder decoder = NimbusJwtDecoder.withPublicKey(parsedPublicKey).build();
+                return decoder;
+            } catch (Exception e) {
+                LOGGER.error(
+                        "Fatal : Could not parse or use provided public key, please double check",
+                        e);
+                System.exit(0);
+            }
         }
 
         NimbusJwtDecoder jwtDecoder = JwtDecoders.fromIssuerLocation(issuerUri);
