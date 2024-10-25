@@ -68,7 +68,8 @@ Configurable properties :
 | Key | Default | Description |
 | -------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | `oidc.issuer-uri` | | Issuer URI, should be the same as the `iss` field of the tokens |
-| `oidc.jwk-uri` | | JWK URI, useful when auto discovery is not available or when `iss` is not consistent across tokens (e.g [Google](https://stackoverflow.com/questions/38618826/can-i-get-a-consistent-iss-value-for-a-google-openidconnect-id-token)) | 
+| `oidc.jwk-uri` | | JWK URI, useful when auto discovery is not available or when `iss` is not consistent across tokens (e.g [Google](https://stackoverflow.com/questions/38618826/can-i-get-a-consistent-iss-value-for-a-google-openidconnect-id-token)) |
+| `oidc.public-key` | | Public key used for validating incoming tokens. Don't provide this if you set `issuer-uri` or `jwk-uri` as it will be bootstrapped from that. This is useful if Onyxia-API has trouble connecting to your IDP (e.g self signed certificate). |
 | `oidc.clientID` | | Client id to be used by Onyxia web application |
 | `oidc.audience` | | Optional : audience to validate. Must be the same as the token's `aud` field |
 | `oidc.username-claim` | `preferred_username` | Claim to be used as user id. Must conform to [RFC 1123](https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#dns-label-names) |
