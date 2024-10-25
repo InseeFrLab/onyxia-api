@@ -4,11 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +30,12 @@ public class JsonSchemaResolutionService {
     }
 
     private JsonNode resolveReferences(JsonNode schemaNode, JsonNode rootNode, List<String> roles) {
+        // Prevent mutability by using a deep copy
+        return doResolveReferences(schemaNode.deepCopy(), rootNode, roles);
+    }
+
+    private JsonNode doResolveReferences(
+            JsonNode schemaNode, JsonNode rootNode, List<String> roles) {
         if (schemaNode.isObject()) {
             ObjectNode objectNode = (ObjectNode) schemaNode;
             Iterator<Map.Entry<String, JsonNode>> fields = objectNode.fields();
@@ -53,8 +55,7 @@ public class JsonSchemaResolutionService {
                     }
 
                     if (refNode != null && !refNode.isMissingNode()) {
-                        JsonNode resolvedNode =
-                                resolveReferences(refNode.deepCopy(), rootNode, roles);
+                        JsonNode resolvedNode = resolveReferences(refNode, rootNode, roles);
                         updates.putAll(convertToMap((ObjectNode) resolvedNode));
                         updates.put("$ref", null);
                     }
@@ -68,7 +69,7 @@ public class JsonSchemaResolutionService {
 
                     if (overrideSchemaNode != null && !overrideSchemaNode.isMissingNode()) {
                         JsonNode resolvedNode =
-                                resolveReferences(overrideSchemaNode.deepCopy(), rootNode, roles);
+                                resolveReferences(overrideSchemaNode, rootNode, roles);
                         updates.put(field.getKey(), resolvedNode);
                     }
                 } else if (fieldValue.isObject() || fieldValue.isArray()) {
