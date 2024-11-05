@@ -1,15 +1,9 @@
 package fr.insee.onyxia.api.security;
 
-import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
-
 import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.api.services.utils.HttpRequestUtils;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.region.Region;
-import java.security.KeyFactory;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +35,13 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+
+import java.security.KeyFactory;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
+
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 @Configuration
 @ConditionalOnProperty(name = "authentication.mode", havingValue = "openidconnect")
@@ -243,40 +244,38 @@ public class OIDCConfiguration {
     @Bean
     @ConditionalOnProperty(prefix = "oidc", name = "issuer-uri")
     NimbusJwtDecoder jwtDecoder() {
-        // If JWK is defined, use that instead of JWT issuer / audience validation
+        NimbusJwtDecoder decoder = null;
+        OAuth2TokenValidator<Jwt> validator = JwtValidators.createDefault();
         if (StringUtils.isNotEmpty(jwkUri)) {
-            NimbusJwtDecoder decoder = NimbusJwtDecoder.withJwkSetUri(jwkUri).build();
-            return decoder;
-        }
-
-        if (StringUtils.isNotEmpty(publicKey)) {
+            LOGGER.info("OIDC : using JWK URI {} to validate tokens", jwkUri);
+            decoder = NimbusJwtDecoder.withJwkSetUri(jwkUri).build();
+        } else if (StringUtils.isNotEmpty(publicKey)) {
             LOGGER.info("OIDC : using public key {} to validate tokens", publicKey);
             try {
                 byte[] decodedKey = Base64.getDecoder().decode(publicKey);
                 X509EncodedKeySpec keySpec = new X509EncodedKeySpec(decodedKey);
                 KeyFactory keyFactory = KeyFactory.getInstance("RSA");
                 RSAPublicKey parsedPublicKey = (RSAPublicKey) keyFactory.generatePublic(keySpec);
-                NimbusJwtDecoder decoder = NimbusJwtDecoder.withPublicKey(parsedPublicKey).build();
-                return decoder;
+                decoder = NimbusJwtDecoder.withPublicKey(parsedPublicKey).build();
             } catch (Exception e) {
                 LOGGER.error(
                         "Fatal : Could not parse or use provided public key, please double check",
                         e);
                 System.exit(0);
             }
+        } else {
+            LOGGER.info("OIDC : using issuerURI {} to validate tokens", issuerUri);
+            decoder = JwtDecoders.fromIssuerLocation(issuerUri);
+            validator = JwtValidators.createDefaultWithIssuer(issuerUri);
         }
 
-        NimbusJwtDecoder jwtDecoder = JwtDecoders.fromIssuerLocation(issuerUri);
-
         OAuth2TokenValidator<Jwt> audienceValidator = new AudienceValidator();
-        OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(issuerUri);
-
         OAuth2TokenValidator<Jwt> withAudience =
-                new DelegatingOAuth2TokenValidator<>(withIssuer, audienceValidator);
+                new DelegatingOAuth2TokenValidator<>(validator, audienceValidator);
 
-        jwtDecoder.setJwtValidator(withAudience);
+        decoder.setJwtValidator(withAudience);
 
-        return jwtDecoder;
+        return decoder;
     }
 
     public class AudienceValidator implements OAuth2TokenValidator<Jwt> {
