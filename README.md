@@ -68,6 +68,7 @@ Configurable properties :
 | Key | Default | Description |
 | -------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | `oidc.issuer-uri` | | Issuer URI, should be the same as the `iss` field of the tokens |
+| `oidc.skip-tls-verify` | `false` | Disable tls cert verification when retrieving keys from the IDP. Not intended for production. Consider mounting the proper `cacerts` instead of disabling the verification. |
 | `oidc.jwk-uri` | | JWK URI, useful when auto discovery is not available or when `iss` is not consistent across tokens (e.g [Google](https://stackoverflow.com/questions/38618826/can-i-get-a-consistent-iss-value-for-a-google-openidconnect-id-token)) |
 | `oidc.public-key` | | Public key used for validating incoming tokens. Don't provide this if you set `issuer-uri` or `jwk-uri` as it will be bootstrapped from that. This is useful if Onyxia-API has trouble connecting to your IDP (e.g self signed certificate). You can usually get this key directly by loading the issuer URI : (e.g `https://auth.example.com/realms/my-realm`) |
 | `oidc.clientID` | | Client id to be used by Onyxia web application |
