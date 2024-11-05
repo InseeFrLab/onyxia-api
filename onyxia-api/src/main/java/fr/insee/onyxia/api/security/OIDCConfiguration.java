@@ -6,7 +6,28 @@ import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.api.services.utils.HttpRequestUtils;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.region.Region;
+import java.security.KeyFactory;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
+import javax.net.ssl.SSLContext;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.BasicHttpClientConnectionManager;
+import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
+import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.core5.http.config.Registry;
+import org.apache.hc.core5.http.config.RegistryBuilder;
+import org.apache.hc.core5.ssl.SSLContexts;
+import org.apache.hc.core5.ssl.TrustStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -15,6 +36,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -26,12 +48,12 @@ import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -49,6 +71,9 @@ public class OIDCConfiguration {
     @Value("${oidc.issuer-uri}")
     private String issuerUri;
 
+    @Value("${oidc.public-key}")
+    private String publicKey;
+
     @Value("${oidc.jwk-uri}")
     private String jwkUri;
 
@@ -58,10 +83,15 @@ public class OIDCConfiguration {
     @Value("${oidc.clientID}")
     private String clientID;
 
+    @Value("${oidc.skip-tls-verify}")
+    private boolean skipTlsVerify;
+
     @Value("${oidc.extra-query-params}")
     private String extraQueryParams;
 
     private final HttpRequestUtils httpRequestUtils;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OIDCConfiguration.class);
 
     @Autowired
     public OIDCConfiguration(HttpRequestUtils httpRequestUtils) {
@@ -217,6 +247,14 @@ public class OIDCConfiguration {
         return extraQueryParams;
     }
 
+    public String getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
+    }
+
     public void setExtraQueryParams(String extraQueryParams) {
         this.extraQueryParams = extraQueryParams;
     }
@@ -224,23 +262,74 @@ public class OIDCConfiguration {
     @Bean
     @ConditionalOnProperty(prefix = "oidc", name = "issuer-uri")
     NimbusJwtDecoder jwtDecoder() {
-        // If JWK is defined, use that instead of JWT issuer / audience validation
+        NimbusJwtDecoder decoder = null;
+        OAuth2TokenValidator<Jwt> validator = JwtValidators.createDefault();
         if (StringUtils.isNotEmpty(jwkUri)) {
-            NimbusJwtDecoder decoder = NimbusJwtDecoder.withJwkSetUri(jwkUri).build();
-            return decoder;
+            LOGGER.info("OIDC : using JWK URI {} to validate tokens", jwkUri);
+            decoder = NimbusJwtDecoder.withJwkSetUri(jwkUri).build();
+        } else if (StringUtils.isNotEmpty(publicKey)) {
+            LOGGER.info("OIDC : using public key {} to validate tokens", publicKey);
+            try {
+                byte[] decodedKey = Base64.getDecoder().decode(publicKey);
+                X509EncodedKeySpec keySpec = new X509EncodedKeySpec(decodedKey);
+                KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+                RSAPublicKey parsedPublicKey = (RSAPublicKey) keyFactory.generatePublic(keySpec);
+                decoder = NimbusJwtDecoder.withPublicKey(parsedPublicKey).build();
+            } catch (Exception e) {
+                LOGGER.error(
+                        "Fatal : Could not parse or use provided public key, please double check",
+                        e);
+                System.exit(0);
+            }
+        } else {
+            LOGGER.info("OIDC : using issuerURI {} to validate tokens", issuerUri);
+            if (skipTlsVerify) {
+                try {
+                    decoder =
+                            NimbusJwtDecoder.withIssuerLocation(issuerUri)
+                                    .restOperations(getRestTemplate())
+                                    .build();
+                } catch (Exception e) {
+                    LOGGER.error("Fatal : failed to disable SSL verification", e);
+                    System.exit(0);
+                }
+            } else {
+                decoder = NimbusJwtDecoder.withIssuerLocation(issuerUri).build();
+            }
+            validator = JwtValidators.createDefaultWithIssuer(issuerUri);
         }
 
-        NimbusJwtDecoder jwtDecoder = JwtDecoders.fromIssuerLocation(issuerUri);
-
         OAuth2TokenValidator<Jwt> audienceValidator = new AudienceValidator();
-        OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(issuerUri);
-
         OAuth2TokenValidator<Jwt> withAudience =
-                new DelegatingOAuth2TokenValidator<>(withIssuer, audienceValidator);
+                new DelegatingOAuth2TokenValidator<>(validator, audienceValidator);
 
-        jwtDecoder.setJwtValidator(withAudience);
+        decoder.setJwtValidator(withAudience);
 
-        return jwtDecoder;
+        return decoder;
+    }
+
+    public RestTemplate getRestTemplate()
+            throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
+        HttpComponentsClientHttpRequestFactory requestFactoryHttp =
+                new HttpComponentsClientHttpRequestFactory();
+
+        TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
+        SSLContext sslContext =
+                SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
+        SSLConnectionSocketFactory sslsf =
+                new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
+        Registry<ConnectionSocketFactory> socketFactoryRegistry =
+                RegistryBuilder.<ConnectionSocketFactory>create()
+                        .register("https", sslsf)
+                        .register("http", new PlainConnectionSocketFactory())
+                        .build();
+
+        BasicHttpClientConnectionManager connectionManager =
+                new BasicHttpClientConnectionManager(socketFactoryRegistry);
+        CloseableHttpClient httpClient =
+                HttpClients.custom().setConnectionManager(connectionManager).build();
+        requestFactoryHttp.setHttpClient(httpClient);
+        return new RestTemplate(requestFactoryHttp);
     }
 
     public class AudienceValidator implements OAuth2TokenValidator<Jwt> {
