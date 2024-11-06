@@ -2,6 +2,7 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "title": "Kubernetes Tolerations",
     "type": "array",
+    "default": [],
     "x-onyxia": {
         "hidden": true
     },
