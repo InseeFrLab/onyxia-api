@@ -152,7 +152,6 @@ public class KubernetesService {
                     break; // take first role match
                 }
             }
-
             LOGGER.info("applying user enabled style quota");
             applyQuotas(namespaceId, kubClient, quota, true);
         } else if (groupEnabled) {

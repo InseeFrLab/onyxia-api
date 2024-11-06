@@ -92,7 +92,7 @@ It can be used to add additional features to Onyxia. It helps Onyxia users to di
 
 ### Quotas properties
 
-When this feature is enabled, Onyxia creates and maintain a [ResourceQuota](https://kubernetes.io/docs/concepts/policy/resource-quotas/) in the user / group namespace.  
+When this feature is enabled, Onyxia creates and maintains a [ResourceQuota](https://kubernetes.io/docs/concepts/policy/resource-quotas/) in the user / group namespace.
 This feature can be enabled for either or both `user` and `group` namespaces and, for user namespaces, quotas can depend on the user roles. 
 
 | Key            | Default | Description                                                                                                                                                                                        | Example |
@@ -103,17 +103,19 @@ This feature can be enabled for either or both `user` and `group` namespaces and
 | `groupEnabled` | false | Whether or not `ResourceQuotas` should be created for group namespaces.                                                                                                                            | true |
 | `group`        |  | Quota to apply to group namespaces.                                                                                                                                                                | `{ "count/pods": "5" }` |
 
-A quota follows the Kubernetes model which is composed of:
-"requests.memory"
-"requests.cpu"
-"limits.memory"
-"limits.cpu"
-"requests.storage"
-"count/pods"
-"requests.ephemeral-storage"
-"limits.ephemeral-storage"
-"requests.nvidia.com/gpu"
-"limits.nvidia.com/gpu"
+A quota follows the Kubernetes model which is composed of:  
+* "requests.memory"
+* "requests.cpu"
+* "limits.memory"
+* "limits.cpu"
+* "requests.storage"
+* "count/pods"
+* "requests.ephemeral-storage"
+* "limits.ephemeral-storage"
+* "requests.nvidia.com/gpu"
+* "limits.nvidia.com/gpu"  
+
+Note : If you want Onyxia to create the ResourceQuota but not override it at each user login / action (e.g you override it yourself for some specific users), you can add the annotation `onyxia_ignore` to the ResourceQuota. If this annotation is set on a ResourceQuota then Onyxia won't touch it anymore.
 
 ### Expose properties
 
