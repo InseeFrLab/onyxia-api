@@ -75,6 +75,7 @@ Configurable properties :
 | `oidc.audience` | | Optional : audience to validate. Must be the same as the token's `aud` field |
 | `oidc.username-claim` | `preferred_username` | Claim to be used as user id. Must conform to [RFC 1123](https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#dns-label-names) |
 | `oidc.groups-claim` | `groups` | Claim to be used as list of user groups. |
+| `oidc.roles-claim` | `roles` | Claim to be used as list of user roles. |
 | `oidc.extra-query-params` | | Optional : query params to be added by client. e.g : `prompt=consent&kc_idp_hint=google` |
 
 ### Security configuration :
