@@ -551,7 +551,6 @@ public class MyLabController {
         boolean skipTlsVerify = catalog.getSkipTlsVerify();
         String caFile = catalog.getCaFile();
         String timeout = catalog.getTimeout();
-        Map<String, Object> fusion = new HashMap<>();
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
         // Substitute userAttribute value with actual value from user's attributes map
         // This is a hack while we wait for this issue to be fixed:
