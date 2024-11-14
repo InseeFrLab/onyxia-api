@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import fr.insee.onyxia.model.views.Views;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -27,7 +28,10 @@ public class CustomObjectMapper {
         mapper.enable(ALLOW_TRAILING_COMMA);
         mapper.enable(ALLOW_SINGLE_QUOTES);
 
-        return mapper.build();
+        ObjectMapper returnMapper = mapper.build();
+        returnMapper.setConfig(returnMapper.getSerializationConfig().withView(Views.General.class));
+
+        return returnMapper;
     }
 
     @Bean(name = "helm")
