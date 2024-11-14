@@ -14,9 +14,11 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication(scanBasePackages = {"io.github.inseefrlab", "fr.insee.onyxia"})
 @EnableAsync(proxyTargetClass = true)
+@EnableScheduling
 public class Application {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);

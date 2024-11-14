@@ -3,37 +3,30 @@ package fr.insee.onyxia.api.dao.universe;
 import fr.insee.onyxia.api.configuration.Catalogs;
 import io.github.inseefrlab.helmwrapper.service.HelmRepoService;
 import java.io.IOException;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CatalogRefresher implements ApplicationRunner {
+public class CatalogRefresher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CatalogRefresher.class);
 
     private final Catalogs catalogs;
     private final CatalogLoader catalogLoader;
-    private final long refreshTime;
     private final HelmRepoService helmRepoService;
 
     @Autowired
     public CatalogRefresher(
-            Catalogs catalogs,
-            CatalogLoader catalogLoader,
-            HelmRepoService helmRepoService,
-            @Value("${catalogs.refresh.ms}") long refreshTime) {
+            Catalogs catalogs, CatalogLoader catalogLoader, HelmRepoService helmRepoService) {
         this.catalogs = catalogs;
         this.catalogLoader = catalogLoader;
         this.helmRepoService = helmRepoService;
-        this.refreshTime = refreshTime;
     }
 
     private void refreshCatalogs() {
@@ -76,32 +69,18 @@ public class CatalogRefresher implements ApplicationRunner {
         refreshCatalogs();
     }
 
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
-        LOGGER.info("Starting catalog refresher...");
+    @Scheduled(fixedDelayString = "${catalogs.refresh.ms}")
+    public synchronized void run() {
+        LOGGER.info("Refreshing catalogs");
         try {
             refresh();
-        } catch (InterruptedException e) {
-            LOGGER.warn("Run method interrupted", e);
-            Thread.currentThread().interrupt();
+        } catch (Exception e) {
+            LOGGER.error("Catalog refreshing failed", e);
         }
+    }
 
-        if (refreshTime > 0L) {
-            Timer timer = new Timer();
-            TimerTask timerTask =
-                    new TimerTask() {
-                        @Override
-                        public void run() {
-                            LOGGER.info("Refreshing catalogs");
-                            try {
-                                refresh();
-                            } catch (InterruptedException e) {
-                                LOGGER.warn("Timer task interrupted", e);
-                                Thread.currentThread().interrupt();
-                            }
-                        }
-                    };
-            timer.scheduleAtFixedRate(timerTask, refreshTime, refreshTime);
-        }
+    @EventListener(ApplicationReadyEvent.class)
+    public void initialRefresh() {
+        run();
     }
 }
