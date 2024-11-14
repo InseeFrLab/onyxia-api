@@ -15,8 +15,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.ApplicationArguments;
+import org.springframework.test.context.TestPropertySource;
 
 @ExtendWith(MockitoExtension.class)
+@TestPropertySource(properties = "catalogs.refresh.ms=1000")
 class CatalogRefresherTest {
 
     @Mock private Catalogs catalogs;
@@ -31,7 +33,7 @@ class CatalogRefresherTest {
 
     @BeforeEach
     void setUp() {
-        catalogRefresher = new CatalogRefresher(catalogs, catalogLoader, helmRepoService, 1000);
+        catalogRefresher = new CatalogRefresher(catalogs, catalogLoader, helmRepoService);
         Thread.interrupted(); // Clear any existing interrupted status
     }
 
@@ -42,7 +44,7 @@ class CatalogRefresherTest {
                 .when(helmRepoService)
                 .repoUpdate();
 
-        catalogRefresher.run(applicationArguments);
+        catalogRefresher.run();
 
         verify(helmRepoService).repoUpdate();
         verify(catalogLoader, never()).updateCatalog(any(CatalogWrapper.class));
@@ -56,7 +58,7 @@ class CatalogRefresherTest {
     void testTimeoutExceptionHandling() throws Exception {
         doThrow(new TimeoutException("Timeout")).when(helmRepoService).repoUpdate();
 
-        catalogRefresher.run(applicationArguments);
+        catalogRefresher.run();
 
         verify(helmRepoService).repoUpdate();
         verify(catalogLoader, never()).updateCatalog(any(CatalogWrapper.class));
@@ -67,7 +69,7 @@ class CatalogRefresherTest {
     void testIOExceptionHandling() throws Exception {
         doThrow(new IOException("IO error")).when(helmRepoService).repoUpdate();
 
-        catalogRefresher.run(applicationArguments);
+        catalogRefresher.run();
 
         verify(helmRepoService).repoUpdate();
         verify(catalogLoader, never()).updateCatalog(any(CatalogWrapper.class));
@@ -85,7 +87,7 @@ class CatalogRefresherTest {
         when(catalogs.getCatalogs()).thenReturn(List.of(catalogWrapper));
         when(helmRepoService.addHelmRepo("location", "id", false, null)).thenReturn("Repo added");
 
-        catalogRefresher.run(applicationArguments);
+        catalogRefresher.run();
 
         verify(helmRepoService).repoUpdate();
         verify(helmRepoService, times(1)).addHelmRepo("location", "id", false, null);
