@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.ApplicationArguments;
 import org.springframework.test.context.TestPropertySource;
 
 @ExtendWith(MockitoExtension.class)
@@ -26,8 +25,6 @@ class CatalogRefresherTest {
     @Mock private CatalogLoader catalogLoader;
 
     @Mock private HelmRepoService helmRepoService;
-
-    @Mock private ApplicationArguments applicationArguments;
 
     private CatalogRefresher catalogRefresher;
 

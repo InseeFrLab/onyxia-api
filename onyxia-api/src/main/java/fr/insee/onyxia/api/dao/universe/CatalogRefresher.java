@@ -70,7 +70,7 @@ public class CatalogRefresher {
     }
 
     @Scheduled(fixedDelayString = "${catalogs.refresh.ms}")
-    public synchronized void run() throws Exception {
+    public synchronized void run() {
         LOGGER.info("Refreshing catalogs");
         try {
             refresh();
@@ -80,7 +80,7 @@ public class CatalogRefresher {
     }
 
     @EventListener(ApplicationReadyEvent.class)
-    public void initialRefresh() throws Exception {
+    public void initialRefresh() {
         run();
     }
 }
