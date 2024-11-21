@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/admin")
 @RestController
 @SecurityRequirement(name = "auth")
-@ConditionalOnExpression("'${admin-endpoints-enabled}' == 'true'")
+@ConditionalOnExpression("'${admin.enabled}' == 'true'")
 public class AdminController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AdminController.class);
@@ -24,7 +24,17 @@ public class AdminController {
 
     @PostConstruct
     private void postConstruct() {
-        LOGGER.warn("RUNNING IN ADMIN MODE!!!");
+        LOGGER.warn(
+                """
+
+
+
+
+                ADMIN MODE IS ENABLED, DON'T USE THIS IN PRODUCTION
+
+
+
+                """);
     }
 
     @Autowired
