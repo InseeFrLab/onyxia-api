@@ -66,35 +66,30 @@ public class CatalogLoader {
             Repository repository = mapperHelm.readValue(reader, Repository.class);
 
             repository.setEntries(
-                    repository.getEntries().keySet().stream()
+                    repository.getEntries().entrySet().stream()
                             .filter(
                                     // Remove explicitly excluded services
-                                    key ->
+                                    entry ->
                                             cw.getExcludedCharts().stream()
                                                     .noneMatch(
                                                             excludedChart ->
                                                                     excludedChart.equalsIgnoreCase(
-                                                                            key)))
+                                                                            entry.getKey())))
                             .filter(
-                                    // If includeKeywords is defined, only include services where
-                                    // the latest version
-                                    // has the desired keyword.
-                                    key ->
+                                    // If includeKeywords is defined, include only services where
+                                    // the latest version has the desired keyword.
+                                    entry ->
                                             cw.getIncludeKeywords() == null
                                                     || cw.getIncludeKeywords().isEmpty()
                                                     || cw.getIncludeKeywords().stream()
                                                             .anyMatch(
                                                                     include ->
-                                                                            repository
-                                                                                    .getEntries()
-                                                                                    .get(key)
+                                                                            entry.getValue()
                                                                                     .getFirst()
                                                                                     .getKeywords()
                                                                                     .contains(
                                                                                             include)))
-                            .collect(
-                                    Collectors.toMap(
-                                            key -> key, key -> repository.getEntries().get(key))));
+                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
             // For each service, filter the multiple versions if needed then refresh remaining
             // versions
             repository.getEntries().values().parallelStream()
