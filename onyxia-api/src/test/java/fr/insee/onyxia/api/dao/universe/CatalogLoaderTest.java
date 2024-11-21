@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.configuration.CustomObjectMapper;
@@ -14,9 +15,15 @@ import fr.insee.onyxia.model.helm.Chart;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ResourceLoader;
@@ -154,13 +161,24 @@ public class CatalogLoaderTest {
                                 + "[catalog-loader-test/keepeme1.gz]"));
     }
 
-    @Test
-    void filterIncludeKeywordsTest() {
+    @ParameterizedTest
+    @MethodSource("includeKeywords")
+    void filterIncludeKeywordsTest(List<String> includeKeywords, Set<String> expectedServices) {
         CatalogWrapper cw = new CatalogWrapper();
         cw.setType("helm");
         cw.setLocation("classpath:/catalog-loader-test-with-keywords");
-        cw.setIncludeKeywords(List.of("CD"));
+        cw.setIncludeKeywords(includeKeywords);
         catalogLoader.updateCatalog(cw);
-        assertEquals(Set.of("keepme"), cw.getCatalog().getEntries().keySet());
+        assertEquals(expectedServices, cw.getCatalog().getEntries().keySet());
+    }
+
+    private static Stream<Arguments> includeKeywords() {
+        return Stream.of(
+                arguments(List.of("CD"), Set.of("keepme")),
+                arguments(List.of("CD", "Experimental"), Set.of("keepme", "excludeme")),
+                arguments(List.of(), Set.of("keepme", "excludeme")),
+                arguments(null, Set.of("keepme", "excludeme")),
+                arguments(List.of("no one knows"), Set.of())
+        );
     }
 }

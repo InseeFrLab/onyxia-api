@@ -15,6 +15,7 @@ import fr.insee.onyxia.model.helm.Chart;
 import fr.insee.onyxia.model.helm.Repository;
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
@@ -63,17 +64,36 @@ public class CatalogLoader {
                                     .getInputStream(),
                             UTF_8);
             Repository repository = mapperHelm.readValue(reader, Repository.class);
-            // Remove excluded services from list
-            repository
-                    .getEntries()
-                    .entrySet()
-                    .removeIf(
-                            entry ->
-                                    cw.getExcludedCharts().stream()
-                                            .anyMatch(
-                                                    excludedChart ->
-                                                            excludedChart.equalsIgnoreCase(
-                                                                    entry.getKey())));
+
+            repository.setEntries(
+                    repository.getEntries().keySet().stream()
+                            .filter(
+                                    // Remove explicitly excluded services
+                                    key ->
+                                            cw.getExcludedCharts().stream()
+                                                    .noneMatch(
+                                                            excludedChart ->
+                                                                    excludedChart.equalsIgnoreCase(
+                                                                            key)))
+                            .filter(
+                                    // If includeKeywords is defined, only include services where the latest version
+                                    // has the desired keyword.
+                                    key ->
+                                            cw.getIncludeKeywords() == null
+                                                    || cw.getIncludeKeywords().isEmpty()
+                                                    || cw.getIncludeKeywords().stream()
+                                                            .anyMatch(
+                                                                    include ->
+                                                                            repository
+                                                                                    .getEntries()
+                                                                                    .get(key)
+                                                                                    .getFirst()
+                                                                                    .getKeywords()
+                                                                                    .contains(
+                                                                                            include)))
+                            .collect(
+                                    Collectors.toMap(
+                                            key -> key, key -> repository.getEntries().get(key))));
             // For each service, filter the multiple versions if needed then refresh remaining
             // versions
             repository.getEntries().values().parallelStream()

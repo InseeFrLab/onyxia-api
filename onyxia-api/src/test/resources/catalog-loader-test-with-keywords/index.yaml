@@ -121,6 +121,7 @@ entries:
       name: excludeme
       keywords:
         - Experimental
+        - CD
       sources:
         - https://github.com/InseeFrLab/helm-charts-datascience/tree/master/charts/argo-cd
         - https://github.com/argoproj/argo-helm/tree/master/charts/argo-cd
