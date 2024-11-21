@@ -8,7 +8,6 @@ WORKDIR /app
 # Install helm
 COPY install-helm.sh install-helm.sh
 RUN ./install-helm.sh
-RUN helm version
 RUN rm install-helm.sh
 # Create onyxia group and user
 RUN groupadd --gid 101 --system onyxia && \
