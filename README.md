@@ -78,12 +78,6 @@ Configurable properties :
 | `oidc.roles-claim` | `roles` | Claim to be used as list of user roles. |
 | `oidc.extra-query-params` | | Optional : query params to be added by client. e.g : `prompt=consent&kc_idp_hint=google` |
 
-### Admin configuration:
-| Key                       | Default | Description                                                           |
-|---------------------------|---------|-----------------------------------------------------------------------|
-| `admin-endpoints-enabled` | `false`  | Whether to enable the admin endpoints. Do not use this in production! |
-
-
 ### Security configuration :
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
@@ -106,6 +100,14 @@ Configurable properties :
 | `event.webhook.url`      |  | URL of the webhook to send the events to                           |
 | `event.webhook.includes` |  | List of events types to send the webhook for (empty = all events). e.g `service.uninstall,service.install`                           |
 | `event.webhook.excludes` |  | List of events types to ignore for the webhook. e.g `service.uninstall,service.install`                           |
+
+### Admin configuration:
+:warning: This section should be considered pre-alpha and may be subject to major changes and revamps :warning:
+
+| Key              | Default | Description                                                                                |
+|------------------|-----|--------------------------------------------------------------------------------------------|
+| `admin.enabled`  | `false` | Whether to enable the admin endpoints. :warning: Do not use this in production ! :warning: |
+
 
 ### Other configurations
 | Key | Default | Description |
