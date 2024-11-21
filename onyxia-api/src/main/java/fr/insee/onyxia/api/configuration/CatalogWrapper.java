@@ -51,6 +51,9 @@ public class CatalogWrapper {
     @Schema(description = "names of declarative important charts of the catalog")
     private List<String> highlightedCharts = new ArrayList<>();
 
+    @Schema(description = "only include charts with one or more of the given keywords")
+    private List<String> includeKeywords = new ArrayList<>();
+
     @Schema(description = "Skip tls certificate checks for the repository")
     private boolean skipTlsVerify;
 
@@ -192,6 +195,14 @@ public class CatalogWrapper {
 
     public void setHighlightedCharts(List<String> highlightedCharts) {
         this.highlightedCharts = highlightedCharts;
+    }
+
+    public List<String> getIncludeKeywords() {
+        return includeKeywords;
+    }
+
+    public void setIncludeKeywords(List<String> includeKeywords) {
+        this.includeKeywords = includeKeywords;
     }
 
     public boolean getSkipTlsVerify() {

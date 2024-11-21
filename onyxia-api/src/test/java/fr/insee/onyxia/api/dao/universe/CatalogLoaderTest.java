@@ -3,7 +3,7 @@ package fr.insee.onyxia.api.dao.universe;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.configuration.CustomObjectMapper;
@@ -12,6 +12,7 @@ import fr.insee.onyxia.api.services.JsonSchemaResolutionService;
 import fr.insee.onyxia.api.util.TestUtils;
 import fr.insee.onyxia.model.helm.Chart;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -151,5 +152,15 @@ public class CatalogLoaderTest {
                         "fr.insee.onyxia.api.dao.universe.CatalogLoaderException: "
                                 + "Exception occurred during loading resource: class path resource "
                                 + "[catalog-loader-test/keepeme1.gz]"));
+    }
+
+    @Test
+    void filterIncludeKeywordsTest() {
+        CatalogWrapper cw = new CatalogWrapper();
+        cw.setType("helm");
+        cw.setLocation("classpath:/catalog-loader-test-with-keywords");
+        cw.setIncludeKeywords(List.of("CD"));
+        catalogLoader.updateCatalog(cw);
+        assertEquals(Set.of("keepme"), cw.getCatalog().getEntries().keySet());
     }
 }

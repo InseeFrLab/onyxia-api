@@ -15,8 +15,6 @@ entries:
       digest: beedc71c7f5730cf68000b5665dd4da636e72a026edd9b12c1d048398d4166dd
       home: https://argo-cd.readthedocs.io/en/stable/
       icon: https://minio.lab.sspcloud.fr/projet-onyxia/assets/servicesImg/argo.png
-      keywords:
-        - CD
       name: keepme
       sources:
         - https://github.com/InseeFrLab/helm-charts-datascience/tree/master/charts/argo-cd
@@ -42,8 +40,6 @@ entries:
       digest: beedc71c7f5730cf68000b5665dd4da636e72a026edd9b12c1d048398d4166dd
       home: https://argo-cd.readthedocs.io/en/stable/
       icon: https://minio.lab.sspcloud.fr/projet-onyxia/assets/servicesImg/argo.png
-      keywords:
-        - CD
       name: keepme
       sources:
         - https://github.com/InseeFrLab/helm-charts-datascience/tree/master/charts/argo-cd
@@ -69,8 +65,6 @@ entries:
       digest: beedc71c7f5730cf68000b5665dd4da636e72a026edd9b12c1d048398d4166dd
       home: https://argo-cd.readthedocs.io/en/stable/
       icon: https://minio.lab.sspcloud.fr/projet-onyxia/assets/servicesImg/argo.png
-      keywords:
-        - CD
       name: keepme
       sources:
         - https://github.com/InseeFrLab/helm-charts-datascience/tree/master/charts/argo-cd
@@ -95,8 +89,6 @@ entries:
       home: https://argo-cd.readthedocs.io/en/stable/
       icon: https://minio.lab.sspcloud.fr/projet-onyxia/assets/servicesImg/argo.png
       name: excludeme
-      keywords:
-        - Experimental
       sources:
         - https://github.com/InseeFrLab/helm-charts-datascience/tree/master/charts/argo-cd
         - https://github.com/argoproj/argo-helm/tree/master/charts/argo-cd
@@ -119,8 +111,6 @@ entries:
       home: https://argo-cd.readthedocs.io/en/stable/
       icon: https://minio.lab.sspcloud.fr/projet-onyxia/assets/servicesImg/argo.png
       name: excludeme
-      keywords:
-        - Experimental
       sources:
         - https://github.com/InseeFrLab/helm-charts-datascience/tree/master/charts/argo-cd
         - https://github.com/argoproj/argo-helm/tree/master/charts/argo-cd
@@ -128,3 +118,4 @@ entries:
       urls:
         - excludeme2.gz
       version: 2.4.0
+
