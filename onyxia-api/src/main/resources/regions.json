@@ -68,11 +68,6 @@
       },
       "auth": {
         "type": "openidconnect"
-      },
-      "location": {
-        "name": "Paris",
-        "lat": 48.8453225,
-        "long": 2.3024401
       }
     }
   ]
