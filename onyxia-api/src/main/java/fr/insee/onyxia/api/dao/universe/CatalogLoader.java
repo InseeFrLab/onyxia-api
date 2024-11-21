@@ -76,7 +76,8 @@ public class CatalogLoader {
                                                                     excludedChart.equalsIgnoreCase(
                                                                             key)))
                             .filter(
-                                    // If includeKeywords is defined, only include services where the latest version
+                                    // If includeKeywords is defined, only include services where
+                                    // the latest version
                                     // has the desired keyword.
                                     key ->
                                             cw.getIncludeKeywords() == null
