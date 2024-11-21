@@ -78,6 +78,12 @@ Configurable properties :
 | `oidc.roles-claim` | `roles` | Claim to be used as list of user roles. |
 | `oidc.extra-query-params` | | Optional : query params to be added by client. e.g : `prompt=consent&kc_idp_hint=google` |
 
+### Admin configuration:
+| Key                       | Default | Description                                                           |
+|---------------------------|---------|-----------------------------------------------------------------------|
+| `admin-endpoints-enabled` | `false`  | Whether to enable the admin endpoints. Do not use this in production! |
+
+
 ### Security configuration :
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
