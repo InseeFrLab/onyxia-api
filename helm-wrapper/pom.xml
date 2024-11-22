@@ -14,10 +14,6 @@
     <name>helm-wrapper</name>
     <description>Simple wrapper for Helm (https://helm.sh)</description>
 
-    <properties>
-        <java.version>21</java.version>
-    </properties>
-
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
