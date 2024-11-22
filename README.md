@@ -112,6 +112,7 @@ Configurable properties :
 ### Other configurations
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
+| `logging.structured.format.console` | `` | Format for structured logging. Valid values : `ecs`, `gelf`, `logstash`. Leave empty for no structured logging (default). See https://docs.spring.io/spring-boot/reference/features/logging.html#features.logging.structured  |
 | `springdoc.swagger-ui.path` | `/` | Open API (swagger) UI path |
 | `springdoc.swagger-ui.oauth.clientId` | `` | clientid used by swagger to authenticate the user, in general the same which is used by onyxia-ui is ok. |
 
