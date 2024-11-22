@@ -101,6 +101,14 @@ Configurable properties :
 | `event.webhook.includes` |  | List of events types to send the webhook for (empty = all events). e.g `service.uninstall,service.install`                           |
 | `event.webhook.excludes` |  | List of events types to ignore for the webhook. e.g `service.uninstall,service.install`                           |
 
+### Admin configuration:
+:warning: This section should be considered pre-alpha and may be subject to major changes and revamps :warning:
+
+| Key              | Default | Description                                                                                |
+|------------------|-----|--------------------------------------------------------------------------------------------|
+| `admin.enabled`  | `false` | Whether to enable the admin endpoints. :warning: Do not use this in production ! :warning: |
+
+
 ### Other configurations
 | Key | Default | Description |
 | --------------------- | ------- | ------------------------------------------------------------------ |
