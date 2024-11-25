@@ -31,9 +31,6 @@ public class Region {
     private String excludedGroupPattern;
 
     @Schema(description = "")
-    private Location location;
-
-    @Schema(description = "")
     private Services services = new Services();
 
     @Schema(description = "")
@@ -103,14 +100,6 @@ public class Region {
 
     public void setExcludedGroupPattern(String excludedGroupPattern) {
         this.excludedGroupPattern = excludedGroupPattern;
-    }
-
-    public Location getLocation() {
-        return location;
-    }
-
-    public void setLocation(Location location) {
-        this.location = location;
     }
 
     public Services getServices() {
@@ -1074,41 +1063,6 @@ public class Region {
 
         public void setPypiProxyUrl(String pypiProxyUrl) {
             this.pypiProxyUrl = pypiProxyUrl;
-        }
-    }
-
-    @Schema(description = "")
-    public static class Location {
-
-        private double lat;
-
-        @JsonProperty("long")
-        private double longitude;
-
-        private String name;
-
-        public double getLat() {
-            return lat;
-        }
-
-        public void setLat(double lat) {
-            this.lat = lat;
-        }
-
-        public double getLongitude() {
-            return longitude;
-        }
-
-        public void setLongitude(double longitude) {
-            this.longitude = longitude;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
         }
     }
 
