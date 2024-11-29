@@ -80,14 +80,14 @@ public class CatalogLoader {
                                     entry ->
                                             CollectionUtils.isEmpty(cw.getIncludeKeywords())
                                                     || entry.getValue()
-                                                    .getFirst()
-                                                    .hasKeywords(cw.getIncludeKeywords()))
+                                                            .getFirst()
+                                                            .hasKeywords(cw.getIncludeKeywords()))
                             .filter(
                                     entry ->
                                             CollectionUtils.isEmpty(cw.getExcludeKeywords())
-                                            || !entry.getValue()
-                                                    .getFirst()
-                                                    .hasKeywords(cw.getExcludeKeywords()))
+                                                    || !entry.getValue()
+                                                            .getFirst()
+                                                            .hasKeywords(cw.getExcludeKeywords()))
                             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
             // For each service, filter the multiple versions if needed then refresh remaining
             // versions

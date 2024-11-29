@@ -4,7 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.params.provider.Arguments.arguments;
+import static org.junit.jupiter.params.provider.Arguments.argumentSet;
 
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.configuration.CustomObjectMapper;
@@ -13,6 +13,7 @@ import fr.insee.onyxia.api.services.JsonSchemaResolutionService;
 import fr.insee.onyxia.api.util.TestUtils;
 import fr.insee.onyxia.model.helm.Chart;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -162,33 +163,117 @@ public class CatalogLoaderTest {
     @ParameterizedTest
     @MethodSource("includeKeywords")
     @MethodSource("excludeKeywords")
-    void filterServicesTest(List<String> includeKeywords, List<String> excludeKeywords, Set<String> expectedServices) {
+    @MethodSource("includeAnnotations")
+    void filterServicesTest(
+            List<String> includeKeywords,
+            List<String> excludeKeywords,
+            Map<String, String> includeAnnotations,
+            Map<String, String> excludeAnnotations,
+            Set<String> expectedServices) {
         CatalogWrapper cw = new CatalogWrapper();
         cw.setType("helm");
-        cw.setLocation("classpath:/catalog-loader-test-with-keywords");
+        cw.setLocation("classpath:/catalog-loader-test-with-keywords-and-annotations");
         cw.setIncludeKeywords(includeKeywords);
         cw.setExcludeKeywords(excludeKeywords);
+        cw.setIncludeAnnotations(includeAnnotations);
+        cw.setExcludeAnnotations(excludeAnnotations);
         catalogLoader.updateCatalog(cw);
         assertEquals(expectedServices, cw.getCatalog().getEntries().keySet());
     }
 
     private static Stream<Arguments> includeKeywords() {
         return Stream.of(
-                arguments(List.of("CD"), null, Set.of("keepme")),
-                arguments(List.of("CD", "Experimental"), null, Set.of("keepme", "excludeme")),
-                arguments(List.of(), null, Set.of("keepme", "excludeme")),
-                arguments(null, null, Set.of("keepme", "excludeme")),
-                arguments(List.of("no one knows"), null, Set.of()));
+                argumentSet(
+                        "One keyword to include",
+                        List.of("CD"),
+                        null,
+                        null,
+                        null,
+                        Set.of("keepme")),
+                argumentSet(
+                        "Two keywords to include",
+                        List.of("CD", "Experimental"),
+                        null,
+                        null,
+                        null,
+                        Set.of("keepme", "excludeme")),
+                argumentSet(
+                        "Empty list of keywords to include",
+                        List.of(),
+                        null,
+                        null,
+                        null,
+                        Set.of("keepme", "excludeme")),
+                argumentSet(
+                        "null for all filters",
+                        null,
+                        null,
+                        null,
+                        null,
+                        Set.of("keepme", "excludeme")),
+                argumentSet(
+                        "Unknown keyword to include",
+                        List.of("no one knows"),
+                        null,
+                        null,
+                        null,
+                        Set.of()));
     }
 
     private static Stream<Arguments> excludeKeywords() {
         return Stream.of(
-                arguments(null, List.of("Experimental"), Set.of("keepme")),
-                arguments(List.of("CD"), List.of("Experimental"), Set.of("keepme")),
-                arguments(List.of("Experimental"), List.of("Experimental"), Set.of()),
-                arguments(List.of("CD"), List.of("CD", "Experimental"), Set.of()),
-                arguments(List.of(), List.of(), Set.of("keepme", "excludeme")),
-                arguments(null, List.of("no one knows"), Set.of("keepme", "excludeme"))
-        );
+                argumentSet(
+                        "One keyword to exclude",
+                        null,
+                        List.of("Experimental"),
+                        null,
+                        null,
+                        Set.of("keepme")),
+                argumentSet(
+                        "Exclusive keywords to include and exclude",
+                        List.of("CD"),
+                        List.of("Experimental"),
+                        null,
+                        null,
+                        Set.of("keepme")),
+                argumentSet(
+                        "Keyword to exclude takes precedence",
+                        List.of("Experimental"),
+                        List.of("Experimental"),
+                        null,
+                        null,
+                        Set.of()),
+                argumentSet(
+                        "Two keywords to exclude",
+                        List.of("CD"),
+                        List.of("CD", "Experimental"),
+                        null,
+                        null,
+                        Set.of()),
+                argumentSet(
+                        "Empty lists of keywords to include and exclude",
+                        List.of(),
+                        List.of(),
+                        null,
+                        null,
+                        Set.of("keepme", "excludeme")),
+                argumentSet(
+                        "Unknown keyword to exclude",
+                        null,
+                        List.of("no one knows"),
+                        null,
+                        null,
+                        Set.of("keepme", "excludeme")));
+    }
+
+    private static Stream<Arguments> includeAnnotations() {
+        return Stream.of(
+                argumentSet(
+                        "One annotation to include",
+                        null,
+                        null,
+                        Map.of("lifecycle", "production"),
+                        null,
+                        Set.of("keepme")));
     }
 }
