@@ -78,10 +78,19 @@ public class CatalogLoader {
                                                                             entry.getKey())))
                             .filter(
                                     entry ->
-                                            CollectionUtils.isEmpty(cw.getIncludeKeywords())
-                                                    || entry.getValue()
-                                                            .getFirst()
-                                                            .hasKeywords(cw.getIncludeKeywords()))
+                                            (CollectionUtils.isEmpty(cw.getIncludeKeywords())
+                                                            || entry.getValue()
+                                                                    .getFirst()
+                                                                    .hasKeywords(
+                                                                            cw
+                                                                                    .getIncludeKeywords()))
+                                                    && (CollectionUtils.isEmpty(
+                                                                    cw.getIncludeAnnotations())
+                                                            || entry.getValue()
+                                                                    .getFirst()
+                                                                    .hasAnnotations(
+                                                                            cw
+                                                                                    .getIncludeAnnotations())))
                             .filter(
                                     entry ->
                                             CollectionUtils.isEmpty(cw.getExcludeKeywords())

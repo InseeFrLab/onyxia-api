@@ -209,6 +209,7 @@ public class CatalogWrapper {
     }
 
     public List<String> getIncludeKeywords() {
+        if (includeKeywords == null) return new ArrayList<>();
         return includeKeywords;
     }
 
@@ -221,10 +222,12 @@ public class CatalogWrapper {
     }
 
     public List<String> getExcludeKeywords() {
+        if (excludeKeywords == null) return new ArrayList<>();
         return excludeKeywords;
     }
 
     public Map<String, String> getIncludeAnnotations() {
+        if (includeAnnotations == null) return new HashMap<>();
         return includeAnnotations;
     }
 
@@ -233,6 +236,7 @@ public class CatalogWrapper {
     }
 
     public Map<String, String> getExcludeAnnotations() {
+        if (excludeAnnotations == null) return new HashMap<>();
         return excludeAnnotations;
     }
 

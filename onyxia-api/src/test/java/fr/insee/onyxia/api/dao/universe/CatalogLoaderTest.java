@@ -274,6 +274,14 @@ public class CatalogLoaderTest {
                         null,
                         Map.of("lifecycle", "production"),
                         null,
-                        Set.of("keepme")));
+                        Set.of("keepme")),
+                argumentSet(
+                        "Exclude takes precedence",
+                        null,
+                        List.of("CD"),
+                        Map.of("lifecycle", "production"),
+                        null,
+                        Set.of())
+        );
     }
 }

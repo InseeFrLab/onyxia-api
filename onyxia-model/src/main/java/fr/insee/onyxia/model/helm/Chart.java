@@ -3,6 +3,7 @@ package fr.insee.onyxia.model.helm;
 import com.fasterxml.jackson.annotation.*;
 import fr.insee.onyxia.model.catalog.Pkg;
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -285,11 +286,28 @@ public class Chart extends Pkg {
      * @return true if any of the given keywords appear in the keywords on the chart.
      */
     public Boolean hasKeywords(List<String> keywordsToCheck) {
-        return keywordsToCheck
+        return getKeywords() != null
+                && keywordsToCheck
                     .stream()
                     .anyMatch(
-                        include -> getKeywords().contains(include)
+                        keyword -> getKeywords().contains(keyword)
                     );
+    }
+
+    /**
+     * Does the chart have any of the given annotations?
+     *
+     * @param annotationsToCheck The map of annotations we're interested in.
+     * @return true if any of the given annotations appear in the annotations on the chart.
+     */
+    public Boolean hasAnnotations(Map<String, String> annotationsToCheck) {
+        return getAnnotations() != null
+                && annotationsToCheck
+                .entrySet()
+                .stream()
+                .anyMatch(
+                        annotation -> getAnnotations().entrySet().contains(annotation)
+                );
     }
 
     public static class Maintainer {
