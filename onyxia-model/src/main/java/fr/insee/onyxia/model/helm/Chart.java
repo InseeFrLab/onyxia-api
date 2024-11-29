@@ -22,7 +22,8 @@ import java.util.Map;
     "name",
     "sources",
     "urls",
-    "version"
+    "version",
+    "annotations",
 })
 @Schema(description = "")
 public class Chart extends Pkg {
@@ -275,6 +276,23 @@ public class Chart extends Pkg {
     @JsonAnySetter
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
+    }
+
+    /**
+     * Does the chart have any of the given keywords?
+     *
+     * @param keywordsToCheck The list of keywords we're interested in.
+     * @return true if {@code keywordsToCheck} is null, is empty, or if any
+     *          of the given keywords appear in the keywords on the chart.
+     */
+    public Boolean hasKeywords(List<String> keywordsToCheck) {
+        return keywordsToCheck == null
+                || keywordsToCheck.isEmpty()
+                || keywordsToCheck
+                    .stream()
+                    .anyMatch(
+                        include -> getKeywords().contains(include)
+                    );
     }
 
     public static class Maintainer {

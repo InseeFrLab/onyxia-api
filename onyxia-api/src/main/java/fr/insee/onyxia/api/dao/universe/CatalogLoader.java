@@ -76,19 +76,10 @@ public class CatalogLoader {
                                                                     excludedChart.equalsIgnoreCase(
                                                                             entry.getKey())))
                             .filter(
-                                    // If includeKeywords is defined, include only services where
-                                    // the latest version has the desired keyword.
                                     entry ->
-                                            cw.getIncludeKeywords() == null
-                                                    || cw.getIncludeKeywords().isEmpty()
-                                                    || cw.getIncludeKeywords().stream()
-                                                            .anyMatch(
-                                                                    include ->
-                                                                            entry.getValue()
-                                                                                    .getFirst()
-                                                                                    .getKeywords()
-                                                                                    .contains(
-                                                                                            include)))
+                                            entry.getValue()
+                                                    .getFirst()
+                                                    .hasKeywords(cw.getIncludeKeywords()))
                             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
             // For each service, filter the multiple versions if needed then refresh remaining
             // versions
