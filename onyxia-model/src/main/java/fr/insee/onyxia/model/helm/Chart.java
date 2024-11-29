@@ -282,13 +282,10 @@ public class Chart extends Pkg {
      * Does the chart have any of the given keywords?
      *
      * @param keywordsToCheck The list of keywords we're interested in.
-     * @return true if {@code keywordsToCheck} is null, is empty, or if any
-     *          of the given keywords appear in the keywords on the chart.
+     * @return true if any of the given keywords appear in the keywords on the chart.
      */
     public Boolean hasKeywords(List<String> keywordsToCheck) {
-        return keywordsToCheck == null
-                || keywordsToCheck.isEmpty()
-                || keywordsToCheck
+        return keywordsToCheck
                     .stream()
                     .anyMatch(
                         include -> getKeywords().contains(include)

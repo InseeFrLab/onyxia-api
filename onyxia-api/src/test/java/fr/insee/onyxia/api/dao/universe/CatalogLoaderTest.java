@@ -161,21 +161,34 @@ public class CatalogLoaderTest {
 
     @ParameterizedTest
     @MethodSource("includeKeywords")
-    void filterIncludeKeywordsTest(List<String> includeKeywords, Set<String> expectedServices) {
+    @MethodSource("excludeKeywords")
+    void filterServicesTest(List<String> includeKeywords, List<String> excludeKeywords, Set<String> expectedServices) {
         CatalogWrapper cw = new CatalogWrapper();
         cw.setType("helm");
         cw.setLocation("classpath:/catalog-loader-test-with-keywords");
         cw.setIncludeKeywords(includeKeywords);
+        cw.setExcludeKeywords(excludeKeywords);
         catalogLoader.updateCatalog(cw);
         assertEquals(expectedServices, cw.getCatalog().getEntries().keySet());
     }
 
     private static Stream<Arguments> includeKeywords() {
         return Stream.of(
-                arguments(List.of("CD"), Set.of("keepme")),
-                arguments(List.of("CD", "Experimental"), Set.of("keepme", "excludeme")),
-                arguments(List.of(), Set.of("keepme", "excludeme")),
-                arguments(null, Set.of("keepme", "excludeme")),
-                arguments(List.of("no one knows"), Set.of()));
+                arguments(List.of("CD"), null, Set.of("keepme")),
+                arguments(List.of("CD", "Experimental"), null, Set.of("keepme", "excludeme")),
+                arguments(List.of(), null, Set.of("keepme", "excludeme")),
+                arguments(null, null, Set.of("keepme", "excludeme")),
+                arguments(List.of("no one knows"), null, Set.of()));
+    }
+
+    private static Stream<Arguments> excludeKeywords() {
+        return Stream.of(
+                arguments(null, List.of("Experimental"), Set.of("keepme")),
+                arguments(List.of("CD"), List.of("Experimental"), Set.of("keepme")),
+                arguments(List.of("Experimental"), List.of("Experimental"), Set.of()),
+                arguments(List.of("CD"), List.of("CD", "Experimental"), Set.of()),
+                arguments(List.of(), List.of(), Set.of("keepme", "excludeme")),
+                arguments(null, List.of("no one knows"), Set.of("keepme", "excludeme"))
+        );
     }
 }

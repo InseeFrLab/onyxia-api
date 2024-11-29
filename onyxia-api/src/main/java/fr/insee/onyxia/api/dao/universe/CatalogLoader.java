@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 @Service
@@ -77,9 +78,16 @@ public class CatalogLoader {
                                                                             entry.getKey())))
                             .filter(
                                     entry ->
-                                            entry.getValue()
+                                            CollectionUtils.isEmpty(cw.getIncludeKeywords())
+                                                    || entry.getValue()
                                                     .getFirst()
                                                     .hasKeywords(cw.getIncludeKeywords()))
+                            .filter(
+                                    entry ->
+                                            CollectionUtils.isEmpty(cw.getExcludeKeywords())
+                                            || !entry.getValue()
+                                                    .getFirst()
+                                                    .hasKeywords(cw.getExcludeKeywords()))
                             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
             // For each service, filter the multiple versions if needed then refresh remaining
             // versions
