@@ -282,8 +282,7 @@ public class CatalogLoaderTest {
                         List.of("CD"),
                         Map.of("lifecycle", "production"),
                         null,
-                        Set.of())
-        );
+                        Set.of()));
     }
 
     private static Stream<Arguments> excludeAnnotations() {
@@ -301,7 +300,6 @@ public class CatalogLoaderTest {
                         null,
                         Map.of("lifecycle", "production"),
                         Map.of("lifecycle", "production"),
-                        Set.of())
-        );
+                        Set.of()));
     }
 }

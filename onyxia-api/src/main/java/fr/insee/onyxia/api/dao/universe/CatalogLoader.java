@@ -101,8 +101,9 @@ public class CatalogLoader {
                                     entry ->
                                             CollectionUtils.isEmpty(cw.getExcludeAnnotations())
                                                     || !entry.getValue()
-                                                    .getFirst()
-                                                    .hasAnnotations(cw.getExcludeAnnotations()))
+                                                            .getFirst()
+                                                            .hasAnnotations(
+                                                                    cw.getExcludeAnnotations()))
                             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
             // For each service, filter the multiple versions if needed then refresh remaining
             // versions
