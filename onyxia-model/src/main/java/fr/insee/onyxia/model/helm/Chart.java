@@ -3,7 +3,6 @@ package fr.insee.onyxia.model.helm;
 import com.fasterxml.jackson.annotation.*;
 import fr.insee.onyxia.model.catalog.Pkg;
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -287,11 +286,7 @@ public class Chart extends Pkg {
      */
     public Boolean hasKeywords(List<String> keywordsToCheck) {
         return getKeywords() != null
-                && keywordsToCheck
-                    .stream()
-                    .anyMatch(
-                        keyword -> getKeywords().contains(keyword)
-                    );
+                && keywordsToCheck.stream().anyMatch(keyword -> getKeywords().contains(keyword));
     }
 
     /**
@@ -302,12 +297,8 @@ public class Chart extends Pkg {
      */
     public Boolean hasAnnotations(Map<String, String> annotationsToCheck) {
         return getAnnotations() != null
-                && annotationsToCheck
-                .entrySet()
-                .stream()
-                .anyMatch(
-                        annotation -> getAnnotations().entrySet().contains(annotation)
-                );
+                && annotationsToCheck.entrySet().stream()
+                        .anyMatch(annotation -> getAnnotations().entrySet().contains(annotation));
     }
 
     public static class Maintainer {
