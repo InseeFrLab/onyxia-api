@@ -164,6 +164,7 @@ public class CatalogLoaderTest {
     @MethodSource("includeKeywords")
     @MethodSource("excludeKeywords")
     @MethodSource("includeAnnotations")
+    @MethodSource("excludeAnnotations")
     void filterServicesTest(
             List<String> includeKeywords,
             List<String> excludeKeywords,
@@ -276,11 +277,30 @@ public class CatalogLoaderTest {
                         null,
                         Set.of("keepme")),
                 argumentSet(
-                        "Exclude takes precedence",
+                        "Exclude keyword takes precedence",
                         null,
                         List.of("CD"),
                         Map.of("lifecycle", "production"),
                         null,
+                        Set.of())
+        );
+    }
+
+    private static Stream<Arguments> excludeAnnotations() {
+        return Stream.of(
+                argumentSet(
+                        "One annotation to exclude",
+                        null,
+                        null,
+                        null,
+                        Map.of("lifecycle", "production"),
+                        Set.of("excludeme")),
+                argumentSet(
+                        "Exclude annotation takes precedence",
+                        null,
+                        null,
+                        Map.of("lifecycle", "production"),
+                        Map.of("lifecycle", "production"),
                         Set.of())
         );
     }
