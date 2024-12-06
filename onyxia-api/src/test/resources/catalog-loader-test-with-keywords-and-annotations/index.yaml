@@ -28,6 +28,8 @@ entries:
       maintainers:
         - email: test@example.com
           name: test
+      annotations:
+        lifecycle: production
     - apiVersion: v2
       appVersion: "1"
       created: "2022-10-03T11:53:20.589754116Z"
@@ -55,6 +57,8 @@ entries:
       maintainers:
         - email: test@example.com
           name: test
+      annotations:
+        lifecycle: production
     - apiVersion: v2
       appVersion: "2"
       created: "2022-10-03T11:53:20.589754116Z"
@@ -79,6 +83,8 @@ entries:
       urls:
         - keepeme2.gz
       version: 2.4.0
+      annotations:
+        lifecycle: experimental
   excludeme:
     - apiVersion: v2
       appVersion: "1"
@@ -129,3 +135,5 @@ entries:
       urls:
         - excludeme2.gz
       version: 2.4.0
+      annotations:
+        lifecycle: experimental
