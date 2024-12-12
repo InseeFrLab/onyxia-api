@@ -1,7 +1,5 @@
 package io.github.inseefrlab.helmwrapper.service;
 
-import static io.github.inseefrlab.helmwrapper.utils.Command.safeConcat;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.inseefrlab.helmwrapper.configuration.HelmConfiguration;
 import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
@@ -9,6 +7,11 @@ import io.github.inseefrlab.helmwrapper.model.HelmLs;
 import io.github.inseefrlab.helmwrapper.model.HelmReleaseInfo;
 import io.github.inseefrlab.helmwrapper.utils.Command;
 import io.github.inseefrlab.helmwrapper.utils.HelmReleaseInfoParser;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.zeroturnaround.exec.InvalidExitValueException;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -17,10 +20,8 @@ import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.zeroturnaround.exec.InvalidExitValueException;
+
+import static io.github.inseefrlab.helmwrapper.utils.Command.safeConcat;
 
 /** HelmInstall */
 public class HelmInstallService {
@@ -188,11 +189,12 @@ public class HelmInstallService {
         if (reuseValues) {
             command.append(" --reuse-values");
         }
-        String res =
-                Command.executeAndGetResponseAsJson(configuration, command.toString())
-                        .getOutput()
-                        .getString();
-        return new ObjectMapper().readValue(res, HelmInstaller.class);
+        Command.ProcessResultWithError result =
+                Command.executeAndGetResponseAsJson(configuration, command.toString());
+        if (result.getProcessResult().getExitValue() != 0) {
+            throw new RuntimeException(result.getError());
+        }
+        return new ObjectMapper().readValue(result.getProcessResult().getOutput().getString(), HelmInstaller.class);
     }
 
     public int uninstaller(HelmConfiguration configuration, String name, String namespace)
@@ -201,7 +203,7 @@ public class HelmInstallService {
         safeConcat(command, name);
         command.append(" -n ");
         safeConcat(command, namespace);
-        return Command.execute(configuration, command.toString()).getExitValue();
+        return Command.execute(configuration, command.toString()).getProcessResult().getExitValue();
     }
 
     public HelmLs[] listChartInstall(HelmConfiguration configuration, String namespace)
@@ -214,6 +216,7 @@ public class HelmInstallService {
         return new ObjectMapper()
                 .readValue(
                         Command.executeAndGetResponseAsJson(configuration, command.toString())
+                                .getProcessResult()
                                 .getOutput()
                                 .getString(),
                         HelmLs[].class);
@@ -238,7 +241,7 @@ public class HelmInstallService {
         safeConcat(command, namespace);
         try {
             String unparsedReleaseInfo =
-                    Command.execute(configuration, command.toString()).getOutput().getString();
+                    Command.execute(configuration, command.toString()).getProcessResult().getOutput().getString();
             return helmReleaseInfoParser.parseReleaseInfo(unparsedReleaseInfo);
         } catch (IOException | InterruptedException | TimeoutException e) {
             LOGGER.warn("Exception occurred", e);
@@ -259,14 +262,16 @@ public class HelmInstallService {
             safeConcat(command, namespace);
             if (infoType.equals(NOTES_INFO_TYPE)) {
                 return Command.executeAndGetResponseAsRaw(configuration, command.toString())
+                        .getProcessResult()
                         .getOutput()
                         .getString();
             } else if (infoType.equals(VALUES_INFO_TYPE)) {
                 return Command.executeAndGetResponseAsJson(configuration, command.toString())
+                        .getProcessResult()
                         .getOutput()
                         .getString();
             } else {
-                return Command.execute(configuration, command.toString()).getOutput().getString();
+                return Command.execute(configuration, command.toString()).getProcessResult().getOutput().getString();
             }
         } catch (IOException | InterruptedException | TimeoutException e) {
             LOGGER.warn("Exception occurred", e);
@@ -302,6 +307,7 @@ public class HelmInstallService {
                             .readValue(
                                     Command.executeAndGetResponseAsJson(
                                                     configuration, command.toString())
+                                            .getProcessResult()
                                             .getOutput()
                                             .getString(),
                                     HelmLs[].class);

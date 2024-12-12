@@ -1,11 +1,6 @@
 package io.github.inseefrlab.helmwrapper.utils;
 
 import io.github.inseefrlab.helmwrapper.configuration.HelmConfiguration;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeoutException;
-import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +8,15 @@ import org.zeroturnaround.exec.InvalidExitValueException;
 import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.ProcessResult;
 import org.zeroturnaround.exec.listener.ProcessListener;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeoutException;
+import java.util.regex.Pattern;
 
 /** Executeur */
 public class Command {
@@ -22,9 +26,11 @@ public class Command {
                     "^[ ]*[a-z0-9]([-a-z0-9 ]*[a-z0-9 ])?(\\.[a-z0-9 ]([-a-z0-9 ]*[a-z0-9 ])?)*[ ]*$");
     private static final Logger LOGGER = LoggerFactory.getLogger(Command.class);
 
-    private static ProcessExecutor getProcessExecutor() {
+    private static ProcessExecutor getProcessExecutor(OutputStream errorOutputStream) {
         ProcessExecutor processExecutor = new ProcessExecutor();
-        processExecutor.redirectError(System.err);
+        if (errorOutputStream != null) {
+            processExecutor.redirectError(errorOutputStream);
+        }
         processExecutor.readOutput(true);
         processExecutor.addListener(
                 new ProcessListener() {
@@ -37,45 +43,76 @@ public class Command {
         return processExecutor;
     }
 
-    public static ProcessResult executeAndGetResponseAsJson(
+    public static ProcessResultWithError executeAndGetResponseAsJson(
             HelmConfiguration helmConfiguration, String command)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        return getProcessExecutor()
+        ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
+        ProcessResult processResult = getProcessExecutor(errorStream)
                 .environment(getEnv(helmConfiguration))
                 .commandSplit(addConfigToCommand(command, helmConfiguration) + " --output json")
                 .execute();
+        return new ProcessResultWithError(processResult, errorStream);
     }
 
-    public static ProcessResult executeAndGetResponseAsJson(String command)
+    public static ProcessResultWithError executeAndGetResponseAsJson(String command)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
         return executeAndGetResponseAsJson(null, command);
     }
 
-    public static ProcessResult executeAndGetResponseAsRaw(
+    public static ProcessResultWithError executeAndGetResponseAsRaw(
             HelmConfiguration helmConfiguration, String command)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        return getProcessExecutor()
+        ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
+        ProcessResult processResult = getProcessExecutor(errorStream)
                 .environment(getEnv(helmConfiguration))
                 .commandSplit(addConfigToCommand(command, helmConfiguration))
                 .execute();
+        return new ProcessResultWithError(processResult, errorStream);
     }
 
-    public static ProcessResult executeAndGetResponseAsRaw(String command)
+    public static ProcessResultWithError executeAndGetResponseAsRaw(String command)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
         return executeAndGetResponseAsRaw(null, command);
     }
 
-    public static ProcessResult execute(HelmConfiguration helmConfiguration, String command)
+    public static ProcessResultWithError execute(HelmConfiguration helmConfiguration, String command)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        return getProcessExecutor()
+        ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
+        ProcessResult processResult = getProcessExecutor(errorStream)
                 .environment(getEnv(helmConfiguration))
                 .commandSplit(addConfigToCommand(command, helmConfiguration))
                 .execute();
+        return new ProcessResultWithError(processResult, errorStream);
     }
 
-    public static ProcessResult execute(String command)
+    public static ProcessResultWithError execute(String command)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
         return execute(null, command);
+    }
+
+    public static class ProcessResultWithError {
+
+        private ProcessResult processResult;
+        private String error = null;
+
+        public ProcessResultWithError() {
+
+        }
+
+        public ProcessResultWithError(ProcessResult processResult, ByteArrayOutputStream boas) {
+            this.processResult = processResult;
+            if (boas != null) {
+                error = boas.toString(Charset.defaultCharset());
+            }
+        }
+
+        public ProcessResult getProcessResult() {
+            return processResult;
+        }
+
+        public String getError() {
+            return error;
+        }
     }
 
     private static Map<String, String> getEnv(HelmConfiguration helmConfiguration) {
