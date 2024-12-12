@@ -12,6 +12,7 @@ import fr.insee.onyxia.api.configuration.BaseTest;
 import fr.insee.onyxia.api.configuration.SecurityConfig;
 import fr.insee.onyxia.api.configuration.properties.RegionsConfiguration;
 import fr.insee.onyxia.api.controller.api.user.UserController;
+import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.api.services.utils.HttpRequestUtils;
 import fr.insee.onyxia.api.user.OnyxiaUserProvider;
 import fr.insee.onyxia.model.OnyxiaUser;
@@ -40,6 +41,8 @@ public class UserControllerTest extends BaseTest {
     @MockBean private SecurityConfig securityConfig;
 
     @MockBean private OnyxiaUserProvider onyxiaUserProvider;
+
+    @MockBean private UserProvider userProvider;
 
     @BeforeEach
     public void setUp() {
