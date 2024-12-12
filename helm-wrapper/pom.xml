@@ -61,7 +61,21 @@
         <dependency>
             <groupId>io.fabric8</groupId>
             <artifactId>kubernetes-client</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.fabric8</groupId>
+                    <artifactId>kubernetes-httpclient-vertx</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+
+        <dependency>
+            <groupId>io.fabric8</groupId>
+            <artifactId>kubernetes-httpclient-okhttp</artifactId>
+            <version>7.0.0</version>
+            <scope>runtime</scope>
+        </dependency>
+
 
         <dependency>
             <groupId>org.apache.commons</groupId>
