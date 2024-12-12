@@ -1,14 +1,6 @@
 package io.github.inseefrlab.helmwrapper.utils;
 
 import io.github.inseefrlab.helmwrapper.configuration.HelmConfiguration;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.zeroturnaround.exec.InvalidExitValueException;
-import org.zeroturnaround.exec.ProcessExecutor;
-import org.zeroturnaround.exec.ProcessResult;
-import org.zeroturnaround.exec.listener.ProcessListener;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -17,6 +9,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.zeroturnaround.exec.InvalidExitValueException;
+import org.zeroturnaround.exec.ProcessExecutor;
+import org.zeroturnaround.exec.ProcessResult;
+import org.zeroturnaround.exec.listener.ProcessListener;
 
 /** Executeur */
 public class Command {
@@ -47,10 +46,12 @@ public class Command {
             HelmConfiguration helmConfiguration, String command)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
         ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
-        ProcessResult processResult = getProcessExecutor(errorStream)
-                .environment(getEnv(helmConfiguration))
-                .commandSplit(addConfigToCommand(command, helmConfiguration) + " --output json")
-                .execute();
+        ProcessResult processResult =
+                getProcessExecutor(errorStream)
+                        .environment(getEnv(helmConfiguration))
+                        .commandSplit(
+                                addConfigToCommand(command, helmConfiguration) + " --output json")
+                        .execute();
         return new ProcessResultWithError(processResult, errorStream);
     }
 
@@ -63,10 +64,11 @@ public class Command {
             HelmConfiguration helmConfiguration, String command)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
         ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
-        ProcessResult processResult = getProcessExecutor(errorStream)
-                .environment(getEnv(helmConfiguration))
-                .commandSplit(addConfigToCommand(command, helmConfiguration))
-                .execute();
+        ProcessResult processResult =
+                getProcessExecutor(errorStream)
+                        .environment(getEnv(helmConfiguration))
+                        .commandSplit(addConfigToCommand(command, helmConfiguration))
+                        .execute();
         return new ProcessResultWithError(processResult, errorStream);
     }
 
@@ -75,13 +77,15 @@ public class Command {
         return executeAndGetResponseAsRaw(null, command);
     }
 
-    public static ProcessResultWithError execute(HelmConfiguration helmConfiguration, String command)
+    public static ProcessResultWithError execute(
+            HelmConfiguration helmConfiguration, String command)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
         ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
-        ProcessResult processResult = getProcessExecutor(errorStream)
-                .environment(getEnv(helmConfiguration))
-                .commandSplit(addConfigToCommand(command, helmConfiguration))
-                .execute();
+        ProcessResult processResult =
+                getProcessExecutor(errorStream)
+                        .environment(getEnv(helmConfiguration))
+                        .commandSplit(addConfigToCommand(command, helmConfiguration))
+                        .execute();
         return new ProcessResultWithError(processResult, errorStream);
     }
 
@@ -95,9 +99,7 @@ public class Command {
         private ProcessResult processResult;
         private String error = null;
 
-        public ProcessResultWithError() {
-
-        }
+        public ProcessResultWithError() {}
 
         public ProcessResultWithError(ProcessResult processResult, ByteArrayOutputStream boas) {
             this.processResult = processResult;
