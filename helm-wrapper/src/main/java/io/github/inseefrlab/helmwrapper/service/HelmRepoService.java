@@ -13,7 +13,6 @@ public class HelmRepoService {
 
     public HelmRepo[] getHelmRepo()
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        // System.out.println(new ProcessExecutor().getDirectory().getAbsolutePath());
         HelmRepo[] repo =
                 new ObjectMapper()
                         .readValue(
