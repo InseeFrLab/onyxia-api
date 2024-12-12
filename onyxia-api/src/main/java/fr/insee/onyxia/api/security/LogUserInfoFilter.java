@@ -15,9 +15,15 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Component
 public class LogUserInfoFilter extends OncePerRequestFilter {
 
-    @Autowired private UserProvider userProvider;
+    private UserProvider userProvider;
 
-    @Autowired private RegionsConfiguration regionsConfiguration;
+    private RegionsConfiguration regionsConfiguration;
+
+    @Autowired
+    public LogUserInfoFilter(UserProvider userProvider, RegionsConfiguration regionsConfiguration) {
+        this.userProvider = userProvider;
+        this.regionsConfiguration = regionsConfiguration;
+    }
 
     @Override
     protected void doFilterInternal(
