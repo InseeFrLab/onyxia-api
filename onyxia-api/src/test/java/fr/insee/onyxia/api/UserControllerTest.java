@@ -1,22 +1,15 @@
 package fr.insee.onyxia.api;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.configuration.BaseTest;
 import fr.insee.onyxia.api.configuration.SecurityConfig;
 import fr.insee.onyxia.api.configuration.properties.RegionsConfiguration;
 import fr.insee.onyxia.api.controller.api.user.UserController;
+import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.api.services.utils.HttpRequestUtils;
 import fr.insee.onyxia.api.user.OnyxiaUserProvider;
 import fr.insee.onyxia.model.OnyxiaUser;
 import fr.insee.onyxia.model.User;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -25,6 +18,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(UserController.class)
 public class UserControllerTest extends BaseTest {
@@ -40,6 +42,8 @@ public class UserControllerTest extends BaseTest {
     @MockBean private SecurityConfig securityConfig;
 
     @MockBean private OnyxiaUserProvider onyxiaUserProvider;
+
+    @MockBean private UserProvider userProvider;
 
     @BeforeEach
     public void setUp() {
