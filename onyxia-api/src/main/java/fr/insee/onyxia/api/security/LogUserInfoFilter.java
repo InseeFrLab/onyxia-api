@@ -23,9 +23,13 @@ public class LogUserInfoFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        MDC.put(
-                "username",
-                userProvider.getUser(regionsConfiguration.getDefaultRegion()).getIdep());
+        try {
+            MDC.put(
+                    "username",
+                    userProvider.getUser(regionsConfiguration.getDefaultRegion()).getIdep());
+        } catch (Exception ignored) {
+
+        }
         filterChain.doFilter(request, response);
         MDC.clear();
     }
