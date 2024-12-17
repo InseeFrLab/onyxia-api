@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 @Service
@@ -76,19 +77,33 @@ public class CatalogLoader {
                                                                     excludedChart.equalsIgnoreCase(
                                                                             entry.getKey())))
                             .filter(
-                                    // If includeKeywords is defined, include only services where
-                                    // the latest version has the desired keyword.
                                     entry ->
-                                            cw.getIncludeKeywords() == null
-                                                    || cw.getIncludeKeywords().isEmpty()
-                                                    || cw.getIncludeKeywords().stream()
-                                                            .anyMatch(
-                                                                    include ->
-                                                                            entry.getValue()
-                                                                                    .getFirst()
-                                                                                    .getKeywords()
-                                                                                    .contains(
-                                                                                            include)))
+                                            (CollectionUtils.isEmpty(cw.getIncludeKeywords())
+                                                            || entry.getValue()
+                                                                    .getFirst()
+                                                                    .hasKeywords(
+                                                                            cw
+                                                                                    .getIncludeKeywords()))
+                                                    && (CollectionUtils.isEmpty(
+                                                                    cw.getIncludeAnnotations())
+                                                            || entry.getValue()
+                                                                    .getFirst()
+                                                                    .hasAnnotations(
+                                                                            cw
+                                                                                    .getIncludeAnnotations())))
+                            .filter(
+                                    entry ->
+                                            CollectionUtils.isEmpty(cw.getExcludeKeywords())
+                                                    || !entry.getValue()
+                                                            .getFirst()
+                                                            .hasKeywords(cw.getExcludeKeywords()))
+                            .filter(
+                                    entry ->
+                                            CollectionUtils.isEmpty(cw.getExcludeAnnotations())
+                                                    || !entry.getValue()
+                                                            .getFirst()
+                                                            .hasAnnotations(
+                                                                    cw.getExcludeAnnotations()))
                             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
             // For each service, filter the multiple versions if needed then refresh remaining
             // versions
