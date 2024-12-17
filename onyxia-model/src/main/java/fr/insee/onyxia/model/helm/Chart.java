@@ -22,7 +22,8 @@ import java.util.Map;
     "name",
     "sources",
     "urls",
-    "version"
+    "version",
+    "annotations",
 })
 @Schema(description = "")
 public class Chart extends Pkg {
@@ -275,6 +276,29 @@ public class Chart extends Pkg {
     @JsonAnySetter
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
+    }
+
+    /**
+     * Does the chart have any of the given keywords?
+     *
+     * @param keywordsToCheck The list of keywords we're interested in.
+     * @return true if any of the given keywords appear in the keywords on the chart.
+     */
+    public Boolean hasKeywords(List<String> keywordsToCheck) {
+        return getKeywords() != null
+                && keywordsToCheck.stream().anyMatch(keyword -> getKeywords().contains(keyword));
+    }
+
+    /**
+     * Does the chart have any of the given annotations?
+     *
+     * @param annotationsToCheck The map of annotations we're interested in.
+     * @return true if any of the given annotations appear in the annotations on the chart.
+     */
+    public Boolean hasAnnotations(Map<String, String> annotationsToCheck) {
+        return getAnnotations() != null
+                && annotationsToCheck.entrySet().stream()
+                        .anyMatch(annotation -> getAnnotations().entrySet().contains(annotation));
     }
 
     public static class Maintainer {
