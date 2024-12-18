@@ -205,6 +205,12 @@ public class HelmInstallService {
 
     public int uninstaller(HelmConfiguration configuration, String name, String namespace)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
+        if (name.length() > 53 || !rfc1123Pattern.matcher(name).matches()) {
+            throw new IllegalArgumentException(
+                    "Invalid release "
+                            + name
+                            + ". Must be 53 or fewer characters and be a valid RFC 1123 string.");
+        }
         StringBuilder command = new StringBuilder("helm uninstall ");
         safeConcat(command, name);
         command.append(" -n ");
@@ -241,6 +247,12 @@ public class HelmInstallService {
 
     public HelmReleaseInfo getAll(HelmConfiguration configuration, String id, String namespace) {
         StringBuilder command = new StringBuilder("helm get all ");
+        if (id.length() > 53 || !rfc1123Pattern.matcher(id).matches()) {
+            throw new IllegalArgumentException(
+                    "Invalid release "
+                            + id
+                            + ". Must be 53 or fewer characters and be a valid RFC 1123 string.");
+        }
         safeConcat(command, id);
         command.append(" --namespace ");
         safeConcat(command, namespace);
@@ -259,6 +271,12 @@ public class HelmInstallService {
         if (!List.of(MANIFEST_INFO_TYPE, NOTES_INFO_TYPE, VALUES_INFO_TYPE).contains(infoType)) {
             throw new IllegalArgumentException(
                     "Invalid info type " + infoType + ", should be manifest, notes or values");
+        }
+        if (id.length() > 53 || !rfc1123Pattern.matcher(id).matches()) {
+            throw new IllegalArgumentException(
+                    "Invalid release "
+                            + id
+                            + ". Must be 53 or fewer characters and be a valid RFC 1123 string.");
         }
         StringBuilder command = new StringBuilder("helm get " + infoType + " ");
         try {
@@ -306,7 +324,6 @@ public class HelmInstallService {
                             + appId
                             + ". Must be 53 or fewer characters and be a valid RFC 1123 string.");
         }
-
         StringBuilder command = new StringBuilder("helm list --filter ");
         safeConcat(command, appId);
         command.append(" -n ");
