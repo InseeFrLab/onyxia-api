@@ -28,6 +28,9 @@ public class HelmInstallService {
     private static final Logger LOGGER = LoggerFactory.getLogger(HelmInstallService.class);
     private final Pattern helmNamePattern =
             Pattern.compile("^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$");
+    private final Pattern semverPattern =
+            Pattern.compile(
+                    "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$");
 
     private final HelmReleaseInfoParser helmReleaseInfoParser = new HelmReleaseInfoParser();
     private static final String VALUES_INFO_TYPE = "values";
@@ -161,6 +164,10 @@ public class HelmInstallService {
         command.append("-n ");
         safeConcat(command, namespace);
         if (StringUtils.isNotBlank(version)) {
+            if (!semverPattern.matcher(version).matches()) {
+                throw new IllegalArgumentException(
+                        "Invalid release version " + version + ", must be a SemVer 2 string");
+            }
             command.append(" --version ");
             safeConcat(command, version);
         }
