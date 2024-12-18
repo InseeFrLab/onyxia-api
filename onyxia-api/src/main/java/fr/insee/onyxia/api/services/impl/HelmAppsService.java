@@ -3,6 +3,8 @@ package fr.insee.onyxia.api.services.impl;
 import static fr.insee.onyxia.api.services.impl.HelmReleaseHealthResolver.checkHelmReleaseHealth;
 import static fr.insee.onyxia.api.services.impl.ServiceUrlResolver.getServiceUrls;
 
+import fr.insee.onyxia.api.controller.exception.CustomKubernetesException;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.configuration.kubernetes.HelmClientProvider;
@@ -22,6 +24,8 @@ import fr.insee.onyxia.model.dto.ServicesListing;
 import fr.insee.onyxia.model.project.Project;
 import fr.insee.onyxia.model.region.Region;
 import fr.insee.onyxia.model.service.*;
+import fr.insee.onyxia.api.controller.RestExceptionTypes;
+import fr.insee.onyxia.api.controller.exception.*;
 import io.fabric8.kubernetes.api.model.Secret;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.Watch;
@@ -45,6 +49,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.http.ProblemDetail;
+import org.springframework.http.HttpStatus;
+import java.net.URI;
 
 @org.springframework.stereotype.Service
 @Qualifier("Helm")
@@ -91,6 +98,15 @@ public class HelmAppsService implements AppsService {
 
     private HelmInstallService getHelmInstallService() {
         return helmClientProvider.defaultHelmInstallService();
+    }
+
+    private ProblemDetail createProblemDetail(HttpStatus status, URI type, String title, String detail, String instance) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(status);
+        problemDetail.setType(type);
+        problemDetail.setTitle(title);
+        problemDetail.setDetail(detail);
+        problemDetail.setInstance(URI.create(instance));
+        return problemDetail;
     }
 
     @Override
@@ -146,7 +162,28 @@ public class HelmAppsService implements AppsService {
                     region, namespaceId, requestDTO.getName(), metadata);
             return List.of(res.getManifest());
         } catch (IllegalArgumentException e) {
-            throw new AccessDeniedException(e.getMessage());
+            String instanceUri = String.format("/install-app/%s/%s/%s",
+                    namespaceId, catalogId, requestDTO.getName());
+            throw new CustomKubernetesException(
+                createProblemDetail(
+                    HttpStatus.BAD_REQUEST,
+                    RestExceptionTypes.INVALID_ARGUMENT,
+                    "Invalid Argument",
+                    e.getMessage(),
+                    instanceUri));
+        } catch (Exception e) {
+            LOGGER.error("Unexpected error during app installation", e);
+    
+            String instanceUri = String.format("/install-app/%s/%s/%s",
+                    namespaceId, catalogId, requestDTO.getName());
+    
+            throw new CustomKubernetesException(
+                createProblemDetail(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    RestExceptionTypes.INSTALLATION_FAILURE,
+                    "Installation Failure",
+                    "An unexpected error occurred while installing the app. Please try again later.",
+                    instanceUri));
         } finally {
             if (!values.delete()) {
                 LOGGER.warn("Failed to delete values file, path {}", values.getAbsolutePath());
@@ -162,26 +199,44 @@ public class HelmAppsService implements AppsService {
 
     @Override
     public CompletableFuture<ServicesListing> getUserServices(
-            Region region, Project project, User user, String groupId)
-            throws IOException, IllegalAccessException {
-        if (groupId != null) {
-            LOGGER.debug("STUB : group listing is currently not supported on helm");
-            return CompletableFuture.completedFuture(new ServicesListing());
-        }
-        if (StringUtils.isEmpty(project.getNamespace())) {
-            throw new NamespaceNotFoundException();
-        }
-        List<HelmLs> installedCharts = null;
-        try {
-            installedCharts =
-                    Arrays.asList(
-                            getHelmInstallService()
-                                    .listChartInstall(
-                                            getHelmConfiguration(region, user),
-                                            project.getNamespace()));
-        } catch (Exception e) {
-            return CompletableFuture.completedFuture(new ServicesListing());
-        }
+        Region region, Project project, User user, String groupId)
+        throws IOException, IllegalAccessException {
+    if (groupId != null) {
+        LOGGER.debug("STUB : group listing is currently not supported on helm");
+        return CompletableFuture.completedFuture(new ServicesListing());
+    }
+    if (StringUtils.isEmpty(project.getNamespace())) {
+        String instanceUri = "/projects/" + project.getId() + "/namespace";
+        throw new CustomKubernetesException(
+            createProblemDetail(
+                HttpStatus.NOT_FOUND,
+                RestExceptionTypes.NAMESPACE_NOT_FOUND,
+                "Namespace Not Found",
+                "The namespace for the provided project is empty or not defined.",
+                instanceUri
+            )
+        );
+    }
+    List<HelmLs> installedCharts;
+    try {
+        installedCharts = Arrays.asList(
+                getHelmInstallService()
+                        .listChartInstall(
+                                getHelmConfiguration(region, user),
+                                project.getNamespace()));
+    } catch (Exception e) {
+        LOGGER.error("Failed to list installed Helm charts for namespace {}", project.getNamespace(), e);
+        String instanceUri = "/namespaces/" + project.getNamespace() + "/helm-list";
+        throw new CustomKubernetesException(
+            createProblemDetail(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                RestExceptionTypes.HELM_LIST_FAILURE,
+                "Helm List Failure",
+                "Failed to retrieve the list of installed Helm charts. Please try again later.",
+                instanceUri
+            )
+        );
+    }
         List<Service> services =
                 installedCharts.parallelStream()
                         .map(release -> getHelmApp(region, user, release))
@@ -284,18 +339,34 @@ public class HelmAppsService implements AppsService {
     }
 
     private Service getHelmApp(Region region, User user, HelmLs release) {
-        HelmReleaseInfo helmReleaseInfo =
-                getHelmInstallService()
-                        .getAll(
-                                getHelmConfiguration(region, user),
-                                release.getName(),
-                                release.getNamespace());
-        Service service =
-                getServiceFromRelease(region, release, helmReleaseInfo.getManifest(), user);
+        HelmReleaseInfo helmReleaseInfo;
+        try {
+            helmReleaseInfo = getHelmInstallService().getAll(
+                    getHelmConfiguration(region, user),
+                    release.getName(),
+                    release.getNamespace());
+        } catch (Exception e) {
+            LOGGER.error("Failed to retrieve Helm release info for release {} in namespace {}",
+                    release.getName(), release.getNamespace(), e);
+            String instanceUri = "/releases/" + release.getName();
+            throw new CustomKubernetesException(
+                createProblemDetail(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    RestExceptionTypes.HELM_RELEASE_FETCH_FAILURE,
+                    "Helm Release Fetch Failure",
+                    "Failed to retrieve Helm release information.",
+                    instanceUri
+                )
+            );
+        }
+    
+        Service service = getServiceFromRelease(region, release, helmReleaseInfo.getManifest(), user);
+    
         try {
             service.setStartedAt(helmDateFormat.parse(release.getUpdated()).getTime());
         } catch (Exception e) {
-            service.setStartedAt(0);
+            LOGGER.warn("Failed to parse release updated date for {}", release.getName(), e);
+            service.setStartedAt(0); // Fallback to 0 if parsing fails
         }
         try {
             KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
@@ -321,41 +392,43 @@ public class HelmAppsService implements AppsService {
                 }
             }
         } catch (Exception e) {
-            LOGGER.warn("Exception occurred", e);
+            LOGGER.warn("Failed to retrieve or decode Onyxia secret for release {}", release.getName(), e);
         }
+    
         service.setId(release.getName());
         service.setName(release.getName());
         service.setSubtitle(release.getChart());
-        service.setName(release.getName());
         service.setNamespace(release.getNamespace());
         service.setRevision(release.getRevision());
         service.setStatus(release.getStatus());
         service.setUpdated(release.getUpdated());
         service.setChart(release.getChart());
         service.setAppVersion(release.getAppVersion());
+    
         try {
             String values = helmReleaseInfo.getUserSuppliedValues();
             JsonNode node = mapperHelm.readTree(values);
             Map<String, String> result = new HashMap<>();
-            node.fields()
-                    .forEachRemaining(
-                            currentNode -> mapAppender(result, currentNode, new ArrayList<>()));
+            node.fields().forEachRemaining(
+                    currentNode -> mapAppender(result, currentNode, new ArrayList<>()));
             service.setEnv(result);
             service.setSuspendable(service.getEnv().containsKey(SUSPEND_KEY));
             if (service.getEnv().containsKey(SUSPEND_KEY)) {
                 service.setSuspended(Boolean.parseBoolean(service.getEnv().get(SUSPEND_KEY)));
             }
         } catch (Exception e) {
-            LOGGER.warn("Exception occurred", e);
+            LOGGER.warn("Failed to parse user-supplied values for release {}", release.getName(), e);
         }
+    
         try {
             String notes = helmReleaseInfo.getNotes();
             service.setPostInstallInstructions(notes);
         } catch (Exception e) {
-            LOGGER.warn("Exception occurred", e);
+            LOGGER.warn("Failed to retrieve post-install instructions for release {}", release.getName(), e);
         }
+
         return service;
-    }
+    }    
 
     @Override
     public void rename(
@@ -520,79 +593,70 @@ public class HelmAppsService implements AppsService {
         }
     }
 
-    private Service getServiceFromRelease(
-            Region region, HelmLs release, String manifest, User user) {
-        KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
+private Service getServiceFromRelease(Region region, HelmLs release, String manifest, User user) {
+    KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
 
-        Service service = new Service();
+    Service service = new Service();
 
-        try {
-            List<String> urls = getServiceUrls(region, manifest, client);
-            service.setUrls(urls);
-        } catch (Exception e) {
-            LOGGER.warn(
-                    "Failed to retrieve URLS for release {} namespace {}",
-                    release.getName(),
-                    release.getNamespace(),
-                    e);
-            service.setUrls(List.of());
-        }
-
-        try {
-            List<HealthCheckResult> controllers =
-                    checkHelmReleaseHealth(release.getNamespace(), manifest, client);
-            service.setControllers(controllers);
-        } catch (Exception e) {
-            LOGGER.warn(
-                    "Failed to retrieve controllers for release {} namespace {}",
-                    release.getName(),
-                    release.getNamespace(),
-                    e);
-            service.setControllers(List.of());
-        }
-        service.setInstances(1);
-
-        service.setTasks(
-                client
-                        .pods()
-                        .inNamespace(release.getNamespace())
-                        .withLabel("app.kubernetes.io/instance", release.getName())
-                        .list()
-                        .getItems()
-                        .stream()
-                        .map(
-                                pod -> {
-                                    Task currentTask = new Task();
-                                    currentTask.setId(pod.getMetadata().getName());
-                                    TaskStatus status = new TaskStatus();
-                                    status.setStatus(pod.getStatus().getPhase());
-                                    status.setReason(
-                                            pod.getStatus().getContainerStatuses().stream()
-                                                    .filter(
-                                                            cstatus ->
-                                                                    cstatus.getState().getWaiting()
-                                                                            != null)
-                                                    .map(
-                                                            cstatus ->
-                                                                    cstatus.getState()
-                                                                            .getWaiting()
-                                                                            .getReason())
-                                                    .findFirst()
-                                                    .orElse(null));
-                                    pod.getStatus()
-                                            .getContainerStatuses()
-                                            .forEach(
-                                                    c -> {
-                                                        Container container = new Container();
-                                                        container.setName(c.getName());
-                                                        container.setReady(c.getReady());
-                                                        currentTask.getContainers().add(container);
-                                                    });
-                                    currentTask.setStatus(status);
-                                    return currentTask;
-                                })
-                        .toList());
-
-        return service;
+    try {
+        List<String> urls = getServiceUrls(region, manifest, client);
+        service.setUrls(urls);
+    } catch (Exception e) {
+        LOGGER.warn(
+                "Failed to retrieve URLs for release {} in namespace {}. Region: {}, User: {}",
+                release.getName(),
+                release.getNamespace(),
+                region.getName(),
+                user.getIdep(),
+                e);
+        service.setUrls(List.of());
     }
+
+    try {
+        List<HealthCheckResult> controllers = checkHelmReleaseHealth(release.getNamespace(), manifest, client);
+        service.setControllers(controllers);
+    } catch (Exception e) {
+        LOGGER.warn(
+                "Failed to retrieve controllers for release {} in namespace {}. Region: {}, User: {}",
+                release.getName(),
+                release.getNamespace(),
+                region.getName(),
+                user.getIdep(),
+                e);
+        service.setControllers(List.of());
+    }
+
+    service.setInstances(1);
+
+    service.setTasks(
+            client.pods()
+                    .inNamespace(release.getNamespace())
+                    .withLabel("app.kubernetes.io/instance", release.getName())
+                    .list()
+                    .getItems()
+                    .stream()
+                    .map(pod -> {
+                        Task currentTask = new Task();
+                        currentTask.setId(pod.getMetadata().getName());
+                        TaskStatus status = new TaskStatus();
+                        status.setStatus(pod.getStatus().getPhase());
+                        status.setReason(
+                                pod.getStatus().getContainerStatuses().stream()
+                                        .filter(cstatus -> cstatus.getState().getWaiting() != null)
+                                        .map(cstatus -> cstatus.getState().getWaiting().getReason())
+                                        .findFirst()
+                                        .orElse(null));
+                        pod.getStatus().getContainerStatuses().forEach(c -> {
+                            Container container = new Container();
+                            container.setName(c.getName());
+                            container.setReady(c.getReady());
+                            currentTask.getContainers().add(container);
+                        });
+                        currentTask.setStatus(status);
+                        return currentTask;
+                    })
+                    .toList());
+
+    return service;
+}
 }
