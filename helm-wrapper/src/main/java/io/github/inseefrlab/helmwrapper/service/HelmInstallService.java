@@ -31,6 +31,7 @@ public class HelmInstallService {
     private final Pattern semverPattern =
             Pattern.compile(
                     "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$");
+    private final Pattern rfc1123Pattern = Pattern.compile("^[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$");
 
     private final HelmReleaseInfoParser helmReleaseInfoParser = new HelmReleaseInfoParser();
     private static final String VALUES_INFO_TYPE = "values";
@@ -287,6 +288,13 @@ public class HelmInstallService {
      */
     public HelmLs getAppById(HelmConfiguration configuration, String appId, String namespace)
             throws MultipleServiceFound {
+        if (appId.length() > 53 || !rfc1123Pattern.matcher(appId).matches()) {
+            throw new IllegalArgumentException(
+                    "Invalid app id "
+                            + appId
+                            + ". Must be 53 or fewer characters and be a valid RFC 1123 string.");
+        }
+
         StringBuilder command = new StringBuilder("helm list --filter ");
         safeConcat(command, appId);
         command.append(" -n ");
