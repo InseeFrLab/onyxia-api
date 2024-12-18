@@ -454,7 +454,8 @@ public class MyLabController {
 
         Pkg pkg =
                 catalog.getCatalog()
-                        .getPackageByName(requestDTO.getPackageName())
+                        .getPackageByNameAndVersion(
+                                requestDTO.getPackageName(), requestDTO.getPackageVersion())
                         .orElseThrow(NotFoundException::new);
 
         boolean skipTlsVerify = catalog.getSkipTlsVerify();
