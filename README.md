@@ -115,6 +115,8 @@ Configurable properties :
 | `logging.structured.format.console` | `` | Format for structured logging. Valid values : `ecs`, `gelf`, `logstash`. Leave empty for no structured logging (default). See https://docs.spring.io/spring-boot/reference/features/logging.html#features.logging.structured  |
 | `springdoc.swagger-ui.path` | `/` | Open API (swagger) UI path |
 | `springdoc.swagger-ui.oauth.clientId` | `` | clientid used by swagger to authenticate the user, in general the same which is used by onyxia-ui is ok. |
+| `DEBUG_JMX` | `` | Enable JMX monitoring. This is useful for profiling the app to improve performance but is not intended for production / daily use. Once enabled (`true`), use `kubectl port-forward` + a profiler (e.g VisualVM) to profile the app. |
+| `JMX_PORT` | `10000` | Port used by JMX if enabled. |
 
 ## Onyxia API dependency to Helm
 

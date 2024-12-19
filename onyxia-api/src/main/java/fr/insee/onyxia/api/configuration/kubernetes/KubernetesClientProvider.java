@@ -6,6 +6,8 @@ import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +18,10 @@ public class KubernetesClientProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KubernetesClientProvider.class);
 
+    private static Map<String, KubernetesClient> rootKubernetesClientCache = new HashMap<>();
+
+    private static KubernetesClient userKubernetesClientCache = null;
+
     /**
      * This returns the root client which has extended permissions. Currently cluster-admin. User
      * calls should be done using the userClient which only has user permissions.
@@ -23,12 +29,28 @@ public class KubernetesClientProvider {
      * @param region
      * @return
      */
-    public KubernetesClient getRootClient(Region region) {
-        final Config config = getDefaultConfiguration(region).build();
-        return new KubernetesClientBuilder().withConfig(config).build();
+    public synchronized KubernetesClient getRootClient(Region region) {
+        if (!rootKubernetesClientCache.containsKey(region.getId())) {
+            final Config config = getDefaultConfiguration(region).build();
+            rootKubernetesClientCache.put(
+                    region.getId(), new KubernetesClientBuilder().withConfig(config).build());
+        }
+        return rootKubernetesClientCache.get(region.getId());
     }
 
     public KubernetesClient getUserClient(Region region, User user) {
+        // In case of SERVICEACCOUNT authentication, we can safely mutualize and use a single
+        // KubernetesClient
+        if (region.getServices().getAuthenticationMode()
+                == Region.Services.AuthenticationMode.SERVICEACCOUNT) {
+            if (userKubernetesClientCache != null) {
+                return userKubernetesClientCache;
+            }
+            Config config = getDefaultConfiguration(region).build();
+            KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build();
+            userKubernetesClientCache = client;
+            return client;
+        }
         final Config config = getDefaultConfiguration(region).build();
         String username = user.getIdep();
         if (region.getServices().getUsernamePrefix() != null) {

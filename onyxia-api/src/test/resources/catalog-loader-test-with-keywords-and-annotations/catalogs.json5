@@ -1,0 +1,36 @@
+// This file is a json5-file, which onyxia-api should be able to parse
+{
+  "catalogs": [
+    {
+      "id": "ide",
+      "name": "IDE",
+      "description": "Services for datascientists.",
+      "maintainer": "innovation@insee.fr",
+      "location": "https://inseefrlab.github.io/helm-charts-interactive-services",
+      "status": "PROD",
+      "highlightedCharts": ["jupyter-python", "rstudio", "vscode-python"],
+      // Single quote should be supported
+      "timeout": '10m',
+      "type": 'helm',
+      /* block comment
+      over several
+      lines are supported */
+      "skipTlsVerify": false,
+      "caFile": null,
+      "allowSharing": false,
+      "visible": {
+        "user": true,
+        // Trailing comma is supported
+        "project": true,
+      },
+      "restrictions": [
+        {
+          "userAttribute": {
+            "key": "sub",
+            "match": "^onyxia.*"
+          }
+        }
+      ]
+    },
+  ],
+}
