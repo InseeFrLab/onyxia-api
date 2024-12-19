@@ -15,6 +15,7 @@ import fr.insee.onyxia.model.helm.Chart;
 import fr.insee.onyxia.model.helm.Repository;
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
@@ -28,6 +29,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 @Service
@@ -63,17 +65,46 @@ public class CatalogLoader {
                                     .getInputStream(),
                             UTF_8);
             Repository repository = mapperHelm.readValue(reader, Repository.class);
-            // Remove excluded services from list
-            repository
-                    .getEntries()
-                    .entrySet()
-                    .removeIf(
-                            entry ->
-                                    cw.getExcludedCharts().stream()
-                                            .anyMatch(
-                                                    excludedChart ->
-                                                            excludedChart.equalsIgnoreCase(
-                                                                    entry.getKey())));
+
+            repository.setEntries(
+                    repository.getEntries().entrySet().stream()
+                            .filter(
+                                    // Remove explicitly excluded services
+                                    entry ->
+                                            cw.getExcludedCharts().stream()
+                                                    .noneMatch(
+                                                            excludedChart ->
+                                                                    excludedChart.equalsIgnoreCase(
+                                                                            entry.getKey())))
+                            .filter(
+                                    entry ->
+                                            (CollectionUtils.isEmpty(cw.getIncludeKeywords())
+                                                            || entry.getValue()
+                                                                    .getFirst()
+                                                                    .hasKeywords(
+                                                                            cw
+                                                                                    .getIncludeKeywords()))
+                                                    && (CollectionUtils.isEmpty(
+                                                                    cw.getIncludeAnnotations())
+                                                            || entry.getValue()
+                                                                    .getFirst()
+                                                                    .hasAnnotations(
+                                                                            cw
+                                                                                    .getIncludeAnnotations())))
+                            .filter(
+                                    entry ->
+                                            CollectionUtils.isEmpty(cw.getExcludeKeywords())
+                                                    || !entry.getValue()
+                                                            .getFirst()
+                                                            .hasKeywords(cw.getExcludeKeywords()))
+                            .filter(
+                                    entry ->
+                                            CollectionUtils.isEmpty(cw.getExcludeAnnotations())
+                                                    || !entry.getValue()
+                                                            .getFirst()
+                                                            .hasAnnotations(
+                                                                    cw.getExcludeAnnotations()))
+                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
             // For each service, filter the multiple versions if needed then refresh remaining
             // versions
             repository.getEntries().values().parallelStream()

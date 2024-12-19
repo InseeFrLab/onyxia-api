@@ -8,7 +8,9 @@ import fr.insee.onyxia.model.catalog.CatalogStatus;
 import fr.insee.onyxia.model.helm.Repository;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -50,6 +52,18 @@ public class CatalogWrapper {
 
     @Schema(description = "names of declarative important charts of the catalog")
     private List<String> highlightedCharts = new ArrayList<>();
+
+    @Schema(description = "only include charts with one or more of the given keywords")
+    private List<String> includeKeywords = new ArrayList<>();
+
+    @Schema(description = "exclude any charts which have one or more of the given keywords")
+    private List<String> excludeKeywords = new ArrayList<>();
+
+    @Schema(description = "only include charts with one or more of the given annotations")
+    private Map<String, String> includeAnnotations = new HashMap<>();
+
+    @Schema(description = "exclude any charts which have one or more of the given annotations")
+    private Map<String, String> excludeAnnotations = new HashMap<>();
 
     @Schema(description = "Skip tls certificate checks for the repository")
     private boolean skipTlsVerify;
@@ -192,6 +206,38 @@ public class CatalogWrapper {
 
     public void setHighlightedCharts(List<String> highlightedCharts) {
         this.highlightedCharts = highlightedCharts;
+    }
+
+    public List<String> getIncludeKeywords() {
+        return includeKeywords;
+    }
+
+    public void setIncludeKeywords(List<String> includeKeywords) {
+        this.includeKeywords = includeKeywords;
+    }
+
+    public void setExcludeKeywords(List<String> excludeKeywords) {
+        this.excludeKeywords = excludeKeywords;
+    }
+
+    public List<String> getExcludeKeywords() {
+        return excludeKeywords;
+    }
+
+    public Map<String, String> getIncludeAnnotations() {
+        return includeAnnotations;
+    }
+
+    public void setIncludeAnnotations(Map<String, String> includeAnnotations) {
+        this.includeAnnotations = includeAnnotations;
+    }
+
+    public Map<String, String> getExcludeAnnotations() {
+        return excludeAnnotations;
+    }
+
+    public void setExcludeAnnotations(Map<String, String> excludeAnnotations) {
+        this.excludeAnnotations = excludeAnnotations;
     }
 
     public boolean getSkipTlsVerify() {

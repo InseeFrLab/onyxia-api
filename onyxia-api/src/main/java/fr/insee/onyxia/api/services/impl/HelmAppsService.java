@@ -119,7 +119,7 @@ public class HelmAppsService implements AppsService {
                                     catalogId + "/" + pkg.getName(),
                                     namespaceId,
                                     requestDTO.getName(),
-                                    requestDTO.getPackageVersion(),
+                                    pkg.getVersion(),
                                     requestDTO.isDryRun(),
                                     values,
                                     null,

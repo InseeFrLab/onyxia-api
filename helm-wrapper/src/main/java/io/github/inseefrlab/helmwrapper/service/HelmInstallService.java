@@ -28,6 +28,10 @@ public class HelmInstallService {
     private static final Logger LOGGER = LoggerFactory.getLogger(HelmInstallService.class);
     private final Pattern helmNamePattern =
             Pattern.compile("^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$");
+    private final Pattern semverPattern =
+            Pattern.compile(
+                    "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$");
+    private final Pattern rfc1123Pattern = Pattern.compile("^[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$");
 
     private final HelmReleaseInfoParser helmReleaseInfoParser = new HelmReleaseInfoParser();
     private static final String VALUES_INFO_TYPE = "values";
@@ -171,8 +175,18 @@ public class HelmInstallService {
         }
         command.append(chart + " ");
         command.append("-n ");
+        if (namespace.length() > 63 || !rfc1123Pattern.matcher(namespace).matches()) {
+            throw new IllegalArgumentException(
+                    "Invalid namespace "
+                            + namespace
+                            + ". Must be 63 or fewer characters and be a valid RFC 1123 string.");
+        }
         safeConcat(command, namespace);
         if (StringUtils.isNotBlank(version)) {
+            if (!semverPattern.matcher(version).matches()) {
+                throw new IllegalArgumentException(
+                        "Invalid release version " + version + ", must be a SemVer 2 string");
+            }
             command.append(" --version ");
             safeConcat(command, version);
         }
@@ -197,6 +211,18 @@ public class HelmInstallService {
 
     public int uninstaller(HelmConfiguration configuration, String name, String namespace)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
+        if (name.length() > 53 || !rfc1123Pattern.matcher(name).matches()) {
+            throw new IllegalArgumentException(
+                    "Invalid release "
+                            + name
+                            + ". Must be 53 or fewer characters and be a valid RFC 1123 string.");
+        }
+        if (namespace.length() > 63 || !rfc1123Pattern.matcher(namespace).matches()) {
+            throw new IllegalArgumentException(
+                    "Invalid namespace "
+                            + namespace
+                            + ". Must be 63 or fewer characters and be a valid RFC 1123 string.");
+        }
         StringBuilder command = new StringBuilder("helm uninstall ");
         safeConcat(command, name);
         command.append(" -n ");
@@ -207,6 +233,12 @@ public class HelmInstallService {
     public HelmLs[] listChartInstall(HelmConfiguration configuration, String namespace)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
         StringBuilder command = new StringBuilder("helm ls -a");
+        if (namespace.length() > 63 || !rfc1123Pattern.matcher(namespace).matches()) {
+            throw new IllegalArgumentException(
+                    "Invalid namespace "
+                            + namespace
+                            + ". Must be 63 or fewer characters and be a valid RFC 1123 string.");
+        }
         if (namespace != null) {
             command.append(" -n ");
             safeConcat(command, namespace);
@@ -233,6 +265,18 @@ public class HelmInstallService {
 
     public HelmReleaseInfo getAll(HelmConfiguration configuration, String id, String namespace) {
         StringBuilder command = new StringBuilder("helm get all ");
+        if (id.length() > 53 || !rfc1123Pattern.matcher(id).matches()) {
+            throw new IllegalArgumentException(
+                    "Invalid release "
+                            + id
+                            + ". Must be 53 or fewer characters and be a valid RFC 1123 string.");
+        }
+        if (namespace.length() > 63 || !rfc1123Pattern.matcher(namespace).matches()) {
+            throw new IllegalArgumentException(
+                    "Invalid namespace "
+                            + namespace
+                            + ". Must be 63 or fewer characters and be a valid RFC 1123 string.");
+        }
         safeConcat(command, id);
         command.append(" --namespace ");
         safeConcat(command, namespace);
@@ -251,6 +295,18 @@ public class HelmInstallService {
         if (!List.of(MANIFEST_INFO_TYPE, NOTES_INFO_TYPE, VALUES_INFO_TYPE).contains(infoType)) {
             throw new IllegalArgumentException(
                     "Invalid info type " + infoType + ", should be manifest, notes or values");
+        }
+        if (id.length() > 53 || !rfc1123Pattern.matcher(id).matches()) {
+            throw new IllegalArgumentException(
+                    "Invalid release "
+                            + id
+                            + ". Must be 53 or fewer characters and be a valid RFC 1123 string.");
+        }
+        if (namespace.length() > 63 || !rfc1123Pattern.matcher(namespace).matches()) {
+            throw new IllegalArgumentException(
+                    "Invalid namespace "
+                            + namespace
+                            + ". Must be 63 or fewer characters and be a valid RFC 1123 string.");
         }
         StringBuilder command = new StringBuilder("helm get " + infoType + " ");
         try {
@@ -292,6 +348,18 @@ public class HelmInstallService {
      */
     public HelmLs getAppById(HelmConfiguration configuration, String appId, String namespace)
             throws MultipleServiceFound {
+        if (appId.length() > 53 || !rfc1123Pattern.matcher(appId).matches()) {
+            throw new IllegalArgumentException(
+                    "Invalid app id "
+                            + appId
+                            + ". Must be 53 or fewer characters and be a valid RFC 1123 string.");
+        }
+        if (namespace.length() > 63 || !rfc1123Pattern.matcher(namespace).matches()) {
+            throw new IllegalArgumentException(
+                    "Invalid namespace "
+                            + namespace
+                            + ". Must be 63 or fewer characters and be a valid RFC 1123 string.");
+        }
         StringBuilder command = new StringBuilder("helm list --filter ");
         safeConcat(command, appId);
         command.append(" -n ");

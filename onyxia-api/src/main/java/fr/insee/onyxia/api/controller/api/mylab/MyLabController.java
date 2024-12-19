@@ -524,7 +524,8 @@ public class MyLabController {
 
         Pkg pkg =
                 catalog.getCatalog()
-                        .getPackageByName(requestDTO.getPackageName())
+                        .getPackageByNameAndVersion(
+                                requestDTO.getPackageName(), requestDTO.getPackageVersion())
                         .orElseThrow(NotFoundException::new);
 
         Map<String, Object> fusion = new HashMap<>();
