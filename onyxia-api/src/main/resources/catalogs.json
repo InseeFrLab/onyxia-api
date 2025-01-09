@@ -24,6 +24,8 @@
         "user": true,
         "project": true
       },
+      "username": null,
+      "password": null,
       "multipleServicesMode" : "latest"
     },
     {
@@ -51,6 +53,8 @@
         "user": true,
         "project": true
       },
+      "username": null,
+      "password": null,
       "multipleServicesMode" : "latest"
     },
     {
@@ -77,6 +81,8 @@
         "user": true,
         "project": true
       },
+      "username": null,
+      "password": null,
       "multipleServicesMode" : "latest"
     }
   ]
