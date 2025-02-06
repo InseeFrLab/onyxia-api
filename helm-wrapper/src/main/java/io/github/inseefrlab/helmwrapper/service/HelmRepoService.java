@@ -13,11 +13,11 @@ public class HelmRepoService {
 
     public HelmRepo[] getHelmRepo()
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        // System.out.println(new ProcessExecutor().getDirectory().getAbsolutePath());
         HelmRepo[] repo =
                 new ObjectMapper()
                         .readValue(
                                 Command.executeAndGetResponseAsJson("helm search repo")
+                                        .getProcessResult()
                                         .getOutput()
                                         .getString(StandardCharsets.UTF_8.name()),
                                 HelmRepo[].class);
@@ -39,7 +39,7 @@ public class HelmRepoService {
                             "--ca-file " + System.getenv("CACERTS_DIR") + "/" + caFile + " ");
         }
         command = command.concat(nomRepo + " " + url);
-        return Command.execute(command).getOutput().getString();
+        return Command.execute(command).getProcessResult().getOutput().getString();
     }
 
     public void repoUpdate() throws InterruptedException, TimeoutException, IOException {
