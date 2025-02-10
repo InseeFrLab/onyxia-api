@@ -1,7 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "custom image",
+    "title": "Use a custom image instead",
     "type": "boolean",
-    "description": "use a custom jupyter docker image",
     "default": false
 }
