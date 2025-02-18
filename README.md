@@ -50,33 +50,270 @@ Each variable can be overridden using environment variables.
 | `catalogs` | [onyxia-api/src/main/resources/catalogs.json](onyxia-api/src/main/resources/catalogs.json) | List of helm catalogs, see [Admin doc](https://docs.onyxia.sh/admin-doc/catalog-of-services) |
 | `catalogs.refresh.ms` | `300000` (5 minutes) | The rate at which the catalogs should be refreshed. `<= 0` means no refreshs after initial loading |
 
-### Authentication configuration
-| Key | Default | Description |
-| --------------------- | ------- | ------------------------------------------------------------------ |
-| `authentication.mode` | `none` | Supported modes are : `none`, `openidconnect` (must be configured) |
+### Authentication Configuration
 
-### Open id configuration (used when `authentication.mode`=`openidconnect`)  
-You have to specify `oidc.issuer-uri`. `oidc.jwk-uri` is optional.  
-Common used configurations :  
-| Provider | `oidc.issuer-uri` | `oidc.jwk-uri` |
-|---|---|---|
-| Keycloak  | `https://keycloak.example.com/auth/realms/REALMNAME` |   |
-| Google  | https://accounts.google.com  | `https://www.googleapis.com/oauth2/v3/certs` |
-| Microsoft | `https://login.microsoftonline.com/TENANTID/v2.0` |   |
+Below is an overview of all available authentication-related configuration options.  
+Scroll down for detailed examples for specific OIDC providers.
 
-Configurable properties :  
-| Key | Default | Description |
-| -------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `oidc.issuer-uri` | | Issuer URI, should be the same as the `iss` field of the tokens |
-| `oidc.skip-tls-verify` | `false` | Disable tls cert verification when retrieving keys from the IDP. Not intended for production. Consider mounting the proper `cacerts` instead of disabling the verification. |
-| `oidc.jwk-uri` | | JWK URI, useful when auto discovery is not available or when `iss` is not consistent across tokens (e.g [Google](https://stackoverflow.com/questions/38618826/can-i-get-a-consistent-iss-value-for-a-google-openidconnect-id-token)) |
-| `oidc.public-key` | | Public key used for validating incoming tokens. Don't provide this if you set `issuer-uri` or `jwk-uri` as it will be bootstrapped from that. This is useful if Onyxia-API has trouble connecting to your IDP (e.g self signed certificate). You can usually get this key directly by loading the issuer URI : (e.g `https://auth.example.com/realms/my-realm`) |
-| `oidc.clientID` | | Client id to be used by Onyxia web application |
-| `oidc.audience` | | Optional : audience to validate. Must be the same as the token's `aud` field |
-| `oidc.username-claim` | `preferred_username` | Claim to be used as user id. Must conform to [RFC 1123](https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#dns-label-names) |
-| `oidc.groups-claim` | `groups` | Claim to be used as list of user groups. |
-| `oidc.roles-claim` | `roles` | Claim to be used as list of user roles. |
-| `oidc.extra-query-params` | | Optional : query params to be added by client. e.g : `prompt=consent&kc_idp_hint=google` |
+> **Note:** This is the OIDC configuration for Onyxia itself.  
+> If you're looking for details on configuring OIDC-enabled services that Onyxia connects to  
+> (e.g., S3, Vault, Kubernetes API), see the section at the end of this document.
+
+`values.yaml`
+```yaml
+onyxia:
+  api:
+    env:
+      # Mandatory and no other mode is currently supported.
+      authentication.mode: "openidconnect"
+
+      # Mandatory: The issuer URI of the OIDC provider.  
+      # See specific examples below for commonly used OIDC providers.
+      oidc.issuer-uri: "..."
+
+      # Mandatory: The client ID of the OIDC client that represents the Onyxia Web Application.
+      oidc.clientID: "..."
+
+      # Mandatory: Defines which claim in the Access Token's JWT serves as the unique user identifier.  
+      # This identifier must contain only lowercase alphanumeric characters and `-`. (`[a-z0-9-]+`)  
+      #
+      # - If your usernames conform to this constraint, you can use `"preferred_username"` 
+      #   for a more human-readable identifier.
+      # - If your usernames may contain special characters, use another claim like `"sub"` 
+      #   (Make sure the `sub` values matches the above regex).  
+      #
+      oidc.username-claim: "..."
+
+      # Optional: Defaults to `"groups"`. Defines which claim represents user groups.
+      oidc.groups-claim: "..."
+
+      # Optional: Defaults to `"roles"`. Defines which claim represents user roles.
+      oidc.roles-claim: "..."
+
+      # Optional: Additional query parameters to append to the OIDC provider login URL.  
+      # Example: If using Keycloak with Google OAuth as an identity provider, you might want  
+      # to preselect Google as the login option using `"kc_idp_hint=google"`.  
+      # 
+      # ⚠️ This string is appended as-is. Ensure it's properly URI-encoded.  
+      # If adding multiple parameters, separate them with `&`.  
+      # Example: `"foo=foo%20value&bar=bar%20value"`
+      oidc.extra-query-params: "..."
+
+      # Optional: Specifies the expected audience value in the Access Token.  
+      # If provided, Onyxia will validate the `aud` claim in the token and reject requests  
+      # where it does not match.
+      oidc.audience: "..."
+
+      # Optional: Specifies the OIDC scopes requested by the Onyxia client.  
+      # Defaults to `"openid profile"`.  
+      # This is a space-separated list. `"openid"` is always requested, regardless of this setting.
+      oidc.scope: "..."
+
+      # Onyxia API fetches `<issuer-uri>/.well-known/openid-configuration` to retrieve JWKs  
+      # for validating Access Tokens (used as Authorization Bearers).  
+      #
+      # ⚠️ In development, if you lack proper root certificates, you can disable TLS verification.  
+      # However, in production, it's recommended to mount the correct `cacerts` instead.
+      oidc.skip-tls-verify: "true|false"
+```
+
+---
+
+#### Authentication Configuration: Using Keycloak as the OIDC Provider
+
+For detailed Keycloak-specific instructions, refer to the  
+[Keycloak Configuration Guide](https://docs.oidc-spa.dev/resources/keycloak-configuration).
+
+You can also refer to [the official Onyxia installation guide](https://docs.onyxia.sh/admin-doc/readme/user-authentication).
+
+`values.yaml`
+```yaml
+onyxia:
+  api:
+    env:
+      authentication.mode: "openidconnect"
+      # Example values if following the official installation guide:
+      # - <KC_DOMAIN> = auth.lab.my-domain.net (replace my-domain.net with your actual domain)
+      # - <KC_RELATIVE_PATH> = /auth
+      # - <REALM> = datalab
+      #
+      # Expected result: "https://auth.lab.my-domain.net/auth/realms/datalab"
+      oidc.issuer-uri: "https://<KC_DOMAIN><KC_RELATIVE_PATH>/realms/<REALM_NAME>"
+
+      # Default "onyxia" if following the official installation guide.
+      oidc.clientID: "<ONYXIA_CLIENT_ID>"
+
+      # Use "preferred_username" if your Keycloak realm enforces a username regex constraint  
+      # (as per the Onyxia Installation Guide).  
+      # Otherwise, use `"sub"` if integrating with an existing Keycloak instance.
+      oidc.username-claim: "preferred_username"
+```
+
+---
+
+#### Authentication Configuration: Using Google OAuth as the OIDC Provider
+
+For detailed Google OAuth-specific instructions, refer to the  
+[Google OAuth Configuration Guide](https://docs.oidc-spa.dev/resources/google-oauth).
+
+- **Authorized Redirect URIs:** The home URL of your Onyxia instance (e.g., `https://datalab.my-domain.net/`)
+- **Authorized JavaScript Origins:** Example `https://datalab.my-domain.net`
+
+`values.yaml`
+```yaml
+onyxia:
+  api:
+    env:
+      authentication.mode: "openidconnect"
+      # Always use this exact issuer URI:
+      oidc.issuer-uri: "https://accounts.google.com"
+
+      # Example client ID format:
+      # "000000000000-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.apps.googleusercontent.com"
+      oidc.clientID: "<Client ID>"
+
+      # ⚠️ Do **not** use `"email"` or other claims that may contain special characters (e.g., `@`).  
+      # Use `"sub"` instead.
+      oidc.username-claim: "sub"
+
+      # Example client secret format: "GOCSPX-_xxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      #
+      # ⚠️ Google OAuth requires providing a client secret for public clients,  
+      # even though it has no security implications.
+      # While this feels misleading, it is how Google expects it to be configured.
+      clientSecret: "<Client Secret>"
+```
+
+---
+
+#### Authentication Configuration: Using Microsoft Entra ID as the OIDC Provider
+
+Microsoft Entra ID requires additional configuration to behave like a standard OIDC provider.  
+By default, it issues opaque access tokens that cannot be validated without calling the Microsoft Graph API.  
+
+Follow the steps in the [Microsoft Entra ID Configuration Guide](https://docs.oidc-spa.dev/resources/entraid)  
+to configure Entra ID correctly.
+
+`values.yaml`
+```yaml
+onyxia:
+  api:
+    env:
+      authentication.mode: "openidconnect"
+      # <Directory (tenant) ID> should look like: "71a0a621-363a-4182-8209-86364aa6de03"
+      oidc.issuer-uri: "https://login.microsoftonline.com/<Directory (tenant) ID>/v2.0"
+
+      # <Application (client) ID> should look like: "ea067b46-d482-4d5e-b1b4-61d3dbf9527c"
+      oidc.clientID: "<Application (client) ID>"
+
+      # ⚠️ Do **not** use `"sub"` or `"upn"` since they may contain non-alphanumeric characters.  
+      oidc.username-claim: "oid"
+
+      # Provide a custom scope as explained in the guide to ensure the access token is a valid JWT.
+      # Example format: `"api://onyxia-api/default"`
+      oidc.scope: "<Custom Scope>"
+```
+
+---
+
+#### OIDC Configuration for Services Onyxia Connects To
+
+Onyxia uses an OIDC client for authentication, but it also connects to other OIDC-enabled services.  
+Each of these services **can** have its own OIDC configuration, allowing Onyxia to authenticate  
+using a separate client identity.
+
+In the **region configuration**, you can specify an optional `oidcConfiguration` object for  
+each service:
+
+- **S3 (MinIO STS)** → `onyxia.api.regions[].data.S3.sts.oidcConfiguration`
+- **Vault** → `onyxia.api.regions[].vault.oidcConfiguration`
+- **Kubernetes API** → `onyxia.api.regions[].services.k8sPublicEndpoint.oidcConfiguration`
+
+Each configuration follows this structure:
+
+```ts
+type OidcConfiguration = {
+    issuerURI?: string;
+    clientID?: string;
+    extraQueryParams?: string;
+    scope?: string[];
+    clientSecret?: string; // WARNING: Only for Google OAuth
+};
+```
+
+If no `oidcConfiguration` is provided for a service, Onyxia will **reuse its own OIDC client**  
+and the same Access Token for authentication. However, it is **recommended** to provide  
+a **separate client ID** for each service to improve access control and security.
+
+Example configuration in `values.yaml`:
+
+```yaml
+onyxia:
+  api:
+    env:
+      authentication.mode: "openidconnect"
+      oidc.issuer-uri: "https://auth.lab.my-domain.net/auth/realms/datalab"
+      oidc.clientID: "onyxia"
+    regions: 
+      [
+        {
+          data: {
+            S3: {
+              sts: {
+                oidcConfiguration: {
+                  clientID: "onyxia-minio",
+                }
+              }
+            }
+          },
+          vault: {
+            oidcConfiguration: {
+              clientID: "onyxia-vault"
+            }
+          },
+          services: {
+            k8sPublicEndpoint: {
+              oidcConfiguration: {
+                clientID: "onyxia-k8s"
+              }
+            }
+          }
+        }
+      ]
+```
+
+⚠ ️ Important: Consistency of Claims Across Services:  
+
+When configuring OIDC for Onyxia, you define specific claims that indicate where to find  
+the **user identifier**, **groups**, and **roles** within the Access Token's JWT.  
+
+These claims **cannot be configured separately for each service** Onyxia interacts with (e.g., S3, Vault, Kubernetes API).  
+They must remain **consistent across all OIDC-enabled services** to ensure proper authentication and authorization.
+
+
+When a user logs in, the OIDC provider issues an Access Token for the `onyxia` client.  
+This token includes claims such as:
+
+```json
+{
+  "sub": "abcd1234",
+  "preferred_username": "jhondoe",
+  "groups": [ "funathon", "spark-lab" ],
+  "roles": [ "vip", "admin-keycloak" ],
+}
+```
+
+If you have configured `oidc.username-claim: "preferred_username"` in the main Onyxia configuration,  
+Onyxia expects that all other services it interacts with—such as `onyxia-minio`, `onyxia-vault`, and `onyxia-k8s`—  
+will also receive Access Tokens where the **same claim (`preferred_username`) exists and holds the same value**.
+
+To avoid any issue, **all OIDC clients** (`onyxia`, `onyxia-minio`, `onyxia-vault`, `onyxia-k8s`)  
+should be configured within **the same SSO realm** in your OIDC provider.  
+This ensures that each issued Access Token follows the same claim structure and contains  
+consistent values for the same user.
+
+If you're unsure whether your setup meets this requirement, **check the JWT of each Access Token**  
+issued for different clients and confirm that the claims are aligned.
 
 ### Security configuration :
 | Key | Default | Description |

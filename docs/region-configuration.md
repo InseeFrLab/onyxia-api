@@ -16,10 +16,10 @@ See [regions.json](/onyxia-api/src/main/resources/regions.json) for a complete e
     - [Quotas properties](#quotas-properties)
     - [Expose properties](#expose-properties)
       - [istio](#istio)
-      - [CertManager](#certManager)
   - [Data properties](#data-properties)
     - [S3](#s3)
   - [Vault properties](#vault-properties)
+  - [CertManager](#certmanager)
   - [Git properties](#git-properties)
   - [ProxyInjection properties](#proxyinjection-properties)
   - [PackageRepositoryInjection properties](#packagerepositoryinjection-properties)
@@ -265,18 +265,9 @@ type Region = {
         };
 
         /**
-         * OIDC configuration. Defaults to Onyxia API's configuration if unspecified.
-         * If only the ClientID is provided, the issuer URI defaults to the Onyxia API's configuration.
-         * 
-         * Example:
-         *   "oidcConfiguration": {
-         *     "clientID": "onyxia-minio"
-         *   }
+         * See [OIDC Configuration for Services Onyxia Connects To](../README.md#OIDC-Configuration-for-Services-Onyxia-Connects-To)
          */
-        oidcConfiguration?: {
-          issuerURI?: string;
-          clientID: string;
-        };
+        oidcConfiguration?: OidcConfiguration;
 
       };
 
