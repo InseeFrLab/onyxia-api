@@ -56,29 +56,23 @@ Each variable can be overridden using environment variables.
 | `authentication.mode` | `none` | Supported modes are : `none`, `openidconnect` (must be configured) |
 
 ### Open id configuration (used when `authentication.mode`=`openidconnect`)  
-You have to specify `oidc.issuer-uri`. `oidc.jwk-uri` is optional.  
-Common used configurations :  
-| Provider | `oidc.issuer-uri` | `oidc.jwk-uri` |
-|---|---|---|
-| Keycloak  | `https://keycloak.example.com/auth/realms/REALMNAME` |   |
-| Google  | https://accounts.google.com  | `https://www.googleapis.com/oauth2/v3/certs` |
-| Microsoft | `https://login.microsoftonline.com/TENANTID/v2.0` |   |
+
+The only two required parameters are `oidc.issuer-uri` and `oidc.clientID`. 
 
 Configurable properties :  
 | Key | Default | Description |
 | -------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | `oidc.issuer-uri` | | Issuer URI, should be the same as the `iss` field of the tokens |
-| `oidc.skip-tls-verify` | `false` | Disable tls cert verification when retrieving keys from the IDP. Not intended for production. Consider mounting the proper `cacerts` instead of disabling the verification. |
-| `oidc.jwk-uri` | | JWK URI, useful when auto discovery is not available or when `iss` is not consistent across tokens (e.g [Google](https://stackoverflow.com/questions/38618826/can-i-get-a-consistent-iss-value-for-a-google-openidconnect-id-token)) |
-| `oidc.public-key` | | Public key used for validating incoming tokens. Don't provide this if you set `issuer-uri` or `jwk-uri` as it will be bootstrapped from that. This is useful if Onyxia-API has trouble connecting to your IDP (e.g self signed certificate). You can usually get this key directly by loading the issuer URI : (e.g `https://auth.example.com/realms/my-realm`) |
 | `oidc.clientID` | | Client id to be used by Onyxia web application |
-| `oidc.audience` | | Optional : audience to validate. Must be the same as the token's `aud` field |
 | `oidc.username-claim` | `preferred_username` | Claim to be used as user id. Must conform to [RFC 1123](https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#dns-label-names) |
 | `oidc.groups-claim` | `groups` | Claim to be used as list of user groups. |
 | `oidc.roles-claim` | `roles` | Claim to be used as list of user roles. |
+| `oidc.audience` | | Optional : audience to validate. Must be the same as the token's `aud` field |
+| `oidc.skip-tls-verify` | `false` | Disable tls cert verification when retrieving keys from the IDP. Not intended for production. Consider mounting the proper `cacerts` instead of disabling the verification. |
+| `oidc.public-key` | | Optional: If for some reason you don't want Onyxia-API to bootstrap configuration by requesting the `issuer-uri` then you can manually provide the public key used for validating incoming tokens. |
 | `oidc.extra-query-params` | | Optional : query params to be added by client. e.g : `prompt=consent&kc_idp_hint=google` |
 | `oidc.scope` | `openid profile` | Optional : Specifies the OIDC scopes to be requested by the Onyxia client. `"openid"` is always requested, regardless of this setting. |
-| `oidc.workaroundForGoogleUseDummyClientSecret` | `false` | For some reasons, Google OAuth requires providing a client secret even for public clients. Set this to `true` if you are using Google OAuth, Onyxia will then use a dummy client secret to ensure compatibility with Google Oauth.  |
+| `oidc.workaroundForGoogleClientSecret` | | For some reasons, Google OAuth requires providing a client secret even for public clients. ⚠️ Use this configuration only if using Google OAuth ! ⚠️ For all other providers you should not have client secret as the Onyxia client is public. Example client secret format: " `GOCSPX-_xxxxxxxxxxxxxxxxxxxxxxxxxxx` |
 
 ### Security configuration :
 | Key | Default | Description |
