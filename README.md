@@ -57,12 +57,12 @@ Each variable can be overridden using environment variables.
 
 ### Open id configuration (used when `authentication.mode`=`openidconnect`)  
 
-The only two required parameters are `oidc.issuer-uri` and `oidc.clientID`. 
+The only two required parameters are `oidc.issuer-uri` and `oidc.clientID`. See below for more details.
 
 Configurable properties :  
 | Key | Default | Description |
 | -------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `oidc.issuer-uri` | | Issuer URI, should be the same as the `iss` field of the tokens |
+| `oidc.issuer-uri` | | Issuer URI. Onyxia-API will use this URL to retrieve the public key for token validation. e.g for Keycloak : `https://keycloak.example.com/auth/realms/REALMNAME` |
 | `oidc.clientID` | | Client id to be used by Onyxia web application |
 | `oidc.username-claim` | `preferred_username` | Claim to be used as user id. Must conform to [RFC 1123](https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#dns-label-names) |
 | `oidc.groups-claim` | `groups` | Claim to be used as list of user groups. |
