@@ -5,7 +5,7 @@
     "type": "array",
     "default": [],
     "items": {
-      "title": "environment variable",
+      "title": "",
       "type": "object",
       "properties": {
         "name": {
