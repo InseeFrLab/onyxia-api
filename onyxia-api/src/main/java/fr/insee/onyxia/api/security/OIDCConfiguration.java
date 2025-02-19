@@ -95,7 +95,7 @@ public class OIDCConfiguration {
     private String scope;
 
     @Value("${oidc.workaroundForGoogleClientSecret}")
-    private boolean workaroundForGoogleClientSecret;
+    private String workaroundForGoogleClientSecret;
 
     private final HttpRequestUtils httpRequestUtils;
 
@@ -288,12 +288,12 @@ public class OIDCConfiguration {
         this.scope = scope;
     }
 
-    public String getWorkaroundForGoogleClientSecret() {
-        return workaroundForGoogleClientSecret;
-    }
-
     public void setWorkaroundForGoogleClientSecret(String workaroundForGoogleClientSecret) {
         this.workaroundForGoogleClientSecret = workaroundForGoogleClientSecret;
+    }
+
+    public String getWorkaroundForGoogleClientSecret() {
+        return workaroundForGoogleClientSecret;
     }
 
     @Bean

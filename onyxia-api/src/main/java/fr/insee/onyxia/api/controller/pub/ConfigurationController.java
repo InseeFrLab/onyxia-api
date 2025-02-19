@@ -54,6 +54,9 @@ public class ConfigurationController {
             OIDCConfiguration.setIssuerURI(oidcConfiguration.getIssuerUri());
             OIDCConfiguration.setClientID(oidcConfiguration.getClientID());
             OIDCConfiguration.setExtraQueryParams(oidcConfiguration.getExtraQueryParams());
+            OIDCConfiguration.setWorkaroundForGoogleClientSecret(
+                    oidcConfiguration.getWorkaroundForGoogleClientSecret());
+            OIDCConfiguration.setScope(oidcConfiguration.getScope());
             appInfo.setOidcConfiguration(OIDCConfiguration);
         }
         return appInfo;
