@@ -1,21 +1,9 @@
 package fr.insee.onyxia.api.security;
 
-import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
-
 import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.api.services.utils.HttpRequestUtils;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.region.Region;
-import java.security.KeyFactory;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.List;
-import javax.net.ssl.SSLContext;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
@@ -60,6 +48,19 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.net.ssl.SSLContext;
+import java.security.KeyFactory;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.List;
+
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+
 @Configuration
 @ConditionalOnProperty(name = "authentication.mode", havingValue = "openidconnect")
 public class OIDCConfiguration {
@@ -93,6 +94,12 @@ public class OIDCConfiguration {
 
     @Value("${oidc.extra-query-params}")
     private String extraQueryParams;
+
+    @Value("${oidc.scope}")
+    private String scope;
+
+    @Value("${oidc.workaroundForGoogleUseDummyClientSecret}")
+    private boolean workaroundForGoogleUseDummyClientSecret;
 
     private final HttpRequestUtils httpRequestUtils;
 
@@ -267,6 +274,38 @@ public class OIDCConfiguration {
 
     public void setExtraQueryParams(String extraQueryParams) {
         this.extraQueryParams = extraQueryParams;
+    }
+
+    public boolean isSkipTlsVerify() {
+        return skipTlsVerify;
+    }
+
+    public void setSkipTlsVerify(boolean skipTlsVerify) {
+        this.skipTlsVerify = skipTlsVerify;
+    }
+
+    public String getRolesClaim() {
+        return rolesClaim;
+    }
+
+    public void setRolesClaim(String rolesClaim) {
+        this.rolesClaim = rolesClaim;
+    }
+
+    public String getScope() {
+        return scope;
+    }
+
+    public void setScope(String scope) {
+        this.scope = scope;
+    }
+
+    public boolean isWorkaroundForGoogleUseDummyClientSecret() {
+        return workaroundForGoogleUseDummyClientSecret;
+    }
+
+    public void setWorkaroundForGoogleUseDummyClientSecret(boolean workaroundForGoogleUseDummyClientSecret) {
+        this.workaroundForGoogleUseDummyClientSecret = workaroundForGoogleUseDummyClientSecret;
     }
 
     @Bean

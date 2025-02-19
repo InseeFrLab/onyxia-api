@@ -77,6 +77,8 @@ Configurable properties :
 | `oidc.groups-claim` | `groups` | Claim to be used as list of user groups. |
 | `oidc.roles-claim` | `roles` | Claim to be used as list of user roles. |
 | `oidc.extra-query-params` | | Optional : query params to be added by client. e.g : `prompt=consent&kc_idp_hint=google` |
+| `oidc.scope` | `openid profile` | Optional : Specifies the OIDC scopes to be requested by the Onyxia client. `"openid"` is always requested, regardless of this setting. |
+| `oidc.workaroundForGoogleUseDummyClientSecret` | `false` | For some reasons, Google OAuth requires providing a client secret even for public clients. Set this to `true` if you are using Google OAuth, Onyxia will then use a dummy client secret to ensure compatibility with Google Oauth.  |
 
 ### Security configuration :
 | Key | Default | Description |
