@@ -785,8 +785,9 @@ public class Region {
 
         private String issuerURI;
         private String clientID;
-
         private String extraQueryParams;
+        private String scope;
+        private String workaroundForGoogleClientSecret;
 
         public String getIssuerURI() {
             return issuerURI;
@@ -810,6 +811,22 @@ public class Region {
 
         public void setExtraQueryParams(String extraQueryParams) {
             this.extraQueryParams = extraQueryParams;
+        }
+
+        public String getWorkaroundForGoogleClientSecret() {
+            return workaroundForGoogleClientSecret;
+        }
+
+        public void setWorkaroundForGoogleClientSecret(String workaroundForGoogleClientSecret) {
+            this.workaroundForGoogleClientSecret = workaroundForGoogleClientSecret;
+        }
+
+        public String getScope() {
+            return scope;
+        }
+
+        public void setScope(String scope) {
+            this.scope = scope;
         }
     }
 

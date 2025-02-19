@@ -79,9 +79,6 @@ public class OIDCConfiguration {
     @Value("${oidc.public-key}")
     private String publicKey;
 
-    @Value("${oidc.jwk-uri}")
-    private String jwkUri;
-
     @Value("${oidc.audience}")
     private String audience;
 
@@ -93,6 +90,12 @@ public class OIDCConfiguration {
 
     @Value("${oidc.extra-query-params}")
     private String extraQueryParams;
+
+    @Value("${oidc.scope}")
+    private String scope;
+
+    @Value("${oidc.workaroundForGoogleClientSecret}")
+    private String workaroundForGoogleClientSecret;
 
     private final HttpRequestUtils httpRequestUtils;
 
@@ -229,14 +232,6 @@ public class OIDCConfiguration {
         this.issuerUri = issuerUri;
     }
 
-    public String getJwkUri() {
-        return jwkUri;
-    }
-
-    public void setJwkUri(String jwkUri) {
-        this.jwkUri = jwkUri;
-    }
-
     public String getAudience() {
         return audience;
     }
@@ -269,15 +264,44 @@ public class OIDCConfiguration {
         this.extraQueryParams = extraQueryParams;
     }
 
+    public boolean isSkipTlsVerify() {
+        return skipTlsVerify;
+    }
+
+    public void setSkipTlsVerify(boolean skipTlsVerify) {
+        this.skipTlsVerify = skipTlsVerify;
+    }
+
+    public String getRolesClaim() {
+        return rolesClaim;
+    }
+
+    public void setRolesClaim(String rolesClaim) {
+        this.rolesClaim = rolesClaim;
+    }
+
+    public String getScope() {
+        return scope;
+    }
+
+    public void setScope(String scope) {
+        this.scope = scope;
+    }
+
+    public void setWorkaroundForGoogleClientSecret(String workaroundForGoogleClientSecret) {
+        this.workaroundForGoogleClientSecret = workaroundForGoogleClientSecret;
+    }
+
+    public String getWorkaroundForGoogleClientSecret() {
+        return workaroundForGoogleClientSecret;
+    }
+
     @Bean
     @ConditionalOnProperty(prefix = "oidc", name = "issuer-uri")
     NimbusJwtDecoder jwtDecoder() {
         NimbusJwtDecoder decoder = null;
         OAuth2TokenValidator<Jwt> validator = JwtValidators.createDefault();
-        if (StringUtils.isNotEmpty(jwkUri)) {
-            LOGGER.info("OIDC : using JWK URI {} to validate tokens", jwkUri);
-            decoder = NimbusJwtDecoder.withJwkSetUri(jwkUri).build();
-        } else if (StringUtils.isNotEmpty(publicKey)) {
+        if (StringUtils.isNotEmpty(publicKey)) {
             LOGGER.info("OIDC : using public key {} to validate tokens", publicKey);
             try {
                 byte[] decodedKey = Base64.getDecoder().decode(publicKey);
