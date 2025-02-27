@@ -789,6 +789,8 @@ public class Region {
         private String scope;
         private String workaroundForGoogleClientSecret;
 
+        private String audience;
+
         public String getIssuerURI() {
             return issuerURI;
         }
@@ -827,6 +829,14 @@ public class Region {
 
         public void setScope(String scope) {
             this.scope = scope;
+        }
+
+        public void setAudience(String audience) {
+            this.audience = audience;
+        }
+
+        public String getAudience() {
+            return audience;
         }
     }
 
