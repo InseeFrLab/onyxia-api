@@ -57,6 +57,7 @@ public class ConfigurationController {
             OIDCConfiguration.setWorkaroundForGoogleClientSecret(
                     oidcConfiguration.getWorkaroundForGoogleClientSecret());
             OIDCConfiguration.setScope(oidcConfiguration.getScope());
+            OIDCConfiguration.setAudience(oidcConfiguration.getAudience());
             appInfo.setOidcConfiguration(OIDCConfiguration);
         }
         return appInfo;
