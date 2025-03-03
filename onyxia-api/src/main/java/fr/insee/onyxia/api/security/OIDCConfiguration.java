@@ -94,8 +94,8 @@ public class OIDCConfiguration {
     @Value("${oidc.scope}")
     private String scope;
 
-    @Value("${oidc.workaroundForGoogleClientSecret}")
-    private String workaroundForGoogleClientSecret;
+    @Value("${oidc.idleSessionLifetimeInSeconds}")
+    private Integer idleSessionLifetimeInSeconds;
 
     private final HttpRequestUtils httpRequestUtils;
 
@@ -288,12 +288,12 @@ public class OIDCConfiguration {
         this.scope = scope;
     }
 
-    public void setWorkaroundForGoogleClientSecret(String workaroundForGoogleClientSecret) {
-        this.workaroundForGoogleClientSecret = workaroundForGoogleClientSecret;
+    public void setIdleSessionLifetimeInSeconds(Integer idleSessionLifetimeInSeconds) {
+        this.idleSessionLifetimeInSeconds = idleSessionLifetimeInSeconds;
     }
 
-    public String getWorkaroundForGoogleClientSecret() {
-        return workaroundForGoogleClientSecret;
+    public Integer getIdleSessionLifetimeInSeconds() {
+        return idleSessionLifetimeInSeconds;
     }
 
     @Bean

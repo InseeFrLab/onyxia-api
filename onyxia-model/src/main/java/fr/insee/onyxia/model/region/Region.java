@@ -787,7 +787,7 @@ public class Region {
         private String clientID;
         private String extraQueryParams;
         private String scope;
-        private String workaroundForGoogleClientSecret;
+        private Integer idleSessionLifetimeInSeconds;
 
         private String audience;
 
@@ -815,12 +815,12 @@ public class Region {
             this.extraQueryParams = extraQueryParams;
         }
 
-        public String getWorkaroundForGoogleClientSecret() {
-            return workaroundForGoogleClientSecret;
+        public Integer getIdleSessionLifetimeInSeconds() {
+            return idleSessionLifetimeInSeconds;
         }
 
-        public void setWorkaroundForGoogleClientSecret(String workaroundForGoogleClientSecret) {
-            this.workaroundForGoogleClientSecret = workaroundForGoogleClientSecret;
+        public void setIdleSessionLifetimeInSeconds(Integer idleSessionLifetimeInSeconds) {
+            this.idleSessionLifetimeInSeconds = idleSessionLifetimeInSeconds;
         }
 
         public String getScope() {
