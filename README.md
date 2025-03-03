@@ -72,7 +72,7 @@ Configurable properties :
 | `oidc.public-key` | | Optional: If for some reason you don't want Onyxia-API to bootstrap configuration by requesting the `issuer-uri` then you can manually provide the public key used for validating incoming tokens. |
 | `oidc.extra-query-params` | | Optional : query params to be added by client. e.g : `prompt=consent&kc_idp_hint=google` |
 | `oidc.scope` | `openid profile` | Optional : Specifies the OIDC scopes to be requested by the Onyxia client. `"openid"` is always requested, regardless of this setting. |
-| `oidc.workaroundForGoogleClientSecret` | | For some reasons, Google OAuth requires providing a client secret even for public clients. ⚠️ Use this configuration only if using Google OAuth ! ⚠️ For all other providers you should not have client secret as the Onyxia client is public. Example client secret format: " `GOCSPX-_xxxxxxxxxxxxxxxxxxxxxxxxxxx` |
+| `oidc.idleSessionLifetimeInSeconds` | | Optional: Automatically logs out users after a set period of inactivity. |
 
 ### Security configuration :
 | Key | Default | Description |

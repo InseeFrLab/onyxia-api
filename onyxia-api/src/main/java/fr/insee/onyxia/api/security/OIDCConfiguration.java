@@ -1,21 +1,9 @@
 package fr.insee.onyxia.api.security;
 
-import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
-
 import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.api.services.utils.HttpRequestUtils;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.region.Region;
-import java.security.KeyFactory;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.List;
-import javax.net.ssl.SSLContext;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
@@ -60,6 +48,19 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.net.ssl.SSLContext;
+import java.security.KeyFactory;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.List;
+
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+
 @Configuration
 @ConditionalOnProperty(name = "authentication.mode", havingValue = "openidconnect")
 public class OIDCConfiguration {
@@ -94,8 +95,8 @@ public class OIDCConfiguration {
     @Value("${oidc.scope}")
     private String scope;
 
-    @Value("${oidc.workaroundForGoogleClientSecret}")
-    private String workaroundForGoogleClientSecret;
+    @Value("${oidc.idleSessionLifetimeInSeconds}")
+    private Integer idleSessionLifetimeInSeconds;
 
     private final HttpRequestUtils httpRequestUtils;
 
@@ -288,12 +289,12 @@ public class OIDCConfiguration {
         this.scope = scope;
     }
 
-    public void setWorkaroundForGoogleClientSecret(String workaroundForGoogleClientSecret) {
-        this.workaroundForGoogleClientSecret = workaroundForGoogleClientSecret;
+    public void setIdleSessionLifetimeInSeconds(Integer idleSessionLifetimeInSeconds) {
+        this.idleSessionLifetimeInSeconds = idleSessionLifetimeInSeconds;
     }
 
-    public String getWorkaroundForGoogleClientSecret() {
-        return workaroundForGoogleClientSecret;
+    public Integer getIdleSessionLifetimeInSeconds() {
+        return idleSessionLifetimeInSeconds;
     }
 
     @Bean
