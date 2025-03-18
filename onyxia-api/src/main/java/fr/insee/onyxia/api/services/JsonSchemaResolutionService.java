@@ -35,7 +35,7 @@ public class JsonSchemaResolutionService {
 
     // Returns a fresh JsonNode by resolving all $ref, overwriteSchemaWith and patchSchemaWith
     // in schemaNode and then merging the result with patchNode (if not null)
-    private JsonNode resolveReferences (
+    private JsonNode resolveReferences(
             JsonNode schemaNode, JsonNode rootNode, List<String> roles, JsonNode patchNode) {
         if (schemaNode.isObject()) {
             return resolveReferences((ObjectNode) schemaNode, rootNode, roles, patchNode);
@@ -43,7 +43,7 @@ public class JsonSchemaResolutionService {
             // If provided, the patch replaces any non-object
             return patchNode;
         } else if (schemaNode.isArray()) {
-            ArrayNode arrayNode =  this.objectMapper.createArrayNode();
+            ArrayNode arrayNode = this.objectMapper.createArrayNode();
             for (int i = 0; i < schemaNode.size(); i++) {
                 arrayNode.set(i, resolveReferences(schemaNode.get(i), rootNode, roles));
             }
@@ -53,7 +53,7 @@ public class JsonSchemaResolutionService {
         }
     }
 
-    private JsonNode resolveReferences (
+    private JsonNode resolveReferences(
             ObjectNode schemaNode, JsonNode rootNode, List<String> roles, JsonNode patchNode) {
         if (patchNode != null && !patchNode.isObject()) {
             // If the patch is a value (not an object), then it replaces the schema
@@ -76,12 +76,10 @@ public class JsonSchemaResolutionService {
         }
 
         // Special case 2: resolve x-onyxia.overwriteSchemaWith
-        if (schemaNode.has("x-onyxia")
-                && schemaNode.get("x-onyxia").has("overwriteSchemaWith")) {
+        if (schemaNode.has("x-onyxia") && schemaNode.get("x-onyxia").has("overwriteSchemaWith")) {
             String overwriteSchemaName =
                     schemaNode.get("x-onyxia").get("overwriteSchemaWith").asText();
-            JsonNode overwriteSchemaNode =
-                    registryService.getSchema(roles, overwriteSchemaName);
+            JsonNode overwriteSchemaNode = registryService.getSchema(roles, overwriteSchemaName);
             if (overwriteSchemaNode != null && !overwriteSchemaNode.isMissingNode()) {
                 // Proceed with the overwriteSchemaWith node but still apply current patch (if any)
                 return resolveReferences(overwriteSchemaNode, rootNode, roles, patchNode);
@@ -97,17 +95,21 @@ public class JsonSchemaResolutionService {
                     // If the new patch is not an object, it replaces the schema
                     return resolveReferences(newPatchNode, rootNode, roles, patchNode);
                 } else if (patchNode == null) {
-                    // Otherwise it's an object. If no patch is currently applied, then it becomes the patch.
+                    // Otherwise it's an object. If no patch is currently applied, then it becomes
+                    // the patch.
                     patchNode = newPatchNode;
                 } else {
                     // Otherwise we have two object patches.
                     // Apply first the new patch to the schema object
-                    schemaNode = resolveReferencesInObject(schemaNode, rootNode, roles, (ObjectNode) newPatchNode);
+                    schemaNode =
+                            resolveReferencesInObject(
+                                    schemaNode, rootNode, roles, (ObjectNode) newPatchNode);
                     // then proceed with the main processing and apply the original patch
                 }
             }
         }
-        return cleanOnyxiaTags(resolveReferencesInObject(schemaNode, rootNode, roles, (ObjectNode) patchNode));
+        return cleanOnyxiaTags(
+                resolveReferencesInObject(schemaNode, rootNode, roles, (ObjectNode) patchNode));
     }
 
     private ObjectNode resolveReferencesInObject(
@@ -120,7 +122,8 @@ public class JsonSchemaResolutionService {
             // If no patch is supplied, simply map all keys from schemaNode to their resolved values
             while (it.hasNext()) {
                 Map.Entry<String, JsonNode> entry = it.next();
-                objectNode.put(entry.getKey(), resolveReferences(entry.getValue(), rootNode, roles));
+                objectNode.put(
+                        entry.getKey(), resolveReferences(entry.getValue(), rootNode, roles));
             }
 
         } else {
@@ -129,14 +132,16 @@ public class JsonSchemaResolutionService {
                 Map.Entry<String, JsonNode> entry = it.next();
                 String key = entry.getKey();
                 JsonNode patchVal = patchNode.get(key);
-                 if (patchVal == null) {
+                if (patchVal == null) {
                     // The key is not patched: resolve the value without any patch
                     objectNode.put(key, resolveReferences(entry.getValue(), rootNode, roles));
                 } else if (!patchVal.isNull()) {
                     // The key is patched to non-null: resolve the value using that patch
-                    objectNode.put(key, resolveReferences(entry.getValue(), rootNode, roles, patchVal));
+                    objectNode.put(
+                            key, resolveReferences(entry.getValue(), rootNode, roles, patchVal));
                 }
-                // Otherwise the key is patched to an explicit null: to not add it to the output schema (removed key)
+                // Otherwise the key is patched to an explicit null: to not add it to the output
+                // schema (removed key)
             }
 
             // For all keys in the patch
@@ -145,7 +150,8 @@ public class JsonSchemaResolutionService {
                 Map.Entry<String, JsonNode> patchEntry = patchIt.next();
                 String patchKey = patchEntry.getKey();
                 JsonNode patchVal = patchEntry.getValue();
-                // If the key is patched with a non-null value, not already set in the previous loop: add the patch value
+                // If the key is patched with a non-null value, not already set in the previous
+                // loop: add the patch value
                 if (!patchVal.isNull() && !objectNode.has(patchKey)) {
                     objectNode.put(patchKey, patchVal);
                 }
@@ -166,5 +172,4 @@ public class JsonSchemaResolutionService {
         }
         return node;
     }
-
 }
