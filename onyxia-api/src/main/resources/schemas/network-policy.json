@@ -1,25 +1,28 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "type": "object",
-    "title": "Network Policy",
-    "description": "Define access policy to the service",
-    "properties": {
-        "enabled": {
-            "type": "boolean",
-            "title": "Enable network policy",
-            "description": "Only pod from the same namespace will be allowed",
-            "default": false,
-            "x-onyxia": {
-                "hidden": true
-            }
-        },
-        "from": {
-            "type": "array",
-            "description": "Array of source allowed to have network access to your service",
-            "default": [],
-            "x-onyxia": {
-                "hidden": true
-            }
-        }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Network access policy",
+  "type": "object",
+  "properties": {
+    "enabled": {
+      "title": "Only allow access from the same namespace",
+      "type": "boolean",
+      "default": false,
+      "x-onyxia": {
+        "overwriteDefaultWith": "region.defaultNetworkPolicy"
+      }
+    },
+    "from": {
+      "description": "Array of sources allowed to have network access to your service",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "default": [],
+      "x-onyxia": {
+        "hidden": true,
+        "overwriteDefaultWith": "region.from"
+      }
     }
+  }
 }

@@ -1,35 +1,35 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "Route",
-    "description": "Route parameters",
-    "type": "object",
-    "properties": {
-        "enabled": {
-            "description": "Enable route",
-            "type": "boolean",
-            "default": false,
-            "x-onyxia": {
-                "hidden": true,
-                "overwriteDefaultWith": "k8s.route"
-            }
-        },
-        "hostname": {
-            "type": "string",
-            "form": true,
-            "title": "Hostname",
-            "x-onyxia": {
-                "hidden": true,
-                "overwriteDefaultWith": "{{project.id}}-{{k8s.randomSubdomain}}-0.{{k8s.domain}}"
-            }
-        },
-        "userHostname": {
-            "type": "string",
-            "form": true,
-            "title": "Hostname",
-            "x-onyxia": {
-                "hidden": true,
-                "overwriteDefaultWith": "{{project.id}}-{{k8s.randomSubdomain}}-user.{{k8s.domain}}"
-            }
-        }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Route details",
+  "type": "object",
+  "form": true,
+  "properties": {
+    "enabled": {
+      "description": "Enable route",
+      "type": "boolean",
+      "default": false,
+      "x-onyxia": {
+        "hidden": true,
+        "overwriteDefaultWith": "k8s.route"
+      }
+    },
+    "hostname": {
+      "type": "string",
+      "form": true,
+      "title": "Hostname",
+      "x-onyxia": {
+        "hidden": true,
+        "overwriteDefaultWith": "{{project.id}}-{{k8s.randomSubdomain}}-0.{{k8s.domain}}"
+      }
+    },
+    "userHostname": {
+      "type": "string",
+      "form": true,
+      "title": "Hostname",
+      "x-onyxia": {
+        "hidden": true,
+        "overwriteDefaultWith": "{{project.id}}-{{k8s.randomSubdomain}}-user.{{k8s.domain}}"
+      }
     }
+  }
 }
