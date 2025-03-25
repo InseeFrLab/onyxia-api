@@ -54,6 +54,10 @@ public class ConfigurationController {
             OIDCConfiguration.setIssuerURI(oidcConfiguration.getIssuerUri());
             OIDCConfiguration.setClientID(oidcConfiguration.getClientID());
             OIDCConfiguration.setExtraQueryParams(oidcConfiguration.getExtraQueryParams());
+            OIDCConfiguration.setIdleSessionLifetimeInSeconds(
+                    oidcConfiguration.getIdleSessionLifetimeInSeconds());
+            OIDCConfiguration.setScope(oidcConfiguration.getScope());
+            OIDCConfiguration.setAudience(oidcConfiguration.getAudience());
             appInfo.setOidcConfiguration(OIDCConfiguration);
         }
         return appInfo;

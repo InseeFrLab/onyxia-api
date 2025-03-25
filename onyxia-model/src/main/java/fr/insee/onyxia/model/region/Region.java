@@ -785,8 +785,11 @@ public class Region {
 
         private String issuerURI;
         private String clientID;
-
         private String extraQueryParams;
+        private String scope;
+        private Integer idleSessionLifetimeInSeconds;
+
+        private String audience;
 
         public String getIssuerURI() {
             return issuerURI;
@@ -810,6 +813,30 @@ public class Region {
 
         public void setExtraQueryParams(String extraQueryParams) {
             this.extraQueryParams = extraQueryParams;
+        }
+
+        public Integer getIdleSessionLifetimeInSeconds() {
+            return idleSessionLifetimeInSeconds;
+        }
+
+        public void setIdleSessionLifetimeInSeconds(Integer idleSessionLifetimeInSeconds) {
+            this.idleSessionLifetimeInSeconds = idleSessionLifetimeInSeconds;
+        }
+
+        public String getScope() {
+            return scope;
+        }
+
+        public void setScope(String scope) {
+            this.scope = scope;
+        }
+
+        public void setAudience(String audience) {
+            this.audience = audience;
+        }
+
+        public String getAudience() {
+            return audience;
         }
     }
 
