@@ -39,7 +39,9 @@ public class CatalogRefresher {
                                         c.getLocation(),
                                         c.getId(),
                                         c.getSkipTlsVerify(),
-                                        c.getCaFile());
+                                        c.getCaFile(),
+                                        c.getUsername(),
+                                        c.getPassword());
                                 LOGGER.info("Updating catalog: {}", c.getId());
                                 catalogLoader.updateCatalog(c);
                             } catch (Exception e) {
