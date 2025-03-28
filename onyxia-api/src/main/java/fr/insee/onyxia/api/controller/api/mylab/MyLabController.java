@@ -29,15 +29,16 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 @Tag(name = "My lab", description = "My services")
 @RequestMapping("/my-lab")
@@ -174,7 +175,9 @@ public class MyLabController {
                 catalogService
                         .getChartByVersion(catalogId, chartName, version)
                         .orElseThrow(NotFoundException::new);
-
+        if (chart.getConfig() == null) {
+            return null;
+        }
         return jsonSchemaResolutionService.resolveReferences(chart.getConfig(), user.getRoles());
     }
 
@@ -531,23 +534,26 @@ public class MyLabController {
         Map<String, Object> fusion = new HashMap<>();
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
 
-        JSONObject jsonSchema =
-                new JSONObject(
-                        new JSONTokener(
-                                jsonSchemaResolutionService
-                                        .resolveReferences(pkg.getConfig(), user.getRoles())
-                                        .toString()));
+        // If getConfig is null that means that no schema is provided : skip validation
+        if (pkg.getConfig() != null) {
+            JSONObject jsonSchema =
+                    new JSONObject(
+                            new JSONTokener(
+                                    jsonSchemaResolutionService
+                                            .resolveReferences(pkg.getConfig(), user.getRoles())
+                                            .toString()));
 
-        SchemaLoader loader =
-                SchemaLoader.builder()
-                        .schemaJson(jsonSchema)
-                        .draftV6Support() // or draftV7Support()
-                        .build();
-        org.everit.json.schema.Schema schema = loader.load().build();
-        // Convert the options map to a JSONObject
-        JSONObject jsonObject = new JSONObject(fusion);
-        // Validate the options object against the schema
-        schema.validate(jsonObject);
+            SchemaLoader loader =
+                    SchemaLoader.builder()
+                            .schemaJson(jsonSchema)
+                            .draftV6Support() // or draftV7Support()
+                            .build();
+            org.everit.json.schema.Schema schema = loader.load().build();
+            // Convert the options map to a JSONObject
+            JSONObject jsonObject = new JSONObject(fusion);
+            // Validate the options object against the schema
+            schema.validate(jsonObject);
+        }
 
         boolean skipTlsVerify = catalog.getSkipTlsVerify();
         String caFile = catalog.getCaFile();
