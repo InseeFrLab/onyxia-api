@@ -92,8 +92,7 @@
       },
       "hidden": {
         "value": false,
-        "path": "enabled",
-        "isPathRelative": true
+        "path": "s3/enabled"
       }
     }
   },
