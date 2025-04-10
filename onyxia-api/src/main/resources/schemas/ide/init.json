@@ -1,27 +1,35 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "Init",
-    "description": "Init parameters",
-    "type": "object",
-    "properties": {
-        "regionInit": {
-            "type": "string",
-            "description": "region initialization script",
-            "default": "",
-            "x-onyxia": {
-                "hidden": true,
-                "overwriteDefaultWith": "{{k8s.initScriptUrl}}"
-            }
-        },
-        "personalInit": {
-            "type": "string",
-            "description": "user initialization script",
-            "default": ""
-        },
-        "personalInitArgs": {
-            "type": "string",
-            "description": "args for user initialization script",
-            "default": ""
-        }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Initialization scripts",
+  "type": "object",
+  "properties": {
+    "regionInit": {
+      "type": "string",
+      "description": "region initialization script",
+      "default": "",
+      "x-onyxia": {
+        "hidden": true,
+        "overwriteDefaultWith": "{{k8s.initScriptUrl}}"
+      }
+    },
+    "regionInitCheckSum": {
+      "type": "string",
+      "description": "region initialization script",
+      "default": "",
+      "x-onyxia": {
+        "hidden": true,
+        "overwriteDefaultWith": "{{k8s.initScriptCheckSum}}"
+      }
+    },
+    "personalInit": {
+      "title": "Use a custom script (URL)",
+      "type": "string",
+      "default": ""
+    },
+    "personalInitArgs": {
+      "title": "Arguments for the custom script",
+      "type": "string",
+      "default": ""
     }
+  }
 }

@@ -1,22 +1,21 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "Environment variables",
-    "description": "environment variables available within your service",
-    "type": "array",
-    "default": [],
-    "items": {
-      "title": "",
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "default": "CHANGE_ME",
-          "pattern": "^[^ ]+$"
-        },
-        "value": {
-          "type": "string",
-          "default": ""
-        }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Environment variables available within your service",
+  "type": "array",
+  "default": [],
+  "items": {
+    "title": "",
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "default": "CHANGE_ME",
+        "pattern": "^[a-zA-Z0-9_]+$"
+      },
+      "value": {
+        "type": "string",
+        "default": ""
       }
     }
   }
+}
