@@ -37,7 +37,7 @@ public class Region {
     private OnyxiaAPI onyxiaAPI;
 
     @Schema(description = "")
-    private Data data = new Data();
+    private Object data = null;
 
     @Schema(description = "")
     private Vault vault;
@@ -110,11 +110,11 @@ public class Region {
         this.services = services;
     }
 
-    public Data getData() {
+    public Object getData() {
         return data;
     }
 
-    public void setData(Data data) {
+    public void setData(Object data) {
         this.data = data;
     }
 
