@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,14 +25,13 @@ public class JsonSchemaProfileRegistryService {
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
-    public JsonSchemaProfileRegistryService() {
-        loadProfileSchema();
-    }
+    public JsonSchemaProfileRegistryService() {}
 
     public JsonNode getProfileSchema() {
         return defaultProfileSchema;
     }
 
+    @PostConstruct
     private void loadProfileSchema() {
         Path roleSchemaPath = Paths.get(userProfileDirectory);
         if (Files.exists(roleSchemaPath) && Files.exists(roleSchemaPath.resolve("default"))) {
