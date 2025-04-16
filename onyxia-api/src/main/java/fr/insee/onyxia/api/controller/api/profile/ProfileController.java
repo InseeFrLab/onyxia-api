@@ -1,6 +1,7 @@
 package fr.insee.onyxia.api.controller.api.profile;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import fr.insee.onyxia.api.services.JsonSchemaProfileRegistryService;
 import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.region.Region;
@@ -20,14 +21,19 @@ public class ProfileController {
 
     private final UserProvider userProvider;
 
+    private final JsonSchemaProfileRegistryService jsonSchemaProfileRegistryService;
+
     @Autowired
-    public ProfileController(UserProvider userProvider) {
+    public ProfileController(
+            UserProvider userProvider,
+            JsonSchemaProfileRegistryService jsonSchemaProfileRegistryService) {
         this.userProvider = userProvider;
+        this.jsonSchemaProfileRegistryService = jsonSchemaProfileRegistryService;
     }
 
     @GetMapping("schema")
     public JsonNode profileSchema(@Parameter(hidden = true) Region region) {
         User user = userProvider.getUser(region);
-        return jsonSchemaResolutionService.resolveReferences(chart.getConfig(), user.getRoles());
+        return jsonSchemaProfileRegistryService.getProfileSchema();
     }
 }
