@@ -41,7 +41,7 @@ public class HelmRepoService {
                     command.concat(
                             "--ca-file " + System.getenv("CACERTS_DIR") + "/" + caFile + " ");
         }
-        command = command.concat(nomRepo + " " + url);
+        command = command.concat(nomRepo + " " + url + " ");
         if (StringUtils.isNotEmpty(username)) {
             command = command.concat("--username " + username + " ");
         }
