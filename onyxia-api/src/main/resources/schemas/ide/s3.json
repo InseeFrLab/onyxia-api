@@ -1,18 +1,18 @@
 {
-  "title": "S3 Configuration",
-  "description": "Configuration of temporary identity for AWS S3",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "S3 object storage",
   "type": "object",
   "properties": {
     "enabled": {
+      "title": "Enable S3 access from within the service",
       "type": "boolean",
-      "description": "Add S3 temporary identity inside your environment",
       "default": true
     },
     "accessKeyId": {
-      "description": "AWS Access Key",
+      "title": "Access Key ID",
       "type": "string",
       "x-onyxia": {
-        "overwriteDefaultWith": "{{s3.AWS_ACCESS_KEY_ID}}"
+        "overwriteDefaultWith": "s3.AWS_ACCESS_KEY_ID"
       },
       "hidden": {
         "value": false,
@@ -21,7 +21,7 @@
       }
     },
     "endpoint": {
-      "description": "AWS S3 Endpoint",
+      "title": "S3 endpoint URL",
       "type": "string",
       "x-onyxia": {
         "overwriteDefaultWith": "{{s3.AWS_S3_ENDPOINT}}"
@@ -33,7 +33,7 @@
       }
     },
     "defaultRegion": {
-      "description": "AWS S3 default region",
+      "title": "Default region",
       "type": "string",
       "x-onyxia": {
         "overwriteDefaultWith": "{{s3.AWS_DEFAULT_REGION}}"
@@ -45,7 +45,7 @@
       }
     },
     "secretAccessKey": {
-      "description": "AWS S3 secret access key",
+      "title": "Secret Access Key",
       "type": "string",
       "render": "password",
       "x-onyxia": {
@@ -58,7 +58,7 @@
       }
     },
     "sessionToken": {
-      "description": "AWS S3 session Token",
+      "title": "Session token",
       "type": "string",
       "render": "password",
       "x-onyxia": {
@@ -71,7 +71,7 @@
       }
     },
     "pathStyleAccess": {
-      "title": "Path style access",
+      "title": "Path-style access",
       "type": "boolean",
       "default": false,
       "x-onyxia": {
@@ -79,11 +79,12 @@
       },
       "hidden": {
         "value": false,
-        "path": "s3/enabled"
+        "path": "enabled",
+        "isPathRelative": true
       }
     },
     "workingDirectoryPath": {
-      "title": "Working directory path ",
+      "title": "Working directory path",
       "type": "string",
       "default": "",
       "x-onyxia": {
@@ -95,6 +96,7 @@
       }
     }
   },
-  "required": ["enabled"]
+  "required": [
+    "enabled"
+  ]
 }
-
