@@ -11,6 +11,7 @@ public class HelmVersionService {
     public String getVersion()
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
         return Command.executeAndGetResponseAsRaw("helm version --template={{.Version}}")
+                .getProcessResult()
                 .getOutput()
                 .getString(StandardCharsets.UTF_8.name());
     }
