@@ -127,6 +127,7 @@ Note : If you want Onyxia to create the ResourceQuota but not override it at eac
 | `route`                 | false | Whether or not OpenShift Route is enabled                                                                                   |
 | `istio`                 |       | See [Istio](#istio)                                                                                                         |
 | `ingressClassName`      | ''    | Ingress Class Name: useful if you want to use a specific ingress controller instead of a default one                        |
+| `ingressPort`      |     | Optional : define this if your ingress controller does not listen to 80/443 port. If set, the UI will append this port number to the "open service" button link.                        |
 | `annotations`           |       | Annotations to add at ingress creation {"cert-manager.io/cluster-issuer": "nameOfClusterIssuer"}                            |
 | `useDefaultCertificate` | true  | When true, no TLS secret name will be generated, specify false if you want ingress certificate to be managed by CertManager |
 | `certManager`           |       | See [CertManager](#certManager)                                                                                             |
