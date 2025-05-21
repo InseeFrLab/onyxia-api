@@ -645,11 +645,20 @@ public class Region {
         private boolean useDefaultCertificate = true;
         private Map<String, String> annotations = new HashMap<>();
         private boolean ingress = true;
+        private Integer ingressPort = null;
 
         private boolean route = false;
 
         private IstioIngress istio;
         private CertManager certManager;
+
+        public Integer getIngressPort() {
+            return ingressPort;
+        }
+
+        public void setIngressPort(Integer ingressPort) {
+            this.ingressPort = ingressPort;
+        }
 
         public String getDomain() {
             return domain;
