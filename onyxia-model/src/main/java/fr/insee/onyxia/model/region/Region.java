@@ -188,6 +188,7 @@ public class Region {
         private Monitoring monitoring;
         private String allowedURIPattern = "^https://";
         private Quotas quotas = new Quotas();
+        private Map<String, Object> customValues = new HashMap<>();
 
         /***
          * @Deprecated since v3
@@ -200,6 +201,14 @@ public class Region {
 
         private NamespaceAnnotationsDynamic namespaceAnnotationsDynamic =
                 new NamespaceAnnotationsDynamic();
+
+        public Map<String, Object> getCustomValues() {
+            return customValues;
+        }
+
+        public void setCustomValues(Map<String, Object> customValues) {
+            this.customValues = customValues;
+        }
 
         public boolean isSingleNamespace() {
             return singleNamespace;
