@@ -92,6 +92,12 @@ public class CatalogWrapper {
     @Schema(description = "If multipleServicesMode is set to maxNumber, how many versions to keep")
     private int maxNumberOfVersions = 5;
 
+    @Schema(description = "Username for basic authentication")
+    private String username = null;
+
+    @Schema(description = "Password for basic authentication")
+    private String password = null;
+
     public enum MultipleServicesMode {
         @JsonProperty("all")
         ALL,
@@ -302,6 +308,22 @@ public class CatalogWrapper {
 
     public void setRestrictions(List<CatalogRestrictions> restrictions) {
         this.restrictions = restrictions;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public static class CatalogRestrictions {

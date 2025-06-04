@@ -9,7 +9,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.4</version>
+        <version>3.4.5</version>
     </parent>
     <modules>
         <module>onyxia-model</module>
@@ -20,7 +20,7 @@
 
     </distributionManagement>
     <properties>
-        <fabric8io.version>7.1.0</fabric8io.version>
+        <fabric8io.version>7.3.1</fabric8io.version>
         <maven.compiler.release>21</maven.compiler.release>
         <java.version>21</java.version>
     </properties>

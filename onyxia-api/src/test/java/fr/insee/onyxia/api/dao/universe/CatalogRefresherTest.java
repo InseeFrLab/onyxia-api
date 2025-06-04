@@ -82,12 +82,13 @@ class CatalogRefresherTest {
         when(catalogWrapper.getCaFile()).thenReturn(null);
 
         when(catalogs.getCatalogs()).thenReturn(List.of(catalogWrapper));
-        when(helmRepoService.addHelmRepo("location", "id", false, null)).thenReturn("Repo added");
+        when(helmRepoService.addHelmRepo("location", "id", false, null, null, null))
+                .thenReturn("Repo added");
 
         catalogRefresher.run();
 
         verify(helmRepoService).repoUpdate();
-        verify(helmRepoService, times(1)).addHelmRepo("location", "id", false, null);
+        verify(helmRepoService, times(1)).addHelmRepo("location", "id", false, null, null, null);
         verify(catalogLoader, times(1)).updateCatalog(catalogWrapper);
     }
 }
