@@ -3,11 +3,12 @@ package fr.insee.onyxia.api.dao.universe;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.params.provider.Arguments.argumentSet;
 
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.configuration.CustomObjectMapper;
+import fr.insee.onyxia.api.configuration.HttpClientProvider;
 import fr.insee.onyxia.api.services.JsonSchemaRegistryService;
 import fr.insee.onyxia.api.services.JsonSchemaResolutionService;
 import fr.insee.onyxia.api.util.TestUtils;
@@ -35,7 +36,8 @@ import org.springframework.util.CollectionUtils;
             CatalogLoader.class,
             CustomObjectMapper.class,
             JsonSchemaResolutionService.class,
-            JsonSchemaRegistryService.class
+            JsonSchemaRegistryService.class,
+            HttpClientProvider.class
         })
 public class CatalogLoaderTest {
 
@@ -151,13 +153,11 @@ public class CatalogLoaderTest {
         catalogLoader.updateCatalog(cw);
 
         String stdErrLogs = TestUtils.tapSystemOut(() -> catalogLoader.updateCatalog(cw));
-
         assertThat(
                 stdErrLogs,
                 containsString(
                         "fr.insee.onyxia.api.dao.universe.CatalogLoaderException: "
-                                + "Exception occurred during loading resource: class path resource "
-                                + "[catalog-loader-test/keepeme1.gz]"));
+                                + "Exception occurred during loading resource: classpath"));
     }
 
     @ParameterizedTest

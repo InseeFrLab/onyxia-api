@@ -37,15 +37,10 @@ public class Application {
             ConfigurableEnvironment environment = event.getEnvironment();
             MutablePropertySources propertySources = environment.getPropertySources();
             Map<String, Object> myMap = new HashMap<>();
-            String oidcJwkUri = environment.getProperty("oidc.jwk-uri");
             String oidcIssuerUri = environment.getProperty("oidc.issuer-uri");
-            LOGGER.info("oidc properties, jwk-uri: {}, issuer-uri: {}", oidcJwkUri, oidcIssuerUri);
 
             if (StringUtils.isNotEmpty(oidcIssuerUri)) {
                 myMap.put("spring.security.oauth2.resourceserver.jwt.issuer-uri", oidcIssuerUri);
-            }
-            if (StringUtils.isNotEmpty(oidcJwkUri)) {
-                myMap.put("spring.security.oauth2.resourceserver.jwt.jwk-set-uri", oidcJwkUri);
             }
             propertySources.addFirst(new MapPropertySource("ALIASES", myMap));
         }
