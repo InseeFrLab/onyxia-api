@@ -13,9 +13,14 @@ import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.helm.Chart;
 import fr.insee.onyxia.model.helm.Repository;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
+import okhttp3.Credentials;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
@@ -26,7 +31,6 @@ import org.json.JSONTokener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -40,10 +44,15 @@ public class CatalogLoader {
     private final ResourceLoader resourceLoader;
     private final ObjectMapper mapperHelm;
 
+    private OkHttpClient httpClient;
+
     public CatalogLoader(
-            ResourceLoader resourceLoader, @Qualifier("helm") ObjectMapper mapperHelm) {
+            ResourceLoader resourceLoader,
+            @Qualifier("helm") ObjectMapper mapperHelm,
+            OkHttpClient httpClient) {
         this.resourceLoader = resourceLoader;
         this.mapperHelm = mapperHelm;
+        this.httpClient = httpClient;
     }
 
     public void updateCatalog(CatalogWrapper cw) {
@@ -57,14 +66,11 @@ public class CatalogLoader {
 
     /** TODO : move this helm specific logic somewhere else ? */
     private void updateHelmRepository(CatalogWrapper cw) {
-        try {
-            Reader reader =
-                    new InputStreamReader(
-                            resourceLoader
-                                    .getResource(cw.getLocation() + "/index.yaml")
-                                    .getInputStream(),
-                            UTF_8);
-            Repository repository = mapperHelm.readValue(reader, Repository.class);
+
+        try (InputStream stream =
+                fetchResource(
+                        cw.getLocation() + "/index.yaml", cw.getUsername(), cw.getPassword())) {
+            Repository repository = mapperHelm.readValue(stream, Repository.class);
 
             repository.setEntries(
                     repository.getEntries().entrySet().stream()
@@ -117,6 +123,19 @@ public class CatalogLoader {
             cw.setLastUpdateTime(System.currentTimeMillis());
         } catch (Exception e) {
             LOGGER.info("Exception occurred", e);
+        }
+    }
+
+    private InputStream fetchResource(String url, String username, String password)
+            throws IOException {
+        if (url.startsWith("http")) {
+            Request.Builder builder = new Request.Builder().url(url);
+            if (username != null && password != null) {
+                builder = builder.addHeader("Authorization", Credentials.basic(username, password));
+            }
+            return httpClient.newCall(builder.build()).execute().body().byteStream();
+        } else {
+            return resourceLoader.getResource(url).getInputStream();
         }
     }
 
@@ -193,13 +212,12 @@ public class CatalogLoader {
             absoluteUrl = StringUtils.applyRelativePath(cw.getLocation() + "/", chartUrl);
         }
 
-        Resource resource = resourceLoader.getResource(absoluteUrl);
-
-        try (InputStream inputStream = resource.getInputStream()) {
+        try (InputStream inputStream =
+                fetchResource(absoluteUrl, cw.getUsername(), cw.getPassword())) {
             extractDataFromTgz(inputStream, chart);
         } catch (IOException e) {
             throw new CatalogLoaderException(
-                    "Exception occurred during loading resource: " + resource.getDescription(), e);
+                    "Exception occurred during loading resource: " + absoluteUrl, e);
         }
     }
 
