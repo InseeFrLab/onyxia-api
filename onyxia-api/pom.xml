@@ -59,12 +59,12 @@
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
-            <version>4.12.0</version>
+            <version>5.1.0</version>
         </dependency>
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>logging-interceptor</artifactId>
-            <version>4.12.0</version>
+            <version>5.1.0</version>
         </dependency>
         <dependency>
             <groupId>innovation.insee</groupId>
@@ -132,7 +132,7 @@
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>mockwebserver</artifactId>
-            <version>4.12.0</version>
+            <version>5.1.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
