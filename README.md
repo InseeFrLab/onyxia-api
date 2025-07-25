@@ -91,10 +91,6 @@ Configurable properties :
 | `http.cacheMaxSizeMB` | 500                                                                | Maximum size (in MB) used by the cache (cleanup will be done automatically if space is not enough) |
 | `http.overrideCacheLocation` | `${java.io.tmpdir}/http_cache` (=`/tmp/http_cache` on most setups) | Specify where to store the cache                                                                   |
 
-http.cacheEnabled=true
-http.cacheMaxSizeMB=500
-http.overrideCacheLocation=
-
 ### Events
 | Key                      | Default | Description                                                        |
 |--------------------------|--|--------------------------------------------------------------------|
