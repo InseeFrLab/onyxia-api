@@ -2,6 +2,8 @@ package fr.insee.onyxia.api.configuration;
 
 import fr.insee.onyxia.model.region.Region;
 import io.micrometer.common.util.StringUtils;
+import java.io.File;
+import java.io.IOException;
 import okhttp3.*;
 import okhttp3.logging.HttpLoggingInterceptor;
 import org.jetbrains.annotations.NotNull;
@@ -11,9 +13,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.io.File;
-import java.io.IOException;
 
 @Configuration
 public class HttpClientProvider {
