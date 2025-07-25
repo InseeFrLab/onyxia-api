@@ -1,5 +1,5 @@
 #! /bin/bash
-HELM_VERSION=v3.17.1
+HELM_VERSION=v3.18.4
 
 # initOS discovers the operating system for this system.
 initOS() {
