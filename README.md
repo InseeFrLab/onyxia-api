@@ -80,13 +80,16 @@ Configurable properties :
 | `security.cors.allowed_origins` | | To indicate which origins are allowed by [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) |
 
 ### HTTP configuration  
-| Key | Default | Description |
-| --------------------- | ------- | ------------------------------------------------------------------ |
-| `http.proxyHost` | | Proxy hostname (e.g : proxy.example.com) |
-| `http.proxyPort` | 80 for `HTTP`, 443 for `HTTPS` | Proxy port |
-| `http.noProxy` | | Hosts that should not use the proxy (e.g : `localhost,host.example.com`) |
-| `http.proxyUsername` | | Username if the proxy requires authentication |
-| `http.proxyPassword` | | Password if the proxy requires authentication |
+| Key | Default                                                            | Description                                                                                        |
+| --------------------- |--------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
+| `http.proxyHost` |                                                                    | Proxy hostname (e.g : proxy.example.com)                                                           |
+| `http.proxyPort` | 80 for `HTTP`, 443 for `HTTPS`                                     | Proxy port                                                                                         |
+| `http.noProxy` |                                                                    | Hosts that should not use the proxy (e.g : `localhost,host.example.com`)                           |
+| `http.proxyUsername` |                                                                    | Username if the proxy requires authentication                                                      |
+| `http.proxyPassword` |                                                                    | Password if the proxy requires authentication                                                      |
+| `http.cacheEnabled` | true                                                               | Enable cache for charts retrieval.                                                                 |
+| `http.cacheMaxSizeMB` | 500                                                                | Maximum size (in MB) used by the cache (cleanup will be done automatically if space is not enough) |
+| `http.overrideCacheLocation` | `${java.io.tmpdir}/http_cache` (=`/tmp/http_cache` on most setups) | Specify where to store the cache                                                                   |
 
 ### Events
 | Key                      | Default | Description                                                        |

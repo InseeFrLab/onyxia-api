@@ -18,9 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
-import okhttp3.Credentials;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
+import okhttp3.*;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
@@ -49,7 +47,7 @@ public class CatalogLoader {
     public CatalogLoader(
             ResourceLoader resourceLoader,
             @Qualifier("helm") ObjectMapper mapperHelm,
-            OkHttpClient httpClient) {
+            @Qualifier("withCache") OkHttpClient httpClient) {
         this.resourceLoader = resourceLoader;
         this.mapperHelm = mapperHelm;
         this.httpClient = httpClient;
@@ -69,7 +67,10 @@ public class CatalogLoader {
 
         try (InputStream stream =
                 fetchResource(
-                        cw.getLocation() + "/index.yaml", cw.getUsername(), cw.getPassword())) {
+                        cw.getLocation() + "/index.yaml",
+                        cw.getUsername(),
+                        cw.getPassword(),
+                        true)) {
             Repository repository = mapperHelm.readValue(stream, Repository.class);
 
             repository.setEntries(
@@ -128,10 +129,18 @@ public class CatalogLoader {
 
     private InputStream fetchResource(String url, String username, String password)
             throws IOException {
+        return fetchResource(url, username, password, false);
+    }
+
+    private InputStream fetchResource(
+            String url, String username, String password, boolean skipCache) throws IOException {
         if (url.startsWith("http")) {
             Request.Builder builder = new Request.Builder().url(url);
             if (username != null && password != null) {
                 builder = builder.addHeader("Authorization", Credentials.basic(username, password));
+            }
+            if (skipCache) {
+                builder.cacheControl(new CacheControl.Builder().noCache().build());
             }
             return httpClient.newCall(builder.build()).execute().body().byteStream();
         } else {
