@@ -49,7 +49,7 @@ public class CatalogLoader {
     public CatalogLoader(
             ResourceLoader resourceLoader,
             @Qualifier("helm") ObjectMapper mapperHelm,
-            OkHttpClient httpClient) {
+            @Qualifier("withCache") OkHttpClient httpClient) {
         this.resourceLoader = resourceLoader;
         this.mapperHelm = mapperHelm;
         this.httpClient = httpClient;
