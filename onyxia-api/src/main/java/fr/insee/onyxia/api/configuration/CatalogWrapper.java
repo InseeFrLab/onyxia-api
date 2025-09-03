@@ -93,9 +93,11 @@ public class CatalogWrapper {
     private int maxNumberOfVersions = 5;
 
     @Schema(description = "Username for basic authentication")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String username = null;
 
     @Schema(description = "Password for basic authentication")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password = null;
 
     public enum MultipleServicesMode {
