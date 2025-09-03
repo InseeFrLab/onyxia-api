@@ -1,17 +1,18 @@
 package fr.insee.onyxia.api.configuration;
 
-import static fr.insee.onyxia.model.helm.Repository.TYPE_HELM;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.insee.onyxia.model.catalog.CatalogStatus;
 import fr.insee.onyxia.model.helm.Repository;
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+
+import static fr.insee.onyxia.model.helm.Repository.TYPE_HELM;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Schema(description = "A catalog with its metadatas")
@@ -93,9 +94,11 @@ public class CatalogWrapper {
     private int maxNumberOfVersions = 5;
 
     @Schema(description = "Username for basic authentication")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String username = null;
 
     @Schema(description = "Password for basic authentication")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password = null;
 
     public enum MultipleServicesMode {
