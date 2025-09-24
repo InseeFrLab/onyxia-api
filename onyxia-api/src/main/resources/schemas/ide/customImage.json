@@ -1,6 +1,6 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "Use a custom image instead",
-    "type": "boolean",
-    "default": false
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Use a custom image instead",
+  "type": "boolean",
+  "default": false
 }
