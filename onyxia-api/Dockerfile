@@ -1,9 +1,9 @@
-FROM eclipse-temurin:21.0.8_9-jre AS extract
+FROM eclipse-temurin:25-jre AS extract
 ARG JAR_FILE=target/*.jar
 COPY ${JAR_FILE} application.jar
 RUN java -Djarmode=layertools -jar application.jar  extract
 
-FROM eclipse-temurin:21.0.8_9-jre
+FROM eclipse-temurin:25-jre
 WORKDIR /app
 # Install helm
 COPY install-helm.sh install-helm.sh
