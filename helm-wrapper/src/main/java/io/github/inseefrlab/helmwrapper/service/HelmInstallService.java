@@ -148,7 +148,9 @@ public class HelmInstallService {
                     InterruptedException,
                     TimeoutException,
                     IllegalArgumentException {
-        StringBuilder command = new StringBuilder("helm upgrade --atomic --cleanup-on-fail --install --history-max 0 ");
+        StringBuilder command =
+                new StringBuilder(
+                        "helm upgrade --atomic --cleanup-on-fail --install --history-max 0 ");
 
         if (timeout != null) {
             command.append("--timeout " + timeout + " ");
