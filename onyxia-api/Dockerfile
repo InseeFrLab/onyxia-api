@@ -7,7 +7,7 @@ FROM eclipse-temurin:25-jre-alpine-3.22
 WORKDIR /app
 # Install helm
 COPY install-helm.sh install-helm.sh
-RUN ./install-helm.sh
+RUN bash ./install-helm.sh
 RUN rm install-helm.sh
 # Create onyxia group and user
 RUN groupadd --gid 101 --system onyxia && \
