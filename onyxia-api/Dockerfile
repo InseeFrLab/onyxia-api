@@ -17,7 +17,7 @@ ENV CACERTS_DIR="/usr/local/share/ca-certificates"
 RUN chown onyxia $JAVA_HOME/lib/security/cacerts
 # copy build extraction
 COPY --from=extract dependencies/ ./
-COPY --from=extract snapshot-dependencies/ ./
+#COPY --from=extract snapshot-dependencies/ ./
 COPY --from=extract spring-boot-loader/ ./
 COPY --from=extract application/ ./
 COPY entrypoint.sh entrypoint.sh
