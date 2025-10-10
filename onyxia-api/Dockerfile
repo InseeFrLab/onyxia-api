@@ -1,9 +1,9 @@
-FROM eclipse-temurin:25-jre-alpine-3.22 AS extract
+FROM eclipse-temurin:25-jre AS extract
 ARG JAR_FILE=target/*.jar
 COPY ${JAR_FILE} application.jar
 RUN java -Djarmode=tools -jar application.jar  extract --layers --launcher
 
-FROM eclipse-temurin:25-jre-alpine-3.22
+FROM eclipse-temurin:25-jre
 WORKDIR /app
 # Install helm
 COPY install-helm.sh install-helm.sh
