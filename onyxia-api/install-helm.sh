@@ -1,5 +1,5 @@
 #! /bin/bash
-HELM_VERSION=v3.18.4
+HELM_VERSION=v3.19.0
 
 # initOS discovers the operating system for this system.
 initOS() {
@@ -29,6 +29,7 @@ initArch() {
 initOS
 initArch
 HELM_DIST="helm-${HELM_VERSION}-${OS}-${ARCH}.tar.gz"
+apt update && apt install -y wget tar
 wget https://get.helm.sh/${HELM_DIST}
 tar -zxvf ${HELM_DIST}
 mv ${OS}-${ARCH}/helm /usr/local/bin/helm
