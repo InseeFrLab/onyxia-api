@@ -1,7 +1,7 @@
 FROM eclipse-temurin:25-jre AS extract
 ARG JAR_FILE=target/*.jar
 COPY ${JAR_FILE} application.jar
-RUN java -Djarmode=tools -jar application.jar  extract --layers --launcher
+RUN java -Djarmode=tools -jar application.jar  extract --layers --launcher --destination output
 
 FROM eclipse-temurin:25-jre
 WORKDIR /app
@@ -16,10 +16,10 @@ RUN groupadd --gid 101 --system onyxia && \
 ENV CACERTS_DIR="/usr/local/share/ca-certificates"
 RUN chown onyxia $JAVA_HOME/lib/security/cacerts
 # copy build extraction
-COPY --from=extract dependencies/ ./
-#COPY --from=extract snapshot-dependencies/ ./
-COPY --from=extract spring-boot-loader/ ./
-COPY --from=extract application/ ./
+COPY --from=extract output/dependencies/ ./
+COPY --from=extract output/snapshot-dependencies/ ./
+COPY --from=extract output/spring-boot-loader/ ./
+COPY --from=extract output/application/ ./
 COPY entrypoint.sh entrypoint.sh
 # Equivalent to 'USER onyxia', see: https://github.com/InseeFrLab/onyxia-api/pull/116
 USER 101
