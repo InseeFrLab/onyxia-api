@@ -70,7 +70,6 @@
                     <configuration>
                         <java>
                             <googleJavaFormat>
-                                <version>1.18.1</version>
                                 <style>AOSP</style>
                             </googleJavaFormat>
                         </java>
