@@ -1,7 +1,5 @@
 package fr.insee.onyxia.api.dao.universe;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -13,12 +11,10 @@ import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.helm.Chart;
 import fr.insee.onyxia.model.helm.Repository;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
-import java.util.stream.Collectors;
-import okhttp3.*;
+import okhttp3.CacheControl;
+import okhttp3.Credentials;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
@@ -33,6 +29,14 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Service
 public class CatalogLoader {
@@ -117,6 +121,7 @@ public class CatalogLoader {
             repository.getEntries().values().parallelStream()
                     .forEach(
                             charts -> {
+                                sortChartsListByVersion(charts, cw);
                                 epurateChartsList(charts, cw);
                                 refreshChartsList(charts, cw);
                             });
@@ -146,6 +151,13 @@ public class CatalogLoader {
         } else {
             return resourceLoader.getResource(url).getInputStream();
         }
+    }
+
+    private void sortChartsListByVersion(List<Chart> charts, CatalogWrapper cw) {
+        charts.sort(Comparator.comparing(
+                chart -> Version.tryParse(chart.getVersion()).orElse(Version.of(0,0,0)),
+                Comparator.reverseOrder()
+        ));
     }
 
     private void epurateChartsList(List<Chart> charts, CatalogWrapper cw) {
