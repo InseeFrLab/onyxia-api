@@ -18,7 +18,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
-import okhttp3.*;
+import okhttp3.CacheControl;
+import okhttp3.Credentials;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
@@ -117,6 +120,7 @@ public class CatalogLoader {
             repository.getEntries().values().parallelStream()
                     .forEach(
                             charts -> {
+                                sortChartsListByVersion(charts, cw);
                                 epurateChartsList(charts, cw);
                                 refreshChartsList(charts, cw);
                             });
@@ -146,6 +150,13 @@ public class CatalogLoader {
         } else {
             return resourceLoader.getResource(url).getInputStream();
         }
+    }
+
+    private void sortChartsListByVersion(List<Chart> charts, CatalogWrapper cw) {
+        charts.sort(
+                Comparator.comparing(
+                        chart -> Version.tryParse(chart.getVersion()).orElse(Version.of(0, 0, 0)),
+                        Comparator.reverseOrder()));
     }
 
     private void epurateChartsList(List<Chart> charts, CatalogWrapper cw) {
