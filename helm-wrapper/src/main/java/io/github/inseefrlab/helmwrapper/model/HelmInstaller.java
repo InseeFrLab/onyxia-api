@@ -1,11 +1,13 @@
 package io.github.inseefrlab.helmwrapper.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.ArrayList;
 import java.util.List;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class HelmInstaller {
 
     private String name;
