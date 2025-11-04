@@ -57,7 +57,7 @@ jobs:
           path: onyxia-api/target
       - name: Docker meta
         id: docker_meta
-        uses: crazy-max/ghaction-docker-meta@v5.8.0
+        uses: crazy-max/ghaction-docker-meta@v5.9.0
         with:
           images: inseefrlab/onyxia-api # list of Docker images to use as base name for tags
       - name: Set up QEMU
