@@ -1,47 +1,45 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "Spark",
-    "type": "object",
-    "description": "spark specific configuration",
-    "properties": {
-      "sparkui": {
-        "type": "boolean",
-        "title": "SparkUI",
-        "description": "Enable Spark monitoring interface",
-        "default": true
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Spark",
+  "type": "object",
+  "properties": {
+    "sparkui": {
+      "title": "Enable monitoring interface",
+      "type": "boolean",
+      "default": true
+    },
+    "default": {
+      "title": "Create a Spark configuration",
+      "type": "boolean",
+      "default": true
+    },
+    "disabledCertChecking": {
+      "title": "Disable certificate checking for S3 storage",
+      "description": "(do not disable in production)",
+      "type": "boolean",
+      "default": false
+    },
+    "userConfig": {
+      "title": "Spark configuration (spark-default.conf)",
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
       },
       "default": {
-        "type": "boolean",
-        "title": "Create a spark config",
-        "description": "Create a default spark config in spark-default.conf",
-        "default": true
+        "spark.dynamicAllocation.enabled": "true",
+        "spark.dynamicAllocation.initialExecutors": "1",
+        "spark.dynamicAllocation.minExecutors": "1",
+        "spark.dynamicAllocation.maxExecutors": "10",
+        "spark.executor.memory": "2g",
+        "spark.driver.memory": "2g",
+        "spark.dynamicAllocation.executorAllocationRatio": "1",
+        "spark.dynamicAllocation.shuffleTracking.enabled": "true",
+        "spark.hadoop.fs.s3a.bucket.all.committer.magic.enabled": "true"
       },
-      "disabledCertChecking": {
-        "title": "Disable certificate checking ",
-        "type": "boolean",
-        "description": "Disable certificate checking for your S3 storage, do not use it in production",
-        "default": false
-      },
-      "userConfig": {
-        "type": "object",
-        "title": "Create a spark config",
-        "description": "Create a default spark config in spark-default.conf",
-        "default": {
-          "spark.dynamicAllocation.enabled": "true",
-          "spark.dynamicAllocation.initialExecutors": "1",
-          "spark.dynamicAllocation.minExecutors": "1",
-          "spark.dynamicAllocation.maxExecutors": "10",
-          "spark.executor.memory": "2g",
-          "spark.driver.memory": "2g",
-          "spark.dynamicAllocation.executorAllocationRatio": "1",
-          "spark.dynamicAllocation.shuffleTracking.enabled": "true",
-          "spark.hadoop.fs.s3a.bucket.all.committer.magic.enabled": "true"
-        },
-        "hidden": {
-          "value": false,
-          "path": "default",
-          "isPathRelative": true
-        }
+      "hidden": {
+        "value": false,
+        "path": "spark/default"
       }
     }
+  }
 }

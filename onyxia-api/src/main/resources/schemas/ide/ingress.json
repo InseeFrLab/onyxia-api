@@ -1,64 +1,72 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "Ingress",
-    "description": "Ingress parameters",
-    "type": "object",
-    "properties": {
-        "enabled": {
-            "description": "Enable Ingress",
-            "type": "boolean",
-            "default": true,
-            "x-onyxia": {
-                "hidden": true,
-                "overwriteDefaultWith": "k8s.ingress"
-            }
-        },
-        "hostname": {
-            "type": "string",
-            "form": true,
-            "title": "Hostname",
-            "x-onyxia": {
-                "hidden": true,
-                "overwriteDefaultWith": "{{project.id}}-{{k8s.randomSubdomain}}-0.{{k8s.domain}}"
-            }
-        },
-        "userHostname": {
-            "type": "string",
-            "form": true,
-            "title": "Hostname",
-            "x-onyxia": {
-                "hidden": true,
-                "overwriteDefaultWith": "{{project.id}}-{{k8s.randomSubdomain}}-user.{{k8s.domain}}"
-            }
-        },
-        "ingressClassName": {
-            "type": "string",
-            "form": true,
-            "title": "ingressClassName",
-            "default": "",
-            "x-onyxia": {
-                "hidden": true,
-                "overwriteDefaultWith": "{{k8s.ingressClassName}}"
-            }
-        },
-        "useCertManager": {
-            "type": "boolean",
-            "description": "Whether CertManager should be used to generate a certificate",
-            "default": false,
-            "x-onyxia": {
-                "hidden": true,
-                "overwriteDefaultWith": "k8s.useCertManager"
-            }
-        },
-        "certManagerClusterIssuer":{
-            "type": "string",
-            "description": "certManager cluster issuer",
-            "title": "CertManager Cluster Issuer",
-            "default": "",
-            "x-onyxia": {
-                "hidden": true,
-                "overwriteDefaultWith": "k8s.certManagerClusterIssuer"
-            }
-        }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Ingress Details",
+  "type": "object",
+  "form": true,
+  "properties": {
+    "enabled": {
+      "description": "Enable Ingress",
+      "type": "boolean",
+      "default": true,
+      "x-onyxia": {
+        "hidden": true,
+        "overwriteDefaultWith": "k8s.ingress"
+      }
+    },
+    "hostname": {
+      "type": "string",
+      "form": true,
+      "title": "Hostname",
+      "x-onyxia": {
+        "hidden": true,
+        "overwriteDefaultWith": "{{project.id}}-{{k8s.randomSubdomain}}-0.{{k8s.domain}}"
+      }
+    },
+    "userHostname": {
+      "type": "string",
+      "form": true,
+      "title": "Hostname",
+      "x-onyxia": {
+        "hidden": true,
+        "overwriteDefaultWith": "{{project.id}}-{{k8s.randomSubdomain}}-user.{{k8s.domain}}"
+      }
+    },
+    "ingressClassName": {
+      "type": "string",
+      "form": true,
+      "title": "ingressClassName",
+      "default": "",
+      "x-onyxia": {
+        "hidden": true,
+        "overwriteDefaultWith": "{{k8s.ingressClassName}}"
+      }
+    },
+    "useCertManager": {
+      "type": "boolean",
+      "description": "Whether CertManager should be used to generate a certificate",
+      "default": false,
+      "x-onyxia": {
+        "hidden": true,
+        "overwriteDefaultWith": "k8s.useCertManager"
+      }
+    },
+    "certManagerClusterIssuer": {
+      "type": "string",
+      "description": "certManager cluster issuer",
+      "title": "CertManager Cluster Issuer",
+      "default": "",
+      "x-onyxia": {
+        "hidden": true,
+        "overwriteDefaultWith": "k8s.certManagerClusterIssuer"
+      }
+    },
+    "useTlsSecret": {
+      "type": "boolean",
+      "description": "Whether you want to use the specified secretName in ingress tls",
+      "default": false,
+      "x-onyxia": {
+        "hidden": true
+      }
     }
+  }
 }

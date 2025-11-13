@@ -1,8 +1,30 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Startup probe",
+  "description": "Startup probe",
   "type": "object",
-  "description": "Startup probes let kubelet know that a container application has started",
+  "properties": {
+    "failureThreshold": {
+      "type": "integer",
+      "default": 60
+    },
+    "initialDelaySeconds": {
+      "type": "integer",
+      "default": 10
+    },
+    "periodSeconds": {
+      "type": "integer",
+      "default": 10
+    },
+    "successThreshold": {
+      "type": "integer",
+      "default": 1
+    },
+    "timeoutSeconds": {
+      "type": "integer",
+      "default": 2
+    }
+  },
   "default": {
     "failureThreshold": 60,
     "initialDelaySeconds": 10,
