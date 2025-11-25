@@ -232,7 +232,7 @@ public class HelmInstallService {
 
     public HelmLs[] listChartInstall(HelmConfiguration configuration, String namespace)
             throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
-        StringBuilder command = new StringBuilder("helm ls -a");
+        StringBuilder command = new StringBuilder("helm ls ");
         if (namespace.length() > 63 || !rfc1123Pattern.matcher(namespace).matches()) {
             throw new IllegalArgumentException(
                     "Invalid namespace "
