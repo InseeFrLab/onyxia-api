@@ -68,6 +68,7 @@ Users can work on Onyxia as a User or as a Group to which they belong. Each user
 | `server`                      | | Define the configuration of the services provider API server, this value is not served on the API as it contains credentials for the API.                                                                                                                                                                          | See [Server properties](#server-properties)                                                       |
 | `k8sPublicEndpoint`           | | Define external access to Kubernetes API if available. It helps Onyxia users to directly connect to Kubernetes outside the datalab                                                                                                                                                                                 | See [K8sPublicEndpoint properties](#k8sPublicEndpoint-properties)                                 |
 | `quotas`                      | | Properties setting quotas on how many resources a user can get on the services provider.                                                                                                                                                                                                                           | See [Quotas properties](#quotas-properties)                                                       |
+| `helm`                        | | Helm flags used by Onyxia on every `helm upgrade` (install, suspend, resume).                                                                                                                                                                                                                                      | See [Helm properties](#helm-properties)                                                           |
 
 
 
@@ -141,6 +142,14 @@ Note : If you want Onyxia to create the ResourceQuota but not override it at eac
 | `enabled`  | false  | Whether or not Istio is enabled                                                                              |
 | `gateways` | []     | List of istio gateways to be used. Should contain at least one element. E.g. `["istio-system/my-gateway"]`   |
 
+
+### Helm properties
+
+It can be used to add additional flags which will be used when installing, resuming and suspending services running Onyxia. 
+
+| Key              | Default | Description                                                                                                                                                                                                                                                                                                                    |
+|------------------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| 
+| `forceConflicts` | false   | If set server-side apply will force changes against conflicts, also see https://helm.sh/docs/helm/helm_upgrade#options . This might be useful if you have mutating webhooks which take ownership of fields, which would normaly result in Helm 4 to fail (see https://helm.sh/community/hips/hip-0023#conflicts-and-forcing ). | 
 
 
 ## Data properties
