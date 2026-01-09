@@ -23,6 +23,7 @@ import io.fabric8.kubernetes.api.model.Event;
 import io.fabric8.kubernetes.client.Watch;
 import io.fabric8.kubernetes.client.Watcher;
 import io.fabric8.kubernetes.client.WatcherException;
+import io.github.inseefrlab.helmwrapper.service.HelmFlags;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -297,6 +298,13 @@ public class MyLabController {
             throw new IllegalStateException("Catalog " + catalogId + " is not available anymore");
         }
 
+        var flags =
+                HelmFlags.suspendAndResumeFlags(
+                        false,
+                        catalog.get().getSkipTlsVerify(),
+                        catalog.get().getTimeout(),
+                        catalog.get().getCaFile(),
+                        region.getServices().getHelm().getForceConflicts());
         if (suspend) {
             helmAppsService.suspend(
                     region,
@@ -306,10 +314,7 @@ public class MyLabController {
                     version,
                     user,
                     serviceId,
-                    catalog.get().getSkipTlsVerify(),
-                    catalog.get().getTimeout(),
-                    catalog.get().getCaFile(),
-                    false);
+                    flags);
         } else {
             helmAppsService.resume(
                     region,
@@ -319,10 +324,7 @@ public class MyLabController {
                     version,
                     user,
                     serviceId,
-                    catalog.get().getSkipTlsVerify(),
-                    catalog.get().getTimeout(),
-                    catalog.get().getCaFile(),
-                    false);
+                    flags);
         }
     }
 

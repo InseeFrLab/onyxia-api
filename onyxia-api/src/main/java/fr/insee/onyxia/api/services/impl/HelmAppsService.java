@@ -30,6 +30,7 @@ import io.github.inseefrlab.helmwrapper.configuration.HelmConfiguration;
 import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
 import io.github.inseefrlab.helmwrapper.model.HelmLs;
 import io.github.inseefrlab.helmwrapper.model.HelmReleaseInfo;
+import io.github.inseefrlab.helmwrapper.service.HelmFlags;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService.MultipleServiceFound;
 import java.io.File;
@@ -120,12 +121,14 @@ public class HelmAppsService implements AppsService {
                                     namespaceId,
                                     requestDTO.getName(),
                                     pkg.getVersion(),
-                                    requestDTO.isDryRun(),
                                     values,
                                     null,
-                                    skipTlsVerify,
-                                    timeout,
-                                    caFile);
+                                    HelmFlags.installFlags(
+                                            requestDTO.isDryRun(),
+                                            skipTlsVerify,
+                                            timeout,
+                                            caFile,
+                                            region.getServices().getHelm().getForceConflicts()));
             InstallServiceEvent installServiceEvent =
                     new InstallServiceEvent(
                             user.getIdep(),
@@ -410,24 +413,10 @@ public class HelmAppsService implements AppsService {
             String version,
             User user,
             String serviceId,
-            boolean skipTlsVerify,
-            String timeout,
-            String caFile,
-            boolean dryRun)
+            HelmFlags flags)
             throws IOException, InterruptedException, TimeoutException {
         suspendOrResume(
-                region,
-                project,
-                catalogId,
-                chartName,
-                version,
-                user,
-                serviceId,
-                skipTlsVerify,
-                timeout,
-                caFile,
-                dryRun,
-                true);
+                region, project, catalogId, chartName, version, user, serviceId, flags, true);
     }
 
     @Override
@@ -439,24 +428,10 @@ public class HelmAppsService implements AppsService {
             String version,
             User user,
             String serviceId,
-            boolean skipTlsVerify,
-            String timeout,
-            String caFile,
-            boolean dryRun)
+            HelmFlags flags)
             throws IOException, InterruptedException, TimeoutException {
         suspendOrResume(
-                region,
-                project,
-                catalogId,
-                chartName,
-                version,
-                user,
-                serviceId,
-                skipTlsVerify,
-                timeout,
-                caFile,
-                dryRun,
-                false);
+                region, project, catalogId, chartName, version, user, serviceId, flags, false);
     }
 
     public void suspendOrResume(
@@ -467,39 +442,22 @@ public class HelmAppsService implements AppsService {
             String version,
             User user,
             String serviceId,
-            boolean skipTlsVerify,
-            String timeout,
-            String caFile,
-            boolean dryRun,
+            HelmFlags flags,
             boolean suspend)
             throws IOException, InterruptedException, TimeoutException {
         String namespaceId =
                 kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
-        if (suspend) {
-            getHelmInstallService()
-                    .suspend(
-                            getHelmConfiguration(region, user),
-                            catalogId + "/" + chartName,
-                            namespaceId,
-                            serviceId,
-                            version,
-                            dryRun,
-                            skipTlsVerify,
-                            timeout,
-                            caFile);
-        } else {
-            getHelmInstallService()
-                    .resume(
-                            getHelmConfiguration(region, user),
-                            catalogId + "/" + chartName,
-                            namespaceId,
-                            serviceId,
-                            version,
-                            dryRun,
-                            skipTlsVerify,
-                            timeout,
-                            caFile);
-        }
+        var suspendEnv = Map.of(SUSPEND_KEY, suspend ? "true" : "false");
+        getHelmInstallService()
+                .installChart(
+                        getHelmConfiguration(region, user),
+                        catalogId + "/" + chartName,
+                        namespaceId,
+                        serviceId,
+                        version,
+                        null,
+                        suspendEnv,
+                        flags);
         SuspendResumeServiceEvent event =
                 new SuspendResumeServiceEvent(
                         user.getIdep(), namespaceId, serviceId, chartName, catalogId, suspend);
