@@ -6,15 +6,18 @@ public record HelmFlags(
         String timeout,
         String caFile,
         boolean reuseValues,
-        boolean forceConflicts) {
+        boolean forceConflicts,
+        String serverSide) {
 
     public static HelmFlags suspendAndResumeFlags(
             boolean dryRun,
             boolean skipTlsVerify,
             String timeout,
             String caFile,
-            boolean forceConflicts) {
-        return new HelmFlags(dryRun, skipTlsVerify, timeout, caFile, true, forceConflicts);
+            boolean forceConflicts,
+            String serverSide) {
+        return new HelmFlags(
+                dryRun, skipTlsVerify, timeout, caFile, true, forceConflicts, serverSide);
     }
 
     public static HelmFlags installFlags(
@@ -22,8 +25,10 @@ public record HelmFlags(
             boolean skipTlsVerify,
             String timeout,
             String caFile,
-            boolean forceConflicts) {
-        return new HelmFlags(dryRun, skipTlsVerify, timeout, caFile, false, forceConflicts);
+            boolean forceConflicts,
+            String serverSide) {
+        return new HelmFlags(
+                dryRun, skipTlsVerify, timeout, caFile, false, forceConflicts, serverSide);
     }
 
     /**
@@ -34,6 +39,9 @@ public record HelmFlags(
         StringBuilder result = new StringBuilder();
         if (forceConflicts) {
             result.append("--force-conflicts ");
+        }
+        if (serverSide != null) {
+            result.append(" --server-side " + serverSide + " ");
         }
 
         if (timeout != null) {

@@ -449,12 +449,22 @@ public class Region {
             /** If set server-side apply will force changes against conflicts */
             private boolean forceConflicts = false;
 
+            private String serverSide = "auto";
+
             public boolean getForceConflicts() {
                 return forceConflicts;
             }
 
             public void setForceConflicts(boolean forceConflicts) {
                 this.forceConflicts = forceConflicts;
+            }
+
+            public String getServerSide() {
+                return serverSide;
+            }
+
+            public void setServerSide(String serverSide) {
+                this.serverSide = serverSide;
             }
         }
     }

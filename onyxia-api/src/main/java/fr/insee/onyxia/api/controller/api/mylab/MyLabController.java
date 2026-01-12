@@ -304,7 +304,8 @@ public class MyLabController {
                         catalog.get().getSkipTlsVerify(),
                         catalog.get().getTimeout(),
                         catalog.get().getCaFile(),
-                        region.getServices().getHelm().getForceConflicts());
+                        region.getServices().getHelm().getForceConflicts(),
+                        region.getServices().getHelm().getServerSide());
         if (suspend) {
             helmAppsService.suspend(
                     region,
