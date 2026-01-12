@@ -131,7 +131,8 @@ public class HelmAppsService implements AppsService {
                                             skipTlsVerify,
                                             timeout,
                                             caFile,
-                                            region.getServices().getHelm().getForceConflicts()));
+                                            region.getServices().getHelm().getForceConflicts(),
+                                            region.getServices().getHelm().getServerSide()));
             InstallServiceEvent installServiceEvent =
                     new InstallServiceEvent(
                             user.getIdep(),
