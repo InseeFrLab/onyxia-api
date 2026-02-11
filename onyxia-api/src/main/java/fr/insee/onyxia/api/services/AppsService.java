@@ -11,6 +11,7 @@ import fr.insee.onyxia.model.service.UninstallService;
 import io.fabric8.kubernetes.api.model.Event;
 import io.fabric8.kubernetes.client.Watch;
 import io.fabric8.kubernetes.client.Watcher;
+import io.github.inseefrlab.helmwrapper.service.HelmFlags;
 import io.github.inseefrlab.helmwrapper.service.HelmInstallService;
 import java.io.IOException;
 import java.text.ParseException;
@@ -69,10 +70,7 @@ public interface AppsService {
             String version,
             User user,
             String serviceId,
-            boolean skipTlsVerify,
-            String timeout,
-            String caFile,
-            boolean dryRun)
+            HelmFlags flags)
             throws IOException, InterruptedException, TimeoutException;
 
     void suspend(
@@ -83,9 +81,6 @@ public interface AppsService {
             String version,
             User user,
             String serviceId,
-            boolean skipTlsVerify,
-            String timeout,
-            String caFile,
-            boolean dryRun)
+            HelmFlags flags)
             throws IOException, InterruptedException, TimeoutException;
 }
