@@ -84,6 +84,16 @@
                 "path": "enabled",
                 "isPathRelative": true
             }
+        },
+        "asCodeServerRoot": {
+            "title": "Open the service in the clone folder",
+            "type": "boolean",
+            "default": false,
+            "hidden": {
+            "value": false,
+            "path": "enabled",
+            "isPathRelative": true
+            }
         }
     }
 }
