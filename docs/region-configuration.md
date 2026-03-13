@@ -125,6 +125,7 @@ Note : If you want Onyxia to create the ResourceQuota but not override it at eac
 | `domain`                |       | When users request to expose their service, only the subdomain of this object will be created.                              |
 | `ingress`               | true  | Whether or not Kubernetes Ingress is enabled                                                                                |
 | `route`                 | false | Whether or not OpenShift Route is enabled                                                                                   |
+| `httpRoute`             |       | See [HTTPRoute](#httproute)                                                                                                 |
 | `istio`                 |       | See [Istio](#istio)                                                                                                         |
 | `ingressClassName`      | ''    | Ingress Class Name: useful if you want to use a specific ingress controller instead of a default one                        |
 | `ingressPort`      |     | Optional : define this if your ingress controller does not listen to 80/443 port. If set, the UI will append this port number to the "open service" button link.                        |
@@ -139,6 +140,33 @@ Note : If you want Onyxia to create the ResourceQuota but not override it at eac
 |------------|--------|--------------------------------------------------------------------------------------------------------------|
 | `enabled`  | false  | Whether or not Istio is enabled                                                                              |
 | `gateways` | []     | List of istio gateways to be used. Should contain at least one element. E.g. `["istio-system/my-gateway"]`   |
+
+
+#### httproute
+
+| Key          | Default | Description                                                                                                                                     |
+|--------------|---------|-------------------------------------------------------------------------------------------------------------------------------------------------|
+| `enabled`    | false   | Whether or not Kubernetes Gateway API HTTPRoute support is enabled                                                                              |
+| `parentRefs` | []      | List of parent references to the Gateway configured by the cluster administrator. Must contain at least one element when enabled.             |
+
+Each `parentRefs` entry must define the Gateway `name` and may also define `namespace`, `sectionName`, or `port`. For example:
+
+```json
+{
+  "enabled": true,
+  "parentRefs": [
+    {
+      "name": "shared-gateway",
+      "namespace": "gateway-system",
+      "sectionName": "web"
+    }
+  ]
+}
+```
+
+If `namespace` points to a different namespace than the service namespace, the target Gateway listener must allow routes from that namespace.
+
+When using HTTPRoute, service charts should also set explicit `spec.hostnames` if you want Onyxia to resolve public service URLs for the "Open" action.
 
 
 
