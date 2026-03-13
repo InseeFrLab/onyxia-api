@@ -110,7 +110,7 @@ public final class ServiceUrlResolver {
             for (HTTPRoute httpRoute : httpRoutes) {
                 try {
                     urls.addAll(getHttpRouteUrls(httpRoute));
-                } catch (Exception e) {
+                } catch (Exception _) {
                     LOGGER.warn(
                             "Could not read urls from HTTPRoute {}",
                             httpRoute.getFullResourceName());
@@ -153,35 +153,15 @@ public final class ServiceUrlResolver {
         boolean hasImplicitRootMatch = false;
 
         for (HTTPRouteRule rule : httpRoute.getSpec().getRules()) {
-            if (rule.getMatches() == null || rule.getMatches().isEmpty()) {
+            List<HTTPRouteMatch> matches = rule.getMatches();
+
+            if (matches == null || matches.isEmpty()) {
                 hasImplicitRootMatch = true;
-                continue;
-            }
-
-            for (HTTPRouteMatch match : rule.getMatches()) {
-                if ((match.getHeaders() != null && !match.getHeaders().isEmpty())
-                        || (match.getQueryParams() != null && !match.getQueryParams().isEmpty())
-                        || match.getMethod() != null) {
-                    continue;
-                }
-
-                if (match.getPath() == null) {
-                    continue;
-                }
-
-                String pathType = match.getPath().getType();
-
-                if (pathType != null && !pathType.equals("PathPrefix") && !pathType.equals("Exact")) {
-                    continue;
-                }
-
-                String pathValue = match.getPath().getValue();
-
-                if (pathValue == null || pathValue.isBlank()) {
-                    continue;
-                }
-
-                paths.add(normalizePath(pathValue));
+            } else {
+                matches.stream()
+                        .map(ServiceUrlResolver::getHttpRoutePath)
+                        .flatMap(java.util.Optional::stream)
+                        .forEach(paths::add);
             }
         }
 
@@ -190,6 +170,29 @@ public final class ServiceUrlResolver {
         }
 
         return hasImplicitRootMatch ? List.of("/") : List.of();
+    }
+
+    private static java.util.Optional<String> getHttpRoutePath(HTTPRouteMatch match) {
+        if ((match.getHeaders() != null && !match.getHeaders().isEmpty())
+                || (match.getQueryParams() != null && !match.getQueryParams().isEmpty())
+                || match.getMethod() != null
+                || match.getPath() == null) {
+            return java.util.Optional.empty();
+        }
+
+        String pathType = match.getPath().getType();
+
+        if (pathType != null && !pathType.equals("PathPrefix") && !pathType.equals("Exact")) {
+            return java.util.Optional.empty();
+        }
+
+        String pathValue = match.getPath().getValue();
+
+        if (pathValue == null || pathValue.isBlank()) {
+            return java.util.Optional.empty();
+        }
+
+        return java.util.Optional.of(normalizePath(pathValue));
     }
 
     private static String normalizePath(String path) {
