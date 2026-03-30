@@ -1,0 +1,68 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "HTTPRoute",
+    "description": "Gateway API HTTPRoute parameters",
+    "type": "object",
+    "properties": {
+        "enabled": {
+            "description": "Enable HTTPRoute",
+            "type": "boolean",
+            "default": false,
+            "x-onyxia": {
+                "hidden": true,
+                "overwriteDefaultWith": "k8s.httpRoute.enabled"
+            }
+        },
+        "hostname": {
+            "type": "string",
+            "form": true,
+            "title": "Hostname",
+            "description": "Convenience hostname that service charts can map to HTTPRoute spec.hostnames",
+            "x-onyxia": {
+                "hidden": true,
+                "overwriteDefaultWith": "{{project.id}}-{{k8s.randomSubdomain}}-0.{{k8s.domain}}"
+            }
+        },
+        "userHostname": {
+            "type": "string",
+            "form": true,
+            "title": "Hostname",
+            "description": "Convenience hostname for user-facing routes that service charts can map to HTTPRoute spec.hostnames",
+            "x-onyxia": {
+                "hidden": true,
+                "overwriteDefaultWith": "{{project.id}}-{{k8s.randomSubdomain}}-user.{{k8s.domain}}"
+            }
+        },
+        "parentRefs": {
+            "description": "Gateway parent references",
+            "type": "array",
+            "default": [],
+            "x-onyxia": {
+                "hidden": true,
+                "overwriteDefaultWith": "k8s.httpRoute.parentRefs"
+            },
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "title": "Gateway name",
+                        "description": "Name of the Gateway parent reference. Required when HTTPRoute is enabled."
+                    },
+                    "namespace": {
+                        "type": "string",
+                        "title": "Gateway namespace"
+                    },
+                    "sectionName": {
+                        "type": "string",
+                        "title": "Listener name"
+                    },
+                    "port": {
+                        "type": "integer",
+                        "title": "Listener port"
+                    }
+                }
+            }
+        }
+    }
+}
