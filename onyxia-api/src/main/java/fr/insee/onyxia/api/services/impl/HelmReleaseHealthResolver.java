@@ -1,23 +1,35 @@
 package fr.insee.onyxia.api.services.impl;
 
 import fr.insee.onyxia.model.service.HealthCheckResult;
+import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.apps.DaemonSet;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.StatefulSet;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.dsl.base.ResourceDefinitionContext;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class HelmReleaseHealthResolver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HelmReleaseHealthResolver.class);
+
+    private static final ResourceDefinitionContext CNPG_CLUSTER =
+            new ResourceDefinitionContext.Builder()
+                    .withGroup("postgresql.cnpg.io")
+                    .withVersion("v1")
+                    .withPlural("clusters")
+                    .withNamespaced(true)
+                    .build();
 
     static List<HealthCheckResult> checkHelmReleaseHealth(
             String namespace, String manifest, KubernetesClient kubernetesClient) {
@@ -39,6 +51,7 @@ public final class HelmReleaseHealthResolver {
         for (HasMetadata resource : resources) {
             String name = resource.getMetadata().getName();
             String kind = resource.getKind();
+            String apiVersion = resource.getApiVersion();
             HealthCheckResult result = new HealthCheckResult();
             result.setName(name);
             result.setKind(kind);
@@ -94,6 +107,25 @@ public final class HelmReleaseHealthResolver {
                         if (daemonSet.getStatus().getNumberAvailable() > 0
                                 && daemonSet.getStatus().getNumberReady() != null) {
                             details.setReady(daemonSet.getStatus().getNumberReady());
+                        }
+                        break;
+                    case "Cluster":
+                        if (!"postgresql.cnpg.io/v1".equals(apiVersion)) continue;
+                        GenericKubernetesResource raw =
+                                kubernetesClient
+                                        .genericKubernetesResources(CNPG_CLUSTER)
+                                        .inNamespace(namespace)
+                                        .withName(name)
+                                        .get();
+                        if (raw.getAdditionalProperties().get("status") instanceof Map) {
+                            Map<String, Object> status =
+                                    Collections.unmodifiableMap(
+                                            (Map<String, Object>)
+                                                    raw.getAdditionalProperties().get("status"));
+                            details.setDesired(
+                                    Integer.parseInt(status.get("instances").toString()));
+                            details.setReady(
+                                    Integer.parseInt(status.get("readyInstances").toString()));
                         }
                         break;
                     default:
