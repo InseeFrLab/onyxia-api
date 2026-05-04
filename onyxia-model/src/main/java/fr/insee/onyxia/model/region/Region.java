@@ -649,6 +649,8 @@ public class Region {
 
         private boolean route = false;
 
+        private HttpRoute httpRoute = new HttpRoute();
+
         private IstioIngress istio;
         private CertManager certManager;
 
@@ -708,6 +710,14 @@ public class Region {
             this.route = route;
         }
 
+        public HttpRoute getHttpRoute() {
+            return httpRoute;
+        }
+
+        public void setHttpRoute(HttpRoute httpRoute) {
+            this.httpRoute = httpRoute == null ? new HttpRoute() : httpRoute;
+        }
+
         public IstioIngress getIstio() {
             return istio;
         }
@@ -744,6 +754,70 @@ public class Region {
 
         public void setGateways(String[] gateways) {
             this.gateways = gateways;
+        }
+    }
+
+    public static class HttpRoute {
+        private boolean enabled = false;
+
+        private List<HttpRouteParentRef> parentRefs = new ArrayList<>();
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public List<HttpRouteParentRef> getParentRefs() {
+            return parentRefs;
+        }
+
+        public void setParentRefs(List<HttpRouteParentRef> parentRefs) {
+            this.parentRefs = parentRefs == null ? new ArrayList<>() : parentRefs;
+        }
+    }
+
+    public static class HttpRouteParentRef {
+        private String name;
+
+        private String namespace;
+
+        private String sectionName;
+
+        private Integer port;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getNamespace() {
+            return namespace;
+        }
+
+        public void setNamespace(String namespace) {
+            this.namespace = namespace;
+        }
+
+        public String getSectionName() {
+            return sectionName;
+        }
+
+        public void setSectionName(String sectionName) {
+            this.sectionName = sectionName;
+        }
+
+        public Integer getPort() {
+            return port;
+        }
+
+        public void setPort(Integer port) {
+            this.port = port;
         }
     }
 
