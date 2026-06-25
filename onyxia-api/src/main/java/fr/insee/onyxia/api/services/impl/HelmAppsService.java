@@ -1,6 +1,5 @@
 package fr.insee.onyxia.api.services.impl;
 
-import static fr.insee.onyxia.api.services.impl.HelmReleaseHealthResolver.checkHelmReleaseHealth;
 import static fr.insee.onyxia.api.services.impl.ServiceUrlResolver.getServiceUrls;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -63,6 +62,8 @@ public class HelmAppsService implements AppsService {
 
     private final HelmClientProvider helmClientProvider;
 
+    private final HelmReleaseHealthResolver helmReleaseHealthResolver;
+
     final OnyxiaEventPublisher onyxiaEventPublisher;
 
     public static final String ONYXIA_SECRET_PREFIX = "sh.onyxia.release.v1.";
@@ -77,12 +78,14 @@ public class HelmAppsService implements AppsService {
             KubernetesService kubernetesService,
             KubernetesClientProvider kubernetesClientProvider,
             HelmClientProvider helmClientProvider,
-            OnyxiaEventPublisher onyxiaEventPublisher) {
+            OnyxiaEventPublisher onyxiaEventPublisher,
+            HelmReleaseHealthResolver helmReleaseHealthResolver) {
         this.mapperHelm = mapperHelm;
         this.kubernetesService = kubernetesService;
         this.kubernetesClientProvider = kubernetesClientProvider;
         this.helmClientProvider = helmClientProvider;
         this.onyxiaEventPublisher = onyxiaEventPublisher;
+        this.helmReleaseHealthResolver = helmReleaseHealthResolver;
     }
 
     private HelmConfiguration getHelmConfiguration(Region region, User user) {
@@ -540,7 +543,8 @@ public class HelmAppsService implements AppsService {
 
         try {
             List<HealthCheckResult> controllers =
-                    checkHelmReleaseHealth(release.getNamespace(), manifest, client);
+                    helmReleaseHealthResolver.checkHelmReleaseHealth(
+                                    release.getNamespace(), manifest, client);
             service.setControllers(controllers);
         } catch (Exception e) {
             LOGGER.warn(
