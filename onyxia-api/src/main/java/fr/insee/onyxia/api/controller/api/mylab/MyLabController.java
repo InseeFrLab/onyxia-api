@@ -14,6 +14,7 @@ import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.catalog.Pkg;
 import fr.insee.onyxia.model.dto.CreateServiceDTO;
 import fr.insee.onyxia.model.dto.ServicesListing;
+import fr.insee.onyxia.model.dto.UpgradeServiceDTO;
 import fr.insee.onyxia.model.helm.Chart;
 import fr.insee.onyxia.model.project.Project;
 import fr.insee.onyxia.model.region.Region;
@@ -36,7 +37,9 @@ import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Tag(name = "My lab", description = "My services")
@@ -533,26 +536,7 @@ public class MyLabController {
         Map<String, Object> fusion = new HashMap<>();
         fusion.putAll((Map<String, Object>) requestDTO.getOptions());
 
-        // If getConfig is null that means that no schema is provided : skip validation
-        if (pkg.getConfig() != null) {
-            JSONObject jsonSchema =
-                    new JSONObject(
-                            new JSONTokener(
-                                    jsonSchemaResolutionService
-                                            .resolveReferences(pkg.getConfig(), user.getRoles())
-                                            .toString()));
-
-            SchemaLoader loader =
-                    SchemaLoader.builder()
-                            .schemaJson(jsonSchema)
-                            .draftV6Support() // or draftV7Support()
-                            .build();
-            org.everit.json.schema.Schema schema = loader.load().build();
-            // Convert the options map to a JSONObject
-            JSONObject jsonObject = new JSONObject(fusion);
-            // Validate the options object against the schema
-            schema.validate(jsonObject);
-        }
+        validateOptionsAgainstSchema(pkg, user, fusion);
 
         boolean skipTlsVerify = catalog.getSkipTlsVerify();
         String caFile = catalog.getCaFile();
@@ -569,6 +553,124 @@ public class MyLabController {
                 skipTlsVerify,
                 timeout,
                 caFile);
+    }
+
+    private void validateOptionsAgainstSchema(Pkg pkg, User user, Map<String, Object> fusion)
+            throws Exception {
+        // If getConfig is null that means that no schema is provided : skip validation
+        if (pkg.getConfig() == null) {
+            return;
+        }
+        JSONObject jsonSchema =
+                new JSONObject(
+                        new JSONTokener(
+                                jsonSchemaResolutionService
+                                        .resolveReferences(pkg.getConfig(), user.getRoles())
+                                        .toString()));
+
+        SchemaLoader loader =
+                SchemaLoader.builder()
+                        .schemaJson(jsonSchema)
+                        .draftV6Support() // or draftV7Support()
+                        .build();
+        org.everit.json.schema.Schema schema = loader.load().build();
+        // Convert the options map to a JSONObject
+        JSONObject jsonObject = new JSONObject(fusion);
+        // Validate the options object against the schema
+        schema.validate(jsonObject);
+    }
+
+    @Operation(
+            summary = "Upgrade an existing service.",
+            description =
+                    "Re-deploy an existing service with new parameters (values.yaml, chart version, friendly name, share). The service name and namespace are kept. If the chart version is not provided, the service is upgraded with its current chart version.",
+            parameters = {
+                @Parameter(
+                        name = "ONYXIA-PROJECT",
+                        description =
+                                "Project associated with the namespace, defaults to user project.",
+                        in = ParameterIn.HEADER,
+                        schema =
+                                @Schema(
+                                        name = "ONYXIA-PROJECT",
+                                        type = "string",
+                                        description = "Generated project id.",
+                                        example = "project-id-example"))
+            })
+    @PutMapping("/app/{serviceId}")
+    public Object upgradeApp(
+            @Parameter(hidden = true) Region region,
+            @Parameter(hidden = true) Project project,
+            @PathVariable String serviceId,
+            @RequestBody UpgradeServiceDTO requestDTO)
+            throws Exception {
+        User user = userProvider.getUser(region);
+        Service userService = helmAppsService.getUserService(region, project, user, serviceId);
+        if (!serviceId.equals(userService.getId())) {
+            throw new NotFoundException();
+        }
+        String chart = userService.getChart();
+        int split = chart.lastIndexOf('-');
+        String chartName = chart.substring(0, split);
+        String currentVersion = chart.substring(split + 1);
+        if (!(requestDTO.getOptions() instanceof Map<?, ?>)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "options must be an object");
+        }
+        String version =
+                requestDTO.getPackageVersion() != null
+                        ? requestDTO.getPackageVersion()
+                        : currentVersion;
+        String catalogId = userService.getCatalogId();
+        // This code is for legacy compat for services that were created with Onyxia < v2.7.0
+        // before introduction of Onyxia's secret
+        if (catalogId == null) {
+            List<CatalogWrapper> elligibleCatalogs =
+                    catalogService.getCatalogs(region, user).getCatalogs().stream()
+                            .filter(
+                                    catalog ->
+                                            catalog.getCatalog()
+                                                    .getPackageByName(chartName)
+                                                    .isPresent())
+                            .toList();
+            if (elligibleCatalogs.isEmpty()) {
+                throw new NotFoundException();
+            }
+            if (elligibleCatalogs.size() > 1) {
+                throw new IllegalStateException("Chart is present in multiple catalogs, abort");
+            }
+            CatalogWrapper catalog = elligibleCatalogs.getFirst();
+            catalogId = catalog.getId();
+        }
+        Optional<CatalogWrapper> catalog = catalogService.getCatalogById(catalogId, user);
+        if (catalog.isEmpty()) {
+            throw new IllegalStateException("Catalog " + catalogId + " is not available anymore");
+        }
+
+        Pkg pkg =
+                catalog.get()
+                        .getCatalog()
+                        .getPackageByNameAndVersion(chartName, version)
+                        .orElseThrow(NotFoundException::new);
+
+        Map<String, Object> fusion = new HashMap<>();
+        fusion.putAll((Map<String, Object>) requestDTO.getOptions());
+
+        validateOptionsAgainstSchema(pkg, user, fusion);
+
+        return helmAppsService.upgradeApp(
+                region,
+                project,
+                catalogId,
+                chartName,
+                version,
+                user,
+                serviceId,
+                fusion,
+                requestDTO.getFriendlyName(),
+                requestDTO.getShare(),
+                catalog.get().getSkipTlsVerify(),
+                catalog.get().getTimeout(),
+                catalog.get().getCaFile());
     }
 
     public static class SuspendOrResumeRequestDTO {
