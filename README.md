@@ -100,7 +100,22 @@ Configurable properties :
 | `event.webhook.includes` |  | List of events types to send the webhook for (empty = all events). e.g `service.uninstall,service.install`                           |
 | `event.webhook.excludes` |  | List of events types to ignore for the webhook. e.g `service.uninstall,service.install`                           |
 
+### Health checks configuration
+Deployments, StatefulSets and DaemonSets are monitored natively. Additional CRDs can be configured as a list:
+
+| Key | Default | Description |
+| --- | ------- | ----------- |
+| `health.custom-crd.checks[n].group` | | API group of the CRD. e.g. `postgresql.cnpg.io` |
+| `health.custom-crd.checks[n].version` | | API version of the CRD. e.g. `v1` |
+| `health.custom-crd.checks[n].plural` | | Plural resource name used in the API URL. e.g. `clusters` |
+| `health.custom-crd.checks[n].kind` | | Kind name as it appears in the manifest. e.g. `Cluster` |
+| `health.custom-crd.checks[n].strategy` | `FIELDS` | `FIELDS`: read two integer fields from `status`. `CONDITION`: check `status.conditions` |
+| `health.custom-crd.checks[n].desired-field` | | Status field for the desired count (`FIELDS` strategy). e.g. `instances` |
+| `health.custom-crd.checks[n].ready-field` | | Status field for the ready count (`FIELDS` strategy). e.g. `readyInstances` |
+| `health.custom-crd.checks[n].condition-type` | `Ready` | Condition type to look for in `status.conditions` (`CONDITION` strategy) |
+
 ### Admin configuration:
+
 :warning: This section should be considered pre-alpha and may be subject to major changes and revamps :warning:
 
 | Key              | Default | Description                                                                                |
