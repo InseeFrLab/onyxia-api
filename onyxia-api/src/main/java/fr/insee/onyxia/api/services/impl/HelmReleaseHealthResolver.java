@@ -171,7 +171,8 @@ public class HelmReleaseHealthResolver {
 
         switch (check.getStrategy()) {
             case FIELDS:
-                details.setDesired(Integer.parseInt(status.get(check.getDesiredField()).toString()));
+                details.setDesired(
+                        Integer.parseInt(status.get(check.getDesiredField()).toString()));
                 details.setReady(Integer.parseInt(status.get(check.getReadyField()).toString()));
                 break;
             case CONDITION:

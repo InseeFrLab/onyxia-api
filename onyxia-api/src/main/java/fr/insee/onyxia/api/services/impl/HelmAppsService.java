@@ -544,7 +544,7 @@ public class HelmAppsService implements AppsService {
         try {
             List<HealthCheckResult> controllers =
                     helmReleaseHealthResolver.checkHelmReleaseHealth(
-                                    release.getNamespace(), manifest, client);
+                            release.getNamespace(), manifest, client);
             service.setControllers(controllers);
         } catch (Exception e) {
             LOGGER.warn(
