@@ -2,6 +2,8 @@ package io.github.inseefrlab.helmwrapper.utils;
 
 import io.github.inseefrlab.helmwrapper.configuration.HelmConfiguration;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
@@ -116,9 +118,27 @@ public class Command {
                     newCommand.concat(" --kube-as-user " + helmConfiguration.getAsKubeUser() + " ");
 
             // Temp fix for https://github.com/kubernetes/kubernetes/issues/93474
-            newCommand =
-                    newCommand.concat(
-                            " --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token \"$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)\" --kube-apiserver \"https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}\" ");
+            try {
+                String token =
+                        Files.readString(
+                                        Path.of(
+                                                "/var/run/secrets/kubernetes.io/serviceaccount/token"))
+                                .trim();
+                String apiserver =
+                        "https://"
+                                + System.getenv("KUBERNETES_SERVICE_HOST")
+                                + ":"
+                                + System.getenv("KUBERNETES_SERVICE_PORT");
+                newCommand =
+                        newCommand.concat(
+                                " --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token "
+                                        + token
+                                        + " --kube-apiserver "
+                                        + apiserver
+                                        + " ");
+            } catch (IOException e) {
+                LOGGER.debug("Could not retrieve in-cluster token");
+            }
         }
         String kubeConfig = null;
         if (StringUtils.isNotEmpty(helmConfiguration.getApiserverUrl())) {
