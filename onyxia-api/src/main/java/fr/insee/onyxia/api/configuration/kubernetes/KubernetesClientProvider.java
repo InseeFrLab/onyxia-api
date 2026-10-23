@@ -42,7 +42,9 @@ public class KubernetesClientProvider {
         // In case of SERVICEACCOUNT authentication, we can safely mutualize and use a single
         // KubernetesClient
         if (region.getServices().getAuthenticationMode()
-                == Region.Services.AuthenticationMode.SERVICEACCOUNT) {
+                        == Region.Services.AuthenticationMode.SERVICEACCOUNT
+                || region.getServices().getAuthenticationMode()
+                        == Region.Services.AuthenticationMode.SERVICEACCOUNTINTARGETNAMESPACE) {
             if (userKubernetesClientCache != null) {
                 return userKubernetesClientCache;
             }
