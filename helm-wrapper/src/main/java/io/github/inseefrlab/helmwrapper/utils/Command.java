@@ -133,9 +133,9 @@ public class Command {
                                 + System.getenv("KUBERNETES_SERVICE_PORT");
                 newCommand =
                         newCommand.concat(
-                                " --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token "
+                                " --kube-ca-file=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token="
                                         + token
-                                        + " --kube-apiserver "
+                                        + " --kube-apiserver="
                                         + apiserver
                                         + " ");
             } catch (IOException e) {
@@ -174,7 +174,7 @@ public class Command {
     }
 
     private static String redactToken(String commandLine) {
-        return commandLine.replaceAll("(--kube-token=)[^&\\s]+", "$1[REDACTED]");
+        return commandLine.replaceAll("--kube-token[= ]+[^\\s]+", "--kube-token=[REDACTED]");
     }
 
     public static void safeConcat(StringBuilder currentCommand, String toConcat)
