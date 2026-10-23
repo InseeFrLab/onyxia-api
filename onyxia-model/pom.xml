@@ -36,10 +36,10 @@
             <artifactId>jackson-dataformat-yaml</artifactId>
         </dependency>
 
-        <dependency>
+       <dependency>
             <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-common</artifactId>
-            <version>1.8.0</version>
+            <artifactId>springdoc-openapi-starter-common</artifactId>
+            <version>2.9.1</version>
         </dependency>
 
     </dependencies>
