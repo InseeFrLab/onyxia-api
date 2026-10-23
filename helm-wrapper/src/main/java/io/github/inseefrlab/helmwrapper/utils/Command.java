@@ -32,7 +32,9 @@ public class Command {
                 new ProcessListener() {
                     @Override
                     public void afterStart(Process process, ProcessExecutor executor) {
-                        process.info().commandLine().ifPresent(cli -> LOGGER.info(cli));
+                        process.info()
+                                .commandLine()
+                                .ifPresent(cli -> LOGGER.info(redactToken(cli)));
                         super.afterStart(process, executor);
                     }
                 });
@@ -169,6 +171,10 @@ public class Command {
         }
 
         return newCommand;
+    }
+
+    private static String redactToken(String commandLine) {
+        return commandLine.replaceAll("(--kube-token=)[^&\\s]+", "$1[REDACTED]");
     }
 
     public static void safeConcat(StringBuilder currentCommand, String toConcat)
