@@ -180,7 +180,8 @@ public class HelmAppsService implements AppsService {
                     Arrays.asList(
                             getHelmInstallService()
                                     .listChartInstall(
-                                            getHelmConfiguration(region, user),
+                                            getHelmConfiguration(
+                                                    region, user, project.getNamespace()),
                                             project.getNamespace()));
         } catch (Exception e) {
             return CompletableFuture.completedFuture(new ServicesListing());
@@ -234,13 +235,14 @@ public class HelmAppsService implements AppsService {
         if (serviceId.startsWith("/")) {
             serviceId = serviceId.substring(1);
         }
+        String namespace =
+                kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
         HelmLs result =
                 getHelmInstallService()
                         .getAppById(
-                                getHelmConfiguration(region, user),
+                                getHelmConfiguration(region, user, namespace),
                                 serviceId,
-                                kubernetesService.determineNamespaceAndCreateIfNeeded(
-                                        region, project, user));
+                                namespace);
         return getHelmApp(region, user, result);
     }
 
@@ -257,14 +259,15 @@ public class HelmAppsService implements AppsService {
             // If bulk in kub we ignore the path and delete every helm release
             HelmLs[] releases =
                     getHelmInstallService()
-                            .listChartInstall(getHelmConfiguration(region, user), namespace);
+                            .listChartInstall(
+                                    getHelmConfiguration(region, user, namespace), namespace);
             for (HelmLs release : releases) {
                 status =
                         Math.max(
                                 0,
                                 getHelmInstallService()
                                         .uninstaller(
-                                                getHelmConfiguration(region, user),
+                                                getHelmConfiguration(region, user, namespace),
                                                 release.getName(),
                                                 namespace));
                 UninstallServiceEvent uninstallServiceEvent =
@@ -277,7 +280,9 @@ public class HelmAppsService implements AppsService {
             status =
                     getHelmInstallService()
                             .uninstaller(
-                                    getHelmConfiguration(region, user), cannonicalPath, namespace);
+                                    getHelmConfiguration(region, user, namespace),
+                                    cannonicalPath,
+                                    namespace);
             UninstallServiceEvent uninstallServiceEvent =
                     new UninstallServiceEvent(namespace, cannonicalPath, user.getIdep());
             onyxiaEventPublisher.publishEvent(uninstallServiceEvent);
@@ -290,7 +295,7 @@ public class HelmAppsService implements AppsService {
         HelmReleaseInfo helmReleaseInfo =
                 getHelmInstallService()
                         .getAll(
-                                getHelmConfiguration(region, user),
+                                getHelmConfiguration(region, user, release.getNamespace()),
                                 release.getName(),
                                 release.getNamespace());
         Service service =
@@ -481,7 +486,7 @@ public class HelmAppsService implements AppsService {
         if (suspend) {
             getHelmInstallService()
                     .suspend(
-                            getHelmConfiguration(region, user),
+                            getHelmConfiguration(region, user, namespaceId),
                             catalogId + "/" + chartName,
                             namespaceId,
                             serviceId,
@@ -493,7 +498,7 @@ public class HelmAppsService implements AppsService {
         } else {
             getHelmInstallService()
                     .resume(
-                            getHelmConfiguration(region, user),
+                            getHelmConfiguration(region, user, namespaceId),
                             catalogId + "/" + chartName,
                             namespaceId,
                             serviceId,
