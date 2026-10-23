@@ -11,6 +11,7 @@ import fr.insee.onyxia.api.events.InstallServiceEvent;
 import fr.insee.onyxia.api.events.OnyxiaEventPublisher;
 import fr.insee.onyxia.api.events.SuspendResumeServiceEvent;
 import fr.insee.onyxia.api.events.UninstallServiceEvent;
+import fr.insee.onyxia.api.events.UpgradeServiceEvent;
 import fr.insee.onyxia.api.services.AppsService;
 import fr.insee.onyxia.api.services.impl.kubernetes.KubernetesService;
 import fr.insee.onyxia.api.services.utils.Base64Utils;
@@ -147,6 +148,72 @@ public class HelmAppsService implements AppsService {
             metadata.put(SHARE, Base64Utils.base64Encode(String.valueOf(requestDTO.isShare())));
             kubernetesService.createOnyxiaSecret(
                     region, namespaceId, requestDTO.getName(), metadata);
+            return List.of(res.getManifest());
+        } catch (IllegalArgumentException e) {
+            throw new AccessDeniedException(e.getMessage());
+        } finally {
+            if (!values.delete()) {
+                LOGGER.warn("Failed to delete values file, path {}", values.getAbsolutePath());
+            }
+        }
+    }
+
+    @Override
+    public Collection<Object> upgradeApp(
+            Region region,
+            Project project,
+            String catalogId,
+            String chartName,
+            String version,
+            User user,
+            String serviceId,
+            Map<String, Object> fusion,
+            String friendlyName,
+            Boolean share,
+            final boolean skipTlsVerify,
+            String timeout,
+            final String caFile)
+            throws IOException, TimeoutException, InterruptedException {
+
+        File values = File.createTempFile("values", ".yaml");
+        mapperHelm.writeValue(values, fusion);
+        String namespaceId =
+                kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
+        try {
+            HelmInstaller res =
+                    getHelmInstallService()
+                            .installChart(
+                                    getHelmConfiguration(region, user),
+                                    catalogId + "/" + chartName,
+                                    namespaceId,
+                                    serviceId,
+                                    version,
+                                    false,
+                                    values,
+                                    null,
+                                    skipTlsVerify,
+                                    timeout,
+                                    caFile,
+                                    false);
+            UpgradeServiceEvent upgradeServiceEvent =
+                    new UpgradeServiceEvent(
+                            user.getIdep(),
+                            namespaceId,
+                            serviceId,
+                            chartName,
+                            catalogId,
+                            friendlyName);
+            onyxiaEventPublisher.publishEvent(upgradeServiceEvent);
+            Map<String, String> metadata = new HashMap<>();
+            if (friendlyName != null) {
+                metadata.put(FRIENDLY_NAME, friendlyName);
+            }
+            if (share != null) {
+                metadata.put(SHARE, String.valueOf(share));
+            }
+            if (!metadata.isEmpty()) {
+                patchOnyxiaSecret(region, project, user, serviceId, metadata);
+            }
             return List.of(res.getManifest());
         } catch (IllegalArgumentException e) {
             throw new AccessDeniedException(e.getMessage());
@@ -589,7 +656,12 @@ public class HelmAppsService implements AppsService {
                                                     c -> {
                                                         Container container = new Container();
                                                         container.setName(c.getName());
-                                                        container.setReady(c.getReady());
+                                                        container.setReady(
+                                                                pod.getMetadata()
+                                                                                        .getDeletionTimestamp()
+                                                                                == null
+                                                                        && Boolean.TRUE.equals(
+                                                                                c.getReady()));
                                                         currentTask.getContainers().add(container);
                                                     });
                                     currentTask.setStatus(status);

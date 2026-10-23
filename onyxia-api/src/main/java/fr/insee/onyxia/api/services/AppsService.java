@@ -44,6 +44,22 @@ public interface AppsService {
             final String caFile)
             throws Exception;
 
+    Collection<Object> upgradeApp(
+            Region region,
+            Project project,
+            String catalogId,
+            String chartName,
+            String version,
+            User user,
+            String serviceId,
+            Map<String, Object> fusion,
+            String friendlyName,
+            Boolean share,
+            final boolean skipTlsVerify,
+            String timeout,
+            final String caFile)
+            throws Exception;
+
     Service getUserService(Region region, Project project, User user, String serviceId)
             throws Exception;
 
