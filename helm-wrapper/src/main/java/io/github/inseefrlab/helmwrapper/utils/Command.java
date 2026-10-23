@@ -114,6 +114,11 @@ public class Command {
         if (helmConfiguration.getAsKubeUser() != null) {
             newCommand =
                     newCommand.concat(" --kube-as-user " + helmConfiguration.getAsKubeUser() + " ");
+
+            // Temp fix for https://github.com/kubernetes/kubernetes/issues/93474
+            newCommand =
+                    newCommand.concat(
+                            " --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token \"$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)\" --kube-apiserver \"https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}\" ");
         }
         String kubeConfig = null;
         if (StringUtils.isNotEmpty(helmConfiguration.getApiserverUrl())) {
