@@ -88,8 +88,8 @@ public class HelmAppsService implements AppsService {
         this.helmReleaseHealthResolver = helmReleaseHealthResolver;
     }
 
-    private HelmConfiguration getHelmConfiguration(Region region, User user) {
-        return helmClientProvider.getConfiguration(region, user);
+    private HelmConfiguration getHelmConfiguration(Region region, User user, String namespace) {
+        return helmClientProvider.getConfiguration(region, user, namespace);
     }
 
     private HelmInstallService getHelmInstallService() {
@@ -118,7 +118,7 @@ public class HelmAppsService implements AppsService {
             HelmInstaller res =
                     getHelmInstallService()
                             .installChart(
-                                    getHelmConfiguration(region, user),
+                                    getHelmConfiguration(region, user, namespaceId),
                                     catalogId + "/" + pkg.getName(),
                                     namespaceId,
                                     requestDTO.getName(),

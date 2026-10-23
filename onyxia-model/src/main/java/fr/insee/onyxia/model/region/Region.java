@@ -352,7 +352,8 @@ public class Region {
             @JsonProperty("serviceAccount")
             @JsonAlias("admin")
             SERVICEACCOUNT,
-
+            @JsonProperty("serviceAccountInTargetNamespace")
+            SERVICEACCOUNTINTARGETNAMESPACE,
             @JsonProperty("tokenPassthrough")
             TOKEN_PASSTHROUGH
         }
