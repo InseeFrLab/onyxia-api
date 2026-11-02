@@ -38,13 +38,27 @@ public class KubernetesClientProvider {
         return rootKubernetesClientCache.get(region.getId());
     }
 
-    public KubernetesClient getUserClient(Region region, User user) {
+    /**
+     * Username of the service account created by the onboarding in the given namespace,
+     * impersonated in SERVICEACCOUNTINTARGETNAMESPACE mode.
+     */
+    public static String getTargetNamespaceServiceAccountUsername(Region region, String namespace) {
+        return String.format(
+                "system:serviceaccount:%s:%s",
+                namespace, region.getServices().getTargetNamespaceServiceAccount());
+    }
+
+    /**
+     * Client to act on the given namespace on behalf of the user.
+     *
+     * @param namespace the namespace the client will act on, used to impersonate its service
+     *     account in SERVICEACCOUNTINTARGETNAMESPACE mode
+     */
+    public KubernetesClient getUserClient(Region region, User user, String namespace) {
         // In case of SERVICEACCOUNT authentication, we can safely mutualize and use a single
         // KubernetesClient
         if (region.getServices().getAuthenticationMode()
-                        == Region.Services.AuthenticationMode.SERVICEACCOUNT
-                || region.getServices().getAuthenticationMode()
-                        == Region.Services.AuthenticationMode.SERVICEACCOUNTINTARGETNAMESPACE) {
+                == Region.Services.AuthenticationMode.SERVICEACCOUNT) {
             if (userKubernetesClientCache != null) {
                 return userKubernetesClientCache;
             }
@@ -54,6 +68,20 @@ public class KubernetesClientProvider {
             return client;
         }
         final Config config = getDefaultConfiguration(region).build();
+
+        if (region.getServices().getAuthenticationMode()
+                == Region.Services.AuthenticationMode.SERVICEACCOUNTINTARGETNAMESPACE) {
+            if (StringUtils.isEmpty(namespace)) {
+                throw new IllegalArgumentException(
+                        "A namespace is required to impersonate its service account");
+            }
+            config.setImpersonateUsername(
+                    getTargetNamespaceServiceAccountUsername(region, namespace));
+            // Without explicit groups, the API server adds the service account groups itself
+            config.setImpersonateGroups(null);
+            return new KubernetesClientBuilder().withConfig(config).build();
+        }
+
         String username = user.getIdep();
         if (region.getServices().getUsernamePrefix() != null) {
             username = region.getServices().getUsernamePrefix() + user.getIdep();

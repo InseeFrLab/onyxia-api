@@ -205,13 +205,10 @@ public class HelmAppsService implements AppsService {
     @Override
     public String getLogs(
             Region region, Project project, User user, String serviceId, String taskId) {
-        KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
-        return client.pods()
-                .inNamespace(
-                        kubernetesService.determineNamespaceAndCreateIfNeeded(
-                                region, project, user))
-                .withName(taskId)
-                .getLog();
+        String namespace =
+                kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
+        KubernetesClient client = kubernetesClientProvider.getUserClient(region, user, namespace);
+        return client.pods().inNamespace(namespace).withName(taskId).getLog();
     }
 
     @Override
@@ -220,13 +217,10 @@ public class HelmAppsService implements AppsService {
             Project project,
             User user,
             Watcher<io.fabric8.kubernetes.api.model.Event> watcher) {
-        KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
-        return client.v1()
-                .events()
-                .inNamespace(
-                        kubernetesService.determineNamespaceAndCreateIfNeeded(
-                                region, project, user))
-                .watch(watcher);
+        String namespace =
+                kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
+        KubernetesClient client = kubernetesClientProvider.getUserClient(region, user, namespace);
+        return client.v1().events().inNamespace(namespace).watch(watcher);
     }
 
     @Override
@@ -306,7 +300,8 @@ public class HelmAppsService implements AppsService {
             service.setStartedAt(0);
         }
         try {
-            KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
+            KubernetesClient client =
+                    kubernetesClientProvider.getUserClient(region, user, release.getNamespace());
             Secret secret =
                     client.secrets()
                             .inNamespace(release.getNamespace())
@@ -382,7 +377,7 @@ public class HelmAppsService implements AppsService {
             Region region, Project project, User user, String serviceId, Map<String, String> data) {
         String namespaceId =
                 kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
-        KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
+        KubernetesClient client = kubernetesClientProvider.getUserClient(region, user, namespaceId);
         Secret secret =
                 client.secrets()
                         .inNamespace(namespaceId)
@@ -530,7 +525,8 @@ public class HelmAppsService implements AppsService {
 
     private Service getServiceFromRelease(
             Region region, HelmLs release, String manifest, User user) {
-        KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
+        KubernetesClient client =
+                kubernetesClientProvider.getUserClient(region, user, release.getNamespace());
 
         Service service = new Service();
 

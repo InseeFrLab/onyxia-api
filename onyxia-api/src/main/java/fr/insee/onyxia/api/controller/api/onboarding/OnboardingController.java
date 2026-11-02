@@ -35,10 +35,16 @@ public class OnboardingController {
         this.userProvider = userProvider;
     }
 
+    /**
+     * @deprecated namespaces should be created by the onboarding API. Disabled with
+     *     serviceAccountInTargetNamespace authentication.
+     */
+    @Deprecated
     @Operation(
             summary = "Init a namespace for a user or a group.",
             description =
-                    "create or replace the namespace of the user or the namespace of a group if the user is in the requested group and the according rbac policies. with the group prefix / user prefix of the region",
+                    "Deprecated: use the onboarding API instead. create or replace the namespace of the user or the namespace of a group if the user is in the requested group and the according rbac policies. with the group prefix / user prefix of the region",
+            deprecated = true,
             parameters = {
                 @Parameter(
                         name = "ONYXIA-REGION",

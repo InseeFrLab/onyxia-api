@@ -50,7 +50,8 @@ public class HelmClientProvider {
         if (region.getServices().getAuthenticationMode()
                 == Region.Services.AuthenticationMode.SERVICEACCOUNTINTARGETNAMESPACE) {
             helmConfiguration.setAsKubeUser(
-                    String.format("system:serviceaccount:%s:onyxia-local", namespace));
+                    KubernetesClientProvider.getTargetNamespaceServiceAccountUsername(
+                            region, namespace));
         }
 
         if (region.getServices().getAuthenticationMode()

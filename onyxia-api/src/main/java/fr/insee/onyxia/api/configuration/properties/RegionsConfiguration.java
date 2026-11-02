@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +65,37 @@ public class RegionsConfiguration {
                             .equals(Region.Services.AuthenticationMode.TOKEN_PASSTHROUGH)) {
                         LOGGER.info(
                                 "Using token passthrough authentication for region {}. User token will be used by Onyxia to interact with the API Server.",
+                                region.getId());
+                    }
+
+                    if (region.getServices()
+                            .getAuthenticationMode()
+                            .equals(
+                                    Region.Services.AuthenticationMode
+                                            .SERVICEACCOUNTINTARGETNAMESPACE)) {
+                        if (StringUtils.isBlank(
+                                region.getServices().getTargetNamespaceServiceAccount())) {
+                            throw new IllegalStateException(
+                                    "services.targetNamespaceServiceAccount is required with serviceAccountInTargetNamespace authentication for region "
+                                            + region.getId());
+                        }
+                        LOGGER.info(
+                                "Using the {} service account of each namespace for region {}.",
+                                region.getServices().getTargetNamespaceServiceAccount(),
+                                region.getId());
+                        if (!region.getServices().isSingleNamespace()
+                                && region.getServices().isAllowNamespaceCreation()) {
+                            // Namespaces and their service account are created by the onboarding
+                            // API, the API has no permission to do it in this mode
+                            LOGGER.warn(
+                                    "Namespace creation is disabled for region {}: the onboarding API must be used with serviceAccountInTargetNamespace authentication.",
+                                    region.getId());
+                            region.getServices().setAllowNamespaceCreation(false);
+                        }
+                    } else if (!region.getServices().isSingleNamespace()
+                            && region.getServices().isAllowNamespaceCreation()) {
+                        LOGGER.warn(
+                                "Namespace creation by Onyxia API (allowNamespaceCreation) is deprecated for region {} and will be removed, use the onboarding API instead.",
                                 region.getId());
                     }
                 });
