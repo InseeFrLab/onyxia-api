@@ -262,9 +262,13 @@ public class KubernetesService {
     }
 
     public void createOnyxiaSecret(
-            Region region, String namespaceId, String releaseName, Map<String, String> secretData) {
+            Region region,
+            User user,
+            String namespaceId,
+            String releaseName,
+            Map<String, String> secretData) {
 
-        final KubernetesClient kubClient = kubernetesClientProvider.getRootClient(region);
+        final KubernetesClient kubClient = getNamespaceClient(region, user, namespaceId);
         String ownerSecretName =
                 "sh.helm.release.v1." + releaseName + ".v1"; // Name of the Secret managed by Helm
 

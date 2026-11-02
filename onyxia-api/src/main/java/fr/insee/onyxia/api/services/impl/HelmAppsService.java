@@ -146,7 +146,7 @@ public class HelmAppsService implements AppsService {
             }
             metadata.put(SHARE, Base64Utils.base64Encode(String.valueOf(requestDTO.isShare())));
             kubernetesService.createOnyxiaSecret(
-                    region, namespaceId, requestDTO.getName(), metadata);
+                    region, user, namespaceId, requestDTO.getName(), metadata);
             return List.of(res.getManifest());
         } catch (IllegalArgumentException e) {
             throw new AccessDeniedException(e.getMessage());
@@ -400,7 +400,7 @@ public class HelmAppsService implements AppsService {
             Map<String, String> metadata = new HashMap<>();
             metadata.put(OWNER, user.getIdep());
             metadata.putAll(data);
-            kubernetesService.createOnyxiaSecret(region, namespaceId, serviceId, metadata);
+            kubernetesService.createOnyxiaSecret(region, user, namespaceId, serviceId, metadata);
         }
     }
 
