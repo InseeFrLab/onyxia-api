@@ -302,4 +302,24 @@ public class CatalogLoaderTest {
                         Map.of("lifecycle", "production"),
                         Set.of()));
     }
+
+    @DisplayName(
+            "Given a chart packaged by Helm (gzip header with Helm's non-standard extra field), "
+                    + "when we extract it, "
+                    + "then its values.schema.json and values.yaml are read")
+    @Test
+    void extractHelmPackagedChartTest() throws Exception {
+        Chart chart = new Chart();
+        chart.setName("vscode-python-darkmode");
+        try (var in =
+                resourceLoader
+                        .getResource(
+                                "classpath:/catalog-loader-test/vscode-python-darkmode-1.11.11.tgz")
+                        .getInputStream()) {
+            catalogLoader.extractDataFromTgz(in, chart);
+        }
+
+        assertThat(chart.getConfig() != null && chart.getConfig().isObject(), is(true));
+        assertThat(chart.getDefaultValues(), containsString("service:"));
+    }
 }

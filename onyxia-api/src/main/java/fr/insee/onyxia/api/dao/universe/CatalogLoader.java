@@ -12,13 +12,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.zip.GZIPInputStream;
 import okhttp3.CacheControl;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
@@ -245,7 +245,9 @@ public class CatalogLoader {
     public void extractDataFromTgz(InputStream in, Chart chart) throws IOException {
         String chartName = chart.getName();
 
-        try (GzipCompressorInputStream gzipIn = new GzipCompressorInputStream(in);
+        // JDK GZIPInputStream skips the gzip "extra" field. commons-compress >= 1.28 parses it
+        // strictly and rejects the non-standard one written by "helm package".
+        try (GZIPInputStream gzipIn = new GZIPInputStream(in);
                 TarArchiveInputStream tarIn = new TarArchiveInputStream(gzipIn)) {
 
             TarArchiveEntry entry;
