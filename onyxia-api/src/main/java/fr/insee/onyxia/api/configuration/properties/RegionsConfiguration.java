@@ -1,7 +1,5 @@
 package fr.insee.onyxia.api.configuration.properties;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.model.region.Region;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
@@ -9,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +17,8 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.core.io.support.PropertySourceFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @Configuration
 @PropertySource(value = "classpath:regions.json", factory = RegionsConfiguration.JsonLoader.class)
@@ -64,6 +65,37 @@ public class RegionsConfiguration {
                             .equals(Region.Services.AuthenticationMode.TOKEN_PASSTHROUGH)) {
                         LOGGER.info(
                                 "Using token passthrough authentication for region {}. User token will be used by Onyxia to interact with the API Server.",
+                                region.getId());
+                    }
+
+                    if (region.getServices()
+                            .getAuthenticationMode()
+                            .equals(
+                                    Region.Services.AuthenticationMode
+                                            .SERVICEACCOUNTINTARGETNAMESPACE)) {
+                        if (StringUtils.isBlank(
+                                region.getServices().getTargetNamespaceServiceAccount())) {
+                            throw new IllegalStateException(
+                                    "services.targetNamespaceServiceAccount is required with serviceAccountInTargetNamespace authentication for region "
+                                            + region.getId());
+                        }
+                        LOGGER.info(
+                                "Using the {} service account of each namespace for region {}.",
+                                region.getServices().getTargetNamespaceServiceAccount(),
+                                region.getId());
+                        if (!region.getServices().isSingleNamespace()
+                                && region.getServices().isAllowNamespaceCreation()) {
+                            // Namespaces and their service account are created by the onboarding
+                            // API, the API has no permission to do it in this mode
+                            LOGGER.warn(
+                                    "Namespace creation is disabled for region {}: the onboarding API must be used with serviceAccountInTargetNamespace authentication.",
+                                    region.getId());
+                            region.getServices().setAllowNamespaceCreation(false);
+                        }
+                    } else if (!region.getServices().isSingleNamespace()
+                            && region.getServices().isAllowNamespaceCreation()) {
+                        LOGGER.warn(
+                                "Namespace creation by Onyxia API (allowNamespaceCreation) is deprecated for region {} and will be removed, use the onboarding API instead.",
                                 region.getId());
                     }
                 });

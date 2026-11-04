@@ -1,7 +1,6 @@
 package fr.insee.onyxia.api.services;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -11,9 +10,11 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @Service
 public class JsonSchemaRegistryService {
@@ -79,7 +80,7 @@ public class JsonSchemaRegistryService {
             JsonNode schema = objectMapper.readTree(path.toFile());
             String key = generateKey(basePath, path);
             schemaRegistry.put(key, schema);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException("Failed to load schema: " + path.getFileName(), e);
         }
     }
@@ -114,7 +115,7 @@ public class JsonSchemaRegistryService {
                     .computeIfAbsent(role, k -> new HashMap<>()) // Ensure a map exists for the role
                     .put(schemaKey, schema); // Add the schema under the role
 
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException(
                     "Failed to load schema for role from file: " + schemaFile.getFileName(), e);
         }

@@ -18,16 +18,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest(classes = {OnyxiaUserProvider.class, UserProvider.class})
 public class OnyxiaUserProviderTest {
 
     @Autowired OnyxiaUserProvider onyxiaUserProvider;
 
-    @MockBean private KubernetesService kubernetesService;
+    @MockitoBean private KubernetesService kubernetesService;
 
-    @MockBean private UserProvider userProvider;
+    @MockitoBean private UserProvider userProvider;
 
     Region region;
     User user;

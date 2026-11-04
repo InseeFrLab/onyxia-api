@@ -178,16 +178,19 @@ public class Region {
         private Map<String, String> namespaceLabels = new HashMap<>();
         private Map<String, String> namespaceAnnotations = new HashMap<>();
         private boolean userNamespace = true;
+
         private String namespacePrefix = "user-";
         private String groupNamespacePrefix = "projet-";
         private String usernamePrefix;
         private String groupPrefix;
         private AuthenticationMode authenticationMode = AuthenticationMode.SERVICEACCOUNT;
+        private String targetNamespaceServiceAccount = "onyxia-local";
         private Expose expose;
         private Server server;
         private Monitoring monitoring;
         private String allowedURIPattern = "^https://";
         private Quotas quotas = new Quotas();
+        private Helm helm = new Helm();
 
         /***
          * @Deprecated since v3
@@ -314,6 +317,14 @@ public class Region {
             this.authenticationMode = authenticationMode;
         }
 
+        public String getTargetNamespaceServiceAccount() {
+            return targetNamespaceServiceAccount;
+        }
+
+        public void setTargetNamespaceServiceAccount(String targetNamespaceServiceAccount) {
+            this.targetNamespaceServiceAccount = targetNamespaceServiceAccount;
+        }
+
         public String getGroupNamespacePrefix() {
             return groupNamespacePrefix;
         }
@@ -346,13 +357,22 @@ public class Region {
             this.quotas = quotas;
         }
 
+        public Helm getHelm() {
+            return helm;
+        }
+
+        public void setHelm(Helm helm) {
+            this.helm = helm;
+        }
+
         public static enum AuthenticationMode {
             @JsonProperty("impersonate")
             IMPERSONATE,
             @JsonProperty("serviceAccount")
             @JsonAlias("admin")
             SERVICEACCOUNT,
-
+            @JsonProperty("serviceAccountInTargetNamespace")
+            SERVICEACCOUNTINTARGETNAMESPACE,
             @JsonProperty("tokenPassthrough")
             TOKEN_PASSTHROUGH
         }
@@ -431,6 +451,30 @@ public class Region {
 
             public Map<String, Quota> getRolesQuota() {
                 return rolesQuota;
+            }
+        }
+
+        public static class Helm {
+
+            /** If set server-side apply will force changes against conflicts */
+            private boolean forceConflicts = false;
+
+            private String serverSide = "auto";
+
+            public boolean getForceConflicts() {
+                return forceConflicts;
+            }
+
+            public void setForceConflicts(boolean forceConflicts) {
+                this.forceConflicts = forceConflicts;
+            }
+
+            public String getServerSide() {
+                return serverSide;
+            }
+
+            public void setServerSide(String serverSide) {
+                this.serverSide = serverSide;
             }
         }
     }

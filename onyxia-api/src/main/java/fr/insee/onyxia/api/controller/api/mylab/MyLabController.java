@@ -1,7 +1,5 @@
 package fr.insee.onyxia.api.controller.api.mylab;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.configuration.Catalogs;
 import fr.insee.onyxia.api.configuration.NotFoundException;
@@ -23,6 +21,7 @@ import io.fabric8.kubernetes.api.model.Event;
 import io.fabric8.kubernetes.client.Watch;
 import io.fabric8.kubernetes.client.Watcher;
 import io.fabric8.kubernetes.client.WatcherException;
+import io.github.inseefrlab.helmwrapper.service.HelmFlags;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -38,6 +37,8 @@ import org.json.JSONTokener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @Tag(name = "My lab", description = "My services")
 @RequestMapping("/my-lab")
@@ -297,6 +298,14 @@ public class MyLabController {
             throw new IllegalStateException("Catalog " + catalogId + " is not available anymore");
         }
 
+        var flags =
+                HelmFlags.suspendAndResumeFlags(
+                        false,
+                        catalog.get().getSkipTlsVerify(),
+                        catalog.get().getTimeout(),
+                        catalog.get().getCaFile(),
+                        region.getServices().getHelm().getForceConflicts(),
+                        region.getServices().getHelm().getServerSide());
         if (suspend) {
             helmAppsService.suspend(
                     region,
@@ -306,10 +315,7 @@ public class MyLabController {
                     version,
                     user,
                     serviceId,
-                    catalog.get().getSkipTlsVerify(),
-                    catalog.get().getTimeout(),
-                    catalog.get().getCaFile(),
-                    false);
+                    flags);
         } else {
             helmAppsService.resume(
                     region,
@@ -319,10 +325,7 @@ public class MyLabController {
                     version,
                     user,
                     serviceId,
-                    catalog.get().getSkipTlsVerify(),
-                    catalog.get().getTimeout(),
-                    catalog.get().getCaFile(),
-                    false);
+                    flags);
         }
     }
 

@@ -2,7 +2,6 @@ package io.github.inseefrlab.helmwrapper.service;
 
 import static io.github.inseefrlab.helmwrapper.utils.Command.safeConcat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.inseefrlab.helmwrapper.configuration.HelmConfiguration;
 import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
 import io.github.inseefrlab.helmwrapper.model.HelmLs;
@@ -21,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeroturnaround.exec.InvalidExitValueException;
+import tools.jackson.databind.ObjectMapper;
 
 /** HelmInstall */
 public class HelmInstallService {
@@ -38,111 +38,15 @@ public class HelmInstallService {
     private static final String MANIFEST_INFO_TYPE = "manifest";
     private static final String NOTES_INFO_TYPE = "notes";
 
-    public void resume(
-            HelmConfiguration configuration,
-            String chart,
-            String namespace,
-            String name,
-            String version,
-            boolean dryRun,
-            final boolean skipTlsVerify,
-            String timeout,
-            String caFile)
-            throws InvalidExitValueException,
-                    IOException,
-                    InterruptedException,
-                    TimeoutException,
-                    IllegalArgumentException {
-        installChart(
-                configuration,
-                chart,
-                namespace,
-                name,
-                version,
-                dryRun,
-                null,
-                Map.of("global.suspend", "false"),
-                skipTlsVerify,
-                timeout,
-                caFile,
-                true);
-    }
-
-    public void suspend(
-            HelmConfiguration configuration,
-            String chart,
-            String namespace,
-            String name,
-            String version,
-            boolean dryRun,
-            final boolean skipTlsVerify,
-            String timeout,
-            String caFile)
-            throws InvalidExitValueException,
-                    IOException,
-                    InterruptedException,
-                    TimeoutException,
-                    IllegalArgumentException {
-        installChart(
-                configuration,
-                chart,
-                namespace,
-                name,
-                version,
-                dryRun,
-                null,
-                Map.of("global.suspend", "true"),
-                skipTlsVerify,
-                timeout,
-                caFile,
-                true);
-    }
-
     public HelmInstaller installChart(
             HelmConfiguration configuration,
             String chart,
             String namespace,
             String name,
             String version,
-            boolean dryRun,
             File values,
             Map<String, String> env,
-            final boolean skipTlsVerify,
-            String timeout,
-            String caFile)
-            throws InvalidExitValueException,
-                    IOException,
-                    InterruptedException,
-                    TimeoutException,
-                    IllegalArgumentException {
-        return installChart(
-                configuration,
-                chart,
-                namespace,
-                name,
-                version,
-                dryRun,
-                values,
-                env,
-                skipTlsVerify,
-                timeout,
-                caFile,
-                false);
-    }
-
-    public HelmInstaller installChart(
-            HelmConfiguration configuration,
-            String chart,
-            String namespace,
-            String name,
-            String version,
-            boolean dryRun,
-            File values,
-            Map<String, String> env,
-            final boolean skipTlsVerify,
-            String timeout,
-            String caFile,
-            boolean reuseValues)
+            HelmFlags additionalFlags)
             throws InvalidExitValueException,
                     IOException,
                     InterruptedException,
@@ -150,15 +54,7 @@ public class HelmInstallService {
                     IllegalArgumentException {
         StringBuilder command = new StringBuilder("helm upgrade --install --history-max 0 ");
 
-        if (timeout != null) {
-            command.append("--timeout " + timeout + " ");
-        }
-
-        if (skipTlsVerify) {
-            command.append("--insecure-skip-tls-verify ");
-        } else if (caFile != null) {
-            command.append("--ca-file " + System.getenv("CACERTS_DIR") + "/" + caFile + " ");
-        }
+        command.append(additionalFlags.toHelmUpgradeCliString());
 
         if (name != null) {
             if (!helmNamePattern.matcher(name).matches() || name.length() > 53) {
@@ -195,12 +91,6 @@ public class HelmInstallService {
         }
         if (env != null) {
             command.append(buildEnvVar(env));
-        }
-        if (dryRun) {
-            command.append(" --dry-run");
-        }
-        if (reuseValues) {
-            command.append(" --reuse-values");
         }
         String res =
                 Command.executeAndGetResponseAsJson(configuration, command.toString())

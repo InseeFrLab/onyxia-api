@@ -1,6 +1,6 @@
 package fr.insee.onyxia.api.security;
 
-import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+import static org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher.pathPattern;
 
 import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.api.services.utils.HttpRequestUtils;
@@ -121,48 +121,56 @@ public class OIDCConfiguration {
                         configurer -> {
                             configurer.requestMatchers(HttpMethod.OPTIONS).permitAll();
                             // configuration pour Swagger
-                            configurer.requestMatchers(antMatcher("/")).permitAll();
-                            configurer.requestMatchers(antMatcher("/swagger-ui**")).permitAll();
-                            configurer.requestMatchers(antMatcher("/swagger-ui/**")).permitAll();
-                            configurer.requestMatchers(antMatcher("/v2/api-docs")).permitAll();
-                            configurer.requestMatchers(antMatcher("/v3/api-docs")).permitAll();
-                            configurer.requestMatchers(antMatcher("/v3/api-docs/*")).permitAll();
-                            configurer.requestMatchers(antMatcher("/csrf")).permitAll();
-                            configurer.requestMatchers(antMatcher("/webjars/**")).permitAll();
+                            configurer.requestMatchers(pathPattern("/")).permitAll();
+                            configurer.requestMatchers(pathPattern("/swagger-ui**")).permitAll();
+                            configurer.requestMatchers(pathPattern("/swagger-ui/**")).permitAll();
+                            configurer.requestMatchers(pathPattern("/v2/api-docs")).permitAll();
+                            configurer.requestMatchers(pathPattern("/v3/api-docs")).permitAll();
+                            configurer.requestMatchers(pathPattern("/v3/api-docs/*")).permitAll();
+                            configurer.requestMatchers(pathPattern("/csrf")).permitAll();
+                            configurer.requestMatchers(pathPattern("/webjars/**")).permitAll();
                             configurer
-                                    .requestMatchers(antMatcher("/swagger-resources/**"))
+                                    .requestMatchers(pathPattern("/swagger-resources/**"))
                                     .permitAll();
-                            configurer.requestMatchers(antMatcher("/actuator/**")).permitAll();
-                            configurer.requestMatchers(antMatcher("/actuator")).permitAll();
-                            configurer.requestMatchers(antMatcher("/api")).permitAll();
-                            configurer.requestMatchers(antMatcher("/api/swagger-ui**")).permitAll();
+                            configurer.requestMatchers(pathPattern("/actuator/**")).permitAll();
+                            configurer.requestMatchers(pathPattern("/actuator")).permitAll();
+                            configurer.requestMatchers(pathPattern("/api")).permitAll();
                             configurer
-                                    .requestMatchers(antMatcher("/api/swagger-ui/**"))
+                                    .requestMatchers(pathPattern("/api/swagger-ui**"))
                                     .permitAll();
-                            configurer.requestMatchers(antMatcher("/api/v2/api-docs")).permitAll();
-                            configurer.requestMatchers(antMatcher("/api/v3/api-docs")).permitAll();
                             configurer
-                                    .requestMatchers(antMatcher("/api/v3/api-docs/*"))
+                                    .requestMatchers(pathPattern("/api/swagger-ui/**"))
                                     .permitAll();
-                            configurer.requestMatchers(antMatcher("/api/csrf")).permitAll();
-                            configurer.requestMatchers(antMatcher("/api/webjars/**")).permitAll();
+                            configurer.requestMatchers(pathPattern("/api/v2/api-docs")).permitAll();
+                            configurer.requestMatchers(pathPattern("/api/v3/api-docs")).permitAll();
                             configurer
-                                    .requestMatchers(antMatcher("/api/swagger-resources/**"))
+                                    .requestMatchers(pathPattern("/api/v3/api-docs/*"))
                                     .permitAll();
-                            configurer.requestMatchers(antMatcher("/api/actuator/**")).permitAll();
-                            configurer.requestMatchers(antMatcher("/api/actuator")).permitAll();
-                            configurer.requestMatchers(antMatcher("/configuration/**")).permitAll();
+                            configurer.requestMatchers(pathPattern("/api/csrf")).permitAll();
+                            configurer.requestMatchers(pathPattern("/api/webjars/**")).permitAll();
                             configurer
-                                    .requestMatchers(antMatcher("/swagger-resources/**"))
+                                    .requestMatchers(pathPattern("/api/swagger-resources/**"))
+                                    .permitAll();
+                            configurer.requestMatchers(pathPattern("/api/actuator/**")).permitAll();
+                            configurer.requestMatchers(pathPattern("/api/actuator")).permitAll();
+                            configurer
+                                    .requestMatchers(pathPattern("/configuration/**"))
+                                    .permitAll();
+                            configurer
+                                    .requestMatchers(pathPattern("/swagger-resources/**"))
                                     .permitAll();
                             // configuration pour public
-                            configurer.requestMatchers(antMatcher("/public/**")).permitAll();
-                            configurer.requestMatchers(antMatcher("/api/public/**")).permitAll();
+                            configurer.requestMatchers(pathPattern("/public/**")).permitAll();
+                            configurer.requestMatchers(pathPattern("/api/public/**")).permitAll();
                             configurer.anyRequest().authenticated();
                         })
                 .oauth2ResourceServer(
                         httpSecurityOAuth2ResourceServerConfigurer -> {
                             httpSecurityOAuth2ResourceServerConfigurer.jwt(
+                                    Customizer.withDefaults());
+                            // Spring Security 7 no longer enables DPoP automatically (it did in
+                            // 6.5): Onyxia web sends DPoP-bound tokens ("Authorization: DPoP")
+                            httpSecurityOAuth2ResourceServerConfigurer.dPoP(
                                     Customizer.withDefaults());
                         });
         return http.build();

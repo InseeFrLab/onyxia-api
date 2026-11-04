@@ -1,16 +1,16 @@
 package fr.insee.onyxia.api.services;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
+import jakarta.annotation.PostConstruct;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @Service
 public class JsonSchemaProfileRegistryService {
@@ -38,7 +38,7 @@ public class JsonSchemaProfileRegistryService {
             try {
                 JsonNode schema = objectMapper.readTree(roleSchemaPath.resolve("default").toFile());
                 defaultProfileSchema = schema;
-            } catch (IOException e) {
+            } catch (JacksonException e) {
                 LOGGER.error("User profile : failed to load default profile", e);
             }
         }

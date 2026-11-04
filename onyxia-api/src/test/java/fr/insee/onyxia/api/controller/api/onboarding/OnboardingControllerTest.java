@@ -6,7 +6,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.configuration.BaseTest;
 import fr.insee.onyxia.api.configuration.SecurityConfig;
 import fr.insee.onyxia.api.configuration.properties.RegionsConfiguration;
@@ -19,9 +18,10 @@ import fr.insee.onyxia.model.User;
 import fr.insee.onyxia.model.region.Region;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.ObjectMapper;
 
 @WebMvcTest(OnboardingController.class)
 class OnboardingControllerTest extends BaseTest {
@@ -29,13 +29,13 @@ class OnboardingControllerTest extends BaseTest {
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper mapper;
 
-    @MockBean private UserProvider userProvider;
-    @MockBean private RegionsConfiguration regionsConfiguration;
+    @MockitoBean private UserProvider userProvider;
+    @MockitoBean private RegionsConfiguration regionsConfiguration;
 
-    @MockBean private HttpRequestUtils httpRequestUtils;
-    @MockBean private SecurityConfig securityConfig;
-    @MockBean private OnyxiaUserProvider onyxiaUserProvider;
-    @MockBean private KubernetesService kubernetesService;
+    @MockitoBean private HttpRequestUtils httpRequestUtils;
+    @MockitoBean private SecurityConfig securityConfig;
+    @MockitoBean private OnyxiaUserProvider onyxiaUserProvider;
+    @MockitoBean private KubernetesService kubernetesService;
 
     @Test
     public void should_not_create_namespace_when_single_project() throws Exception {

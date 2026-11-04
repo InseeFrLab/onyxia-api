@@ -55,7 +55,7 @@ public class KubernetesService {
         if (StringUtils.isEmpty(project.getNamespace())) {
             throw new NamespaceNotFoundException();
         }
-        if (!isNamespaceAlreadyExisting(region, project.getNamespace())) {
+        if (!isNamespaceAlreadyExisting(region, user, project.getNamespace())) {
             if (!region.getServices().isAllowNamespaceCreation()) {
                 throw new NamespaceNotFoundException();
             } else {
@@ -168,13 +168,46 @@ public class KubernetesService {
         return namespaceId;
     }
 
-    private boolean isNamespaceAlreadyExisting(Region region, String namespaceId) {
+    private boolean isNamespaceAlreadyExisting(Region region, User user, String namespaceId) {
+        if (isTargetNamespaceServiceAccountMode(region)) {
+            // The namespace service account can read its own namespace. If the namespace does not
+            // exist or has not been onboarded yet, it has no permission there: 403, not 404.
+            try {
+                return kubernetesClientProvider
+                                .getUserClient(region, user, namespaceId)
+                                .namespaces()
+                                .withName(namespaceId)
+                                .get()
+                        != null;
+            } catch (KubernetesClientException e) {
+                if (e.getCode() == 403) {
+                    return false;
+                }
+                throw e;
+            }
+        }
         return kubernetesClientProvider
                         .getRootClient(region)
                         .namespaces()
                         .withName(namespaceId)
                         .get()
                 != null;
+    }
+
+    private boolean isTargetNamespaceServiceAccountMode(Region region) {
+        return region.getServices().getAuthenticationMode()
+                == Region.Services.AuthenticationMode.SERVICEACCOUNTINTARGETNAMESPACE;
+    }
+
+    /**
+     * Client for calls on a user namespace that do not depend on the user permissions: the
+     * namespace service account in SERVICEACCOUNTINTARGETNAMESPACE mode, the root client otherwise.
+     */
+    private KubernetesClient getNamespaceClient(Region region, User user, String namespace) {
+        if (isTargetNamespaceServiceAccountMode(region)) {
+            return kubernetesClientProvider.getUserClient(region, user, namespace);
+        }
+        return kubernetesClientProvider.getRootClient(region);
     }
 
     private void applyQuotas(
@@ -229,9 +262,13 @@ public class KubernetesService {
     }
 
     public void createOnyxiaSecret(
-            Region region, String namespaceId, String releaseName, Map<String, String> secretData) {
+            Region region,
+            User user,
+            String namespaceId,
+            String releaseName,
+            Map<String, String> secretData) {
 
-        final KubernetesClient kubClient = kubernetesClientProvider.getRootClient(region);
+        final KubernetesClient kubClient = getNamespaceClient(region, user, namespaceId);
         String ownerSecretName =
                 "sh.helm.release.v1." + releaseName + ".v1"; // Name of the Secret managed by Helm
 
@@ -286,14 +323,14 @@ public class KubernetesService {
     }
 
     public void applyQuota(Region region, Project project, User user, Quota quota) {
-        final KubernetesClient kubClient = kubernetesClientProvider.getRootClient(region);
         final String namespace = determineNamespaceAndCreateIfNeeded(region, project, user);
+        final KubernetesClient kubClient = getNamespaceClient(region, user, namespace);
         applyQuotas(namespace, kubClient, quota, true);
     }
 
     public ResourceQuota getOnyxiaQuota(Region region, Project project, User user) {
-        final KubernetesClient kubClient = kubernetesClientProvider.getRootClient(region);
         final String namespace = determineNamespaceAndCreateIfNeeded(region, project, user);
+        final KubernetesClient kubClient = getNamespaceClient(region, user, namespace);
         return kubClient.resourceQuotas().inNamespace(namespace).withName(ONYXIA_QUOTA).get();
     }
 
