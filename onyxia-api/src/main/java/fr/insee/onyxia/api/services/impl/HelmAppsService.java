@@ -88,8 +88,8 @@ public class HelmAppsService implements AppsService {
         this.helmReleaseHealthResolver = helmReleaseHealthResolver;
     }
 
-    private HelmConfiguration getHelmConfiguration(Region region, User user) {
-        return helmClientProvider.getConfiguration(region, user);
+    private HelmConfiguration getHelmConfiguration(Region region, User user, String namespace) {
+        return helmClientProvider.getConfiguration(region, user, namespace);
     }
 
     private HelmInstallService getHelmInstallService() {
@@ -118,7 +118,7 @@ public class HelmAppsService implements AppsService {
             HelmInstaller res =
                     getHelmInstallService()
                             .installChart(
-                                    getHelmConfiguration(region, user),
+                                    getHelmConfiguration(region, user, namespaceId),
                                     catalogId + "/" + pkg.getName(),
                                     namespaceId,
                                     requestDTO.getName(),
@@ -146,7 +146,7 @@ public class HelmAppsService implements AppsService {
             }
             metadata.put(SHARE, Base64Utils.base64Encode(String.valueOf(requestDTO.isShare())));
             kubernetesService.createOnyxiaSecret(
-                    region, namespaceId, requestDTO.getName(), metadata);
+                    region, user, namespaceId, requestDTO.getName(), metadata);
             return List.of(res.getManifest());
         } catch (IllegalArgumentException e) {
             throw new AccessDeniedException(e.getMessage());
@@ -180,7 +180,8 @@ public class HelmAppsService implements AppsService {
                     Arrays.asList(
                             getHelmInstallService()
                                     .listChartInstall(
-                                            getHelmConfiguration(region, user),
+                                            getHelmConfiguration(
+                                                    region, user, project.getNamespace()),
                                             project.getNamespace()));
         } catch (Exception e) {
             return CompletableFuture.completedFuture(new ServicesListing());
@@ -204,13 +205,10 @@ public class HelmAppsService implements AppsService {
     @Override
     public String getLogs(
             Region region, Project project, User user, String serviceId, String taskId) {
-        KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
-        return client.pods()
-                .inNamespace(
-                        kubernetesService.determineNamespaceAndCreateIfNeeded(
-                                region, project, user))
-                .withName(taskId)
-                .getLog();
+        String namespace =
+                kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
+        KubernetesClient client = kubernetesClientProvider.getUserClient(region, user, namespace);
+        return client.pods().inNamespace(namespace).withName(taskId).getLog();
     }
 
     @Override
@@ -219,13 +217,10 @@ public class HelmAppsService implements AppsService {
             Project project,
             User user,
             Watcher<io.fabric8.kubernetes.api.model.Event> watcher) {
-        KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
-        return client.v1()
-                .events()
-                .inNamespace(
-                        kubernetesService.determineNamespaceAndCreateIfNeeded(
-                                region, project, user))
-                .watch(watcher);
+        String namespace =
+                kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
+        KubernetesClient client = kubernetesClientProvider.getUserClient(region, user, namespace);
+        return client.v1().events().inNamespace(namespace).watch(watcher);
     }
 
     @Override
@@ -234,13 +229,14 @@ public class HelmAppsService implements AppsService {
         if (serviceId.startsWith("/")) {
             serviceId = serviceId.substring(1);
         }
+        String namespace =
+                kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
         HelmLs result =
                 getHelmInstallService()
                         .getAppById(
-                                getHelmConfiguration(region, user),
+                                getHelmConfiguration(region, user, namespace),
                                 serviceId,
-                                kubernetesService.determineNamespaceAndCreateIfNeeded(
-                                        region, project, user));
+                                namespace);
         return getHelmApp(region, user, result);
     }
 
@@ -257,14 +253,15 @@ public class HelmAppsService implements AppsService {
             // If bulk in kub we ignore the path and delete every helm release
             HelmLs[] releases =
                     getHelmInstallService()
-                            .listChartInstall(getHelmConfiguration(region, user), namespace);
+                            .listChartInstall(
+                                    getHelmConfiguration(region, user, namespace), namespace);
             for (HelmLs release : releases) {
                 status =
                         Math.max(
                                 0,
                                 getHelmInstallService()
                                         .uninstaller(
-                                                getHelmConfiguration(region, user),
+                                                getHelmConfiguration(region, user, namespace),
                                                 release.getName(),
                                                 namespace));
                 UninstallServiceEvent uninstallServiceEvent =
@@ -277,7 +274,9 @@ public class HelmAppsService implements AppsService {
             status =
                     getHelmInstallService()
                             .uninstaller(
-                                    getHelmConfiguration(region, user), cannonicalPath, namespace);
+                                    getHelmConfiguration(region, user, namespace),
+                                    cannonicalPath,
+                                    namespace);
             UninstallServiceEvent uninstallServiceEvent =
                     new UninstallServiceEvent(namespace, cannonicalPath, user.getIdep());
             onyxiaEventPublisher.publishEvent(uninstallServiceEvent);
@@ -290,7 +289,7 @@ public class HelmAppsService implements AppsService {
         HelmReleaseInfo helmReleaseInfo =
                 getHelmInstallService()
                         .getAll(
-                                getHelmConfiguration(region, user),
+                                getHelmConfiguration(region, user, release.getNamespace()),
                                 release.getName(),
                                 release.getNamespace());
         Service service =
@@ -301,7 +300,8 @@ public class HelmAppsService implements AppsService {
             service.setStartedAt(0);
         }
         try {
-            KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
+            KubernetesClient client =
+                    kubernetesClientProvider.getUserClient(region, user, release.getNamespace());
             Secret secret =
                     client.secrets()
                             .inNamespace(release.getNamespace())
@@ -377,7 +377,7 @@ public class HelmAppsService implements AppsService {
             Region region, Project project, User user, String serviceId, Map<String, String> data) {
         String namespaceId =
                 kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
-        KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
+        KubernetesClient client = kubernetesClientProvider.getUserClient(region, user, namespaceId);
         Secret secret =
                 client.secrets()
                         .inNamespace(namespaceId)
@@ -400,7 +400,7 @@ public class HelmAppsService implements AppsService {
             Map<String, String> metadata = new HashMap<>();
             metadata.put(OWNER, user.getIdep());
             metadata.putAll(data);
-            kubernetesService.createOnyxiaSecret(region, namespaceId, serviceId, metadata);
+            kubernetesService.createOnyxiaSecret(region, user, namespaceId, serviceId, metadata);
         }
     }
 
@@ -481,7 +481,7 @@ public class HelmAppsService implements AppsService {
         if (suspend) {
             getHelmInstallService()
                     .suspend(
-                            getHelmConfiguration(region, user),
+                            getHelmConfiguration(region, user, namespaceId),
                             catalogId + "/" + chartName,
                             namespaceId,
                             serviceId,
@@ -493,7 +493,7 @@ public class HelmAppsService implements AppsService {
         } else {
             getHelmInstallService()
                     .resume(
-                            getHelmConfiguration(region, user),
+                            getHelmConfiguration(region, user, namespaceId),
                             catalogId + "/" + chartName,
                             namespaceId,
                             serviceId,
@@ -525,7 +525,8 @@ public class HelmAppsService implements AppsService {
 
     private Service getServiceFromRelease(
             Region region, HelmLs release, String manifest, User user) {
-        KubernetesClient client = kubernetesClientProvider.getUserClient(region, user);
+        KubernetesClient client =
+                kubernetesClientProvider.getUserClient(region, user, release.getNamespace());
 
         Service service = new Service();
 

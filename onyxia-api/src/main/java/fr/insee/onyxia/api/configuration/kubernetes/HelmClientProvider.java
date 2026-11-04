@@ -27,7 +27,7 @@ public class HelmClientProvider {
         return new HelmVersionService();
     }
 
-    public HelmConfiguration getConfiguration(Region region, User user) {
+    public HelmConfiguration getConfiguration(Region region, User user, String namespace) {
         final HelmConfiguration helmConfiguration = new HelmConfiguration();
         if (region.getServices().getServer() != null) {
             final Region.Auth auth = region.getServices().getServer().getAuth();
@@ -45,6 +45,13 @@ public class HelmClientProvider {
         if (region.getServices().getAuthenticationMode()
                 == Region.Services.AuthenticationMode.IMPERSONATE) {
             helmConfiguration.setAsKubeUser(username);
+        }
+
+        if (region.getServices().getAuthenticationMode()
+                == Region.Services.AuthenticationMode.SERVICEACCOUNTINTARGETNAMESPACE) {
+            helmConfiguration.setAsKubeUser(
+                    KubernetesClientProvider.getTargetNamespaceServiceAccountUsername(
+                            region, namespace));
         }
 
         if (region.getServices().getAuthenticationMode()

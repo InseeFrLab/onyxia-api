@@ -2,6 +2,8 @@ package io.github.inseefrlab.helmwrapper.utils;
 
 import io.github.inseefrlab.helmwrapper.configuration.HelmConfiguration;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
@@ -30,7 +32,9 @@ public class Command {
                 new ProcessListener() {
                     @Override
                     public void afterStart(Process process, ProcessExecutor executor) {
-                        process.info().commandLine().ifPresent(cli -> LOGGER.info(cli));
+                        process.info()
+                                .commandLine()
+                                .ifPresent(cli -> LOGGER.info(redactToken(cli)));
                         super.afterStart(process, executor);
                     }
                 });
@@ -114,6 +118,29 @@ public class Command {
         if (helmConfiguration.getAsKubeUser() != null) {
             newCommand =
                     newCommand.concat(" --kube-as-user " + helmConfiguration.getAsKubeUser() + " ");
+
+            // Temp fix for https://github.com/kubernetes/kubernetes/issues/93474
+            try {
+                String token =
+                        Files.readString(
+                                        Path.of(
+                                                "/var/run/secrets/kubernetes.io/serviceaccount/token"))
+                                .trim();
+                String apiserver =
+                        "https://"
+                                + System.getenv("KUBERNETES_SERVICE_HOST")
+                                + ":"
+                                + System.getenv("KUBERNETES_SERVICE_PORT");
+                newCommand =
+                        newCommand.concat(
+                                " --kube-ca-file=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token="
+                                        + token
+                                        + " --kube-apiserver="
+                                        + apiserver
+                                        + " ");
+            } catch (IOException e) {
+                LOGGER.debug("Could not retrieve in-cluster token");
+            }
         }
         String kubeConfig = null;
         if (StringUtils.isNotEmpty(helmConfiguration.getApiserverUrl())) {
@@ -144,6 +171,10 @@ public class Command {
         }
 
         return newCommand;
+    }
+
+    private static String redactToken(String commandLine) {
+        return commandLine.replaceAll("--kube-token[= ]+[^\\s]+", "--kube-token=[REDACTED]");
     }
 
     public static void safeConcat(StringBuilder currentCommand, String toConcat)

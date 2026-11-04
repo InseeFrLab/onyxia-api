@@ -183,6 +183,7 @@ public class Region {
         private String usernamePrefix;
         private String groupPrefix;
         private AuthenticationMode authenticationMode = AuthenticationMode.SERVICEACCOUNT;
+        private String targetNamespaceServiceAccount = "onyxia-local";
         private Expose expose;
         private Server server;
         private Monitoring monitoring;
@@ -314,6 +315,14 @@ public class Region {
             this.authenticationMode = authenticationMode;
         }
 
+        public String getTargetNamespaceServiceAccount() {
+            return targetNamespaceServiceAccount;
+        }
+
+        public void setTargetNamespaceServiceAccount(String targetNamespaceServiceAccount) {
+            this.targetNamespaceServiceAccount = targetNamespaceServiceAccount;
+        }
+
         public String getGroupNamespacePrefix() {
             return groupNamespacePrefix;
         }
@@ -352,7 +361,8 @@ public class Region {
             @JsonProperty("serviceAccount")
             @JsonAlias("admin")
             SERVICEACCOUNT,
-
+            @JsonProperty("serviceAccountInTargetNamespace")
+            SERVICEACCOUNTINTARGETNAMESPACE,
             @JsonProperty("tokenPassthrough")
             TOKEN_PASSTHROUGH
         }
