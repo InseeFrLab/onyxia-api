@@ -2,7 +2,6 @@ package io.github.inseefrlab.helmwrapper.service;
 
 import static io.github.inseefrlab.helmwrapper.utils.Command.safeConcat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.inseefrlab.helmwrapper.configuration.HelmConfiguration;
 import io.github.inseefrlab.helmwrapper.model.HelmInstaller;
 import io.github.inseefrlab.helmwrapper.model.HelmLs;
@@ -21,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeroturnaround.exec.InvalidExitValueException;
+import tools.jackson.databind.ObjectMapper;
 
 /** HelmInstall */
 public class HelmInstallService {

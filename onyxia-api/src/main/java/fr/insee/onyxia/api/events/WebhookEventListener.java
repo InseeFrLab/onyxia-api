@@ -1,7 +1,5 @@
 package fr.insee.onyxia.api.events;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +16,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 @EnableAsync
 @Component
@@ -49,7 +49,7 @@ public class WebhookEventListener {
 
     @Async
     @EventListener
-    public void onOnyxiaEvent(OnyxiaEvent onyxiaEvent) throws JsonProcessingException {
+    public void onOnyxiaEvent(OnyxiaEvent onyxiaEvent) throws JacksonException {
         if (!includes.isEmpty() && !includes.contains(onyxiaEvent.getType())) {
             return;
         }

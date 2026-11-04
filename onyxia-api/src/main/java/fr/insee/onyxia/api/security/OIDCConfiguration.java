@@ -168,6 +168,10 @@ public class OIDCConfiguration {
                         httpSecurityOAuth2ResourceServerConfigurer -> {
                             httpSecurityOAuth2ResourceServerConfigurer.jwt(
                                     Customizer.withDefaults());
+                            // Spring Security 7 no longer enables DPoP automatically (it did in
+                            // 6.5): Onyxia web sends DPoP-bound tokens ("Authorization: DPoP")
+                            httpSecurityOAuth2ResourceServerConfigurer.dPoP(
+                                    Customizer.withDefaults());
                         });
         return http.build();
     }

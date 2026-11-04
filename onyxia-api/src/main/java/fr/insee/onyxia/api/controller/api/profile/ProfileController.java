@@ -1,6 +1,5 @@
 package fr.insee.onyxia.api.controller.api.profile;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.onyxia.api.services.JsonSchemaProfileRegistryService;
 import fr.insee.onyxia.api.services.UserProvider;
 import fr.insee.onyxia.model.User;
@@ -12,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import tools.jackson.databind.JsonNode;
 
 @Tag(name = "Profile", description = "Info on profile configuration feature")
 @RequestMapping("/profile")
