@@ -275,8 +275,7 @@ public class CatalogLoader {
         }
     }
 
-    public JsonNode resolveInternalReferences(JsonNode schemaNode, ObjectMapper objectMapper)
-            throws IOException {
+    public JsonNode resolveInternalReferences(JsonNode schemaNode, ObjectMapper objectMapper) {
         // Convert the main schema JSON node to JSONObject
         JSONObject schemaJson = new JSONObject(new JSONTokener(schemaNode.toString()));
 
