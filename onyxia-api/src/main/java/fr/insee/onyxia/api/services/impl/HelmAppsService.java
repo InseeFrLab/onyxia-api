@@ -2,8 +2,6 @@ package fr.insee.onyxia.api.services.impl;
 
 import static fr.insee.onyxia.api.services.impl.ServiceUrlResolver.getServiceUrls;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.configuration.kubernetes.HelmClientProvider;
 import fr.insee.onyxia.api.configuration.kubernetes.KubernetesClientProvider;
 import fr.insee.onyxia.api.controller.exception.NamespaceNotFoundException;
@@ -45,6 +43,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.access.AccessDeniedException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @org.springframework.stereotype.Service
 @Qualifier("Helm")
@@ -344,7 +344,8 @@ public class HelmAppsService implements AppsService {
             String values = helmReleaseInfo.getUserSuppliedValues();
             JsonNode node = mapperHelm.readTree(values);
             Map<String, String> result = new HashMap<>();
-            node.fields()
+            node.properties()
+                    .iterator()
                     .forEachRemaining(
                             currentNode -> mapAppender(result, currentNode, new ArrayList<>()));
             service.setEnv(result);
@@ -473,10 +474,13 @@ public class HelmAppsService implements AppsService {
         names.add(node.getKey());
         if (node.getValue().isValueNode()) {
             String name = String.join(".", names);
-            result.put(name, node.getValue().asText());
+            JsonNode value = node.getValue();
+            // Jackson 3 renders null as "" where Jackson 2 rendered "null": keep the old behaviour
+            result.put(name, value.isNull() ? "null" : value.asString());
         } else {
             node.getValue()
-                    .fields()
+                    .properties()
+                    .iterator()
                     .forEachRemaining(
                             nested -> mapAppender(result, nested, new ArrayList<>(names)));
         }
