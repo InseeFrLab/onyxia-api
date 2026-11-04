@@ -46,14 +46,9 @@ public final class ServiceUrlResolver {
                 try {
                     urls.addAll(
                             ingress.getSpec().getRules().stream()
-                                    .flatMap(
-                                            rule ->
-                                                    rule.getHttp().getPaths().stream()
-                                                            .map(
-                                                                    path ->
-                                                                            rule.getHost()
-                                                                                    + path
-                                                                                            .getPath()))
+                                    .flatMap(rule ->
+                                            rule.getHttp().getPaths().stream()
+                                                    .map(path -> rule.getHost() + path.getPath()))
                                     .toList());
                 } catch (Exception e) {
                     LOGGER.warn(

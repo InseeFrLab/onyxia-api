@@ -28,32 +28,29 @@ public class CatalogRestrictionServiceImpl implements CatalogRestrictionService 
         }
 
         return catalogRestrictions.stream()
-                .allMatch(
-                        restriction -> {
-                            if (restriction.getUserAttribute() == null) return false;
+                .allMatch(restriction -> {
+                    if (restriction.getUserAttribute() == null) return false;
 
-                            String key = restriction.getUserAttribute().getKey();
-                            Pattern regex = restriction.getUserAttribute().getMatches();
+                    String key = restriction.getUserAttribute().getKey();
+                    Pattern regex = restriction.getUserAttribute().getMatches();
 
-                            if (user.getAttributes().containsKey(key)) {
+                    if (user.getAttributes().containsKey(key)) {
 
-                                Object attribute = user.getAttributes().get(key);
-                                if (attribute instanceof List<?> claims) {
-                                    return claims.stream()
-                                            .filter(String.class::isInstance)
-                                            .map(String.class::cast)
-                                            .anyMatch(
-                                                    claimValue ->
-                                                            regex.matcher(claimValue).matches());
-                                } else if (attribute instanceof String claimValue) {
-                                    return regex.matcher(claimValue).matches();
-                                } else if (attribute instanceof Boolean claimValue) {
-                                    return claimValue.toString().equalsIgnoreCase(regex.pattern());
-                                }
-                                LOGGER.info("claim {} was found, but type is not supported", key);
-                            }
+                        Object attribute = user.getAttributes().get(key);
+                        if (attribute instanceof List<?> claims) {
+                            return claims.stream()
+                                    .filter(String.class::isInstance)
+                                    .map(String.class::cast)
+                                    .anyMatch(claimValue -> regex.matcher(claimValue).matches());
+                        } else if (attribute instanceof String claimValue) {
+                            return regex.matcher(claimValue).matches();
+                        } else if (attribute instanceof Boolean claimValue) {
+                            return claimValue.toString().equalsIgnoreCase(regex.pattern());
+                        }
+                        LOGGER.info("claim {} was found, but type is not supported", key);
+                    }
 
-                            return false;
-                        });
+                    return false;
+                });
     }
 }

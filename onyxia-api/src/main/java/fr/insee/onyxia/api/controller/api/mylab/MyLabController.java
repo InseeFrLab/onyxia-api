@@ -278,11 +278,8 @@ public class MyLabController {
         if (catalogId == null) {
             List<CatalogWrapper> elligibleCatalogs =
                     catalogService.getCatalogs(region, user).getCatalogs().stream()
-                            .filter(
-                                    catalog ->
-                                            catalog.getCatalog()
-                                                    .getPackageByName(chartName)
-                                                    .isPresent())
+                            .filter(catalog ->
+                                    catalog.getCatalog().getPackageByName(chartName).isPresent())
                             .toList();
             if (elligibleCatalogs.isEmpty()) {
                 throw new NotFoundException();

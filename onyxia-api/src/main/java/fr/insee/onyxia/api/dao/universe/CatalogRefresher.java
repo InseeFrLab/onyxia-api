@@ -31,26 +31,22 @@ public class CatalogRefresher {
 
     private void refreshCatalogs() {
         catalogs.getCatalogs()
-                .forEach(
-                        c -> {
-                            try {
-                                LOGGER.info("Adding Helm Repo: {}", c.getId());
-                                helmRepoService.addHelmRepo(
-                                        c.getLocation(),
-                                        c.getId(),
-                                        c.getSkipTlsVerify(),
-                                        c.getCaFile(),
-                                        c.getUsername(),
-                                        c.getPassword());
-                                LOGGER.info("Updating catalog: {}", c.getId());
-                                catalogLoader.updateCatalog(c);
-                            } catch (Exception e) {
-                                LOGGER.warn(
-                                        "Exception occurred while updating catalog: {}",
-                                        c.getId(),
-                                        e);
-                            }
-                        });
+                .forEach(c -> {
+                    try {
+                        LOGGER.info("Adding Helm Repo: {}", c.getId());
+                        helmRepoService.addHelmRepo(
+                                c.getLocation(),
+                                c.getId(),
+                                c.getSkipTlsVerify(),
+                                c.getCaFile(),
+                                c.getUsername(),
+                                c.getPassword());
+                        LOGGER.info("Updating catalog: {}", c.getId());
+                        catalogLoader.updateCatalog(c);
+                    } catch (Exception e) {
+                        LOGGER.warn("Exception occurred while updating catalog: {}", c.getId(), e);
+                    }
+                });
     }
 
     private void updateRepo() throws InterruptedException {

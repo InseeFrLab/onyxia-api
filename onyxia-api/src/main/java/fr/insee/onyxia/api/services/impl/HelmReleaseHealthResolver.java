@@ -132,10 +132,9 @@ public class HelmReleaseHealthResolver {
     private CrdHealthCheck findConfiguredCrd(String kind, String apiVersion) {
         return crdHealthCheckProperties.getChecks().stream()
                 .filter(c -> c.getKind().equals(kind))
-                .filter(
-                        c ->
-                                apiVersion == null
-                                        || apiVersion.equals(c.getGroup() + "/" + c.getVersion()))
+                .filter(c ->
+                        apiVersion == null
+                                || apiVersion.equals(c.getGroup() + "/" + c.getVersion()))
                 .findFirst()
                 .orElse(null);
     }

@@ -83,48 +83,38 @@ public class CatalogLoader {
                                     // Remove explicitly excluded services
                                     entry ->
                                             cw.getExcludedCharts().stream()
-                                                    .noneMatch(
-                                                            excludedChart ->
-                                                                    excludedChart.equalsIgnoreCase(
-                                                                            entry.getKey())))
-                            .filter(
-                                    entry ->
-                                            (CollectionUtils.isEmpty(cw.getIncludeKeywords())
-                                                            || entry.getValue()
-                                                                    .getFirst()
-                                                                    .hasKeywords(
-                                                                            cw
-                                                                                    .getIncludeKeywords()))
-                                                    && (CollectionUtils.isEmpty(
-                                                                    cw.getIncludeAnnotations())
-                                                            || entry.getValue()
-                                                                    .getFirst()
-                                                                    .hasAnnotations(
-                                                                            cw
-                                                                                    .getIncludeAnnotations())))
-                            .filter(
-                                    entry ->
-                                            CollectionUtils.isEmpty(cw.getExcludeKeywords())
-                                                    || !entry.getValue()
+                                                    .noneMatch(excludedChart ->
+                                                            excludedChart.equalsIgnoreCase(
+                                                                    entry.getKey())))
+                            .filter(entry ->
+                                    (CollectionUtils.isEmpty(cw.getIncludeKeywords())
+                                                    || entry.getValue()
                                                             .getFirst()
-                                                            .hasKeywords(cw.getExcludeKeywords()))
-                            .filter(
-                                    entry ->
-                                            CollectionUtils.isEmpty(cw.getExcludeAnnotations())
-                                                    || !entry.getValue()
+                                                            .hasKeywords(cw.getIncludeKeywords()))
+                                            && (CollectionUtils.isEmpty(cw.getIncludeAnnotations())
+                                                    || entry.getValue()
                                                             .getFirst()
                                                             .hasAnnotations(
-                                                                    cw.getExcludeAnnotations()))
+                                                                    cw.getIncludeAnnotations())))
+                            .filter(entry ->
+                                    CollectionUtils.isEmpty(cw.getExcludeKeywords())
+                                            || !entry.getValue()
+                                                    .getFirst()
+                                                    .hasKeywords(cw.getExcludeKeywords()))
+                            .filter(entry ->
+                                    CollectionUtils.isEmpty(cw.getExcludeAnnotations())
+                                            || !entry.getValue()
+                                                    .getFirst()
+                                                    .hasAnnotations(cw.getExcludeAnnotations()))
                             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
             // For each service, filter the multiple versions if needed then refresh remaining
             // versions
             repository.getEntries().values().parallelStream()
-                    .forEach(
-                            charts -> {
-                                sortChartsListByVersion(charts, cw);
-                                epurateChartsList(charts, cw);
-                                refreshChartsList(charts, cw);
-                            });
+                    .forEach(charts -> {
+                        sortChartsListByVersion(charts, cw);
+                        epurateChartsList(charts, cw);
+                        refreshChartsList(charts, cw);
+                    });
             cw.setCatalog(repository);
             cw.setLastUpdateTime(System.currentTimeMillis());
         } catch (Exception e) {
@@ -198,14 +188,13 @@ public class CatalogLoader {
 
     private void refreshChartsList(List<Chart> charts, CatalogWrapper cw) {
         charts.parallelStream()
-                .forEach(
-                        pkg -> {
-                            try {
-                                refreshPackage(cw, pkg);
-                            } catch (CatalogLoaderException | IOException e) {
-                                LOGGER.info("Exception occurred", e);
-                            }
-                        });
+                .forEach(pkg -> {
+                    try {
+                        refreshPackage(cw, pkg);
+                    } catch (CatalogLoaderException | IOException e) {
+                        LOGGER.info("Exception occurred", e);
+                    }
+                });
     }
 
     private void refreshPackage(CatalogWrapper cw, Pkg pkg)
@@ -224,10 +213,9 @@ public class CatalogLoader {
         String chartUrl =
                 chart.getUrls().stream()
                         .findFirst()
-                        .orElseThrow(
-                                () ->
-                                        new CatalogLoaderException(
-                                                "Package " + cw.getName() + " has no urls"));
+                        .orElseThrow(() ->
+                                new CatalogLoaderException(
+                                        "Package " + cw.getName() + " has no urls"));
         String absoluteUrl = chartUrl;
         if (!(chartUrl.startsWith("http") || chartUrl.startsWith("https"))) {
             absoluteUrl = StringUtils.applyRelativePath(cw.getLocation() + "/", chartUrl);

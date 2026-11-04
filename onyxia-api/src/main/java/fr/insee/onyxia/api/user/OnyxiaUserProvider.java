@@ -38,34 +38,33 @@ public class OnyxiaUserProvider {
             userProvider
                     .getUser(region)
                     .getGroups()
-                    .forEach(
-                            group -> {
-                                String projectBaseName =
-                                        getProjectBaseNameFromGroup(
-                                                group,
-                                                includedGroupPattern,
-                                                region.getTransformGroupPattern());
-                                if (projectBaseName != null) {
-                                    Project project = new Project();
-                                    project.setGroup(group);
-                                    project.setId(
-                                            region.getServices().getGroupNamespacePrefix()
-                                                    + projectBaseName);
-                                    String vaultPrefix = "";
-                                    if (region.getVault() != null
-                                            && region.getVault().getGroupPrefix() != null) {
-                                        vaultPrefix = region.getVault().getGroupPrefix();
-                                    }
-                                    project.setVaultTopDir(
-                                            vaultPrefix
-                                                    + region.getServices().getGroupNamespacePrefix()
-                                                    + projectBaseName);
-                                    project.setNamespace(
-                                            region.getServices().getGroupNamespacePrefix()
-                                                    + projectBaseName);
-                                    user.getProjects().add(project);
-                                }
-                            });
+                    .forEach(group -> {
+                        String projectBaseName =
+                                getProjectBaseNameFromGroup(
+                                        group,
+                                        includedGroupPattern,
+                                        region.getTransformGroupPattern());
+                        if (projectBaseName != null) {
+                            Project project = new Project();
+                            project.setGroup(group);
+                            project.setId(
+                                    region.getServices().getGroupNamespacePrefix()
+                                            + projectBaseName);
+                            String vaultPrefix = "";
+                            if (region.getVault() != null
+                                    && region.getVault().getGroupPrefix() != null) {
+                                vaultPrefix = region.getVault().getGroupPrefix();
+                            }
+                            project.setVaultTopDir(
+                                    vaultPrefix
+                                            + region.getServices().getGroupNamespacePrefix()
+                                            + projectBaseName);
+                            project.setNamespace(
+                                    region.getServices().getGroupNamespacePrefix()
+                                            + projectBaseName);
+                            user.getProjects().add(project);
+                        }
+                    });
         }
 
         user.getProjects().removeIf(p -> !isRespectingRFC1123LabelName(p.getNamespace()));

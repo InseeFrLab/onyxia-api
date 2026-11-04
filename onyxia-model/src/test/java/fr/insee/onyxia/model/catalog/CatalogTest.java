@@ -14,7 +14,7 @@ import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.dataformat.yaml.YAMLMapper;
 
-@SpringBootTest()
+@SpringBootTest
 public class CatalogTest {
     @Autowired private ResourceLoader resourceLoader;
 

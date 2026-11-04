@@ -31,13 +31,12 @@ public class V3Checks {
     public void checkDefaultConfigurationIsNoLongerSupported() {
         regionsConfiguration
                 .getResolvedRegions()
-                .forEach(
-                        region -> {
-                            if (region.getServices().getDefaultConfiguration() != null) {
-                                LOGGER.error(
-                                        "FATAL : Setting defaultConfiguration in region is no longer supported and has been replaced by JSONSchema support. See migration guide at https://docs.onyxia.sh/admin-doc/migration-guides/v8-greater-than-v9");
-                                exitHandler.run();
-                            }
-                        });
+                .forEach(region -> {
+                    if (region.getServices().getDefaultConfiguration() != null) {
+                        LOGGER.error(
+                                "FATAL : Setting defaultConfiguration in region is no longer supported and has been replaced by JSONSchema support. See migration guide at https://docs.onyxia.sh/admin-doc/migration-guides/v8-greater-than-v9");
+                        exitHandler.run();
+                    }
+                });
     }
 }

@@ -48,12 +48,11 @@ public abstract class CatalogWrapper {
             return null;
         }
         final Map<String, Chart> latestCharts = new HashMap<>();
-        entries.forEach(
-                (key, value) -> {
-                    if (value != null && !value.isEmpty()) {
-                        latestCharts.put(key, value.get(0));
-                    }
-                });
+        entries.forEach((key, value) -> {
+            if (value != null && !value.isEmpty()) {
+                latestCharts.put(key, value.get(0));
+            }
+        });
         return latestCharts;
     }
 

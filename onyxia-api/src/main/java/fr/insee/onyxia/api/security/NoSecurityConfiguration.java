@@ -17,9 +17,8 @@ public class NoSecurityConfiguration {
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
-        http.headers(
-                configurer ->
-                        configurer.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
+        http.headers(configurer ->
+                configurer.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
         http.csrf(AbstractHttpConfigurer::disable);
         return http.build();
     }

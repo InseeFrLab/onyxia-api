@@ -42,63 +42,57 @@ public class RegionsConfiguration {
     @PostConstruct
     public void load() throws Exception {
         resolvedRegions = Arrays.asList(mapper.readValue(regions, Region[].class));
-        resolvedRegions.forEach(
-                region -> {
-                    if (region.getServices()
-                            .getAuthenticationMode()
-                            .equals(Region.Services.AuthenticationMode.SERVICEACCOUNT)) {
-                        LOGGER.warn(
-                                "Using serviceAccount authentication for region {}. Onyxia will deploy services using it's own global permissions, this may be a security issue.",
-                                region.getId());
-                    }
+        resolvedRegions.forEach(region -> {
+            if (region.getServices()
+                    .getAuthenticationMode()
+                    .equals(Region.Services.AuthenticationMode.SERVICEACCOUNT)) {
+                LOGGER.warn(
+                        "Using serviceAccount authentication for region {}. Onyxia will deploy services using it's own global permissions, this may be a security issue.",
+                        region.getId());
+            }
 
-                    if (region.getServices()
-                            .getAuthenticationMode()
-                            .equals(Region.Services.AuthenticationMode.IMPERSONATE)) {
-                        LOGGER.info(
-                                "Using impersonation authentication for region {}.",
-                                region.getId());
-                    }
+            if (region.getServices()
+                    .getAuthenticationMode()
+                    .equals(Region.Services.AuthenticationMode.IMPERSONATE)) {
+                LOGGER.info("Using impersonation authentication for region {}.", region.getId());
+            }
 
-                    if (region.getServices()
-                            .getAuthenticationMode()
-                            .equals(Region.Services.AuthenticationMode.TOKEN_PASSTHROUGH)) {
-                        LOGGER.info(
-                                "Using token passthrough authentication for region {}. User token will be used by Onyxia to interact with the API Server.",
-                                region.getId());
-                    }
+            if (region.getServices()
+                    .getAuthenticationMode()
+                    .equals(Region.Services.AuthenticationMode.TOKEN_PASSTHROUGH)) {
+                LOGGER.info(
+                        "Using token passthrough authentication for region {}. User token will be used by Onyxia to interact with the API Server.",
+                        region.getId());
+            }
 
-                    if (region.getServices()
-                            .getAuthenticationMode()
-                            .equals(
-                                    Region.Services.AuthenticationMode
-                                            .SERVICEACCOUNTINTARGETNAMESPACE)) {
-                        if (StringUtils.isBlank(
-                                region.getServices().getTargetNamespaceServiceAccount())) {
-                            throw new IllegalStateException(
-                                    "services.targetNamespaceServiceAccount is required with serviceAccountInTargetNamespace authentication for region "
-                                            + region.getId());
-                        }
-                        LOGGER.info(
-                                "Using the {} service account of each namespace for region {}.",
-                                region.getServices().getTargetNamespaceServiceAccount(),
-                                region.getId());
-                        if (!region.getServices().isSingleNamespace()
-                                && region.getServices().isAllowNamespaceCreation()) {
-                            // Namespaces and their service account are created by the onboarding
-                            // API, the API has no permission to do it in this mode
-                            LOGGER.warn(
-                                    "Namespace creation is disabled for region {}: the onboarding API must be used with serviceAccountInTargetNamespace authentication.",
-                                    region.getId());
-                            region.getServices().setAllowNamespaceCreation(false);
-                        }
-                    } else if (!region.getServices().isSingleNamespace()
-                            && region.getServices().isAllowNamespaceCreation()) {
-                        LOGGER.warn(
-                                "Namespace creation by Onyxia API (allowNamespaceCreation) is deprecated for region {} and will be removed, use the onboarding API instead.",
-                                region.getId());
-                    }
-                });
+            if (region.getServices()
+                    .getAuthenticationMode()
+                    .equals(Region.Services.AuthenticationMode.SERVICEACCOUNTINTARGETNAMESPACE)) {
+                if (StringUtils.isBlank(region.getServices().getTargetNamespaceServiceAccount())) {
+                    throw new IllegalStateException(
+                            "services.targetNamespaceServiceAccount is required with serviceAccountInTargetNamespace authentication for region "
+                                    + region.getId());
+                }
+                LOGGER.info(
+                        "Using the {} service account of each namespace for region {}.",
+                        region.getServices().getTargetNamespaceServiceAccount(),
+                        region.getId());
+                if (!region.getServices().isSingleNamespace()
+                        && region.getServices().isAllowNamespaceCreation()) {
+                    // Namespaces and their service account are created by the onboarding
+                    // API, the API has no permission to do it in this mode
+                    LOGGER.warn(
+                            "Namespace creation is disabled for region {}: the onboarding API must be used with serviceAccountInTargetNamespace authentication.",
+                            region.getId());
+                    region.getServices().setAllowNamespaceCreation(false);
+                }
+            } else if (!region.getServices().isSingleNamespace()
+                    && region.getServices().isAllowNamespaceCreation()) {
+                LOGGER.warn(
+                        "Namespace creation by Onyxia API (allowNamespaceCreation) is deprecated for region {} and will be removed, use the onboarding API instead.",
+                        region.getId());
+            }
+        });
     }
 
     public Optional<Region> getRegionById(String regionId) {

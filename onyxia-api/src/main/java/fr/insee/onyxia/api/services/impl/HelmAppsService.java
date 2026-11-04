@@ -193,13 +193,11 @@ public class HelmAppsService implements AppsService {
         List<Service> services =
                 installedCharts.parallelStream()
                         .map(release -> getHelmApp(region, user, release))
-                        .filter(
-                                service ->
-                                        // Check if user can see this service
-                                        project.getGroup() == null
-                                                || service.isShare()
-                                                || user.getIdep()
-                                                        .equalsIgnoreCase(service.getOwner()))
+                        .filter(service ->
+                                // Check if user can see this service
+                                project.getGroup() == null
+                                        || service.isShare()
+                                        || user.getIdep().equalsIgnoreCase(service.getOwner()))
                         .toList();
         ServicesListing listing = new ServicesListing();
         listing.setApps(services);
@@ -528,37 +526,30 @@ public class HelmAppsService implements AppsService {
                         .list()
                         .getItems()
                         .stream()
-                        .map(
-                                pod -> {
-                                    Task currentTask = new Task();
-                                    currentTask.setId(pod.getMetadata().getName());
-                                    TaskStatus status = new TaskStatus();
-                                    status.setStatus(pod.getStatus().getPhase());
-                                    status.setReason(
-                                            pod.getStatus().getContainerStatuses().stream()
-                                                    .filter(
-                                                            cstatus ->
-                                                                    cstatus.getState().getWaiting()
-                                                                            != null)
-                                                    .map(
-                                                            cstatus ->
-                                                                    cstatus.getState()
-                                                                            .getWaiting()
-                                                                            .getReason())
-                                                    .findFirst()
-                                                    .orElse(null));
-                                    pod.getStatus()
-                                            .getContainerStatuses()
-                                            .forEach(
-                                                    c -> {
-                                                        Container container = new Container();
-                                                        container.setName(c.getName());
-                                                        container.setReady(c.getReady());
-                                                        currentTask.getContainers().add(container);
-                                                    });
-                                    currentTask.setStatus(status);
-                                    return currentTask;
-                                })
+                        .map(pod -> {
+                            Task currentTask = new Task();
+                            currentTask.setId(pod.getMetadata().getName());
+                            TaskStatus status = new TaskStatus();
+                            status.setStatus(pod.getStatus().getPhase());
+                            status.setReason(
+                                    pod.getStatus().getContainerStatuses().stream()
+                                            .filter(cstatus ->
+                                                    cstatus.getState().getWaiting() != null)
+                                            .map(cstatus ->
+                                                    cstatus.getState().getWaiting().getReason())
+                                            .findFirst()
+                                            .orElse(null));
+                            pod.getStatus()
+                                    .getContainerStatuses()
+                                    .forEach(c -> {
+                                        Container container = new Container();
+                                        container.setName(c.getName());
+                                        container.setReady(c.getReady());
+                                        currentTask.getContainers().add(container);
+                                    });
+                            currentTask.setStatus(status);
+                            return currentTask;
+                        })
                         .toList());
 
         return service;
