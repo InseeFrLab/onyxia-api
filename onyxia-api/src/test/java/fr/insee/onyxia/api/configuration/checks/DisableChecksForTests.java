@@ -1,12 +1,12 @@
 package fr.insee.onyxia.api.configuration.checks;
 
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @Configuration
 public class DisableChecksForTests {
 
-    @MockBean CompatibilityChecks compatibilityChecks;
+    @MockitoBean CompatibilityChecks compatibilityChecks;
 
     public CompatibilityChecks getCompatibilityChecks() {
         return compatibilityChecks;

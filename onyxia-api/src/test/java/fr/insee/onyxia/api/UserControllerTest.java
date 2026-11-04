@@ -22,8 +22,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -34,15 +34,15 @@ public class UserControllerTest extends BaseTest {
 
     @Autowired private ObjectMapper mapper;
 
-    @MockBean private HttpRequestUtils httpRequestUtils;
+    @MockitoBean private HttpRequestUtils httpRequestUtils;
 
-    @MockBean private RegionsConfiguration regionsConfiguration;
+    @MockitoBean private RegionsConfiguration regionsConfiguration;
 
-    @MockBean private SecurityConfig securityConfig;
+    @MockitoBean private SecurityConfig securityConfig;
 
-    @MockBean private OnyxiaUserProvider onyxiaUserProvider;
+    @MockitoBean private OnyxiaUserProvider onyxiaUserProvider;
 
-    @MockBean private UserProvider userProvider;
+    @MockitoBean private UserProvider userProvider;
 
     @BeforeEach
     public void setUp() {
