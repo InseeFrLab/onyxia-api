@@ -16,6 +16,11 @@ class ServiceUrlResolverTest {
     private final String ISTIO_VIRTUAL_SERVICE_MANIFEST_PATH =
             "kubernetes-manifest/istio-virtualservice.yaml";
     private final String INGRESS_MANIFEST_PATH = "kubernetes-manifest/k8s-ingress.yaml";
+    private final String HTTP_ROUTE_MANIFEST_PATH = "kubernetes-manifest/k8s-httproute.yaml";
+    private final String HTTP_ROUTE_NO_HOSTNAMES_MANIFEST_PATH =
+            "kubernetes-manifest/k8s-httproute-no-hostnames.yaml";
+    private final String HTTP_ROUTE_HEADER_MATCH_MANIFEST_PATH =
+            "kubernetes-manifest/k8s-httproute-header-match.yaml";
     private final String OPENSHIFT_ROUTE_MANIFEST_PATH = "kubernetes-manifest/openshift-route.yaml";
     private final String YAML_LINE_BREAK = "\n---\n";
 
@@ -26,6 +31,8 @@ class ServiceUrlResolverTest {
                 getClassPathResource(ISTIO_VIRTUAL_SERVICE_MANIFEST_PATH)
                         + YAML_LINE_BREAK
                         + getClassPathResource(INGRESS_MANIFEST_PATH)
+                        + YAML_LINE_BREAK
+                        + getClassPathResource(HTTP_ROUTE_MANIFEST_PATH)
                         + YAML_LINE_BREAK
                         + getClassPathResource(OPENSHIFT_ROUTE_MANIFEST_PATH);
 
@@ -39,11 +46,14 @@ class ServiceUrlResolverTest {
         Region region = getRegionNoExposed();
         region.getServices().getExpose().setIngress(true);
         region.getServices().getExpose().setRoute(true);
+        region.getServices().getExpose().getHttpRoute().setEnabled(true);
         region.getServices().getExpose().getIstio().setEnabled(true);
         var allManifest =
                 getClassPathResource(ISTIO_VIRTUAL_SERVICE_MANIFEST_PATH)
                         + YAML_LINE_BREAK
                         + getClassPathResource(INGRESS_MANIFEST_PATH)
+                        + YAML_LINE_BREAK
+                        + getClassPathResource(HTTP_ROUTE_MANIFEST_PATH)
                         + YAML_LINE_BREAK
                         + getClassPathResource(OPENSHIFT_ROUTE_MANIFEST_PATH);
 
@@ -53,8 +63,9 @@ class ServiceUrlResolverTest {
                 List.of(
                         "https://jupyter-python-3574-0.example.com/",
                         "https://hello-openshift.example.com",
-                        "https://jupyter-python-3574-0.example.com");
-        assertEquals(expected, urls);
+                        "https://jupyter-python-3574-0.example.com",
+                        "https://jupyter-python-3574-0.example.com/lab");
+        assertEquals(expected.stream().sorted().toList(), urls.stream().sorted().toList());
     }
 
     @Test
@@ -85,6 +96,36 @@ class ServiceUrlResolverTest {
 
         List<String> urls = ServiceUrlResolver.getServiceUrls(region, manifest, kubernetesClient);
         assertEquals(List.of("https://hello-openshift.example.com"), urls);
+    }
+
+    @Test
+    void gateway_api_httproute_should_be_included_in_urls() {
+        Region region = getRegionNoExposed();
+        region.getServices().getExpose().getHttpRoute().setEnabled(true);
+        var manifest = getClassPathResource(HTTP_ROUTE_MANIFEST_PATH);
+
+        List<String> urls = ServiceUrlResolver.getServiceUrls(region, manifest, kubernetesClient);
+        assertEquals(List.of("https://jupyter-python-3574-0.example.com/lab"), urls);
+    }
+
+    @Test
+    void gateway_api_httproute_without_hostnames_should_not_be_included_in_urls() {
+        Region region = getRegionNoExposed();
+        region.getServices().getExpose().getHttpRoute().setEnabled(true);
+        var manifest = getClassPathResource(HTTP_ROUTE_NO_HOSTNAMES_MANIFEST_PATH);
+
+        List<String> urls = ServiceUrlResolver.getServiceUrls(region, manifest, kubernetesClient);
+        assertEquals(List.of(), urls);
+    }
+
+    @Test
+    void gateway_api_httproute_with_header_match_should_not_be_included_in_urls() {
+        Region region = getRegionNoExposed();
+        region.getServices().getExpose().getHttpRoute().setEnabled(true);
+        var manifest = getClassPathResource(HTTP_ROUTE_HEADER_MATCH_MANIFEST_PATH);
+
+        List<String> urls = ServiceUrlResolver.getServiceUrls(region, manifest, kubernetesClient);
+        assertEquals(List.of(), urls);
     }
 
     private static Region getRegionNoExposed() {

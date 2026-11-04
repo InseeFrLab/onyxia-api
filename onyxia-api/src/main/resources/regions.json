@@ -51,6 +51,10 @@
           "domain": "fakedomain.kub.example.com",
           "ingress": true,
           "route": false,
+          "httpRoute": {
+            "enabled": false,
+            "parentRefs": []
+          },
           "istio": {
             "enabled": false,
             "gateways": []
