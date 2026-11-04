@@ -2,12 +2,6 @@ package fr.insee.onyxia.api.dao.universe;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.zafarkhaja.semver.Version;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.model.catalog.Pkg;
@@ -36,6 +30,13 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import tools.jackson.core.StreamReadFeature;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 @Service
 public class CatalogLoader {
@@ -254,9 +255,11 @@ public class CatalogLoader {
                 if (entryName.endsWith(chartName + "/values.schema.json")
                         && !entryName.endsWith("charts/" + chartName + "/values.schema.json")) {
                     // TODO : mutualize objectmapper
-                    ObjectMapper mapper = new ObjectMapper();
-                    mapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, false);
-                    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                    ObjectMapper mapper =
+                            JsonMapper.builder()
+                                    .disable(StreamReadFeature.AUTO_CLOSE_SOURCE)
+                                    .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                                    .build();
                     try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
                         tarIn.transferTo(baos);
                         chart.setConfig(mapper.readTree(baos.toString(UTF_8)));
@@ -272,8 +275,7 @@ public class CatalogLoader {
         }
     }
 
-    public JsonNode resolveInternalReferences(JsonNode schemaNode, ObjectMapper objectMapper)
-            throws IOException {
+    public JsonNode resolveInternalReferences(JsonNode schemaNode, ObjectMapper objectMapper) {
         // Convert the main schema JSON node to JSONObject
         JSONObject schemaJson = new JSONObject(new JSONTokener(schemaNode.toString()));
 
@@ -301,11 +303,11 @@ public class CatalogLoader {
             ObjectNode objectNode = (ObjectNode) schemaNode;
             Map<String, JsonNode> updates = new HashMap<>();
 
-            Iterator<Map.Entry<String, JsonNode>> fields = objectNode.fields();
+            Iterator<Map.Entry<String, JsonNode>> fields = objectNode.properties().iterator();
             while (fields.hasNext()) {
                 Map.Entry<String, JsonNode> field = fields.next();
-                if (field.getKey().equals("$ref") && field.getValue().isTextual()) {
-                    String ref = field.getValue().asText();
+                if (field.getKey().equals("$ref") && field.getValue().isString()) {
+                    String ref = field.getValue().asString();
                     if (ref.startsWith("#/definitions/")) {
                         String refName = ref.substring("#/definitions/".length());
                         JsonNode refNode = rootNode.at("/definitions/" + refName);
@@ -340,7 +342,7 @@ public class CatalogLoader {
 
     private Map<String, JsonNode> convertToMap(ObjectNode objectNode) {
         Map<String, JsonNode> map = new HashMap<>();
-        Iterator<Map.Entry<String, JsonNode>> fields = objectNode.fields();
+        Iterator<Map.Entry<String, JsonNode>> fields = objectNode.properties().iterator();
         while (fields.hasNext()) {
             Map.Entry<String, JsonNode> field = fields.next();
             map.put(field.getKey(), field.getValue());

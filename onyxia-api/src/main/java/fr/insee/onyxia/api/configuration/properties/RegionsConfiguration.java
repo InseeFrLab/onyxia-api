@@ -1,7 +1,5 @@
 package fr.insee.onyxia.api.configuration.properties;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.model.region.Region;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
@@ -19,6 +17,8 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.core.io.support.PropertySourceFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @Configuration
 @PropertySource(value = "classpath:regions.json", factory = RegionsConfiguration.JsonLoader.class)

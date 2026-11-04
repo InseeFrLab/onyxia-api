@@ -1,12 +1,12 @@
 package fr.insee.onyxia.api.services;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 @Service
 public class JsonSchemaResolutionService {
@@ -38,15 +38,15 @@ public class JsonSchemaResolutionService {
             JsonNode schemaNode, JsonNode rootNode, List<String> roles) {
         if (schemaNode.isObject()) {
             ObjectNode objectNode = (ObjectNode) schemaNode;
-            Iterator<Map.Entry<String, JsonNode>> fields = objectNode.fields();
+            Iterator<Map.Entry<String, JsonNode>> fields = objectNode.properties().iterator();
             Map<String, JsonNode> updates = new HashMap<>();
 
             while (fields.hasNext()) {
                 Map.Entry<String, JsonNode> field = fields.next();
                 JsonNode fieldValue = field.getValue();
 
-                if (field.getKey().equals("$ref") && fieldValue.isTextual()) {
-                    String ref = fieldValue.asText();
+                if (field.getKey().equals("$ref") && fieldValue.isString()) {
+                    String ref = fieldValue.asString();
                     JsonNode refNode = null;
                     if (ref.startsWith("#/definitions/")) {
                         refNode = rootNode.at(ref.substring(1));
@@ -63,7 +63,7 @@ public class JsonSchemaResolutionService {
                         && fieldValue.has("x-onyxia")
                         && fieldValue.get("x-onyxia").has("overwriteSchemaWith")) {
                     String overrideSchemaName =
-                            fieldValue.get("x-onyxia").get("overwriteSchemaWith").asText();
+                            fieldValue.get("x-onyxia").get("overwriteSchemaWith").asString("");
                     JsonNode overrideSchemaNode =
                             registryService.getSchema(roles, overrideSchemaName);
 
@@ -95,7 +95,7 @@ public class JsonSchemaResolutionService {
 
     private Map<String, JsonNode> convertToMap(ObjectNode objectNode) {
         Map<String, JsonNode> map = new HashMap<>();
-        Iterator<Map.Entry<String, JsonNode>> fields = objectNode.fields();
+        Iterator<Map.Entry<String, JsonNode>> fields = objectNode.properties().iterator();
         while (fields.hasNext()) {
             Map.Entry<String, JsonNode> field = fields.next();
             map.put(field.getKey(), field.getValue());

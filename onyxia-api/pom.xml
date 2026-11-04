@@ -106,14 +106,8 @@
         </dependency>
 
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
+            <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-        </dependency>
-        <!-- Spring Boot 4 defaults to Jackson 3: keep Jackson 2 auto-configuration
-             so our custom ObjectMapper keeps being used for HTTP messages -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-jackson2</artifactId>
         </dependency>
 
         <dependency>

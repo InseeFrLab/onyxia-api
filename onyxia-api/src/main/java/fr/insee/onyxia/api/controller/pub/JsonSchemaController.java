@@ -1,6 +1,5 @@
 package fr.insee.onyxia.api.controller.pub;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.onyxia.api.controller.exception.SchemaNotFoundException;
 import fr.insee.onyxia.api.services.JsonSchemaRegistryService;
 import java.util.Map;
@@ -10,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import tools.jackson.databind.JsonNode;
 
 @RestController
 @RequestMapping("/public/schemas")

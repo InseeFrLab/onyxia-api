@@ -3,11 +3,11 @@ package fr.insee.onyxia.api.configuration.properties;
 import static fr.insee.onyxia.api.util.TestUtils.getClassPathResource;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.onyxia.api.configuration.CatalogWrapper;
 import fr.insee.onyxia.api.configuration.CustomObjectMapper;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.ObjectMapper;
 
 class CatalogsConfigurationTest {
 

@@ -2,9 +2,6 @@ package fr.insee.onyxia.model.catalog;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import fr.insee.onyxia.model.helm.Repository;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ResourceLoader;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.dataformat.yaml.YAMLMapper;
 
 @SpringBootTest()
 public class CatalogTest {
@@ -20,8 +20,10 @@ public class CatalogTest {
 
     @Test
     public void shouldReadHelm() throws IOException {
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        ObjectMapper mapper =
+                YAMLMapper.builder()
+                        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                        .build();
         InputStream inputStream =
                 resourceLoader.getResource("classpath:index.yaml").getInputStream();
         Repository repo = mapper.readValue(inputStream, Repository.class);

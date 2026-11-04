@@ -1,6 +1,5 @@
 package io.github.inseefrlab.helmwrapper.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.inseefrlab.helmwrapper.model.HelmRepo;
 import io.github.inseefrlab.helmwrapper.utils.Command;
 import io.micrometer.common.util.StringUtils;
@@ -8,6 +7,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
 import org.zeroturnaround.exec.InvalidExitValueException;
+import tools.jackson.databind.ObjectMapper;
 
 /** HelmExecuter */
 public class HelmRepoService {
