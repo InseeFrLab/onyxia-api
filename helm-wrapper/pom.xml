@@ -71,7 +71,7 @@
         <dependency>
             <groupId>io.fabric8</groupId>
             <artifactId>kubernetes-httpclient-okhttp</artifactId>
-            <version>8.0.0</version>
+            <version>${fabric8io.version}</version>
             <scope>runtime</scope>
         </dependency>
 
