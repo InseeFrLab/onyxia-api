@@ -135,10 +135,9 @@ public class CatalogLoaderTest {
                 "Maintainers have been loaded",
                 maintainers.stream()
                         .filter(l -> !CollectionUtils.isEmpty(l))
-                        .anyMatch(
-                                l ->
-                                        l.get(0).getName().equals("test")
-                                                && l.get(0).getEmail().equals("test@example.com")));
+                        .anyMatch(l ->
+                                l.get(0).getName().equals("test")
+                                        && l.get(0).getEmail().equals("test@example.com")));
     }
 
     @DisplayName(

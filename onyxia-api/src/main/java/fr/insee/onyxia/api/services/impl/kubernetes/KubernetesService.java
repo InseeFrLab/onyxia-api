@@ -232,10 +232,9 @@ public class KubernetesService {
         var resourceQuotaBuilderSpecNested = resourceQuotaBuilder.withNewSpec();
         quotasToApply.entrySet().stream()
                 .filter(e -> e.getValue() != null)
-                .forEach(
-                        e ->
-                                resourceQuotaBuilderSpecNested.addToHard(
-                                        e.getKey(), Quantity.parse(e.getValue())));
+                .forEach(e ->
+                        resourceQuotaBuilderSpecNested.addToHard(
+                                e.getKey(), Quantity.parse(e.getValue())));
         resourceQuotaBuilderSpecNested.endSpec();
 
         final ResourceQuota quota = resourceQuotaBuilder.build();

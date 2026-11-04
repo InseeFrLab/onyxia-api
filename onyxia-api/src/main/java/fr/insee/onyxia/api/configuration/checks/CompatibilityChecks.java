@@ -60,23 +60,21 @@ public class CompatibilityChecks {
     public void checkKubernetesVersion() {
         regionsConfiguration
                 .getResolvedRegions()
-                .forEach(
-                        region -> {
-                            KubernetesClient client =
-                                    kubernetesClientProvider.getRootClient(region);
-                            try {
-                                LOGGER.info(
-                                        "Region {} kubernetes v{}.{}",
-                                        region.getName(),
-                                        client.getKubernetesVersion().getMajor(),
-                                        client.getKubernetesVersion().getMinor());
-                            } catch (Exception e) {
-                                LOGGER.error(
-                                        "Could not contact Kubernetes APIServer for region {} at {}",
-                                        region.getName(),
-                                        client.getMasterUrl(),
-                                        e);
-                            }
-                        });
+                .forEach(region -> {
+                    KubernetesClient client = kubernetesClientProvider.getRootClient(region);
+                    try {
+                        LOGGER.info(
+                                "Region {} kubernetes v{}.{}",
+                                region.getName(),
+                                client.getKubernetesVersion().getMajor(),
+                                client.getKubernetesVersion().getMinor());
+                    } catch (Exception e) {
+                        LOGGER.error(
+                                "Could not contact Kubernetes APIServer for region {} at {}",
+                                region.getName(),
+                                client.getMasterUrl(),
+                                e);
+                    }
+                });
     }
 }

@@ -109,70 +109,52 @@ public class OIDCConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(
-                        configurer -> {
-                            configurer.sessionAuthenticationStrategy(
-                                    sessionAuthenticationStrategy());
-                            configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-                        })
+                .sessionManagement(configurer -> {
+                    configurer.sessionAuthenticationStrategy(sessionAuthenticationStrategy());
+                    configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                })
 
                 // manage routes security here
-                .authorizeHttpRequests(
-                        configurer -> {
-                            configurer.requestMatchers(HttpMethod.OPTIONS).permitAll();
-                            // configuration pour Swagger
-                            configurer.requestMatchers(pathPattern("/")).permitAll();
-                            configurer.requestMatchers(pathPattern("/swagger-ui**")).permitAll();
-                            configurer.requestMatchers(pathPattern("/swagger-ui/**")).permitAll();
-                            configurer.requestMatchers(pathPattern("/v2/api-docs")).permitAll();
-                            configurer.requestMatchers(pathPattern("/v3/api-docs")).permitAll();
-                            configurer.requestMatchers(pathPattern("/v3/api-docs/*")).permitAll();
-                            configurer.requestMatchers(pathPattern("/csrf")).permitAll();
-                            configurer.requestMatchers(pathPattern("/webjars/**")).permitAll();
-                            configurer
-                                    .requestMatchers(pathPattern("/swagger-resources/**"))
-                                    .permitAll();
-                            configurer.requestMatchers(pathPattern("/actuator/**")).permitAll();
-                            configurer.requestMatchers(pathPattern("/actuator")).permitAll();
-                            configurer.requestMatchers(pathPattern("/api")).permitAll();
-                            configurer
-                                    .requestMatchers(pathPattern("/api/swagger-ui**"))
-                                    .permitAll();
-                            configurer
-                                    .requestMatchers(pathPattern("/api/swagger-ui/**"))
-                                    .permitAll();
-                            configurer.requestMatchers(pathPattern("/api/v2/api-docs")).permitAll();
-                            configurer.requestMatchers(pathPattern("/api/v3/api-docs")).permitAll();
-                            configurer
-                                    .requestMatchers(pathPattern("/api/v3/api-docs/*"))
-                                    .permitAll();
-                            configurer.requestMatchers(pathPattern("/api/csrf")).permitAll();
-                            configurer.requestMatchers(pathPattern("/api/webjars/**")).permitAll();
-                            configurer
-                                    .requestMatchers(pathPattern("/api/swagger-resources/**"))
-                                    .permitAll();
-                            configurer.requestMatchers(pathPattern("/api/actuator/**")).permitAll();
-                            configurer.requestMatchers(pathPattern("/api/actuator")).permitAll();
-                            configurer
-                                    .requestMatchers(pathPattern("/configuration/**"))
-                                    .permitAll();
-                            configurer
-                                    .requestMatchers(pathPattern("/swagger-resources/**"))
-                                    .permitAll();
-                            // configuration pour public
-                            configurer.requestMatchers(pathPattern("/public/**")).permitAll();
-                            configurer.requestMatchers(pathPattern("/api/public/**")).permitAll();
-                            configurer.anyRequest().authenticated();
-                        })
-                .oauth2ResourceServer(
-                        httpSecurityOAuth2ResourceServerConfigurer -> {
-                            httpSecurityOAuth2ResourceServerConfigurer.jwt(
-                                    Customizer.withDefaults());
-                            // Spring Security 7 no longer enables DPoP automatically (it did in
-                            // 6.5): Onyxia web sends DPoP-bound tokens ("Authorization: DPoP")
-                            httpSecurityOAuth2ResourceServerConfigurer.dPoP(
-                                    Customizer.withDefaults());
-                        });
+                .authorizeHttpRequests(configurer -> {
+                    configurer.requestMatchers(HttpMethod.OPTIONS).permitAll();
+                    // configuration pour Swagger
+                    configurer.requestMatchers(pathPattern("/")).permitAll();
+                    configurer.requestMatchers(pathPattern("/swagger-ui**")).permitAll();
+                    configurer.requestMatchers(pathPattern("/swagger-ui/**")).permitAll();
+                    configurer.requestMatchers(pathPattern("/v2/api-docs")).permitAll();
+                    configurer.requestMatchers(pathPattern("/v3/api-docs")).permitAll();
+                    configurer.requestMatchers(pathPattern("/v3/api-docs/*")).permitAll();
+                    configurer.requestMatchers(pathPattern("/csrf")).permitAll();
+                    configurer.requestMatchers(pathPattern("/webjars/**")).permitAll();
+                    configurer.requestMatchers(pathPattern("/swagger-resources/**")).permitAll();
+                    configurer.requestMatchers(pathPattern("/actuator/**")).permitAll();
+                    configurer.requestMatchers(pathPattern("/actuator")).permitAll();
+                    configurer.requestMatchers(pathPattern("/api")).permitAll();
+                    configurer.requestMatchers(pathPattern("/api/swagger-ui**")).permitAll();
+                    configurer.requestMatchers(pathPattern("/api/swagger-ui/**")).permitAll();
+                    configurer.requestMatchers(pathPattern("/api/v2/api-docs")).permitAll();
+                    configurer.requestMatchers(pathPattern("/api/v3/api-docs")).permitAll();
+                    configurer.requestMatchers(pathPattern("/api/v3/api-docs/*")).permitAll();
+                    configurer.requestMatchers(pathPattern("/api/csrf")).permitAll();
+                    configurer.requestMatchers(pathPattern("/api/webjars/**")).permitAll();
+                    configurer
+                            .requestMatchers(pathPattern("/api/swagger-resources/**"))
+                            .permitAll();
+                    configurer.requestMatchers(pathPattern("/api/actuator/**")).permitAll();
+                    configurer.requestMatchers(pathPattern("/api/actuator")).permitAll();
+                    configurer.requestMatchers(pathPattern("/configuration/**")).permitAll();
+                    configurer.requestMatchers(pathPattern("/swagger-resources/**")).permitAll();
+                    // configuration pour public
+                    configurer.requestMatchers(pathPattern("/public/**")).permitAll();
+                    configurer.requestMatchers(pathPattern("/api/public/**")).permitAll();
+                    configurer.anyRequest().authenticated();
+                })
+                .oauth2ResourceServer(httpSecurityOAuth2ResourceServerConfigurer -> {
+                    httpSecurityOAuth2ResourceServerConfigurer.jwt(Customizer.withDefaults());
+                    // Spring Security 7 no longer enables DPoP automatically (it did in
+                    // 6.5): Onyxia web sends DPoP-bound tokens ("Authorization: DPoP")
+                    httpSecurityOAuth2ResourceServerConfigurer.dPoP(Customizer.withDefaults());
+                });
         return http.build();
     }
 
