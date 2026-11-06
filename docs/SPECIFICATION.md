@@ -45,17 +45,6 @@ My Lab endpoints are available to authenticated users, offering a programmatic w
 
 The endpoints routed by `fr.insee.onyxia.api.controller.api.mylab.QuotaController`, are only functional if a quota feature is set on the Region, and allow users to:
 - `GET /my-lab/quota` get their quota on the namespace, which is implemented by a quota resource with the name `onyxia-quota`
-- `POST /my-lab/quota` change their quota on the namepsace, if quota changing is enabled
-- `POST /my-lab/quota/reset` reset their quota to the default one on the namespace
-
-### /onboarding/
-
-The request to onboard process entails the creation of the Kubernetes namespace for the Group and the creation of a RoleBinding to that namespace giving the default ServiceAccount of that namespace admin permissions. There is a check in whether the user that made the request belongs to the group, based on the OIDC token, and the group onboarding process is triggered if so.
-
-*NOTE: this onboarding process is being done behind the scenes when requesting a first service, and the endpoint use is not the default behaviour.*  
-
-If no group is given in the body, it is assumed that it is a user onboard, i.e., a namespace for a single user rather than a Group (Project), and the creation of the namespace and RoleBinding remains the same. However, in the user use-case, there is also the possibility to set Quotas on the namespace during creation, and these are obtained in the Region definition configuration.
-
 
 ### /public/
 Public endpoints are available to all, offering a programmatic way to comprehend the current configuration and the available services in Onyxia. They allow users to:
