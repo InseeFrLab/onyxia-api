@@ -35,7 +35,8 @@ public class UtilsCommandTest {
                 "&",
                 "&&",
                 "@",
-                "|"
+                "|",
+                "test --atomic"
             })
     public void shouldDisallowConcatenate(String toConcatenate) {
         assertThrows(
