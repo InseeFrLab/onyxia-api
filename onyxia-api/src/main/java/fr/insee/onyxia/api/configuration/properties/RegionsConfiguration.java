@@ -77,20 +77,6 @@ public class RegionsConfiguration {
                         "Using the {} service account of each namespace for region {}.",
                         region.getServices().getTargetNamespaceServiceAccount(),
                         region.getId());
-                if (!region.getServices().isSingleNamespace()
-                        && region.getServices().isAllowNamespaceCreation()) {
-                    // Namespaces and their service account are created by the onboarding
-                    // API, the API has no permission to do it in this mode
-                    LOGGER.warn(
-                            "Namespace creation is disabled for region {}: the onboarding API must be used with serviceAccountInTargetNamespace authentication.",
-                            region.getId());
-                    region.getServices().setAllowNamespaceCreation(false);
-                }
-            } else if (!region.getServices().isSingleNamespace()
-                    && region.getServices().isAllowNamespaceCreation()) {
-                LOGGER.warn(
-                        "Namespace creation by Onyxia API (allowNamespaceCreation) is deprecated for region {} and will be removed, use the onboarding API instead.",
-                        region.getId());
             }
         });
     }

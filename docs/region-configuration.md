@@ -50,10 +50,6 @@ Users can work on Onyxia as a User or as a Group to which they belong. Each user
 | Key                           | Default | Description                                                                                                                                                                                                                                                                                                        | Example                                                                                           |
 |-------------------------------| ------- |--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|
 | `type`                        | | Type of the platform on which services are launched. Only Kubernetes is supported, Marathon has been removed.                                                                                                                                                                                                      | "KUBERNETES"                                                                                      |
-| `allowNamespaceCreation`      | true | If true, the /onboarding endpoint is enabled and the user will have a namespace created on its first request on a service resource.                                                                                                                                                                                | true                                                                                              |
-| `namespaceLabels`             |  | Static labels to add to the namespace (at creation and subsequent user logins)                                                                                                                                                                                                                                     | {"zone":"prod"}                                                                                   |
-| `namespaceAnnotations`        |  | Static annotations to add to the namespace (at creation and subsequent user logins)                                                                                                                                                                                                                                | {"zone":"prod"}                                                                                   |
-| `namespaceAnnotationsDynamic` |  | Dynamic annotations (currently only based on user JWT token) to add to the namespace (at creation and subsequent user logins). Annotations names will be prefixed with `onyxia_`. `onyxia_last_login_timestamp` is also added.                                                                                     | {"enabled": true, "userAttributes": ["sub", "email"] }                                            |
 | `singleNamespace`             | true | When true, all users share the same namespace on the service provider. This configuration can be used if a project works on its own Onyxia region.                                                                                                                                                                 |                                                                                                   |
 | `userNamespace`               | true | When true, all users have a namespace for their work. This configuration can be used if you don't allow a user to have their own space to work and only use project space                                                                                                                                          |                                                                                                   |
 | `namespacePrefix`             | "user-" | User has a personal namespace like namespacePrefix + userId (should only be used when not singleNamespace but not the case)                                                                                                                                                                                        |                                                                                                   |
@@ -93,30 +89,12 @@ It can be used to add additional features to Onyxia. It helps Onyxia users to di
 
 ### Quotas properties
 
-When this feature is enabled, Onyxia creates and maintains a [ResourceQuota](https://kubernetes.io/docs/concepts/policy/resource-quotas/) in the user / group namespace.
-This feature can be enabled for either or both `user` and `group` namespaces and, for user namespaces, quotas can depend on the user roles. 
+ResourceQuotas are created by the onboarding API in each namespace. These properties only enable the `GET /my-lab/quota` endpoint, which displays the [ResourceQuota](https://kubernetes.io/docs/concepts/policy/resource-quotas/) named `onyxia-quota` of the user / group namespace.
 
-| Key            | Default | Description                                                                                                                                                                                        | Example |
-|----------------| ------- |----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| ------ |
-| `userEnabled`  | false | Whether or not `ResourceQuotas` should be created for user namespaces.                                                                                                                             | true |
-| `user`         |  | Quota to apply to user namespaces.                                                                                                                                                                 | `{ "count/pods": "5" }` |
-| `roles`        |  | Map of quotas corresponding to user roles. In case the user has multiple of those roles, only the first one will be applied. If user has no role from this list then `user` quota will be applied. | `{"admin": { "count/pods": "999" }}` |
-| `groupEnabled` | false | Whether or not `ResourceQuotas` should be created for group namespaces.                                                                                                                            | true |
-| `group`        |  | Quota to apply to group namespaces.                                                                                                                                                                | `{ "count/pods": "5" }` |
-
-A quota follows the Kubernetes model which is composed of:  
-* "requests.memory"
-* "requests.cpu"
-* "limits.memory"
-* "limits.cpu"
-* "requests.storage"
-* "count/pods"
-* "requests.ephemeral-storage"
-* "limits.ephemeral-storage"
-* "requests.nvidia.com/gpu"
-* "limits.nvidia.com/gpu"  
-
-Note : If you want Onyxia to create the ResourceQuota but not override it at each user login / action (e.g you override it yourself for some specific users), you can add the annotation `onyxia_ignore` to the ResourceQuota. If this annotation is set on a ResourceQuota then Onyxia won't touch it anymore.
+| Key            | Default | Description                                                    |
+|----------------| ------- |----------------------------------------------------------------|
+| `userEnabled`  | false   | Whether or not quotas are displayed for user namespaces.       |
+| `groupEnabled` | false   | Whether or not quotas are displayed for group namespaces.      |
 
 ### Expose properties
 

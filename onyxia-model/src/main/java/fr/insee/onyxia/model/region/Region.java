@@ -3,7 +3,6 @@ package fr.insee.onyxia.model.region;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import fr.insee.onyxia.model.service.quota.Quota;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -174,9 +173,6 @@ public class Region {
     public static class Services {
 
         private boolean singleNamespace = true;
-        private boolean allowNamespaceCreation = true;
-        private Map<String, String> namespaceLabels = new HashMap<>();
-        private Map<String, String> namespaceAnnotations = new HashMap<>();
         private boolean userNamespace = true;
 
         private String namespacePrefix = "user-";
@@ -201,9 +197,6 @@ public class Region {
 
         private K8sPublicEndpoint k8sPublicEndpoint = new K8sPublicEndpoint();
 
-        private NamespaceAnnotationsDynamic namespaceAnnotationsDynamic =
-                new NamespaceAnnotationsDynamic();
-
         public boolean isSingleNamespace() {
             return singleNamespace;
         }
@@ -218,39 +211,6 @@ public class Region {
 
         public Object getDefaultConfiguration() {
             return defaultConfiguration;
-        }
-
-        public boolean isAllowNamespaceCreation() {
-            return allowNamespaceCreation;
-        }
-
-        public void setAllowNamespaceCreation(boolean allowNamespaceCreation) {
-            this.allowNamespaceCreation = allowNamespaceCreation;
-        }
-
-        public NamespaceAnnotationsDynamic getNamespaceAnnotationsDynamic() {
-            return namespaceAnnotationsDynamic;
-        }
-
-        public void setNamespaceAnnotationsDynamic(
-                NamespaceAnnotationsDynamic namespaceAnnotationsDynamic) {
-            this.namespaceAnnotationsDynamic = namespaceAnnotationsDynamic;
-        }
-
-        public Map<String, String> getNamespaceLabels() {
-            return namespaceLabels;
-        }
-
-        public void getNamespaceLabels(Map<String, String> namespaceLabels) {
-            this.namespaceLabels = namespaceLabels;
-        }
-
-        public Map<String, String> getNamespaceAnnotations() {
-            return namespaceAnnotations;
-        }
-
-        public void getNamespaceAnnotations(Map<String, String> namespaceAnnotations) {
-            this.namespaceAnnotations = namespaceAnnotations;
         }
 
         public boolean isUserNamespace() {
@@ -377,41 +337,10 @@ public class Region {
             TOKEN_PASSTHROUGH
         }
 
-        public static class NamespaceAnnotationsDynamic {
-            private boolean enabled = true;
-
-            private List<String> userAttributes = new ArrayList<>();
-
-            public boolean isEnabled() {
-                return enabled;
-            }
-
-            public void setEnabled(boolean enabled) {
-                this.enabled = enabled;
-            }
-
-            public List<String> getUserAttributes() {
-                return userAttributes;
-            }
-
-            public void setUserAttributes(List<String> userAttributes) {
-                this.userAttributes = userAttributes;
-            }
-        }
-
         public static class Quotas {
 
             private boolean userEnabled = false;
             private boolean groupEnabled = false;
-
-            @JsonProperty("user")
-            private Quota userQuota;
-
-            @JsonProperty("group")
-            private Quota groupQuota;
-
-            @JsonProperty("roles")
-            private Map<String, Quota> rolesQuota = new HashMap<>();
 
             public boolean isUserEnabled() {
                 return userEnabled;
@@ -427,30 +356,6 @@ public class Region {
 
             public void setGroupEnabled(boolean groupEnabled) {
                 this.groupEnabled = groupEnabled;
-            }
-
-            public Quota getUserQuota() {
-                return userQuota;
-            }
-
-            public void setUserQuota(Quota userQuota) {
-                this.userQuota = userQuota;
-            }
-
-            public Quota getGroupQuota() {
-                return groupQuota;
-            }
-
-            public void setGroupQuota(Quota groupQuota) {
-                this.groupQuota = groupQuota;
-            }
-
-            public void setRolesQuota(Map<String, Quota> rolesQuota) {
-                this.rolesQuota = rolesQuota;
-            }
-
-            public Map<String, Quota> getRolesQuota() {
-                return rolesQuota;
             }
         }
 
