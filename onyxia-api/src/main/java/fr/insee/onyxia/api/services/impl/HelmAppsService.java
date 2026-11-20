@@ -120,7 +120,8 @@ public class HelmAppsService implements AppsService {
                     getHelmInstallService()
                             .installChart(
                                     getHelmConfiguration(region, user, namespaceId),
-                                    catalogId + "/" + pkg.getName(),
+                                    catalogId,
+                                    pkg.getName(),
                                     namespaceId,
                                     requestDTO.getName(),
                                     pkg.getVersion(),
@@ -454,7 +455,8 @@ public class HelmAppsService implements AppsService {
         getHelmInstallService()
                 .installChart(
                         getHelmConfiguration(region, user, namespaceId),
-                        catalogId + "/" + chartName,
+                        catalogId,
+                        chartName,
                         namespaceId,
                         serviceId,
                         version,

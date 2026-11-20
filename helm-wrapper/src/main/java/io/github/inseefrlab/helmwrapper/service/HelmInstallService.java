@@ -40,7 +40,8 @@ public class HelmInstallService {
 
     public HelmInstaller installChart(
             HelmConfiguration configuration,
-            String chart,
+            String catalogID,
+            String chartName,
             String namespace,
             String name,
             String version,
@@ -69,8 +70,10 @@ public class HelmInstallService {
         } else {
             command.append("--generate-name ");
         }
-        command.append(chart + " ");
-        command.append("-n ");
+        safeConcat(command, catalogID);
+        command.append("/");
+        safeConcat(command, chartName);
+        command.append(" -n ");
         if (namespace.length() > 63 || !rfc1123Pattern.matcher(namespace).matches()) {
             throw new IllegalArgumentException(
                     "Invalid namespace "
