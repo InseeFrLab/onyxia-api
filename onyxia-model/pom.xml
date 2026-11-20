@@ -39,7 +39,7 @@
        <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-common</artifactId>
-            <version>3.2.0</version>
+            <version>3.2.1</version>
         </dependency>
 
     </dependencies>
