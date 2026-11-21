@@ -113,8 +113,7 @@ public class HelmAppsService implements AppsService {
 
         File values = File.createTempFile("values", ".yaml");
         mapperHelm.writeValue(values, fusion);
-        String namespaceId =
-                kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
+        String namespaceId = kubernetesService.determineNamespace(region, project, user);
         try {
             HelmInstaller res =
                     getHelmInstallService()
@@ -208,8 +207,7 @@ public class HelmAppsService implements AppsService {
     @Override
     public String getLogs(
             Region region, Project project, User user, String serviceId, String taskId) {
-        String namespace =
-                kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
+        String namespace = kubernetesService.determineNamespace(region, project, user);
         KubernetesClient client = kubernetesClientProvider.getUserClient(region, user, namespace);
         return client.pods().inNamespace(namespace).withName(taskId).getLog();
     }
@@ -220,8 +218,7 @@ public class HelmAppsService implements AppsService {
             Project project,
             User user,
             Watcher<io.fabric8.kubernetes.api.model.Event> watcher) {
-        String namespace =
-                kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
+        String namespace = kubernetesService.determineNamespace(region, project, user);
         KubernetesClient client = kubernetesClientProvider.getUserClient(region, user, namespace);
         return client.v1().events().inNamespace(namespace).watch(watcher);
     }
@@ -232,8 +229,7 @@ public class HelmAppsService implements AppsService {
         if (serviceId.startsWith("/")) {
             serviceId = serviceId.substring(1);
         }
-        String namespace =
-                kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
+        String namespace = kubernetesService.determineNamespace(region, project, user);
         HelmLs result =
                 getHelmInstallService()
                         .getAppById(
@@ -247,8 +243,7 @@ public class HelmAppsService implements AppsService {
     public UninstallService destroyService(
             Region region, Project project, User user, final String path, boolean bulk)
             throws Exception {
-        final String namespace =
-                kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
+        final String namespace = kubernetesService.determineNamespace(region, project, user);
         UninstallService result = new UninstallService();
         result.setPath(path);
         int status = 0;
@@ -379,8 +374,7 @@ public class HelmAppsService implements AppsService {
 
     private void patchOnyxiaSecret(
             Region region, Project project, User user, String serviceId, Map<String, String> data) {
-        String namespaceId =
-                kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
+        String namespaceId = kubernetesService.determineNamespace(region, project, user);
         KubernetesClient client = kubernetesClientProvider.getUserClient(region, user, namespaceId);
         Secret secret =
                 client.secrets()
@@ -449,8 +443,7 @@ public class HelmAppsService implements AppsService {
             HelmFlags flags,
             boolean suspend)
             throws IOException, InterruptedException, TimeoutException {
-        String namespaceId =
-                kubernetesService.determineNamespaceAndCreateIfNeeded(region, project, user);
+        String namespaceId = kubernetesService.determineNamespace(region, project, user);
         var suspendEnv = Map.of(SUSPEND_KEY, suspend ? "true" : "false");
         getHelmInstallService()
                 .installChart(
